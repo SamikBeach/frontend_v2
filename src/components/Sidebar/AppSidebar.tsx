@@ -63,7 +63,7 @@ export function AppSidebar() {
             <Logo />
           </Link>
         </SidebarHeader>
-        <SidebarContent className="border-r-0 px-1 pt-2">
+        <SidebarContent className="border-r-0 px-1">
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
