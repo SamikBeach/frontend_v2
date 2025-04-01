@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SidebarProvider>
           <Header />
           <AppSidebar />
-          <main className="w-full">{children}</main>
+          <main className="mt-[56px] w-full">{children}</main>
         </SidebarProvider>
       </body>
     </html>
