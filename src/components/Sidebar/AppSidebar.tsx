@@ -1,12 +1,9 @@
 'use client';
 
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { useAtom } from 'jotai';
 import { BookOpen, Compass, Home, Lightbulb, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { sidebarExpandedAtom } from '@/atoms/sidebar';
 import { Logo } from '@/components/Logo';
 import {
   Sidebar,
@@ -50,7 +47,6 @@ const mainMenuItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const [isExpanded, setIsExpanded] = useAtom(sidebarExpandedAtom);
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -60,16 +56,8 @@ export function AppSidebar() {
   };
 
   return (
-    <SidebarProvider defaultOpen={isExpanded} onOpenChange={setIsExpanded}>
-      <Sidebar
-        collapsible="icon"
-        style={
-          {
-            '--sidebar-width': '17rem',
-            '--sidebar-width-icon': '4rem',
-          } as React.CSSProperties
-        }
-      >
+    <>
+      <Sidebar collapsible="icon">
         <SidebarHeader className="h-[56px] px-6">
           <Link href="/" className="flex items-center gap-2">
             <Logo />
@@ -105,6 +93,6 @@ export function AppSidebar() {
       <div className="fixed bottom-3 left-4 z-50">
         <SidebarTrigger className="rounded-xl bg-white/80 backdrop-blur-xl hover:bg-gray-100/80" />
       </div>
-    </SidebarProvider>
+    </>
   );
 }
