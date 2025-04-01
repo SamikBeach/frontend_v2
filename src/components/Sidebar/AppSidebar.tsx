@@ -1,9 +1,12 @@
 'use client';
 
+import { SidebarProvider } from '@/components/ui/sidebar';
+import { useAtom } from 'jotai';
 import { BookOpen, Compass, Home, Lightbulb, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { sidebarExpandedAtom } from '@/atoms/sidebar';
 import { Logo } from '@/components/Logo';
 import {
   Sidebar,
@@ -47,6 +50,7 @@ const mainMenuItems = [
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const [isExpanded, setIsExpanded] = useAtom(sidebarExpandedAtom);
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -56,22 +60,22 @@ export function AppSidebar() {
   };
 
   return (
-    <>
+    <SidebarProvider defaultOpen={isExpanded} onOpenChange={setIsExpanded}>
       <Sidebar
         collapsible="icon"
         style={
           {
-            '--sidebar-width': '16rem',
+            '--sidebar-width': '17rem',
             '--sidebar-width-icon': '4rem',
           } as React.CSSProperties
         }
       >
         <SidebarHeader className="h-[56px] px-6">
           <Link href="/" className="flex items-center gap-2">
-            <Logo className="h-6" />
+            <Logo />
           </Link>
         </SidebarHeader>
-        <SidebarContent className="min-w-10 bg-white px-2">
+        <SidebarContent className="border-r-0 px-1 pt-2">
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
@@ -79,12 +83,15 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
-                      className="h-10 px-4 text-[15px] font-medium"
+                      className="h-11 rounded-xl px-4 text-[15px] font-medium text-gray-600 transition-colors hover:bg-gray-100/80 data-[active=true]:bg-gray-100 data-[active=true]:font-semibold data-[active=true]:text-gray-900"
                       data-active={isActive(item.href)}
                       tooltip={item.title}
                     >
-                      <Link href={item.href}>
-                        <item.icon className="h-[20px]! w-[20px]!" />
+                      <Link
+                        href={item.href}
+                        className="flex items-center gap-3"
+                      >
+                        <item.icon className="h-[21px]! w-[21px]!" />
                         <span>{item.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -96,8 +103,8 @@ export function AppSidebar() {
         </SidebarContent>
       </Sidebar>
       <div className="fixed bottom-3 left-4 z-50">
-        <SidebarTrigger />
+        <SidebarTrigger className="rounded-xl bg-white/80 backdrop-blur-xl hover:bg-gray-100/80" />
       </div>
-    </>
+    </SidebarProvider>
   );
 }

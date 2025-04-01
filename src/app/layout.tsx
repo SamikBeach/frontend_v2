@@ -12,17 +12,13 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko">
-      <body className="bg-background min-h-screen">
+      <body className="overflow-x-hidden">
         <SidebarProvider>
-          <div className="relative flex min-h-screen">
-            <AppSidebar />
-            <div className="flex-1">
-              <Header />
-              <main className="container mx-auto px-4 py-8 pt-[72px]">
-                {children}
-              </main>
-            </div>
-          </div>
+          <Header />
+          <AppSidebar />
+          <main className="min-h-screen">
+            <div className="mt-[56px]">{children}</div>
+          </main>
         </SidebarProvider>
       </body>
     </html>
