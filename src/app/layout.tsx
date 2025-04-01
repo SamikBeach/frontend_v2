@@ -16,9 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SidebarProvider>
           <Header />
           <AppSidebar />
-          <main className="min-h-screen">
-            <div className="mt-[56px]">{children}</div>
-          </main>
+          <main className="w-full">{children}</main>
         </SidebarProvider>
       </body>
     </html>
