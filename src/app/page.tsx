@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export default function Page() {
@@ -7,6 +8,7 @@ export default function Page() {
         Hello world!
       </h1>
       <Input placeholder="Hello" />
+      <Button variant="outline">Click me</Button>
     </div>
   );
 }
