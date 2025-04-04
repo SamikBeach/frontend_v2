@@ -1,5 +1,3 @@
-'use client';
-
 import { Book } from '@/components/BookCard';
 
 interface BookGridProps {
@@ -9,7 +7,7 @@ interface BookGridProps {
 
 export function BookGrid({ books, onSelectBook }: BookGridProps) {
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
       {books.map(book => (
         <div
           key={book.id}
