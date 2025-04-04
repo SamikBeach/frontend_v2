@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { CategoryFilter } from '@/app/popular/components/CategoryFilter';
 import { Book } from '@/components/BookCard';
 import { BookDialog } from '@/components/BookDialog';
+import { SortDropdown } from '@/components/SortDropdown';
 import { useUrlParams } from '@/hooks';
 
 import { BookCarousel, BookGrid, DiscoverBreadcrumb } from './components';
@@ -16,11 +17,13 @@ export default function DiscoverPage() {
     defaultValues: {
       category: 'all',
       subcategory: '',
+      sort: 'reviews-desc',
     },
   });
 
   const selectedCategory = params.category;
   const selectedSubcategory = params.subcategory;
+  const selectedSort = params.sort || 'reviews-desc';
 
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
@@ -33,6 +36,11 @@ export default function DiscoverPage() {
   // 서브카테고리 클릭 핸들러
   const handleSubcategoryClick = (subcategoryId: string) => {
     setParam('subcategory', subcategoryId);
+  };
+
+  // 정렬 옵션 변경 핸들러
+  const handleSortChange = (sortId: string) => {
+    setParam('sort', sortId);
   };
 
   // URL params 초기화
@@ -68,15 +76,25 @@ export default function DiscoverPage() {
         />
       </div>
 
-      {/* 카테고리 필터 */}
+      {/* 카테고리 필터와 정렬 옵션 */}
       <div className="mx-auto w-full px-6 pt-3 pb-6">
-        <CategoryFilter
-          categories={curationCategories}
-          selectedCategory={selectedCategory}
-          selectedSubcategory={selectedSubcategory}
-          onCategoryClick={handleCategoryClick}
-          onSubcategoryClick={handleSubcategoryClick}
-        />
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <CategoryFilter
+            categories={curationCategories}
+            selectedCategory={selectedCategory}
+            selectedSubcategory={selectedSubcategory}
+            onCategoryClick={handleCategoryClick}
+            onSubcategoryClick={handleSubcategoryClick}
+          />
+
+          {selectedSubcategory && (
+            <SortDropdown
+              selectedSort={selectedSort}
+              onSortChange={handleSortChange}
+              className="ml-auto"
+            />
+          )}
+        </div>
 
         {/* 컬렉션 리스트 */}
         <div className="mt-6">
