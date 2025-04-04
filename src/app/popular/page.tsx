@@ -59,9 +59,9 @@ export default function PopularPage() {
   });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="bg-white">
       {/* 브레드크럼 */}
-      <div className="mx-auto w-full px-6 py-3">
+      <div className="mx-auto w-full px-6 py-2">
         <PopularBreadcrumb
           selectedCategory={selectedCategory}
           selectedSubcategory={selectedSubcategory}
@@ -72,7 +72,7 @@ export default function PopularPage() {
       </div>
 
       {/* 카테고리 필터 */}
-      <div className="mx-auto w-full px-6 pt-4">
+      <div className="mx-auto w-full px-6 pt-3 pb-6">
         <CategoryFilter
           categories={categories}
           selectedCategory={selectedCategory}

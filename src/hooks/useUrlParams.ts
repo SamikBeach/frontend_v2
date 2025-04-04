@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface UseUrlParamsOptions<T extends Record<string, string>> {
   defaultValues: T;
@@ -14,6 +14,7 @@ export function useUrlParams<T extends Record<string, string>>({
 }: UseUrlParamsOptions<T>) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pendingUpdate = useRef<T | null>(null);
 
   // Initialize params from URL or default values
   const [params, setParams] = useState<T>(() => {
@@ -30,20 +31,29 @@ export function useUrlParams<T extends Record<string, string>>({
     return initialParams;
   });
 
-  // Update URL when params change
-  const updateUrl = (newParams: T) => {
-    const params = new URLSearchParams();
+  // 비동기적으로 URL 업데이트
+  useEffect(() => {
+    if (pendingUpdate.current) {
+      const newParams = new URLSearchParams();
 
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value && value !== defaultValues[key]) {
-        params.set(key, value);
-      }
-    });
+      Object.entries(pendingUpdate.current).forEach(([key, value]) => {
+        if (value && value !== defaultValues[key]) {
+          newParams.set(key, value);
+        }
+      });
 
-    const queryString = params.toString();
-    const path = window.location.pathname;
-    router.push(`${path}${queryString ? `?${queryString}` : ''}`);
-  };
+      const queryString = newParams.toString();
+      const path = window.location.pathname;
+      router.push(`${path}${queryString ? `?${queryString}` : ''}`);
+
+      pendingUpdate.current = null;
+    }
+  }, [params, router, defaultValues]);
+
+  // 업데이트를 스케줄링
+  const updateUrl = useCallback((newParams: T) => {
+    pendingUpdate.current = newParams;
+  }, []);
 
   // Set a specific param
   const setParam = (key: keyof T, value: string) => {
@@ -78,7 +88,7 @@ export function useUrlParams<T extends Record<string, string>>({
     if (hasChanges) {
       setParams(newParams);
     }
-  }, [searchParams]);
+  }, [searchParams, defaultValues, params]);
 
   return {
     params,
