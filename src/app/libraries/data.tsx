@@ -1,6 +1,10 @@
 import {
   ArrowDownAZ,
   Calendar,
+  CalendarClock,
+  CalendarDays,
+  Clock,
+  Clock3,
   Star,
 } from 'lucide-react';
 import { Category, Library, SortOption } from './types';
@@ -41,6 +45,7 @@ export const sortOptions: SortOption[] = [
     label: '인기순',
     icon: () => <Star className="mr-2 h-4 w-4 text-[#FFAB00]" />,
     sortFn: (a, b) => b.followers - a.followers,
+    supportsTimeRange: true,
   },
   {
     id: 'latest',
@@ -54,6 +59,35 @@ export const sortOptions: SortOption[] = [
     label: '제목순',
     icon: () => <ArrowDownAZ className="mr-2 h-4 w-4 text-gray-500" />,
     sortFn: (a, b) => a.title.localeCompare(b.title, 'ko'),
+  },
+];
+
+// 기간 필터 옵션
+export const timeRangeOptions = [
+  {
+    id: 'all',
+    label: '전체 기간',
+    icon: <CalendarDays className="mr-2 h-4 w-4 text-gray-500" />,
+  },
+  {
+    id: 'today',
+    label: '오늘',
+    icon: <Clock className="mr-2 h-4 w-4 text-gray-500" />,
+  },
+  {
+    id: 'week',
+    label: '이번 주',
+    icon: <Clock3 className="mr-2 h-4 w-4 text-gray-500" />,
+  },
+  {
+    id: 'month',
+    label: '이번 달',
+    icon: <Calendar className="mr-2 h-4 w-4 text-gray-500" />,
+  },
+  {
+    id: 'year',
+    label: '올해',
+    icon: <CalendarClock className="mr-2 h-4 w-4 text-gray-500" />,
   },
 ];
 

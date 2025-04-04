@@ -1,9 +1,7 @@
 'use client';
 
-import { Plus } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { Button } from '@/components/ui/button';
 import { useUrlParams } from '@/hooks';
 
 // 분리된 데이터와 컴포넌트 가져오기
@@ -13,6 +11,7 @@ import { LibraryCard } from './components/LibraryCard';
 import { SearchBar } from './components/SearchBar';
 import { SortDropdown } from './components/SortDropdown';
 import { libraries, libraryCategories, sortOptions } from './data';
+import { TimeRange } from './types';
 
 // 스크롤바 숨기는 CSS 추가
 const noScrollbarStyles = `
@@ -27,6 +26,36 @@ const noScrollbarStyles = `
   }
 `;
 
+// 기간별 필터링을 위한 날짜 계산 함수
+const getDateFromTimeRange = (timeRange: TimeRange): Date | null => {
+  const now = new Date();
+
+  switch (timeRange) {
+    case 'today':
+      // 오늘 00:00:00 시간으로 설정
+      now.setHours(0, 0, 0, 0);
+      return now;
+    case 'week':
+      // 이번 주 일요일로 설정 (0: 일요일, 1: 월요일, ..., 6: 토요일)
+      now.setDate(now.getDate() - now.getDay());
+      now.setHours(0, 0, 0, 0);
+      return now;
+    case 'month':
+      // 이번 달 1일로 설정
+      now.setDate(1);
+      now.setHours(0, 0, 0, 0);
+      return now;
+    case 'year':
+      // 올해 1월 1일로 설정
+      now.setMonth(0, 1);
+      now.setHours(0, 0, 0, 0);
+      return now;
+    default:
+      // 'all'인 경우 null 반환
+      return null;
+  }
+};
+
 // 메인 페이지 컴포넌트
 export default function LibrariesPage() {
   // URL 파라미터 관리
@@ -34,11 +63,13 @@ export default function LibrariesPage() {
     defaultValues: {
       category: 'all', // all, philosophy, literature, history, science
       sort: 'popular', // popular, latest, title
+      timeRange: 'all', // all, today, week, month, year
     },
   });
 
   const selectedCategory = params.category || 'all';
   const selectedSort = params.sort || 'popular';
+  const selectedTimeRange = (params.timeRange as TimeRange) || 'all';
   const [searchQuery, setSearchQuery] = useState('');
 
   // 카테고리 클릭 핸들러
@@ -49,6 +80,11 @@ export default function LibrariesPage() {
   // 정렬 옵션 클릭 핸들러
   const handleSortChange = (sortId: string) => {
     setParam('sort', sortId);
+  };
+
+  // 기간 필터 변경 핸들러
+  const handleTimeRangeChange = (timeRange: TimeRange) => {
+    setParam('timeRange', timeRange);
   };
 
   // 필터링 로직
@@ -73,6 +109,17 @@ export default function LibrariesPage() {
     );
   }
 
+  // 기간별 필터링 (인기순 정렬일 때만)
+  if (selectedSort === 'popular' && selectedTimeRange !== 'all') {
+    const cutoffDate = getDateFromTimeRange(selectedTimeRange);
+    if (cutoffDate) {
+      filteredLibraries = filteredLibraries.filter(library => {
+        const libraryDate = new Date(library.timestamp);
+        return libraryDate >= cutoffDate;
+      });
+    }
+  }
+
   // 정렬 로직
   const sortedLibraries = useMemo(() => {
     const currentSortOption =
@@ -84,10 +131,17 @@ export default function LibrariesPage() {
     <>
       <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
       <div className="min-h-screen w-full bg-white">
-        <div className="flex w-full flex-col py-4">
-          {/* 상단 검색 및 필터 영역 */}
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-4 px-4">
-            <div className="flex items-center gap-3">
+        <div className="flex w-full flex-col">
+          {/* 필터 바 및 검색/정렬 영역 */}
+          <div className="mb-6 flex flex-wrap items-center justify-between px-4">
+            <div className="flex-1">
+              <FilterBar
+                categories={libraryCategories}
+                selectedCategory={selectedCategory}
+                onCategoryClick={handleCategoryClick}
+              />
+            </div>
+            <div className="ml-auto flex items-center gap-3">
               <SearchBar
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
@@ -96,20 +150,10 @@ export default function LibrariesPage() {
                 selectedSort={selectedSort}
                 onSortChange={handleSortChange}
                 sortOptions={sortOptions}
+                selectedTimeRange={selectedTimeRange}
+                onTimeRangeChange={handleTimeRangeChange}
               />
             </div>
-            <Button className="h-10 min-w-max rounded-xl bg-gray-900 hover:bg-gray-800">
-              <Plus className="mr-2 h-4 w-4" />새 서재 만들기
-            </Button>
-          </div>
-
-          {/* 필터 바 */}
-          <div className="mb-6 px-4">
-            <FilterBar
-              categories={libraryCategories}
-              selectedCategory={selectedCategory}
-              onCategoryClick={handleCategoryClick}
-            />
           </div>
 
           {/* 메인 콘텐츠 */}
