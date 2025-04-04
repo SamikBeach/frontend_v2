@@ -41,3 +41,4 @@ export function ReadingGroupCard({ group }: ReadingGroupCardProps) {
     </Card>
   );
 }
+ 

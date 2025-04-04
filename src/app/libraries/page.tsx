@@ -160,7 +160,7 @@ export default function LibrariesPage() {
           <div className="flex-1 px-4">
             {/* 서재 목록 */}
             {sortedLibraries.length > 0 ? (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
                 {sortedLibraries.map(library => (
                   <LibraryCard key={library.id} library={library} />
                 ))}

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { CategoryFilter } from '@/app/popular/components/CategoryFilter';
 import { Book } from '@/components/BookCard';
 import { BookDialog } from '@/components/BookDialog';
-import { SortDropdown } from '@/components/SortDropdown';
+import { SortDropdown, TimeRange } from '@/components/SortDropdown';
 import { useUrlParams } from '@/hooks';
 
 import { BookCarousel, BookGrid, DiscoverBreadcrumb } from './components';
@@ -18,12 +18,14 @@ export default function DiscoverPage() {
       category: 'all',
       subcategory: '',
       sort: 'reviews-desc',
+      timeRange: 'all',
     },
   });
 
   const selectedCategory = params.category;
   const selectedSubcategory = params.subcategory;
   const selectedSort = params.sort || 'reviews-desc';
+  const selectedTimeRange = (params.timeRange as TimeRange) || 'all';
 
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
@@ -41,6 +43,11 @@ export default function DiscoverPage() {
   // 정렬 옵션 변경 핸들러
   const handleSortChange = (sortId: string) => {
     setParam('sort', sortId);
+  };
+
+  // 기간 필터 변경 핸들러
+  const handleTimeRangeChange = (timeRange: TimeRange) => {
+    setParam('timeRange', timeRange);
   };
 
   // URL params 초기화
@@ -92,6 +99,8 @@ export default function DiscoverPage() {
               selectedSort={selectedSort}
               onSortChange={handleSortChange}
               className="ml-auto"
+              selectedTimeRange={selectedTimeRange}
+              onTimeRangeChange={handleTimeRangeChange}
             />
           )}
         </div>
@@ -110,6 +119,8 @@ export default function DiscoverPage() {
                     <BookGrid
                       books={collection.books}
                       onSelectBook={setSelectedBook}
+                      selectedSort={selectedSort}
+                      selectedTimeRange={selectedTimeRange}
                     />
                   ) : (
                     // 세부 카테고리가 선택되지 않은 경우 캐러셀 형태로 표시

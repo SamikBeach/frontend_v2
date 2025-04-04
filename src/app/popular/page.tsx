@@ -4,7 +4,11 @@ import { useState } from 'react';
 
 import { Book, BookCard } from '@/components/BookCard';
 import { BookDialog } from '@/components/BookDialog';
-import { SortDropdown, useSortedBooks } from '@/components/SortDropdown';
+import {
+  SortDropdown,
+  TimeRange,
+  useSortedBooks,
+} from '@/components/SortDropdown';
 import { Button } from '@/components/ui/button';
 import { useUrlParams } from '@/hooks';
 
@@ -18,12 +22,14 @@ export default function PopularPage() {
       category: 'all',
       subcategory: '',
       sort: 'reviews-desc',
+      timeRange: 'all',
     },
   });
 
   const selectedCategory = params.category;
   const selectedSubcategory = params.subcategory;
   const selectedSort = params.sort || 'reviews-desc';
+  const selectedTimeRange = (params.timeRange as TimeRange) || 'all';
 
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
 
@@ -41,6 +47,11 @@ export default function PopularPage() {
   // 정렬 옵션 변경 핸들러
   const handleSortChange = (sortId: string) => {
     setParam('sort', sortId);
+  };
+
+  // 기간 필터 변경 핸들러
+  const handleTimeRangeChange = (timeRange: TimeRange) => {
+    setParam('timeRange', timeRange);
   };
 
   // URL params 초기화
@@ -62,7 +73,12 @@ export default function PopularPage() {
   }
 
   // 정렬된 책 목록 가져오기
-  const sortedBooks = useSortedBooks(filteredBooks, selectedSort);
+  const sortedBooks = useSortedBooks(
+    filteredBooks,
+    selectedSort,
+    undefined,
+    selectedTimeRange
+  );
 
   return (
     <div className="bg-white">
@@ -92,6 +108,8 @@ export default function PopularPage() {
             selectedSort={selectedSort}
             onSortChange={handleSortChange}
             className="ml-auto"
+            selectedTimeRange={selectedTimeRange}
+            onTimeRangeChange={handleTimeRangeChange}
           />
         </div>
 
