@@ -37,7 +37,7 @@ export function DiscoverBreadcrumb({
             : 'hover:text-gray-900'
         }
       >
-        고전산책
+        발견하기
       </Link>
       {selectedCategory !== 'all' && (
         <>
