@@ -1,5 +1,3 @@
-'use client';
-
 import { MessageSquare, Share2, Star, ThumbsUp, X } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';

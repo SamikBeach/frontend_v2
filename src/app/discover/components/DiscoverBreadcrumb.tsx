@@ -1,9 +1,11 @@
+'use client';
+
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
-import { Category } from './CategoryFilter';
+import { Category } from '@/app/popular/components/CategoryFilter';
 
-interface PopularBreadcrumbProps {
+interface DiscoverBreadcrumbProps {
   selectedCategory: string;
   selectedSubcategory: string;
   categories: Category[];
@@ -11,20 +13,20 @@ interface PopularBreadcrumbProps {
   onClearFilters: () => void;
 }
 
-export function PopularBreadcrumb({
+export function DiscoverBreadcrumb({
   selectedCategory,
   selectedSubcategory,
   categories,
   onCategoryClick,
   onClearFilters,
-}: PopularBreadcrumbProps) {
+}: DiscoverBreadcrumbProps) {
   // 선택된 카테고리 정보
   const currentCategory = categories.find(cat => cat.id === selectedCategory);
 
   return (
     <div className="flex items-center text-[14px] text-gray-500">
       <Link
-        href="/popular"
+        href="/discover"
         onClick={e => {
           e.preventDefault();
           onClearFilters();
@@ -35,13 +37,13 @@ export function PopularBreadcrumb({
             : 'hover:text-gray-900'
         }
       >
-        분야별 인기
+        고전산책
       </Link>
       {selectedCategory !== 'all' && (
         <>
           <ChevronRight className="mx-1 h-4 w-4" />
           <Link
-            href={`/popular?category=${selectedCategory}`}
+            href={`/discover?category=${selectedCategory}`}
             onClick={e => {
               e.preventDefault();
               onCategoryClick(selectedCategory);
