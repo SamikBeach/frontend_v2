@@ -1,31 +1,27 @@
 'use client';
 
-import { useUrlParams } from '@/hooks';
+import { useQueryParams } from '@/hooks';
 import { CreatePostCard, FilterBar, PostCard } from './components';
 import { mainCategories, posts, sortOptions, users } from './data';
 import { Post } from './types';
 
 export default function CommunityPage() {
   // URL 파라미터 관리
-  const { params, setParam } = useUrlParams({
-    defaultValues: {
-      category: 'all', // all, discussion, bookreport, question, meetup
-      sort: 'popular', // popular, following, latest
-    },
-  });
+  const { getQueryParam, updateQueryParams } = useQueryParams();
 
-  const selectedCategory = params.category || 'all';
-  const selectedSort = params.sort || 'popular';
+  // URL에서 현재 선택된 필터/정렬 값 가져오기
+  const selectedCategory = getQueryParam('category') || 'all';
+  const selectedSort = getQueryParam('sort') || 'popular';
   const currentUser = users[4]; // 현재 로그인한 사용자 (예시)
 
   // 카테고리 클릭 핸들러
   const handleCategoryClick = (categoryId: string) => {
-    setParam('category', categoryId);
+    updateQueryParams({ category: categoryId });
   };
 
   // 정렬 옵션 클릭 핸들러
   const handleSortClick = (sortId: string) => {
-    setParam('sort', sortId);
+    updateQueryParams({ sort: sortId });
   };
 
   // 필터링 로직

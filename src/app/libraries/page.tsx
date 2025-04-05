@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import { useUrlParams } from '@/hooks';
+import { useQueryParams } from '@/hooks';
 
 // 분리된 데이터와 컴포넌트 가져오기
 import { EmptyState } from './components/EmptyState';
@@ -59,32 +59,27 @@ const getDateFromTimeRange = (timeRange: TimeRange): Date | null => {
 // 메인 페이지 컴포넌트
 export default function LibrariesPage() {
   // URL 파라미터 관리
-  const { params, setParam } = useUrlParams({
-    defaultValues: {
-      category: 'all', // all, philosophy, literature, history, science
-      sort: 'popular', // popular, latest, title
-      timeRange: 'all', // all, today, week, month, year
-    },
-  });
+  const { getQueryParam, updateQueryParams } = useQueryParams();
 
-  const selectedCategory = params.category || 'all';
-  const selectedSort = params.sort || 'popular';
-  const selectedTimeRange = (params.timeRange as TimeRange) || 'all';
+  // URL에서 현재 선택된 필터/정렬 값 가져오기
+  const selectedCategory = getQueryParam('category') || 'all';
+  const selectedSort = getQueryParam('sort') || 'popular';
+  const selectedTimeRange = (getQueryParam('timeRange') as TimeRange) || 'all';
   const [searchQuery, setSearchQuery] = useState('');
 
   // 카테고리 클릭 핸들러
   const handleCategoryClick = (categoryId: string) => {
-    setParam('category', categoryId);
+    updateQueryParams({ category: categoryId });
   };
 
   // 정렬 옵션 클릭 핸들러
   const handleSortChange = (sortId: string) => {
-    setParam('sort', sortId);
+    updateQueryParams({ sort: sortId });
   };
 
   // 기간 필터 변경 핸들러
   const handleTimeRangeChange = (timeRange: TimeRange) => {
-    setParam('timeRange', timeRange);
+    updateQueryParams({ timeRange });
   };
 
   // 필터링 로직
