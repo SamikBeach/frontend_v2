@@ -25,6 +25,9 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useQueryParams } from '@/hooks';
 
+import { loginAtom, userAtom } from '@/atoms/auth';
+import { useAtom, useSetAtom } from 'jotai';
+
 // 더미 데이터
 const popularBooks: Book[] = [
   {
@@ -359,6 +362,9 @@ const communityPosts = [
 ];
 
 export default function HomePage() {
+  const [user] = useAtom(userAtom);
+  const login = useSetAtom(loginAtom);
+
   const { updateQueryParams, getQueryParam } = useQueryParams();
 
   // URL에서 book ID 확인
@@ -403,7 +409,7 @@ export default function HomePage() {
 
   return (
     <div className="bg-white">
-      {/* 메인 컨텐츠 - 2x2 그리드 구조로 변경 */}
+      {/* Main content - 2x2 grid structure*/}
       <div className="grid auto-rows-auto grid-cols-2 gap-2">
         {/* 인기 있는 책 섹션 */}
         <section className="h-auto p-4">
@@ -595,7 +601,7 @@ export default function HomePage() {
         </section>
       </div>
 
-      {/* 책 상세 정보 Dialog */}
+      {/* Book detail Dialog */}
       {selectedBook && (
         <BookDialog
           book={{
@@ -613,7 +619,7 @@ export default function HomePage() {
                 id: 1,
                 user: {
                   name: '김독서',
-                  avatar: `https://i.pravatar.cc/150?u=reader1`,
+                  avatar: `https://i.pravatar.cc/150?u=user1`,
                 },
                 rating: 5,
                 content:

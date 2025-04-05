@@ -1,3 +1,5 @@
+import { isLoadingAtom, loginAtom, socialLoginAtom } from '@/atoms/auth';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
@@ -18,11 +20,14 @@ export function LoginForm({
   onClickResetPassword,
   onSuccess,
 }: LoginFormProps) {
+  const isLoading = useAtomValue(isLoadingAtom);
+  const login = useSetAtom(loginAtom);
+  const socialLogin = useSetAtom(socialLoginAtom);
+
   // 상태 관리
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // 이메일 인풋 핸들러
@@ -53,36 +58,32 @@ export function LoginForm({
       return;
     }
 
-    // 여기서는 로직 구현 없이 UI만 구현
-    setIsLoading(true);
-
-    // 성공 시뮬레이션 (실제로는 API 호출)
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await login({ email, password });
       onSuccess?.();
-    }, 1000);
+    } catch (error) {
+      setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+    }
   };
 
   // 구글 로그인 핸들러
-  const handleGoogleLogin = () => {
-    setIsLoading(true);
-
-    // 성공 시뮬레이션 (실제로는 구글 OAuth 인증)
-    setTimeout(() => {
-      setIsLoading(false);
+  const handleGoogleLogin = async () => {
+    try {
+      await socialLogin('google');
       onSuccess?.();
-    }, 1000);
+    } catch (error) {
+      setError('구글 로그인에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   // 애플 로그인 핸들러
-  const handleAppleLogin = () => {
-    setIsLoading(true);
-
-    // 성공 시뮬레이션 (실제로는 애플 OAuth 인증)
-    setTimeout(() => {
-      setIsLoading(false);
+  const handleAppleLogin = async () => {
+    try {
+      await socialLogin('apple');
       onSuccess?.();
-    }, 1000);
+    } catch (error) {
+      setError('애플 로그인에 실패했습니다. 다시 시도해주세요.');
+    }
   };
 
   return (
