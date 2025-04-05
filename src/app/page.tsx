@@ -9,7 +9,7 @@ import {
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { LibraryCard } from '@/app/libraries/components/LibraryCard';
 import { Book, BookCard } from '@/components/BookCard';
@@ -23,6 +23,7 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useQueryParams } from '@/hooks';
 
 // 더미 데이터
 const popularBooks: Book[] = [
@@ -358,12 +359,47 @@ const communityPosts = [
 ];
 
 export default function HomePage() {
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const { updateQueryParams, getQueryParam } = useQueryParams();
+
+  // URL에서 book ID 확인
+  const bookIdParam = getQueryParam('book');
+
+  // book ID에 해당하는 책 찾기
+  const bookFromUrl = React.useMemo(() => {
+    if (bookIdParam) {
+      const bookId = parseInt(bookIdParam);
+      return (
+        [...popularBooks, ...discoveryBooks].find(b => b.id === bookId) || null
+      );
+    }
+    return null;
+  }, [bookIdParam]);
+
+  // selectedBook 상태 관리 - URL 파라미터 우선
+  const [selectedBookState, setSelectedBookState] = useState<Book | null>(null);
+  const selectedBook = bookFromUrl || selectedBookState;
 
   // 카테고리 찾기 함수
   const getCategoryInfo = (categoryId: string) => {
     return mainCategories.find(cat => cat.id === categoryId);
   };
+
+  // 책 선택 핸들러
+  const handleBookSelect = (book: Book) => {
+    setSelectedBookState(book);
+    updateQueryParams({ book: book.id.toString() });
+  };
+
+  // 다이얼로그 상태 변경 핸들러
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      setSelectedBookState(null);
+      updateQueryParams({ book: undefined });
+    }
+  };
+
+  // 다이얼로그가 열려있는지 여부
+  const isDialogOpen = selectedBook !== null;
 
   return (
     <div className="bg-white">
@@ -391,7 +427,7 @@ export default function HomePage() {
           <div className="flex gap-4">
             {popularBooks.slice(0, 3).map(book => (
               <div key={book.id} className="w-1/3">
-                <BookCard book={book} onClick={setSelectedBook} />
+                <BookCard book={book} onClick={handleBookSelect} />
               </div>
             ))}
           </div>
@@ -419,7 +455,7 @@ export default function HomePage() {
           <div className="flex gap-4">
             {discoveryBooks.slice(0, 3).map(book => (
               <div key={book.id} className="w-1/3">
-                <BookCard book={book} onClick={setSelectedBook} />
+                <BookCard book={book} onClick={handleBookSelect} />
               </div>
             ))}
           </div>
@@ -592,8 +628,8 @@ export default function HomePage() {
               coverImage: `https://picsum.photos/seed/similar${book.id}/240/360`,
             })),
           }}
-          open={!!selectedBook}
-          onOpenChange={open => !open && setSelectedBook(null)}
+          open={isDialogOpen}
+          onOpenChange={handleDialogOpenChange}
         />
       )}
     </div>

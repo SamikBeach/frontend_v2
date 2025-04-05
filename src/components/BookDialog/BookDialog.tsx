@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ReviewDialog } from '@/components/ReviewDialog';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { useUrlParams } from '@/hooks/useUrlParams';
+import { useQueryParams } from '@/hooks/useQueryParams';
 
 import { BookCover } from './BookCover';
 import { BookInfo } from './BookInfo';
@@ -23,29 +23,16 @@ interface BookDialogProps {
 
 export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-
-  // URL 쿼리스트링 처리 - onParamChange 콜백 활용
-  const { params, setParam, clearParams } = useUrlParams({
-    defaultValues: {
-      book: '',
-    },
-    onParamChange: (key, value) => {
-      // book 파라미터가 변경되었고, 그 값이 현재 책의 ID와 일치하면 다이얼로그 열기
-      if (key === 'book' && value && value === book.id.toString() && !open) {
-        onOpenChange(true);
-      }
-    },
-  });
+  const { updateQueryParams } = useQueryParams();
 
   // 다이얼로그 상태 변경 핸들러
   const handleOpenChange = (isOpen: boolean) => {
-    // URL 파라미터 처리
     if (isOpen) {
       // 다이얼로그가 열릴 때 URL에 책 ID 추가
-      setParam('book', book.id.toString());
+      updateQueryParams({ book: book.id.toString() });
     } else {
       // 다이얼로그가 닫힐 때 URL 파라미터 제거
-      clearParams();
+      updateQueryParams({ book: undefined });
     }
 
     // 상위 컴포넌트에 상태 변경 알림

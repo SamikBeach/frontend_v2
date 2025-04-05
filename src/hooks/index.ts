@@ -1,1 +1,1 @@
-export * from './useUrlParams';
+export * from './useQueryParams';

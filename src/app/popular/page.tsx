@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 import { Book, BookCard } from '@/components/BookCard';
 import { BookDialog } from '@/components/BookDialog';
@@ -10,64 +10,93 @@ import {
   useSortedBooks,
 } from '@/components/SortDropdown';
 import { Button } from '@/components/ui/button';
-import { useUrlParams } from '@/hooks';
+import { useQueryParams } from '@/hooks';
 
 import { CategoryFilter, PopularBreadcrumb } from './components';
 import { books, categories } from './data';
 
 export default function PopularPage() {
-  // Use our custom URL params hook
-  const { params, setParam, clearParams } = useUrlParams({
-    defaultValues: {
-      category: 'all',
-      subcategory: '',
-      sort: 'reviews-desc',
-      timeRange: 'all',
-    },
-  });
+  const { updateQueryParams, getQueryParam } = useQueryParams();
 
-  const selectedCategory = params.category;
-  const selectedSubcategory = params.subcategory;
-  const selectedSort = params.sort || 'reviews-desc';
-  const selectedTimeRange = (params.timeRange as TimeRange) || 'all';
+  // URL에서 현재 선택된 필터/정렬 값 및 책 정보 가져오기
+  const categoryParam = getQueryParam('category') || 'all';
+  const subcategoryParam = getQueryParam('subcategory') || '';
+  const sortParam = getQueryParam('sort') || 'reviews-desc';
+  const timeRangeParam = (getQueryParam('timeRange') as TimeRange) || 'all';
+  const bookIdParam = getQueryParam('book');
 
-  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  // URL의 book ID에 해당하는 책 찾기
+  const bookFromUrl = React.useMemo(() => {
+    if (bookIdParam) {
+      const bookId = parseInt(bookIdParam);
+      return books.find(b => b.id === bookId) || null;
+    }
+    return null;
+  }, [bookIdParam]);
+
+  // selectedBook 상태 관리 - URL 파라미터 우선
+  const [selectedBookState, setSelectedBookState] = useState<Book | null>(null);
+  const selectedBook = bookFromUrl || selectedBookState;
 
   // 카테고리 클릭 핸들러
   const handleCategoryClick = (categoryId: string) => {
-    setParam('category', categoryId);
-    setParam('subcategory', '');
+    updateQueryParams({
+      category: categoryId,
+      subcategory: undefined,
+    });
   };
 
   // 서브카테고리 클릭 핸들러
   const handleSubcategoryClick = (subcategoryId: string) => {
-    setParam('subcategory', subcategoryId);
+    updateQueryParams({ subcategory: subcategoryId });
   };
 
   // 정렬 옵션 변경 핸들러
   const handleSortChange = (sortId: string) => {
-    setParam('sort', sortId);
+    updateQueryParams({ sort: sortId });
   };
 
   // 기간 필터 변경 핸들러
   const handleTimeRangeChange = (timeRange: TimeRange) => {
-    setParam('timeRange', timeRange);
+    updateQueryParams({ timeRange });
   };
 
   // URL params 초기화
   const handleClearFilters = () => {
-    clearParams();
+    updateQueryParams({
+      category: undefined,
+      subcategory: undefined,
+      sort: undefined,
+      timeRange: undefined,
+    });
   };
+
+  // 책 선택 핸들러
+  const handleBookSelect = (book: Book) => {
+    setSelectedBookState(book);
+    updateQueryParams({ book: book.id.toString() });
+  };
+
+  // 다이얼로그 상태 변경 핸들러
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      setSelectedBookState(null);
+      updateQueryParams({ book: undefined });
+    }
+  };
+
+  // 다이얼로그가 열려있는지 여부
+  const isDialogOpen = selectedBook !== null;
 
   // 필터링 로직
   let filteredBooks = books;
 
-  if (selectedCategory !== 'all') {
-    filteredBooks = books.filter(book => book.category === selectedCategory);
+  if (categoryParam !== 'all') {
+    filteredBooks = books.filter(book => book.category === categoryParam);
 
-    if (selectedSubcategory) {
+    if (subcategoryParam) {
       filteredBooks = filteredBooks.filter(
-        book => book.subcategory === selectedSubcategory
+        book => book.subcategory === subcategoryParam
       );
     }
   }
@@ -75,9 +104,9 @@ export default function PopularPage() {
   // 정렬된 책 목록 가져오기
   const sortedBooks = useSortedBooks(
     filteredBooks,
-    selectedSort,
+    sortParam,
     undefined,
-    selectedTimeRange
+    timeRangeParam
   );
 
   return (
@@ -85,8 +114,8 @@ export default function PopularPage() {
       {/* 브레드크럼 */}
       <div className="mx-auto w-full px-6 py-2">
         <PopularBreadcrumb
-          selectedCategory={selectedCategory}
-          selectedSubcategory={selectedSubcategory}
+          selectedCategory={categoryParam}
+          selectedSubcategory={subcategoryParam}
           categories={categories}
           onCategoryClick={handleCategoryClick}
           onClearFilters={handleClearFilters}
@@ -98,17 +127,17 @@ export default function PopularPage() {
         <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <CategoryFilter
             categories={categories}
-            selectedCategory={selectedCategory}
-            selectedSubcategory={selectedSubcategory}
+            selectedCategory={categoryParam}
+            selectedSubcategory={subcategoryParam}
             onCategoryClick={handleCategoryClick}
             onSubcategoryClick={handleSubcategoryClick}
           />
 
           <SortDropdown
-            selectedSort={selectedSort}
+            selectedSort={sortParam}
             onSortChange={handleSortChange}
             className="ml-auto"
-            selectedTimeRange={selectedTimeRange}
+            selectedTimeRange={timeRangeParam}
             onTimeRangeChange={handleTimeRangeChange}
           />
         </div>
@@ -116,7 +145,7 @@ export default function PopularPage() {
         {/* 도서 그리드 */}
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {sortedBooks.map(book => (
-            <BookCard key={book.id} book={book} onClick={setSelectedBook} />
+            <BookCard key={book.id} book={book} onClick={handleBookSelect} />
           ))}
         </div>
 
@@ -190,8 +219,8 @@ export default function PopularPage() {
               coverImage: `https://picsum.photos/seed/${book.id}/240/360`,
             })),
           }}
-          open={!!selectedBook}
-          onOpenChange={open => !open && setSelectedBook(null)}
+          open={isDialogOpen}
+          onOpenChange={handleDialogOpenChange}
         />
       )}
     </div>
