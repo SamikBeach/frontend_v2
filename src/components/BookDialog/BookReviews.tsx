@@ -18,7 +18,7 @@ export function BookReviews({ book, onOpenReviewDialog }: BookReviewsProps) {
       {/* 리뷰 작성하기 버튼 */}
       <div className="flex justify-end">
         <Button
-          className="rounded-full bg-gray-900 hover:bg-gray-800"
+          className="rounded-full bg-pink-100 text-pink-700 hover:bg-pink-200"
           onClick={onOpenReviewDialog}
         >
           <PenLine className="mr-1.5 h-4 w-4" />

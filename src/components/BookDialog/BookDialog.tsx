@@ -24,24 +24,31 @@ interface BookDialogProps {
 export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
 
-  // URL 쿼리스트링 처리
-  const { setParam, clearParams } = useUrlParams({
+  // URL 쿼리스트링 처리 - onParamChange 콜백 활용
+  const { params, setParam, clearParams } = useUrlParams({
     defaultValues: {
       book: '',
     },
     onParamChange: (key, value) => {
-      // 필요한 경우 추가 조치 가능
-      console.log(`Param changed: ${key} = ${value}`);
+      // book 파라미터가 변경되었고, 그 값이 현재 책의 ID와 일치하면 다이얼로그 열기
+      if (key === 'book' && value && value === book.id.toString() && !open) {
+        onOpenChange(true);
+      }
     },
   });
 
-  // 다이얼로그 상태 변경 시 URL 파라미터도 함께 업데이트
+  // 다이얼로그 상태 변경 핸들러
   const handleOpenChange = (isOpen: boolean) => {
+    // URL 파라미터 처리
     if (isOpen) {
+      // 다이얼로그가 열릴 때 URL에 책 ID 추가
       setParam('book', book.id.toString());
     } else {
+      // 다이얼로그가 닫힐 때 URL 파라미터 제거
       clearParams();
     }
+
+    // 상위 컴포넌트에 상태 변경 알림
     onOpenChange(isOpen);
   };
 
@@ -93,7 +100,7 @@ export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
     <>
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="max-w-4xl rounded-lg bg-white p-0">
-          <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-lg bg-white/80 px-6 backdrop-blur-xl">
+          <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-lg bg-white/80 px-6 backdrop-blur-xl">
             <DialogTitle className="text-base font-medium">
               {book.title}
             </DialogTitle>

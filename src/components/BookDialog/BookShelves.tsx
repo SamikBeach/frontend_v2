@@ -1,4 +1,4 @@
-import { Bookmark, Users } from 'lucide-react';
+import { BookOpen, Users } from 'lucide-react';
 
 import { BookDetails } from './types';
 
@@ -18,28 +18,48 @@ export function BookShelves({ bookshelves = [] }: BookShelvesProps) {
         {bookshelves.map(shelf => (
           <div
             key={shelf.id}
-            className="flex cursor-pointer items-center gap-4 rounded-2xl bg-gray-50 p-5 transition-colors hover:bg-gray-100"
+            className="cursor-pointer overflow-hidden rounded-xl bg-[#F9FAFB] p-4 transition-all duration-200 hover:bg-[#F2F4F6]"
           >
-            <div className="h-20 w-20 overflow-hidden rounded-lg">
-              <img
-                src={shelf.thumbnail}
-                alt={shelf.name}
-                className="h-full w-full object-cover"
-              />
+            <div className="mb-3 flex items-center gap-3">
+              <div className="h-8 w-8 overflow-hidden rounded-lg">
+                <img
+                  src={shelf.thumbnail}
+                  alt={shelf.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-[15px] font-medium text-gray-900 transition-colors duration-150 hover:text-[#3182F6]">
+                  {shelf.name}
+                </h3>
+                <p className="text-xs text-gray-500">{shelf.owner}</p>
+              </div>
             </div>
-            <div className="space-y-1.5">
-              <p className="text-lg font-medium">{shelf.name}</p>
-              <div className="flex items-center text-sm text-gray-500">
-                <p>{shelf.owner}</p>
-                <span className="mx-1.5">·</span>
-                <div className="flex items-center">
-                  <Bookmark className="mr-0.5 h-3.5 w-3.5" />
-                  <span>{shelf.bookCount}권</span>
+
+            {/* 책 이미지 샘플 - 5개로 변경 */}
+            <div className="mb-3 grid grid-cols-5 gap-1.5">
+              {[1, 2, 3, 4, 5].map(index => (
+                <div key={index} className="overflow-hidden rounded-lg">
+                  <div className="relative aspect-[2/3] w-full">
+                    <img
+                      src={`https://picsum.photos/seed/book${shelf.id}${index}/120/180`}
+                      alt="책 이미지"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 hover:scale-110"
+                    />
+                  </div>
                 </div>
-                <span className="mx-1.5">·</span>
-                <div className="flex items-center">
-                  <Users className="mr-0.5 h-3.5 w-3.5" />
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <Users className="h-3.5 w-3.5 text-gray-400" />
                   <span>{shelf.followers}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <BookOpen className="h-3.5 w-3.5 text-gray-400" />
+                  <span>{shelf.bookCount}권</span>
                 </div>
               </div>
             </div>
