@@ -1,1 +1,2 @@
-export * from './BookDialog';
+export { BookDialog } from './BookDialog';
+export * from './types';

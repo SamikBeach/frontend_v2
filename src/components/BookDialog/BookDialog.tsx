@@ -1,79 +1,19 @@
-import { MessageSquare, Share2, Star, ThumbsUp, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { useState } from 'react';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
+import { ReviewDialog } from '@/components/ReviewDialog';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { useUrlParams } from '@/hooks/useUrlParams';
 
-export interface BookDetails {
-  id: number;
-  title: string;
-  author: string;
-  coverImage: string;
-  category?: string;
-  rating?: number;
-  totalRatings?: number;
-  publisher?: string;
-  publishDate?: string;
-  description?: string;
-  toc?: string;
-  authorInfo?: string;
-  publisherReview?: string;
-  pageCount?: number;
-  isbn?: string;
-  originalTitle?: string;
-  translator?: string;
-  dimensions?: string;
-  weight?: string;
-  tags?: string[];
-  series?: {
-    name: string;
-    volume: number;
-    totalVolumes: number;
-  };
-  awards?: Array<{
-    name: string;
-    year: string;
-  }>;
-  quotes?: Array<{
-    id: number;
-    content: string;
-    page: number;
-    likes: number;
-  }>;
-  reviews?: Array<{
-    id: number;
-    user: {
-      name: string;
-      avatar: string;
-      readCount?: number;
-    };
-    rating: number;
-    content: string;
-    date: string;
-    likes: number;
-    comments: number;
-  }>;
-  readingStatus?: {
-    currentReaders: number;
-    completedReaders: number;
-    averageReadingTime: string;
-    difficulty: 'easy' | 'medium' | 'hard';
-  };
-  similarBooks?: Array<{
-    id: number;
-    title: string;
-    coverImage: string;
-    author: string;
-    rating?: number;
-  }>;
-}
+import { BookCover } from './BookCover';
+import { BookInfo } from './BookInfo';
+import { BookQuotes } from './BookQuotes';
+import { BookReviews } from './BookReviews';
+import { BookShelves } from './BookShelves';
+import { ReadingGroups } from './ReadingGroups';
+import { SimilarBooks } from './SimilarBooks';
+import { BookDetails } from './types';
 
 interface BookDialogProps {
   book: BookDetails;
@@ -82,313 +22,134 @@ interface BookDialogProps {
 }
 
 export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+
+  // URL 쿼리스트링 처리
+  const { setParam, clearParams } = useUrlParams({
+    defaultValues: {
+      book: '',
+    },
+    onParamChange: (key, value) => {
+      // 필요한 경우 추가 조치 가능
+      console.log(`Param changed: ${key} = ${value}`);
+    },
+  });
+
+  // 다이얼로그 상태 변경 시 URL 파라미터도 함께 업데이트
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isOpen) {
+      setParam('book', book.id.toString());
+    } else {
+      clearParams();
+    }
+    onOpenChange(isOpen);
+  };
+
+  // 리뷰 제출 처리
+  const handleReviewSubmit = (rating: number, content: string) => {
+    // 리뷰 제출 로직 구현 (API 호출 등)
+    console.log('리뷰 제출:', { rating, content, bookId: book.id });
+    setReviewDialogOpen(false);
+  };
+
+  // 예시용 데이터
+  const defaultBookshelves = [
+    {
+      id: 1,
+      name: '소설 컬렉션',
+      owner: '김독서',
+      bookCount: 42,
+      followers: 128,
+      thumbnail: 'https://picsum.photos/seed/shelf1/100/100',
+    },
+    {
+      id: 2,
+      name: '인생 도서',
+      owner: '책벌레',
+      bookCount: 23,
+      followers: 75,
+      thumbnail: 'https://picsum.photos/seed/shelf2/100/100',
+    },
+  ];
+
+  const defaultReadingGroups = [
+    {
+      id: 1,
+      name: '주말 독서 모임',
+      memberCount: 18,
+      description: '매주 토요일 오전 함께 책을 읽어요',
+      thumbnail: 'https://picsum.photos/seed/group1/100/100',
+    },
+    {
+      id: 2,
+      name: '심야 독서 클럽',
+      memberCount: 12,
+      description: '밤에 책을 읽는 모임입니다',
+      thumbnail: 'https://picsum.photos/seed/group2/100/100',
+    },
+  ];
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-lg border-b bg-white/80 px-4 backdrop-blur-xl">
-          <DialogTitle className="text-lg font-medium">도서 상세</DialogTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            onClick={() => onOpenChange(false)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="mx-auto max-w-5xl space-y-8 p-6">
-          {/* 헤더 섹션 */}
-          <div className="grid gap-8 md:grid-cols-[400px_1fr]">
-            {/* 왼쪽: 책 표지 및 기본 정보 */}
-            <div className="space-y-6">
-              <div className="relative aspect-[3/4] overflow-hidden rounded-lg border bg-gray-100 shadow-lg">
-                <img
-                  src={book.coverImage}
-                  alt={book.title}
-                  className="object-cover"
-                />
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Star className="h-6 w-6 fill-yellow-400 text-yellow-400" />
-                    <span className="text-2xl font-semibold">
-                      {book.rating || 0}
-                    </span>
-                    {book.totalRatings && (
-                      <span className="text-sm text-gray-500">
-                        ({book.totalRatings}명)
-                      </span>
-                    )}
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Share2 className="mr-2 h-4 w-4" />
-                    공유하기
-                  </Button>
-                </div>
-                {book.tags && (
-                  <div className="flex flex-wrap gap-2">
-                    {book.tags.map(tag => (
-                      <Badge key={tag} variant="secondary">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </div>
-                )}
-                <div className="space-y-2 rounded-lg bg-gray-50 p-4">
-                  <h4 className="font-medium">도서 정보</h4>
-                  <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                    <p>저자</p>
-                    <p className="font-medium text-gray-900">{book.author}</p>
-                    {book.translator && (
-                      <>
-                        <p>역자</p>
-                        <p className="font-medium text-gray-900">
-                          {book.translator}
-                        </p>
-                      </>
-                    )}
-                    {book.publisher && (
-                      <>
-                        <p>출판사</p>
-                        <p className="font-medium text-gray-900">
-                          {book.publisher}
-                        </p>
-                      </>
-                    )}
-                    {book.publishDate && (
-                      <>
-                        <p>출간일</p>
-                        <p className="font-medium text-gray-900">
-                          {book.publishDate}
-                        </p>
-                      </>
-                    )}
-                    {book.pageCount && (
-                      <>
-                        <p>페이지</p>
-                        <p className="font-medium text-gray-900">
-                          {book.pageCount}쪽
-                        </p>
-                      </>
-                    )}
-                    {book.isbn && (
-                      <>
-                        <p>ISBN</p>
-                        <p className="font-medium text-gray-900">{book.isbn}</p>
-                      </>
-                    )}
-                  </div>
-                </div>
-                {book.readingStatus && (
-                  <div className="space-y-2 rounded-lg bg-blue-50 p-4">
-                    <h4 className="font-medium">독서 현황</h4>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
-                      <p>현재 읽는 중</p>
-                      <p className="font-medium text-gray-900">
-                        {book.readingStatus.currentReaders}명
-                      </p>
-                      <p>완독</p>
-                      <p className="font-medium text-gray-900">
-                        {book.readingStatus.completedReaders}명
-                      </p>
-                      <p>평균 독서 시간</p>
-                      <p className="font-medium text-gray-900">
-                        {book.readingStatus.averageReadingTime}
-                      </p>
-                      <p>난이도</p>
-                      <p className="font-medium text-gray-900">
-                        {book.readingStatus.difficulty === 'easy'
-                          ? '쉬움'
-                          : book.readingStatus.difficulty === 'medium'
-                            ? '보통'
-                            : '어려움'}
-                      </p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* 오른쪽: 상세 정보 */}
-            <div className="space-y-6">
-              <DialogHeader>
-                <DialogTitle className="text-3xl font-bold">
-                  {book.title}
-                </DialogTitle>
-                {book.originalTitle && (
-                  <p className="text-gray-500">{book.originalTitle}</p>
-                )}
-              </DialogHeader>
-
-              <Tabs defaultValue="description" className="w-full">
-                <TabsList className="w-full justify-start">
-                  <TabsTrigger value="description">책 소개</TabsTrigger>
-                  <TabsTrigger value="toc">목차</TabsTrigger>
-                  <TabsTrigger value="author">저자 소개</TabsTrigger>
-                  <TabsTrigger value="quotes">인상적인 구절</TabsTrigger>
-                  <TabsTrigger value="reviews">리뷰</TabsTrigger>
-                </TabsList>
-                <div className="mt-6">
-                  <TabsContent value="description">
-                    <div className="prose prose-gray max-w-none space-y-4">
-                      {book.description || '책 소개가 없습니다.'}
-                      {book.awards && book.awards.length > 0 && (
-                        <div className="mt-6">
-                          <h4 className="text-lg font-semibold">수상 내역</h4>
-                          <ul>
-                            {book.awards.map(award => (
-                              <li key={award.name}>
-                                {award.year}년 {award.name}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="toc">
-                    <div className="prose prose-gray max-w-none whitespace-pre-line">
-                      {book.toc || '목차 정보가 없습니다.'}
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="author">
-                    <div className="prose prose-gray max-w-none">
-                      {book.authorInfo || '저자 소개가 없습니다.'}
-                    </div>
-                  </TabsContent>
-                  <TabsContent value="quotes">
-                    {book.quotes && book.quotes.length > 0 ? (
-                      <div className="space-y-4">
-                        {book.quotes.map(quote => (
-                          <div
-                            key={quote.id}
-                            className="space-y-2 rounded-lg border bg-gray-50 p-4"
-                          >
-                            <p className="italic">{quote.content}</p>
-                            <div className="flex items-center justify-between text-sm">
-                              <p className="text-gray-500">p. {quote.page}</p>
-                              <div className="flex items-center gap-3">
-                                <Button variant="ghost" size="sm">
-                                  <ThumbsUp className="mr-1 h-4 w-4" />
-                                  {quote.likes}
-                                </Button>
-                                <Button variant="ghost" size="sm">
-                                  <Share2 className="mr-1 h-4 w-4" />
-                                  공유
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-500">
-                        등록된 인상적인 구절이 없습니다.
-                      </p>
-                    )}
-                  </TabsContent>
-                  <TabsContent value="reviews">
-                    {book.reviews && book.reviews.length > 0 ? (
-                      <div className="space-y-4">
-                        {book.reviews.map(review => (
-                          <div
-                            key={review.id}
-                            className="space-y-3 rounded-lg border p-4"
-                          >
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-3">
-                                <Avatar>
-                                  <AvatarImage
-                                    src={review.user.avatar}
-                                    alt={review.user.name}
-                                  />
-                                  <AvatarFallback>
-                                    {review.user.name.charAt(0)}
-                                  </AvatarFallback>
-                                </Avatar>
-                                <div>
-                                  <p className="font-medium">
-                                    {review.user.name}
-                                  </p>
-                                  <div className="flex items-center gap-1 text-sm text-gray-500">
-                                    <div className="flex items-center">
-                                      <Star className="mr-1 h-3 w-3 fill-yellow-400 text-yellow-400" />
-                                      <span>{review.rating.toFixed(1)}</span>
-                                    </div>
-                                    <span>·</span>
-                                    <span>{review.date}</span>
-                                    {review.user.readCount && (
-                                      <>
-                                        <span>·</span>
-                                        <span>
-                                          읽은 책 {review.user.readCount}권
-                                        </span>
-                                      </>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            <p className="text-gray-800">{review.content}</p>
-                            <div className="flex items-center gap-3 pt-1 text-sm">
-                              <Button variant="ghost" size="sm">
-                                <ThumbsUp className="mr-1 h-4 w-4" />
-                                좋아요 {review.likes}
-                              </Button>
-                              <Button variant="ghost" size="sm">
-                                <MessageSquare className="mr-1 h-4 w-4" />
-                                댓글 {review.comments}
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-gray-500">등록된 리뷰가 없습니다.</p>
-                    )}
-                  </TabsContent>
-                </div>
-              </Tabs>
-            </div>
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent className="max-w-4xl rounded-lg bg-white p-0">
+          <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-lg bg-white/80 px-6 backdrop-blur-xl">
+            <DialogTitle className="text-base font-medium">
+              {book.title}
+            </DialogTitle>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              onClick={() => handleOpenChange(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
           </div>
+          <div className="mx-auto max-w-5xl p-6">
+            <div className="grid gap-8 md:grid-cols-[300px_1fr]">
+              {/* 왼쪽: 책 표지 및 기본 정보 */}
+              <BookCover book={book} />
 
-          {/* 비슷한 책 */}
-          {book.similarBooks && book.similarBooks.length > 0 && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold">이런 책은 어떠세요?</h3>
-              <div className="grid grid-cols-3 gap-6">
-                {book.similarBooks.map(similarBook => (
-                  <div
-                    key={similarBook.id}
-                    className="group cursor-pointer overflow-hidden"
-                  >
-                    <div className="relative aspect-[2/3] overflow-hidden rounded-lg">
-                      <img
-                        src={similarBook.coverImage}
-                        alt={similarBook.title}
-                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                    <h4 className="mt-2 font-medium group-hover:text-blue-600">
-                      {similarBook.title}
-                    </h4>
-                    <p className="text-sm text-gray-500">
-                      {similarBook.author}
-                    </p>
-                    {similarBook.rating && (
-                      <div className="mt-1 flex items-center text-sm text-gray-500">
-                        <Star className="mr-1 h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                        {similarBook.rating.toFixed(1)}
-                      </div>
-                    )}
-                  </div>
-                ))}
+              {/* 오른쪽: 상세 정보 */}
+              <div className="space-y-7">
+                {/* 책 제목, 설명, 저자 소개 */}
+                <BookInfo book={book} />
+
+                {/* 리뷰 섹션 */}
+                <BookReviews
+                  book={book}
+                  onOpenReviewDialog={() => setReviewDialogOpen(true)}
+                />
+
+                {/* 등록된 서재 섹션 */}
+                <BookShelves
+                  bookshelves={book.bookshelves || defaultBookshelves}
+                />
+
+                {/* 독서 모임 섹션 */}
+                <ReadingGroups
+                  readingGroups={book.readingGroups || defaultReadingGroups}
+                />
+
+                {/* 인상적인 구절 */}
+                <BookQuotes quotes={book.quotes} />
               </div>
             </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+
+            {/* 비슷한 책 */}
+            <SimilarBooks similarBooks={book.similarBooks} />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* 리뷰 작성 다이얼로그 */}
+      <ReviewDialog
+        open={reviewDialogOpen}
+        onOpenChange={setReviewDialogOpen}
+        bookTitle={book.title}
+        onSubmit={handleReviewSubmit}
+      />
+    </>
   );
 }
