@@ -3,6 +3,7 @@ export { BookItem } from './BookItem';
 export { BookSearchDialog } from './BookSearchDialog';
 export { DeleteButton } from './DeleteButton';
 export { Header } from './Header';
+export { NotificationButton } from './NotificationButton';
 export { RecentSearchList } from './RecentSearchList';
 export { SearchBar } from './SearchBar';
 export { SearchDialog } from './SearchDialog';

@@ -118,6 +118,36 @@ export default function NotificationSettings({
               className="data-[state=checked]:bg-gray-900"
             />
           </div>
+          <Separator />
+
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-sm font-medium text-gray-900">실시간 알림</h3>
+              <p className="text-xs text-gray-500">
+                사이트 이용 중 화면 상단에 실시간 알림을 표시합니다.
+              </p>
+            </div>
+            <Switch
+              checked={true}
+              onValueChange={() => {}}
+              className="data-[state=checked]:bg-gray-900"
+            />
+          </div>
+          <Separator />
+
+          <div className="flex items-start justify-between">
+            <div>
+              <h3 className="text-sm font-medium text-gray-900">알림 소리</h3>
+              <p className="text-xs text-gray-500">
+                새 알림이 도착할 때 소리를 재생합니다.
+              </p>
+            </div>
+            <Switch
+              checked={false}
+              onValueChange={() => {}}
+              className="data-[state=checked]:bg-gray-900"
+            />
+          </div>
         </div>
 
         <div className="flex justify-end pt-4">
