@@ -1,6 +1,6 @@
 'use client';
 
-import { Star, Users } from 'lucide-react';
+import { MessageSquare, Star } from 'lucide-react';
 
 export interface Book {
   id: number;
@@ -47,7 +47,7 @@ export function BookCard({ book, onClick }: BookCardProps) {
             </div>
             <span>·</span>
             <div className="flex items-center gap-1">
-              <Users className="h-3.5 w-3.5" />
+              <MessageSquare className="h-3.5 w-3.5" />
               <span>{book.reviews}</span>
             </div>
           </div>

@@ -8,7 +8,7 @@ import { SearchItem } from './SearchItem';
 interface SearchResultsProps {
   query: string;
   view: 'recent' | 'results';
-  onItemClick: () => void;
+  onItemClick: (item: any) => void;
 }
 
 // 실시간 인기 검색어 (실제로는 API에서 가져와야 함)
@@ -40,24 +40,30 @@ export function SearchResults({
         type: 'book',
         title: '논어',
         subtitle: '공자',
-        image: 'https://picsum.photos/seed/book1/120/180',
+        image: 'https://picsum.photos/seed/book1/180/270',
         author: '공자',
+        rating: 4.8,
+        reviews: 156,
       },
       {
         id: 3,
         type: 'book',
         title: '국가',
         subtitle: '플라톤',
-        image: 'https://picsum.photos/seed/book2/120/180',
+        image: 'https://picsum.photos/seed/book2/180/270',
         author: '플라톤',
+        rating: 4.6,
+        reviews: 235,
       },
       {
         id: 4,
         type: 'book',
         title: '도덕경',
         subtitle: '노자',
-        image: 'https://picsum.photos/seed/book3/120/180',
+        image: 'https://picsum.photos/seed/book3/180/270',
         author: '노자',
+        rating: 4.7,
+        reviews: 172,
       },
     ]);
   }, []);
@@ -76,27 +82,33 @@ export function SearchResults({
             type: 'book',
             title: `${query}와 서양 고전`,
             subtitle: '김철학',
-            image: 'https://picsum.photos/seed/search1/120/180',
+            image: 'https://picsum.photos/seed/search1/180/270',
             author: '김철학',
             highlight: query,
+            rating: 4.5,
+            reviews: 120,
           },
           {
             id: 102,
             type: 'book',
             title: `${query}의 세계`,
             subtitle: '이동양',
-            image: 'https://picsum.photos/seed/search2/120/180',
+            image: 'https://picsum.photos/seed/search2/180/270',
             author: '이동양',
             highlight: query,
+            rating: 4.2,
+            reviews: 87,
           },
           {
             id: 103,
             type: 'book',
             title: `${query}에 관한 고찰`,
             subtitle: '박고전',
-            image: 'https://picsum.photos/seed/search3/120/180',
+            image: 'https://picsum.photos/seed/search3/180/270',
             author: '박고전',
             highlight: query,
+            rating: 4.7,
+            reviews: 145,
           },
         ];
 
@@ -114,13 +126,13 @@ export function SearchResults({
       <div className="pb-4">
         {/* 최근 검색 목록 */}
         {recentSearches.length > 0 && (
-          <CommandGroup heading="최근 검색" className="pb-2">
+          <CommandGroup className="pb-2">
             <div className="mb-2 flex items-center justify-between px-4">
-              <h3 className="flex items-center text-xs font-medium text-gray-500">
-                <Clock className="mr-1.5 h-3.5 w-3.5" />
+              <h3 className="flex items-center text-sm font-medium text-gray-700">
+                <Clock className="mr-2 h-4 w-4 text-gray-500" />
                 최근 도서 검색
               </h3>
-              <button className="text-xs text-blue-500 hover:underline">
+              <button className="cursor-pointer text-xs text-gray-600 hover:text-gray-900 hover:underline">
                 전체 삭제
               </button>
             </div>
@@ -128,7 +140,7 @@ export function SearchResults({
               <SearchItem
                 key={`${item.type}-${item.id}`}
                 item={item}
-                onClick={onItemClick}
+                onClick={() => onItemClick(item)}
                 onDelete={() => console.log('삭제:', item.id)}
               />
             ))}
@@ -136,25 +148,25 @@ export function SearchResults({
         )}
 
         {/* 실시간 인기 검색어 */}
-        <CommandGroup heading="실시간 인기 검색어" className="pt-0">
+        <CommandGroup className="pt-4">
           <div className="mb-2 px-4">
-            <h3 className="flex items-center text-xs font-medium text-gray-500">
-              <TrendingUp className="mr-1.5 h-3.5 w-3.5" />
-              지금 많이 찾는 검색어
+            <h3 className="flex items-center text-sm font-medium text-gray-700">
+              <TrendingUp className="mr-2 h-4 w-4 text-gray-500" />
+              실시간 인기 검색어
             </h3>
           </div>
           <div className="grid grid-cols-2 gap-2 p-3 pt-1 max-sm:grid-cols-1">
             {TRENDING_KEYWORDS.map((trending, index) => (
               <button
                 key={trending.keyword}
-                className="flex items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-left transition-colors hover:border-blue-100 hover:bg-blue-50"
+                className="flex cursor-pointer items-center justify-between rounded-lg border border-gray-100 bg-gray-50 px-3 py-2 text-left transition-colors hover:bg-gray-100"
                 onClick={() =>
                   console.log('인기 검색어 선택:', trending.keyword)
                 }
               >
                 <div className="flex items-center gap-2">
                   <div
-                    className={`flex h-5 w-5 items-center justify-center rounded-full ${index < 3 ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'} `}
+                    className={`flex h-5 w-5 items-center justify-center rounded-full ${index < 3 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'} `}
                   >
                     <span className="text-xs font-medium">{index + 1}</span>
                   </div>
@@ -177,7 +189,7 @@ export function SearchResults({
   if (isLoading) {
     return (
       <div className="flex h-[300px] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+        <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
       </div>
     );
   }
@@ -203,7 +215,7 @@ export function SearchResults({
       {/* 책 검색 결과 */}
       <CommandGroup className="pb-2">
         <div className="mb-2 px-4">
-          <h3 className="flex items-center text-xs font-medium text-gray-500">
+          <h3 className="flex items-center text-sm font-medium text-gray-700">
             "{query}" 검색 결과
           </h3>
         </div>
@@ -211,7 +223,7 @@ export function SearchResults({
           <SearchItem
             key={`book-${book.id}`}
             item={book}
-            onClick={onItemClick}
+            onClick={() => onItemClick(book)}
           />
         ))}
       </CommandGroup>
