@@ -1,4 +1,3 @@
-import { DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BookDetails } from './types';
 
 interface BookInfoProps {
@@ -7,42 +6,32 @@ interface BookInfoProps {
 
 export function BookInfo({ book }: BookInfoProps) {
   return (
-    <div className="space-y-7">
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-bold tracking-tight">
-          {book.title}
-        </DialogTitle>
-        {book.originalTitle && (
-          <p className="text-gray-500">{book.originalTitle}</p>
-        )}
-      </DialogHeader>
-
+    <div className="space-y-6">
       {/* 책 소개 섹션 */}
       <div className="space-y-3">
-        <div className="prose prose-gray max-w-none space-y-4 text-gray-800">
+        <p className="text-sm font-medium text-gray-900">책 소개</p>
+        <div className="prose prose-gray max-w-none text-sm leading-relaxed text-gray-700">
           {book.description || '책 소개가 없습니다.'}
-          {book.awards && book.awards.length > 0 && (
-            <div className="mt-6">
-              <p className="font-medium text-gray-900">수상 내역</p>
-              <ul className="pl-5">
-                {book.awards.map(award => (
-                  <li key={award.name} className="text-sm">
-                    {award.year}년 {award.name}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
+        {book.awards && book.awards.length > 0 && (
+          <div className="mt-4 rounded-xl bg-gray-50 p-4">
+            <p className="mb-2 text-sm font-medium text-gray-900">수상 내역</p>
+            <ul className="space-y-1">
+              {book.awards.map(award => (
+                <li key={award.name} className="text-sm text-gray-700">
+                  {award.year}년 {award.name}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* 저자 소개 */}
       {book.authorInfo && (
         <div className="space-y-3">
-          <p className="text-sm font-medium text-gray-900">
-            {book.author} 작가 소개
-          </p>
-          <div className="rounded-2xl bg-gray-50 p-4 text-sm text-gray-800">
+          <p className="text-sm font-medium text-gray-900">저자 소개</p>
+          <div className="rounded-xl bg-gray-50 p-4 text-sm leading-relaxed text-gray-700">
             {book.authorInfo}
           </div>
         </div>

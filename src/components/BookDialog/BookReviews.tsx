@@ -1,4 +1,4 @@
-import { MessageSquare, PenLine, Star, ThumbsUp } from 'lucide-react';
+import { MessageSquare, Star, ThumbsUp } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -14,25 +14,11 @@ export function BookReviews({ book, onOpenReviewDialog }: BookReviewsProps) {
   const displayReviews = reviews.slice(0, 10);
 
   return (
-    <div className="space-y-7">
-      {/* 리뷰 작성하기 버튼 */}
-      <div className="flex justify-end">
-        <Button
-          className="rounded-full bg-pink-100 text-pink-700 hover:bg-pink-200"
-          onClick={onOpenReviewDialog}
-        >
-          <PenLine className="mr-1.5 h-4 w-4" />
-          리뷰 작성하기
-        </Button>
-      </div>
-
-      {displayReviews.length > 0 && (
+    <div className="space-y-5">
+      {displayReviews.length > 0 ? (
         <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <p className="text-sm font-medium text-gray-900">
-              리뷰 ({reviews.length})
-            </p>
             {reviews.length > 10 && (
+            <div className="flex justify-end">
               <Button
                 variant="ghost"
                 size="sm"
@@ -40,8 +26,8 @@ export function BookReviews({ book, onOpenReviewDialog }: BookReviewsProps) {
               >
                 모든 리뷰 보기
               </Button>
+            </div>
             )}
-          </div>
           <div className="space-y-3">
             {displayReviews.map(review => (
               <div key={review.id} className="rounded-2xl bg-gray-50 p-4">
@@ -99,6 +85,17 @@ export function BookReviews({ book, onOpenReviewDialog }: BookReviewsProps) {
               </div>
             ))}
           </div>
+        </div>
+      ) : (
+        <div className="rounded-2xl bg-gray-50 p-5 text-center">
+          <p className="text-sm text-gray-500">아직 리뷰가 없습니다</p>
+          <Button
+            variant="ghost"
+            className="mt-2 text-sm text-gray-700 hover:text-gray-900"
+            onClick={onOpenReviewDialog}
+          >
+            첫 리뷰를 작성해보세요
+          </Button>
         </div>
       )}
     </div>
