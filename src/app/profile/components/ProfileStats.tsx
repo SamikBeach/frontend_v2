@@ -7,11 +7,7 @@ interface StatsCardProps {
 }
 
 const StatsCard = ({ children, className = '' }: StatsCardProps) => (
-  <div
-    className={`rounded-xl border border-gray-200 bg-gray-50 p-5 ${className}`}
-  >
-    {children}
-  </div>
+  <div className={`rounded-xl bg-gray-50 p-5 ${className}`}>{children}</div>
 );
 
 // 통계 섹션에서 사용할 독서 통계 데이터
@@ -124,7 +120,7 @@ export default function ProfileStats() {
     <div className="space-y-6">
       {/* 상단 주요 통계 카드 */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="rounded-xl bg-gray-50 p-5">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <BookOpen className="h-6 w-6 text-blue-500" />
@@ -152,7 +148,7 @@ export default function ProfileStats() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="rounded-xl bg-gray-50 p-5">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
               <Book className="h-6 w-6 text-purple-500" />
@@ -180,7 +176,7 @@ export default function ProfileStats() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="rounded-xl bg-gray-50 p-5">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-100">
               <Users className="h-6 w-6 text-amber-500" />
@@ -202,7 +198,7 @@ export default function ProfileStats() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="rounded-xl bg-gray-50 p-5">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
               <AreaChart className="h-6 w-6 text-green-500" />
@@ -236,7 +232,7 @@ export default function ProfileStats() {
 
       {/* 장르별 독서 분포 & 연도별 트렌드 */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="rounded-xl bg-gray-50 p-5">
           <h3 className="mb-4 text-sm font-medium text-gray-700">
             장르별 독서 분포
           </h3>
@@ -267,7 +263,7 @@ export default function ProfileStats() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="rounded-xl bg-gray-50 p-5">
           <h3 className="mb-4 text-sm font-medium text-gray-700">
             연도별 독서량
           </h3>
@@ -295,7 +291,7 @@ export default function ProfileStats() {
 
       {/* 현재 목표 & 독서 패턴 */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="rounded-xl bg-gray-50 p-5">
           <h3 className="mb-4 text-sm font-medium text-gray-700">
             이번 달 독서 패턴
           </h3>
@@ -326,7 +322,7 @@ export default function ProfileStats() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+        <div className="rounded-xl bg-gray-50 p-5">
           <h3 className="mb-4 text-sm font-medium text-gray-700">
             알라딘 베스트셀러 독서 현황
           </h3>
@@ -358,7 +354,7 @@ export default function ProfileStats() {
       </div>
 
       {/* 독서 인사이트 */}
-      <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+      <div className="rounded-xl bg-gray-50 p-5">
         <h3 className="mb-4 text-sm font-medium text-gray-700">
           독서 인사이트
         </h3>

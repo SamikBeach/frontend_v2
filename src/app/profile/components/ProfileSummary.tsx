@@ -88,7 +88,7 @@ export default function ProfileSummary({
 
   return (
     <div className="mx-auto w-full px-4 py-6">
-      <div className="grid grid-cols-6 gap-3">
+      <div className="grid grid-cols-5 gap-3">
         {/* 내 서재 */}
         <button
           onClick={() => onSectionChange('books')}
@@ -164,25 +164,6 @@ export default function ProfileSummary({
               &nbsp;
             </span>
             <span className="text-xs text-gray-600">구독한 서재</span>
-          </div>
-        </button>
-
-        {/* 독서모임 */}
-        <button
-          onClick={() => onSectionChange('groups')}
-          className={cn(
-            `flex cursor-pointer flex-col items-center rounded-lg border border-amber-200 bg-white p-4 transition-transform hover:scale-105`,
-            selectedSection === 'groups' && 'ring-2 ring-gray-900 ring-offset-2'
-          )}
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
-            <Users className="h-5 w-5 text-amber-600" />
-          </div>
-          <div className="mt-2 text-center">
-            <span className="block text-xl font-bold text-gray-900">
-              &nbsp;
-            </span>
-            <span className="text-xs text-gray-600">독서모임</span>
           </div>
         </button>
 
