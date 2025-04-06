@@ -1,0 +1,68 @@
+import { userAtom } from '@/atoms/auth';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { useAtomValue } from 'jotai';
+import { UserCircle } from 'lucide-react';
+
+export default function ProfileHeader() {
+  const user = useAtomValue(userAtom);
+
+  // 팔로워 / 팔로잉 수 (임시 데이터)
+  const followers = 128;
+  const following = 75;
+
+  if (!user) return null;
+
+  return (
+    <div className="bg-white">
+      <div className="mx-auto w-full px-4 pt-8 pb-6">
+        <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-20 w-20 border-4 border-white">
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback className="bg-gray-200 text-2xl font-medium text-gray-700">
+                {user.name[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {user.name}
+                </h1>
+                <div className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                  @{user.username}
+                </div>
+              </div>
+              <p className="mt-1 max-w-xl text-sm text-gray-600">
+                {user.bio ||
+                  '고전 문학을 좋아하는 독서가입니다. 플라톤부터 도스토예프스키까지 다양한 작품을 읽고 있습니다.'}
+              </p>
+              <div className="mt-2 flex gap-3 text-sm">
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-gray-900">
+                    {following}
+                  </span>
+                  <span className="text-gray-500">팔로잉</span>
+                </div>
+                <div className="h-4 border-r border-gray-200" />
+                <div className="flex items-center gap-1">
+                  <span className="font-semibold text-gray-900">
+                    {followers}
+                  </span>
+                  <span className="text-gray-500">팔로워</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <Button
+            className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
+            variant="outline"
+          >
+            <UserCircle className="h-4 w-4" />
+            프로필 편집
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
