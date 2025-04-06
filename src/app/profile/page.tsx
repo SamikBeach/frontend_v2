@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useAtomValue } from 'jotai';
 import {
   AreaChart,
+  Bell,
   Book,
   BookOpen,
   CalendarDays,
@@ -42,6 +43,14 @@ const menuItems: MenuItem[] = [
     bgColor: 'bg-blue-50',
     iconBgColor: 'bg-blue-100',
     iconColor: 'text-blue-600',
+  },
+  {
+    id: 'subscriptions',
+    name: '구독한 서재',
+    icon: Bell,
+    bgColor: 'bg-green-50',
+    iconBgColor: 'bg-green-100',
+    iconColor: 'text-green-600',
   },
   {
     id: 'read',
@@ -199,6 +208,130 @@ const userLibraries = [
   },
 ];
 
+// 샘플 구독한 서재 데이터
+const subscribedLibraries = [
+  {
+    id: 101,
+    title: '철학의 시작',
+    description: '서양 철학의 기초를 다지는 필수 고전들',
+    category: 'philosophy',
+    owner: {
+      name: '김철수',
+      avatar: `https://i.pravatar.cc/150?u=user1`,
+      username: 'cheolsu',
+    },
+    followers: 128,
+    hasNewUpdates: true,
+    lastUpdated: '2일 전',
+    books: [
+      {
+        id: 1,
+        title: '소크라테스의 변명',
+        author: '플라톤',
+        coverImage: `https://picsum.photos/seed/book1/120/180`,
+      },
+      {
+        id: 2,
+        title: '니코마코스 윤리학',
+        author: '아리스토텔레스',
+        coverImage: `https://picsum.photos/seed/book4/120/180`,
+      },
+      {
+        id: 3,
+        title: '국가',
+        author: '플라톤',
+        coverImage: `https://picsum.photos/seed/book22/120/180`,
+      },
+      {
+        id: 4,
+        title: '형이상학',
+        author: '아리스토텔레스',
+        coverImage: `https://picsum.photos/seed/book27/120/180`,
+      },
+    ],
+  },
+  {
+    id: 102,
+    title: '문학의 향기',
+    description: '세계 문학의 걸작들을 모아둔 서재입니다',
+    category: 'literature',
+    owner: {
+      name: '이영희',
+      avatar: `https://i.pravatar.cc/150?u=user2`,
+      username: 'younghee',
+    },
+    followers: 256,
+    hasNewUpdates: false,
+    lastUpdated: '1주일 전',
+    books: [
+      {
+        id: 5,
+        title: '죄와 벌',
+        author: '도스토예프스키',
+        coverImage: `https://picsum.photos/seed/book2/120/180`,
+      },
+      {
+        id: 6,
+        title: '안나 카레니나',
+        author: '톨스토이',
+        coverImage: `https://picsum.photos/seed/book15/120/180`,
+      },
+      {
+        id: 7,
+        title: '변신',
+        author: '카프카',
+        coverImage: `https://picsum.photos/seed/book16/120/180`,
+      },
+      {
+        id: 8,
+        title: '백년의 고독',
+        author: '마르케스',
+        coverImage: `https://picsum.photos/seed/book17/120/180`,
+      },
+    ],
+  },
+  {
+    id: 103,
+    title: '역사 속의 지혜',
+    description: '역사 속에서 배우는 삶의 교훈',
+    category: 'history',
+    owner: {
+      name: '박지민',
+      avatar: `https://i.pravatar.cc/150?u=user3`,
+      username: 'jimin',
+    },
+    followers: 189,
+    hasNewUpdates: true,
+    lastUpdated: '3일 전',
+    books: [
+      {
+        id: 9,
+        title: '로마제국 쇠망사',
+        author: '에드워드 기번',
+        coverImage: `https://picsum.photos/seed/book3/120/180`,
+      },
+      {
+        id: 10,
+        title: '사기',
+        author: '사마천',
+        coverImage: `https://picsum.photos/seed/book18/120/180`,
+      },
+      {
+        id: 11,
+        title: '총, 균, 쇠',
+        author: '재레드 다이아몬드',
+        coverImage: `https://picsum.photos/seed/book19/120/180`,
+      },
+      {
+        id: 12,
+        title: '무민 도시의 역사',
+        author: '루이스 멈포드',
+        coverImage: `https://picsum.photos/seed/book20/120/180`,
+      },
+    ],
+  },
+];
+
 // 참여 중인 독서 모임 데이터
 interface ActiveReadingGroup {
   id: number;
@@ -310,6 +443,8 @@ export default function ProfilePage() {
   // 팔로워 / 팔로잉 수
   const followers = 128;
   const following = 75;
+  // 구독 중인 서재 수
+  const subscribedCount = subscribedLibraries.length;
 
   // 통계 데이터
   const statsData = {
@@ -382,6 +517,85 @@ export default function ProfilePage() {
                           <BookOpen className="h-3.5 w-3.5 text-gray-400" />
                           <span>{library.books.length}권</span>
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      case 'subscriptions':
+        return (
+          <div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {subscribedLibraries.map(library => (
+                <div
+                  key={library.id}
+                  className="group cursor-pointer"
+                  onClick={() => router.push(`/libraries/${library.id}`)}
+                >
+                  <div className="group h-full rounded-xl bg-[#F9FAFB] transition-all duration-200 hover:bg-[#F2F4F6]">
+                    <div className="p-5 pb-3">
+                      <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9 border-0">
+                          <AvatarImage
+                            src={library.owner.avatar}
+                            alt={library.owner.name}
+                          />
+                          <AvatarFallback className="bg-gray-100 text-gray-800">
+                            {library.owner.name[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-[15px] font-medium text-gray-900 transition-colors duration-150 group-hover:text-[#3182F6]">
+                              {library.title}
+                            </h3>
+                            {library.hasNewUpdates && (
+                              <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-medium text-blue-600">
+                                업데이트
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500">
+                            {library.owner.name}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="px-5 pt-0 pb-3">
+                      <p className="mb-4 line-clamp-2 text-sm text-gray-600">
+                        {library.description}
+                      </p>
+                      <div className="grid grid-cols-2 gap-2.5">
+                        {library.books.map(book => (
+                          <div
+                            key={book.id}
+                            className="aspect-[2/3] overflow-hidden rounded-md"
+                          >
+                            <img
+                              src={book.coverImage}
+                              alt={book.title}
+                              className="h-full w-full object-cover"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between px-5 py-3 text-xs text-gray-500">
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-1.5">
+                          <Users className="h-3.5 w-3.5 text-gray-400" />
+                          <span>{library.followers.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <BookOpen className="h-3.5 w-3.5 text-gray-400" />
+                          <span>{library.books.length}권</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {library.lastUpdated}
                       </div>
                     </div>
                   </div>
@@ -870,40 +1084,125 @@ export default function ProfilePage() {
 
       {/* 독서 정보 개요 */}
       <div className="mx-auto w-full px-4 py-6">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-          {menuItems.map(item => (
-            <button
-              key={item.id}
-              onClick={() => handleSectionChange(item.id)}
-              className={cn(
-                `flex cursor-pointer flex-col items-center rounded-lg ${item.bgColor} p-4 transition-transform hover:scale-105`,
-                selectedSection === item.id &&
-                  'ring-2 ring-gray-900 ring-offset-2'
-              )}
-            >
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full ${item.iconBgColor}`}
-              >
-                <item.icon className={`h-5 w-5 ${item.iconColor}`} />
-              </div>
-              <div className="mt-2 text-center">
-                <span className="block text-xl font-bold text-gray-900">
-                  {item.id === 'books'
-                    ? booksRated
-                    : item.id === 'read'
-                      ? booksRead
-                      : item.id === 'reviews'
-                        ? reviewsWritten
-                        : item.id === 'groups'
-                          ? groupsJoined
-                          : item.id === 'stats'
-                            ? statsData.readingDays
-                            : ''}
-                </span>
-                <span className="text-xs text-gray-600">{item.name}</span>
-              </div>
-            </button>
-          ))}
+        <div className="grid grid-cols-6 gap-3">
+          {/* 내 서재 */}
+          <button
+            onClick={() => handleSectionChange('books')}
+            className={cn(
+              `flex cursor-pointer flex-col items-center rounded-lg bg-blue-50 p-4 transition-transform hover:scale-105`,
+              selectedSection === 'books' &&
+                'ring-2 ring-gray-900 ring-offset-2'
+            )}
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+              <BookOpen className="h-5 w-5 text-blue-600" />
+            </div>
+            <div className="mt-2 text-center">
+              <span className="block text-xl font-bold text-gray-900">
+                {booksRated}
+              </span>
+              <span className="text-xs text-gray-600">내 서재</span>
+            </div>
+          </button>
+
+          {/* 읽은 책 */}
+          <button
+            onClick={() => handleSectionChange('read')}
+            className={cn(
+              `flex cursor-pointer flex-col items-center rounded-lg bg-violet-50 p-4 transition-transform hover:scale-105`,
+              selectedSection === 'read' && 'ring-2 ring-gray-900 ring-offset-2'
+            )}
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100">
+              <Book className="h-5 w-5 text-violet-600" />
+            </div>
+            <div className="mt-2 text-center">
+              <span className="block text-xl font-bold text-gray-900">
+                {booksRead}
+              </span>
+              <span className="text-xs text-gray-600">읽은 책</span>
+            </div>
+          </button>
+
+          {/* 내 리뷰 */}
+          <button
+            onClick={() => handleSectionChange('reviews')}
+            className={cn(
+              `flex cursor-pointer flex-col items-center rounded-lg bg-purple-50 p-4 transition-transform hover:scale-105`,
+              selectedSection === 'reviews' &&
+                'ring-2 ring-gray-900 ring-offset-2'
+            )}
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
+              <MessageSquare className="h-5 w-5 text-purple-600" />
+            </div>
+            <div className="mt-2 text-center">
+              <span className="block text-xl font-bold text-gray-900">
+                {reviewsWritten}
+              </span>
+              <span className="text-xs text-gray-600">내 리뷰</span>
+            </div>
+          </button>
+
+          {/* 구독한 서재 */}
+          <button
+            onClick={() => handleSectionChange('subscriptions')}
+            className={cn(
+              `flex cursor-pointer flex-col items-center rounded-lg border border-green-200 bg-white p-4 transition-transform hover:scale-105`,
+              selectedSection === 'subscriptions' &&
+                'ring-2 ring-gray-900 ring-offset-2'
+            )}
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
+              <Bell className="h-5 w-5 text-green-600" />
+            </div>
+            <div className="mt-2 text-center">
+              <span className="block text-xl font-bold text-gray-900">
+                &nbsp;
+              </span>
+              <span className="text-xs text-gray-600">구독한 서재</span>
+            </div>
+          </button>
+
+          {/* 독서모임 */}
+          <button
+            onClick={() => handleSectionChange('groups')}
+            className={cn(
+              `flex cursor-pointer flex-col items-center rounded-lg border border-amber-200 bg-white p-4 transition-transform hover:scale-105`,
+              selectedSection === 'groups' &&
+                'ring-2 ring-gray-900 ring-offset-2'
+            )}
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100">
+              <Users className="h-5 w-5 text-amber-600" />
+            </div>
+            <div className="mt-2 text-center">
+              <span className="block text-xl font-bold text-gray-900">
+                &nbsp;
+              </span>
+              <span className="text-xs text-gray-600">독서모임</span>
+            </div>
+          </button>
+
+          {/* 통계 */}
+          <button
+            onClick={() => handleSectionChange('stats')}
+            className={cn(
+              `flex cursor-pointer flex-col items-center rounded-lg border border-blue-200 bg-white p-4 transition-transform hover:scale-105`,
+              selectedSection === 'stats' &&
+                'ring-2 ring-gray-900 ring-offset-2'
+            )}
+          >
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+              <AreaChart className="h-5 w-5 text-blue-600" />
+            </div>
+            <div className="mt-2 text-center">
+              <span className="block text-xl font-bold text-gray-900">
+                &nbsp;
+              </span>
+              <span className="text-xs text-gray-600">통계</span>
+            </div>
+          </button>
         </div>
       </div>
 
