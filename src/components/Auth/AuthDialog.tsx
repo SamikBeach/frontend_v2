@@ -1,4 +1,3 @@
-import { X } from 'lucide-react';
 import { useState } from 'react';
 import { Logo } from '../Logo';
 import { Button } from '../ui/button';
@@ -36,6 +35,8 @@ export function AuthDialog({
   const [mode, setMode] = useState<AuthMode>(initialMode);
   // 회원가입 이메일 저장
   const [email, setEmail] = useState<string>('');
+  // 이전 모드 저장용 히스토리
+  const [modeHistory, setModeHistory] = useState<AuthMode[]>([]);
 
   // 다이얼로그 외부 클릭 처리 (일부 모드에서는 닫기 방지)
   const handlePointerDownOutside = (e: Event) => {
@@ -48,10 +49,30 @@ export function AuthDialog({
     }
   };
 
+  // 모드 변경 함수 (히스토리 추적)
+  const changeMode = (newMode: AuthMode) => {
+    setModeHistory(prev => [...prev, mode]);
+    setMode(newMode);
+  };
+
+  // 뒤로가기 함수
+  const goBack = () => {
+    if (modeHistory.length > 0) {
+      const prevMode = modeHistory[modeHistory.length - 1];
+      setMode(prevMode);
+      setModeHistory(prev => prev.slice(0, -1));
+    }
+  };
+
   // 이메일 인증 완료 핸들러
   const handleEmailVerified = (verifiedEmail: string) => {
     setEmail(verifiedEmail);
-    setMode('userInfo');
+    changeMode('userInfo');
+  };
+
+  // 사용자 정보 입력 완료 핸들러
+  const handleUserInfoCompleted = () => {
+    changeMode('verifyCode');
   };
 
   // 회원가입 완료 핸들러
@@ -66,13 +87,25 @@ export function AuthDialog({
     props.onOpenChange?.(false);
   };
 
+  // 비밀번호 재설정 성공 핸들러
+  const handleResetPasswordSuccess = () => {
+    changeMode('login');
+  };
+
+  // 현재 모드가 로그인이 아닌지 확인
+  const showBackButton = mode !== 'login';
+
   return (
     <Dialog
       {...props}
       onOpenChange={open => {
         // 다이얼로그가 닫힐 때 상태 초기화
         if (!open) {
-          setTimeout(() => setMode(initialMode), 200);
+          setTimeout(() => {
+            setMode(initialMode);
+            setEmail('');
+            setModeHistory([]);
+          }, 200);
         }
         props.onOpenChange?.(open);
       }}
@@ -81,19 +114,35 @@ export function AuthDialog({
         className="absolute top-1/2 left-1/2 w-[400px] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border-0 p-0 shadow-xl"
         onPointerDownOutside={handlePointerDownOutside}
       >
-        {/* 헤더 - 로고만 남기고 타이틀 제거 */}
+        {/* 헤더 - 로고와 뒤로가기 버튼 */}
         <DialogHeader className="relative flex h-14 items-center justify-center border-b border-gray-100 px-6">
           <DialogTitle className="sr-only">로그인 / 회원가입</DialogTitle>
-          <Logo className="absolute left-6" />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute top-1/2 right-3 h-8 w-8 -translate-y-1/2 rounded-full text-gray-400 hover:text-gray-900"
-            onClick={() => props.onOpenChange?.(false)}
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">닫기</span>
-          </Button>
+          {showBackButton && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={goBack}
+              className="absolute top-1/2 left-4 h-8 w-8 -translate-y-1/2 rounded-full p-0"
+              aria-label="뒤로 가기"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M15 19L8 12L15 5"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Button>
+          )}
+          <Logo />
         </DialogHeader>
 
         {/* 폼 컨테이너 */}
@@ -101,8 +150,8 @@ export function AuthDialog({
           {/* 로그인 폼 */}
           {mode === 'login' && (
             <LoginForm
-              onClickSignUp={() => setMode('signup')}
-              onClickResetPassword={() => setMode('resetPassword')}
+              onClickSignUp={() => changeMode('signup')}
+              onClickResetPassword={() => changeMode('resetPassword')}
               onSuccess={handleLoginSuccess}
             />
           )}
@@ -110,7 +159,7 @@ export function AuthDialog({
           {/* 회원가입 폼 (이메일 입력) */}
           {mode === 'signup' && (
             <SignUpForm
-              onClickLogin={() => setMode('login')}
+              onClickLogin={() => changeMode('login')}
               onEmailVerified={handleEmailVerified}
               onSuccess={handleSignUpSuccess}
             />
@@ -118,24 +167,23 @@ export function AuthDialog({
 
           {/* 회원가입 폼 (사용자 정보 입력) */}
           {mode === 'userInfo' && (
-            <UserInfoForm
-              email={email}
-              onSuccess={() => setMode('verifyCode')}
-            />
+            <UserInfoForm email={email} onSuccess={handleUserInfoCompleted} />
           )}
 
           {/* 인증 코드 확인 */}
           {mode === 'verifyCode' && (
-            <VerifyCodeForm email={email} onSuccess={handleSignUpSuccess} />
+            <VerifyCodeForm
+              email={email}
+              onSuccess={handleSignUpSuccess}
+              onClose={() => changeMode('login')}
+            />
           )}
 
           {/* 비밀번호 재설정 */}
           {mode === 'resetPassword' && (
             <ResetPasswordForm
-              onClickLogin={() => setMode('login')}
-              onSuccess={() => {
-                setMode('login');
-              }}
+              onSuccess={handleResetPasswordSuccess}
+              onClose={() => changeMode('login')}
             />
           )}
         </div>

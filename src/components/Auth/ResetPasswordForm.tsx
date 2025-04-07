@@ -1,336 +1,348 @@
+'use client';
+
+import {
+  requestPasswordReset,
+  resetPassword,
+  verifyResetToken,
+} from '@/apis/auth';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Spinner } from '@/components/ui/spinner';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-
-type ResetPasswordStep = 'email' | 'verify' | 'reset';
+import { useForm } from 'react-hook-form';
 
 interface ResetPasswordFormProps {
-  onClickLogin: () => void;
   onSuccess?: () => void;
+  onClose?: () => void;
+}
+
+interface RequestResetFormData {
+  email: string;
+}
+
+interface VerifyTokenFormData {
+  token: string;
+}
+
+interface ResetPasswordFormData {
+  email: string;
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 export function ResetPasswordForm({
-  onClickLogin,
   onSuccess,
+  onClose,
 }: ResetPasswordFormProps) {
-  // 상태 관리
-  const [step, setStep] = useState<ResetPasswordStep>('email');
+  const [step, setStep] = useState<'request' | 'verify' | 'reset'>('request');
   const [email, setEmail] = useState('');
-  const [verificationCode, setVerificationCode] = useState([
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-  ]);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState(180); // 3분
 
-  // 이메일 인풋 핸들러
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    setError(null);
+  // 요청 단계 폼
+  const requestForm = useForm<RequestResetFormData>({
+    defaultValues: {
+      email: '',
+    },
+  });
+
+  // 인증 코드 확인 단계 폼
+  const verifyForm = useForm<VerifyTokenFormData>({
+    defaultValues: {
+      token: '',
+    },
+  });
+
+  // 재설정 단계 폼
+  const resetForm = useForm<ResetPasswordFormData>({
+    defaultValues: {
+      email: '',
+      token: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
+
+  // 비밀번호 재설정 요청 mutation
+  const requestResetMutation = useMutation({
+    mutationFn: (data: RequestResetFormData) =>
+      requestPasswordReset({ email: data.email }),
+    onSuccess: (_, variables) => {
+      setEmail(variables.email);
+      setStep('verify');
+    },
+    onError: (error: any) => {
+      requestForm.setError('email', {
+        message: error.message || '비밀번호 재설정 요청에 실패했습니다.',
+      });
+    },
+  });
+
+  // 인증 코드 확인 mutation
+  const verifyTokenMutation = useMutation({
+    mutationFn: (data: VerifyTokenFormData) =>
+      verifyResetToken({ email, token: data.token }),
+    onSuccess: (_, variables) => {
+      // 재설정 폼에 이메일과 토큰 자동 설정
+      resetForm.setValue('email', email);
+      resetForm.setValue('token', variables.token);
+      setStep('reset');
+    },
+    onError: (error: any) => {
+      verifyForm.setError('token', {
+        message: error.message || '유효하지 않은 인증 코드입니다.',
+      });
+    },
+  });
+
+  // 인증 코드 확인 핸들러
+  const handleVerifyToken = (data: VerifyTokenFormData) => {
+    verifyTokenMutation.mutate(data);
   };
 
-  // 이메일 유효성 검사
-  const isValidEmail = (email: string) => {
-    return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email);
-  };
-
-  // 이메일 폼 제출 핸들러
-  const handleEmailSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (!email) {
-      setError('이메일을 입력해주세요.');
-      return;
-    }
-
-    if (!isValidEmail(email)) {
-      setError('올바른 이메일 형식이 아닙니다.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    // 여기서는 로직 구현 없이 UI만 구현 (성공 시뮬레이션)
-    setTimeout(() => {
-      setIsLoading(false);
-      setStep('verify'); // 다음 단계로 이동
-    }, 1000);
-  };
-
-  // 특정 위치의 코드 변경 핸들러
-  const handleCodeChange = (
-    index: number,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const value = e.target.value;
-    if (value.length > 1) return; // 한 글자만 입력 가능
-
-    const newCode = [...verificationCode];
-    newCode[index] = value;
-    setVerificationCode(newCode);
-    setError(null);
-
-    // 값이 입력되었고 다음 인풋이 있으면 포커스 이동
-    if (value && index < 5 && e.target.nextElementSibling) {
-      (e.target.nextElementSibling as HTMLInputElement).focus();
-    }
-  };
-
-  // 키 입력 핸들러 (백스페이스 처리)
-  const handleKeyDown = (
-    index: number,
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
-    // 백스페이스 키를 누르고 현재 입력란이 비어있다면 이전 입력란으로 포커스 이동
-    if (
-      e.key === 'Backspace' &&
-      !verificationCode[index] &&
-      index > 0 &&
-      e.target.previousElementSibling
-    ) {
-      (e.target.previousElementSibling as HTMLInputElement).focus();
-    }
-  };
-
-  // 인증 코드 폼 제출 핸들러
-  const handleVerifySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    const fullCode = verificationCode.join('');
-    if (fullCode.length !== 6) {
-      setError('6자리 인증 코드를 모두 입력해주세요.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    // 여기서는 로직 구현 없이 UI만 구현 (성공 시뮬레이션)
-    setTimeout(() => {
-      setIsLoading(false);
-      setStep('reset'); // 다음 단계로 이동
-    }, 1000);
-  };
-
-  // 비밀번호 인풋 핸들러
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNewPassword(e.target.value);
-    setError(null);
-  };
-
-  // 비밀번호 확인 인풋 핸들러
-  const handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setConfirmPassword(e.target.value);
-    setError(null);
-  };
-
-  // 비밀번호 재설정 폼 제출 핸들러
-  const handleResetSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    if (!newPassword) {
-      setError('새 비밀번호를 입력해주세요.');
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      setError('비밀번호는 8자 이상이어야 합니다.');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError('비밀번호가 일치하지 않습니다.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    // 여기서는 로직 구현 없이 UI만 구현 (성공 시뮬레이션)
-    setTimeout(() => {
-      setIsLoading(false);
+  // 비밀번호 재설정 mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: (data: ResetPasswordFormData) =>
+      resetPassword({
+        email: data.email,
+        token: data.token,
+        newPassword: data.newPassword,
+      }),
+    onSuccess: () => {
       onSuccess?.();
-    }, 1000);
+    },
+    onError: (error: any) => {
+      if (error.message?.includes('token')) {
+        // 토큰 에러가 발생하면 인증 단계로 돌아가기
+        setStep('verify');
+        verifyForm.setError('token', {
+          message: '유효하지 않은 인증 코드입니다.',
+        });
+      } else {
+        resetForm.setError('newPassword', {
+          message: error.message || '비밀번호 재설정에 실패했습니다.',
+        });
+      }
+    },
+  });
+
+  // 요청 단계 제출 핸들러
+  const onRequestSubmit = (data: RequestResetFormData) => {
+    requestResetMutation.mutate(data);
   };
 
-  // 시간 포맷팅
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  // 재설정 단계 제출 핸들러
+  const onResetSubmit = (data: ResetPasswordFormData) => {
+    if (data.newPassword !== data.confirmPassword) {
+      resetForm.setError('confirmPassword', {
+        message: '비밀번호가 일치하지 않습니다.',
+      });
+      return;
+    }
+    resetPasswordMutation.mutate(data);
   };
+
+  // 단계 표시자 렌더링
+  const renderStepIndicator = () => (
+    <div className="mb-4 flex items-center justify-center">
+      <div className="flex items-center space-x-2">
+        <div
+          className={`h-2.5 w-2.5 rounded-full ${
+            step === 'request' ? 'bg-gray-900' : 'bg-gray-300'
+          }`}
+        />
+        <div
+          className={`h-2.5 w-2.5 rounded-full ${
+            step === 'verify' ? 'bg-gray-900' : 'bg-gray-300'
+          }`}
+        />
+        <div
+          className={`h-2.5 w-2.5 rounded-full ${
+            step === 'reset' ? 'bg-gray-900' : 'bg-gray-300'
+          }`}
+        />
+      </div>
+    </div>
+  );
 
   return (
-    <div className="flex flex-col space-y-5">
-      <div className="space-y-1">
+    <div>
+      <div className="mb-6">
         <h2 className="text-xl font-semibold tracking-tight text-gray-900">
           비밀번호 재설정
         </h2>
-        <p className="text-xs text-gray-500">
-          {step === 'email' &&
-            '가입했던 이메일을 입력하면 인증 코드를 보내드립니다'}
-          {step === 'verify' && '이메일로 전송된 인증 코드를 입력해주세요'}
-          {step === 'reset' && '새로운 비밀번호를 설정해주세요'}
-        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+        >
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M18 6L6 18M6 6L18 18"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
       </div>
 
-      {/* 이메일 입력 단계 */}
-      {step === 'email' && (
-        <form onSubmit={handleEmailSubmit} className="space-y-3">
-          <div className="space-y-1">
-            <Label htmlFor="email" className="text-gray-600">
-              이메일
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="이메일"
-              value={email}
-              onChange={handleEmailChange}
-              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-sm transition-colors focus:bg-white focus:shadow-sm"
-              autoComplete="email"
-            />
-          </div>
+      {renderStepIndicator()}
 
-          {error && <p className="text-xs font-medium text-red-500">{error}</p>}
-
-          <div className="space-y-3">
-            <Button
-              type="submit"
-              className="w-full rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800 focus:ring-offset-0"
-              disabled={isLoading}
-            >
-              {isLoading ? '처리 중...' : '인증 코드 전송'}
-            </Button>
-
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full rounded-xl font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              onClick={onClickLogin}
-            >
-              로그인으로 돌아가기
-            </Button>
-          </div>
-        </form>
-      )}
-
-      {/* 인증 코드 입력 단계 */}
-      {step === 'verify' && (
-        <form onSubmit={handleVerifySubmit} className="space-y-3">
-          <div className="space-y-1">
-            <Label htmlFor="code" className="text-gray-600">
-              인증 코드
-            </Label>
-            <Input
-              id="code"
-              type="text"
-              placeholder="인증 코드 6자리"
-              value={verificationCode.join('')}
-              onChange={e => handleCodeChange(0, e)}
-              onKeyDown={e => handleKeyDown(0, e)}
-              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-sm transition-colors focus:bg-white focus:shadow-sm"
-              autoComplete="one-time-code"
-            />
-          </div>
-
-          <div className="flex items-center justify-center text-xs">
-            <p className="text-gray-500">
-              남은 시간:{' '}
-              <span className="font-medium">{formatTime(countdown)}</span>
+      {step === 'request' && (
+        <form
+          onSubmit={requestForm.handleSubmit(onRequestSubmit)}
+          className="space-y-4"
+        >
+          <div>
+            <p className="mb-4 text-sm text-gray-600">
+              가입한 이메일 주소를 입력하시면 비밀번호 재설정 인증 코드를
+              보내드립니다.
             </p>
+            <Input
+              {...requestForm.register('email', {
+                required: '이메일을 입력해주세요',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                  message: '올바른 이메일을 입력해주세요',
+                },
+              })}
+              type="email"
+              placeholder="이메일 주소"
+              className="h-12"
+            />
+            {requestForm.formState.errors.email && (
+              <p className="mt-1 text-sm text-red-500">
+                {requestForm.formState.errors.email.message}
+              </p>
+            )}
           </div>
 
-          {error && <p className="text-xs font-medium text-red-500">{error}</p>}
-
-          <div className="space-y-3">
-            <Button
-              type="submit"
-              className="w-full rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800 focus:ring-offset-0"
-              disabled={isLoading}
-            >
-              {isLoading ? '처리 중...' : '인증 코드 확인'}
-            </Button>
-
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full rounded-xl font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              onClick={() => setStep('email')}
-            >
-              이전 단계로
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={requestResetMutation.isPending}
+          >
+            {requestResetMutation.isPending && <Spinner className="mr-2" />}
+            인증 코드 받기
+          </Button>
         </form>
       )}
 
-      {/* 새 비밀번호 설정 단계 */}
+      {step === 'verify' && (
+        <form
+          onSubmit={verifyForm.handleSubmit(handleVerifyToken)}
+          className="space-y-4"
+        >
+          <div>
+            <p className="mb-4 text-sm text-gray-600">
+              {email}로 전송된 6자리 인증 코드를 입력해주세요.
+            </p>
+
+            <div className="mb-4">
+              <Input
+                {...verifyForm.register('token', {
+                  required: '인증 코드를 입력해주세요',
+                  minLength: {
+                    value: 6,
+                    message: '인증 코드는 6자리여야 합니다',
+                  },
+                  maxLength: {
+                    value: 6,
+                    message: '인증 코드는 6자리여야 합니다',
+                  },
+                })}
+                type="text"
+                placeholder="6자리 인증 코드"
+                className="h-12"
+                maxLength={6}
+                inputMode="numeric"
+                autoComplete="one-time-code"
+              />
+              {verifyForm.formState.errors.token && (
+                <p className="mt-1 text-sm text-red-500">
+                  {verifyForm.formState.errors.token.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={verifyTokenMutation.isPending}
+          >
+            {verifyTokenMutation.isPending && <Spinner className="mr-2" />}
+            다음
+          </Button>
+        </form>
+      )}
+
       {step === 'reset' && (
-        <form onSubmit={handleResetSubmit} className="space-y-3">
-          <div className="space-y-1">
-            <Label htmlFor="password" className="text-gray-600">
-              새 비밀번호
-            </Label>
-            <Input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="새 비밀번호 (8자 이상)"
-              value={newPassword}
-              onChange={handlePasswordChange}
-              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-sm transition-colors focus:bg-white focus:shadow-sm"
-              autoComplete="new-password"
-            />
+        <form
+          onSubmit={resetForm.handleSubmit(onResetSubmit)}
+          className="space-y-4"
+        >
+          <div>
+            <p className="mb-4 text-sm text-gray-600">
+              새로운 비밀번호를 입력해주세요.
+            </p>
+
+            <div className="mb-4">
+              <Input
+                {...resetForm.register('newPassword', {
+                  required: '새 비밀번호를 입력해주세요',
+                  minLength: {
+                    value: 8,
+                    message: '비밀번호는 8자 이상이어야 합니다',
+                  },
+                })}
+                type="password"
+                placeholder="새 비밀번호"
+                className="h-12"
+              />
+              {resetForm.formState.errors.newPassword && (
+                <p className="mt-1 text-sm text-red-500">
+                  {resetForm.formState.errors.newPassword.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <Input
+                {...resetForm.register('confirmPassword', {
+                  required: '비밀번호를 다시 입력해주세요',
+                  validate: value =>
+                    value === resetForm.getValues('newPassword') ||
+                    '비밀번호가 일치하지 않습니다',
+                })}
+                type="password"
+                placeholder="새 비밀번호 확인"
+                className="h-12"
+              />
+              {resetForm.formState.errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-500">
+                  {resetForm.formState.errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="confirmPassword" className="text-gray-600">
-              비밀번호 확인
-            </Label>
-            <Input
-              id="confirmPassword"
-              type={showConfirmPassword ? 'text' : 'password'}
-              placeholder="비밀번호 확인"
-              value={confirmPassword}
-              onChange={handleConfirmPasswordChange}
-              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-sm transition-colors focus:bg-white focus:shadow-sm"
-              autoComplete="new-password"
-            />
-          </div>
-
-          {error && <p className="text-xs font-medium text-red-500">{error}</p>}
-
-          <div className="space-y-3">
-            <Button
-              type="submit"
-              className="w-full rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800 focus:ring-offset-0"
-              disabled={isLoading}
-            >
-              {isLoading ? '처리 중...' : '비밀번호 재설정'}
-            </Button>
-
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-full rounded-xl font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-              onClick={() => setStep('verify')}
-            >
-              이전 단계로
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={resetPasswordMutation.isPending}
+          >
+            {resetPasswordMutation.isPending && <Spinner className="mr-2" />}
+            비밀번호 변경
+          </Button>
         </form>
       )}
     </div>

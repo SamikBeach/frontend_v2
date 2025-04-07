@@ -25,9 +25,6 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useQueryParams } from '@/hooks';
 
-import { loginAtom, userAtom } from '@/atoms/auth';
-import { useAtom, useSetAtom } from 'jotai';
-
 // 더미 데이터
 const popularBooks: Book[] = [
   {
@@ -362,9 +359,6 @@ const communityPosts = [
 ];
 
 export default function HomePage() {
-  const [user] = useAtom(userAtom);
-  const login = useSetAtom(loginAtom);
-
   const { updateQueryParams, getQueryParam } = useQueryParams();
 
   // URL에서 book ID 확인

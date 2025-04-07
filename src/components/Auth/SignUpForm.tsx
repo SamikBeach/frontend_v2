@@ -1,10 +1,18 @@
+import { checkEmail } from '@/apis/auth';
+import { authUtils } from '@/apis/axios';
+import { AuthProvider } from '@/apis/types/auth';
+import { userAtom } from '@/atoms/user';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Spinner } from '@/components/ui/spinner';
+import { openSocialLoginPopup } from '@/utils/oauth';
+import { useMutation } from '@tanstack/react-query';
+import { useSetAtom } from 'jotai';
 import { useState } from 'react';
-
-import { Button } from '../ui/button';
-import { Checkbox } from '../ui/checkbox';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-import { Separator } from '../ui/separator';
+import { useController, useForm } from 'react-hook-form';
 import { AppleIcon } from './icons/AppleIcon';
 import { GoogleIcon } from './icons/GoogleIcon';
 
@@ -14,102 +22,180 @@ interface SignUpFormProps {
   onSuccess?: () => void;
 }
 
+interface FormData {
+  email: string;
+  termsAgreed: boolean;
+  privacyAgreed: boolean;
+  marketingAgreed: boolean;
+}
+
 export function SignUpForm({
   onClickLogin,
   onEmailVerified,
   onSuccess,
 }: SignUpFormProps) {
-  // 상태 관리
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
-  const [agreedToMarketing, setAgreedToMarketing] = useState(false);
+  const [isOAuthLoading, setIsOAuthLoading] = useState<AuthProvider | null>(
+    null
+  );
+  const setUser = useSetAtom(userAtom);
 
-  // 이메일 인풋 핸들러
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    setError(null);
-  };
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm<FormData>({
+    defaultValues: {
+      email: '',
+      termsAgreed: false,
+      privacyAgreed: false,
+      marketingAgreed: false,
+    },
+    mode: 'onBlur',
+  });
 
-  // 이메일 유효성 검사
-  const isValidEmail = (email: string) => {
-    return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email);
-  };
+  const { field: emailField } = useController({
+    name: 'email',
+    control,
+    rules: {
+      required: '이메일을 입력해주세요',
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+        message: '올바른 이메일 형식이 아닙니다',
+      },
+    },
+  });
 
-  // 폼 제출 핸들러
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const { field: termsAgreedField } = useController({
+    name: 'termsAgreed',
+    control,
+    rules: {
+      required: '이용약관에 동의해주세요',
+      validate: value => value === true || '이용약관에 동의해주세요',
+    },
+  });
 
-    // 유효성 검사
-    if (!email) {
-      setError('이메일을 입력해주세요.');
-      return;
-    }
+  const { field: privacyAgreedField } = useController({
+    name: 'privacyAgreed',
+    control,
+    rules: {
+      required: '개인정보 수집 및 이용에 동의해주세요',
+      validate: value =>
+        value === true || '개인정보 수집 및 이용에 동의해주세요',
+    },
+  });
 
-    if (!isValidEmail(email)) {
-      setError('올바른 이메일 형식이 아닙니다.');
-      return;
-    }
+  const { field: marketingAgreedField } = useController({
+    name: 'marketingAgreed',
+    control,
+  });
 
-    if (!agreedToTerms || !agreedToPrivacy) {
-      setError('필수 약관에 동의해주세요.');
-      return;
-    }
+  // 현재 체크박스 상태 가져오기
+  const termsAgreed = watch('termsAgreed');
+  const privacyAgreed = watch('privacyAgreed');
+  const marketingAgreed = watch('marketingAgreed');
 
-    // 여기서는 로직 구현 없이 UI만 구현
-    setIsLoading(true);
+  // 모든 약관에 동의했는지 확인
+  const allAgreed = termsAgreed && privacyAgreed && marketingAgreed;
 
-    // 성공 시뮬레이션 (실제로는 API 호출)
-    setTimeout(() => {
-      setIsLoading(false);
-      onEmailVerified(email);
-    }, 1000);
-  };
-
-  // 구글 회원가입 핸들러
-  const handleGoogleSignUp = () => {
-    if (!agreedToTerms || !agreedToPrivacy) {
-      setError('필수 약관에 동의해주세요.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    // 성공 시뮬레이션 (실제로는 구글 OAuth 인증)
-    setTimeout(() => {
-      setIsLoading(false);
-      onSuccess?.();
-    }, 1000);
-  };
-
-  // 애플 회원가입 핸들러
-  const handleAppleSignUp = () => {
-    if (!agreedToTerms || !agreedToPrivacy) {
-      setError('필수 약관에 동의해주세요.');
-      return;
-    }
-
-    setIsLoading(true);
-
-    // 성공 시뮬레이션 (실제로는 애플 OAuth 인증)
-    setTimeout(() => {
-      setIsLoading(false);
-      onSuccess?.();
-    }, 1000);
-  };
+  // 이메일 확인 API 뮤테이션 (회원가입 1단계)
+  const checkEmailMutation = useMutation({
+    mutationFn: (email: string) => checkEmail(email),
+    onSuccess: data => {
+      // 이메일 사용 가능한 경우 다음 단계로 이동
+      if (data.isAvailable) {
+        onEmailVerified(emailField.value);
+      } else {
+        setError(data.message || '이메일을 사용할 수 없습니다.');
+      }
+    },
+    onError: (error: any) => {
+      setError(
+        error.response?.data?.message ||
+          '이메일 확인에 실패했습니다. 다시 시도해주세요.'
+      );
+    },
+  });
 
   // 모든 약관 동의 핸들러
   const handleAgreeAll = (checked: boolean) => {
-    setAgreedToTerms(checked);
-    setAgreedToPrivacy(checked);
-    setAgreedToMarketing(checked);
+    setValue('termsAgreed', checked);
+    setValue('privacyAgreed', checked);
+    setValue('marketingAgreed', checked);
   };
 
-  // 모든 약관에 동의했는지 확인
-  const allAgreed = agreedToTerms && agreedToPrivacy && agreedToMarketing;
+  // 폼 제출 핸들러
+  const onSubmit = (data: FormData) => {
+    setError(null);
+    checkEmailMutation.mutate(data.email);
+  };
+
+  // 구글 회원가입 핸들러
+  const handleGoogleSignUp = async () => {
+    if (!termsAgreed || !privacyAgreed) {
+      setError('필수 약관에 동의해주세요.');
+      return;
+    }
+
+    setError(null);
+    setIsOAuthLoading(AuthProvider.GOOGLE);
+
+    try {
+      const { accessToken, refreshToken, user } = await openSocialLoginPopup(
+        AuthProvider.GOOGLE
+      );
+
+      // 토큰 및 사용자 정보 저장
+      authUtils.setTokens(accessToken, refreshToken);
+      setUser(user);
+
+      // 성공 콜백
+      onSuccess?.();
+    } catch (err) {
+      console.error('구글 회원가입 오류:', err);
+      setError(
+        err instanceof Error ? err.message : '구글 회원가입에 실패했습니다.'
+      );
+    } finally {
+      setIsOAuthLoading(null);
+    }
+  };
+
+  // 애플 회원가입 핸들러
+  const handleAppleSignUp = async () => {
+    if (!termsAgreed || !privacyAgreed) {
+      setError('필수 약관에 동의해주세요.');
+      return;
+    }
+
+    setError(null);
+    setIsOAuthLoading(AuthProvider.APPLE);
+
+    try {
+      const { accessToken, refreshToken, user } = await openSocialLoginPopup(
+        AuthProvider.APPLE
+      );
+
+      // 토큰 및 사용자 정보 저장
+      authUtils.setTokens(accessToken, refreshToken);
+      setUser(user);
+
+      // 성공 콜백
+      onSuccess?.();
+    } catch (err) {
+      console.error('애플 회원가입 오류:', err);
+      setError(
+        err instanceof Error ? err.message : '애플 회원가입에 실패했습니다.'
+      );
+    } finally {
+      setIsOAuthLoading(null);
+    }
+  };
+
+  // 로딩 상태 확인
+  const isLoading = checkEmailMutation.isPending;
 
   return (
     <div className="flex flex-col space-y-5">
@@ -117,22 +203,26 @@ export function SignUpForm({
         <h2 className="text-xl font-semibold tracking-tight text-gray-900">
           회원가입
         </h2>
-        <p className="text-xs text-gray-500">
-          고전산책의 다양한 서비스를 이용해보세요
-        </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <div className="space-y-1.5">
           <Input
             id="email"
             type="email"
             placeholder="이메일"
-            value={email}
-            onChange={handleEmailChange}
+            value={emailField.value}
+            onChange={emailField.onChange}
+            onBlur={emailField.onBlur}
+            name={emailField.name}
             className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-sm transition-colors focus:bg-white focus:shadow-sm"
             autoComplete="email"
           />
+          {errors.email && (
+            <p className="text-xs font-medium text-red-500">
+              {errors.email.message}
+            </p>
+          )}
         </div>
 
         {/* 약관 동의 */}
@@ -157,8 +247,10 @@ export function SignUpForm({
           <div className="flex items-center space-x-2">
             <Checkbox
               id="terms"
-              checked={agreedToTerms}
-              onCheckedChange={checked => setAgreedToTerms(checked as boolean)}
+              checked={termsAgreedField.value}
+              onCheckedChange={checked =>
+                termsAgreedField.onChange(checked as boolean)
+              }
               className="border-gray-300 text-gray-900 data-[state=checked]:bg-gray-900 data-[state=checked]:text-white"
             />
             <div className="flex flex-wrap items-center text-xs">
@@ -168,13 +260,18 @@ export function SignUpForm({
               <span className="ml-1 text-xs text-red-500">(필수)</span>
             </div>
           </div>
+          {errors.termsAgreed && (
+            <p className="text-xs font-medium text-red-500">
+              {errors.termsAgreed.message}
+            </p>
+          )}
 
           <div className="flex items-center space-x-2">
             <Checkbox
               id="privacy"
-              checked={agreedToPrivacy}
+              checked={privacyAgreedField.value}
               onCheckedChange={checked =>
-                setAgreedToPrivacy(checked as boolean)
+                privacyAgreedField.onChange(checked as boolean)
               }
               className="border-gray-300 text-gray-900 data-[state=checked]:bg-gray-900 data-[state=checked]:text-white"
             />
@@ -185,17 +282,22 @@ export function SignUpForm({
               <span className="ml-1 text-xs text-red-500">(필수)</span>
             </div>
           </div>
+          {errors.privacyAgreed && (
+            <p className="text-xs font-medium text-red-500">
+              {errors.privacyAgreed.message}
+            </p>
+          )}
 
           <div className="flex items-center space-x-2">
             <Checkbox
               id="marketing"
-              checked={agreedToMarketing}
+              checked={marketingAgreedField.value}
               onCheckedChange={checked =>
-                setAgreedToMarketing(checked as boolean)
+                marketingAgreedField.onChange(checked as boolean)
               }
               className="border-gray-300 text-gray-900 data-[state=checked]:bg-gray-900 data-[state=checked]:text-white"
             />
-            <div className="flex items-center text-xs">
+            <div className="flex flex-wrap items-center text-xs">
               <Label htmlFor="marketing" className="font-medium text-gray-700">
                 마케팅 정보 수신 동의
               </Label>
@@ -208,10 +310,17 @@ export function SignUpForm({
 
         <Button
           type="submit"
-          className="w-full rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800 focus:ring-offset-0"
           disabled={isLoading}
+          className="w-full rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800 focus:ring-offset-0"
         >
-          {isLoading ? '처리 중...' : '이메일로 가입하기'}
+          {checkEmailMutation.isPending ? (
+            <div className="flex items-center justify-center">
+              <Spinner className="mr-2 h-4 w-4" />
+              처리 중...
+            </div>
+          ) : (
+            '이메일로 회원가입'
+          )}
         </Button>
       </form>
 
@@ -230,7 +339,6 @@ export function SignUpForm({
           variant="outline"
           className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
           onClick={handleGoogleSignUp}
-          disabled={isLoading}
         >
           <GoogleIcon className="mr-2 h-4 w-4" />
           Google로 회원가입
@@ -241,7 +349,6 @@ export function SignUpForm({
           variant="outline"
           className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
           onClick={handleAppleSignUp}
-          disabled={isLoading}
         >
           <AppleIcon className="mr-2 h-4 w-4" />
           Apple로 회원가입

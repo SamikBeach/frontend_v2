@@ -1,5 +1,3 @@
-'use client';
-
 import { CommandItem } from '@/components/ui/command';
 import { BookOpen, MessageSquare, ThumbsUp } from 'lucide-react';
 import Image from 'next/image';

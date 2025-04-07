@@ -1,17 +1,23 @@
-import { userAtom } from '@/atoms/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useAtomValue } from 'jotai';
+import { useCurrentUser } from '@/hooks';
 import { UserCircle } from 'lucide-react';
 
 export default function ProfileHeader() {
-  const user = useAtomValue(userAtom);
+  const user = useCurrentUser();
 
-  // 팔로워 / 팔로잉 수 (임시 데이터)
+  /**
+   * 임시 데이터: 팔로워/팔로잉 수
+   * TODO: API 연동 시 실제 데이터로 대체
+   */
   const followers = 128;
   const following = 75;
 
   if (!user) return null;
+
+  // 사용자 표시 정보 설정
+  const displayName = user.name || user.username || user.email.split('@')[0];
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <div className="bg-white">
@@ -19,19 +25,21 @@ export default function ProfileHeader() {
         <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20 border-4 border-white">
-              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarImage src={user.avatar} alt={displayName} />
               <AvatarFallback className="bg-gray-200 text-2xl font-medium text-gray-700">
-                {user.name[0]}
+                {initial}
               </AvatarFallback>
             </Avatar>
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-bold text-gray-900">
-                  {user.name}
+                  {displayName}
                 </h1>
-                <div className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                  @{user.username}
-                </div>
+                {user.username && (
+                  <div className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                    @{user.username}
+                  </div>
+                )}
               </div>
               <p className="mt-1 max-w-xl text-sm text-gray-600">
                 {user.bio ||

@@ -62,7 +62,7 @@ export function useRecentReviews() {
 
         setRecentReviews(mockReviews);
         setIsLoading(false);
-      } catch (err) {
+      } catch {
         setError('리뷰 목록을 불러오는데 실패했습니다.');
         setIsLoading(false);
       }

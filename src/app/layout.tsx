@@ -1,6 +1,8 @@
 import { Header } from '@/components/Header';
+import { Initializer } from '@/components/Initializer';
 import { AppSidebar } from '@/components/Sidebar/AppSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import ReactQueryProvider from '@/providers/ReactQueryProvider';
 import '@/styles/globals.css';
 import { ReactNode } from 'react';
 
@@ -13,11 +15,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko">
       <body className="overflow-x-hidden">
-        <SidebarProvider>
-          <Header />
-          <AppSidebar />
-          <main className="mt-[56px] w-full p-4">{children}</main>
-        </SidebarProvider>
+        <ReactQueryProvider>
+          <Initializer />
+          <SidebarProvider>
+            <Header />
+            <AppSidebar />
+            <main className="mt-[56px] w-full p-4">{children}</main>
+          </SidebarProvider>
+        </ReactQueryProvider>
       </body>
     </html>
   );

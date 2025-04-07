@@ -1,5 +1,10 @@
-import { isLoadingAtom, loginAtom, socialLoginAtom } from '@/atoms/auth';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { login as loginApi } from '@/apis/auth';
+import { authUtils } from '@/apis/axios';
+import { AuthProvider } from '@/apis/types/auth';
+import { userAtom } from '@/atoms/user';
+import { openSocialLoginPopup } from '@/utils/oauth';
+import { useMutation } from '@tanstack/react-query';
+import { useSetAtom } from 'jotai';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 
@@ -20,9 +25,24 @@ export function LoginForm({
   onClickResetPassword,
   onSuccess,
 }: LoginFormProps) {
-  const isLoading = useAtomValue(isLoadingAtom);
-  const login = useSetAtom(loginAtom);
-  const socialLogin = useSetAtom(socialLoginAtom);
+  const setUser = useSetAtom(userAtom);
+
+  // 로그인 mutation
+  const loginMutation = useMutation({
+    mutationFn: async ({
+      email,
+      password,
+    }: {
+      email: string;
+      password: string;
+    }) => {
+      return loginApi({ email, password });
+    },
+    onSuccess: response => {
+      setUser(response.user);
+      authUtils.setTokens(response.accessToken, response.refreshToken);
+    },
+  });
 
   // 상태 관리
   const [email, setEmail] = useState('');
@@ -58,31 +78,62 @@ export function LoginForm({
       return;
     }
 
-    try {
-      await login({ email, password });
-      onSuccess?.();
-    } catch (error) {
-      setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
-    }
+    loginMutation.mutate(
+      { email, password },
+      {
+        onSuccess: () => {
+          onSuccess?.();
+        },
+        onError: () => {
+          setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+        },
+      }
+    );
   };
 
   // 구글 로그인 핸들러
   const handleGoogleLogin = async () => {
+    setError(null);
+
     try {
-      await socialLogin('google');
+      const { accessToken, refreshToken, user } = await openSocialLoginPopup(
+        AuthProvider.GOOGLE
+      );
+
+      // 토큰 및 사용자 정보 저장
+      authUtils.setTokens(accessToken, refreshToken);
+      setUser(user);
+
+      // 성공 콜백
       onSuccess?.();
-    } catch (error) {
-      setError('구글 로그인에 실패했습니다. 다시 시도해주세요.');
+    } catch (err) {
+      console.error('구글 로그인 오류:', err);
+      setError(
+        err instanceof Error ? err.message : '구글 로그인에 실패했습니다.'
+      );
     }
   };
 
   // 애플 로그인 핸들러
   const handleAppleLogin = async () => {
+    setError(null);
+
     try {
-      await socialLogin('apple');
+      const { accessToken, refreshToken, user } = await openSocialLoginPopup(
+        AuthProvider.APPLE
+      );
+
+      // 토큰 및 사용자 정보 저장
+      authUtils.setTokens(accessToken, refreshToken);
+      setUser(user);
+
+      // 성공 콜백
       onSuccess?.();
-    } catch (error) {
-      setError('애플 로그인에 실패했습니다. 다시 시도해주세요.');
+    } catch (err) {
+      console.error('애플 로그인 오류:', err);
+      setError(
+        err instanceof Error ? err.message : '애플 로그인에 실패했습니다.'
+      );
     }
   };
 
@@ -92,9 +143,6 @@ export function LoginForm({
         <h2 className="text-xl font-semibold tracking-tight text-gray-900">
           로그인
         </h2>
-        <p className="text-xs text-gray-500">
-          고전산책 서비스를 이용하기 위해 로그인해주세요
-        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
@@ -157,9 +205,8 @@ export function LoginForm({
         <Button
           type="submit"
           className="w-full rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800 focus:ring-offset-0"
-          disabled={isLoading}
         >
-          {isLoading ? '로그인 중...' : '로그인'}
+          {loginMutation.isPending ? '로그인 중...' : '로그인'}
         </Button>
       </form>
 
@@ -178,7 +225,6 @@ export function LoginForm({
           variant="outline"
           className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
           onClick={handleGoogleLogin}
-          disabled={isLoading}
         >
           <GoogleIcon className="mr-2 h-4 w-4" />
           Google로 로그인
@@ -189,7 +235,6 @@ export function LoginForm({
           variant="outline"
           className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
           onClick={handleAppleLogin}
-          disabled={isLoading}
         >
           <AppleIcon className="mr-2 h-4 w-4" />
           Apple로 로그인

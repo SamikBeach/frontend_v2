@@ -1,3 +1,4 @@
+import { User } from '@/apis/types/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -5,13 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 
 interface ProfileSettingsProps {
-  user: {
-    name: string;
-    username: string;
-    email: string;
-    bio?: string;
-    avatar?: string;
-  };
+  user: User | null;
   onSave: () => void;
 }
 
@@ -19,25 +14,28 @@ export default function ProfileSettings({
   user,
   onSave,
 }: ProfileSettingsProps) {
-  const [name, setName] = useState(user.name);
-  const [username, setUsername] = useState(user.username);
-  const [email, setEmail] = useState(user.email);
-  const [bio, setBio] = useState(user.bio || '');
+  // 사용자 정보 상태 관리
+  const [name, setName] = useState(user?.name || user?.username || '');
+  const [username, setUsername] = useState(user?.username || '');
+  const [email, setEmail] = useState(user?.email || '');
+  const [bio, setBio] = useState(user?.bio || '');
+
+  if (!user) return null;
 
   return (
     <div className="bg-white p-6">
       <h2 className="mb-6 text-lg font-semibold text-gray-900">프로필 정보</h2>
       <div className="space-y-6">
-        {/* 프로필 이미지 */}
+        {/* 프로필 이미지 섹션 */}
         <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">
           <Label className="text-sm font-medium text-gray-700 sm:w-36">
             프로필 이미지
           </Label>
           <div className="flex items-end gap-3">
             <Avatar className="h-20 w-20 border border-gray-200">
-              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarImage alt={username} />
               <AvatarFallback className="bg-gray-100 text-gray-800">
-                {user.name[0]}
+                {username[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex gap-2">
@@ -58,7 +56,7 @@ export default function ProfileSettings({
           </div>
         </div>
 
-        {/* 이름 */}
+        {/* 이름 필드 */}
         <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">
           <Label
             htmlFor="name"
@@ -74,7 +72,7 @@ export default function ProfileSettings({
           />
         </div>
 
-        {/* 사용자명 */}
+        {/* 사용자명 필드 */}
         <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">
           <Label
             htmlFor="username"
@@ -95,7 +93,7 @@ export default function ProfileSettings({
           </div>
         </div>
 
-        {/* 이메일 */}
+        {/* 이메일 필드 */}
         <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">
           <Label
             htmlFor="email"
@@ -117,7 +115,7 @@ export default function ProfileSettings({
           </div>
         </div>
 
-        {/* 소개 */}
+        {/* 소개 필드 */}
         <div className="flex flex-col gap-1.5 sm:flex-row sm:gap-4">
           <Label
             htmlFor="bio"

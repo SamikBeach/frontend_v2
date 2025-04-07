@@ -1,9 +1,11 @@
+import { signup } from '@/apis/auth';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
+import { useMutation } from '@tanstack/react-query';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
-
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 
 interface UserInfoFormProps {
   email: string;
@@ -17,10 +19,7 @@ export function UserInfoForm({ email, onSuccess }: UserInfoFormProps) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // 이메일은 이미 확인되었으므로 수정할 수 없음
 
   // 사용자 이름 입력 핸들러
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,6 +51,25 @@ export function UserInfoForm({ email, onSuccess }: UserInfoFormProps) {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
+  const signupMutation = useMutation({
+    mutationFn: () =>
+      signup({
+        email,
+        password,
+        username,
+        marketingConsent: false,
+      }),
+    onSuccess: () => {
+      onSuccess();
+    },
+    onError: (error: any) => {
+      setError(
+        error.response?.data?.message ||
+          '회원가입에 실패했습니다. 다시 시도해주세요.'
+      );
+    },
+  });
+
   // 폼 제출 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,14 +96,7 @@ export function UserInfoForm({ email, onSuccess }: UserInfoFormProps) {
       return;
     }
 
-    // 여기서는 로직 구현 없이 UI만 구현
-    setIsLoading(true);
-
-    // 성공 시뮬레이션 (실제로는 API 호출)
-    setTimeout(() => {
-      setIsLoading(false);
-      onSuccess();
-    }, 1000);
+    signupMutation.mutate();
   };
 
   return (
@@ -199,9 +210,10 @@ export function UserInfoForm({ email, onSuccess }: UserInfoFormProps) {
         <Button
           type="submit"
           className="w-full rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800 focus:ring-offset-0"
-          disabled={isLoading}
+          disabled={signupMutation.isPending}
         >
-          {isLoading ? '처리 중...' : '다음 단계로'}
+          {signupMutation.isPending ? <Spinner className="mr-2" /> : null}
+          다음 단계로
         </Button>
       </form>
     </div>
