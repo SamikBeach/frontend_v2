@@ -39,7 +39,11 @@ export const isLoadingAtom = atom<boolean>(false);
 // 로그인 함수를 제공하는 atom
 export const loginAtom = atom(
   null,
-  async (get, set, { email, password }: { email: string; password: string }) => {
+  async (
+    get,
+    set,
+    { email, password }: { email: string; password: string }
+  ) => {
     set(isLoadingAtom, true);
     try {
       // 실제 구현에서는 API 호출로 대체
@@ -59,6 +63,7 @@ export const socialLoginAtom = atom(
   null,
   async (get, set, provider: 'google' | 'apple') => {
     set(isLoadingAtom, true);
+
     try {
       // 실제 구현에서는 소셜 로그인 API 호출로 대체
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -75,4 +80,4 @@ export const socialLoginAtom = atom(
 // 로그아웃 함수를 제공하는 atom
 export const logoutAtom = atom(null, (get, set) => {
   set(userAtom, null);
-}); 
+});
