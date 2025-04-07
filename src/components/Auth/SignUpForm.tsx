@@ -35,9 +35,6 @@ export function SignUpForm({
   onSuccess,
 }: SignUpFormProps) {
   const [error, setError] = useState<string | null>(null);
-  const [isOAuthLoading, setIsOAuthLoading] = useState<AuthProvider | null>(
-    null
-  );
   const setUser = useSetAtom(userAtom);
 
   const {
@@ -140,7 +137,6 @@ export function SignUpForm({
     }
 
     setError(null);
-    setIsOAuthLoading(AuthProvider.GOOGLE);
 
     try {
       const { accessToken, refreshToken, user } = await openSocialLoginPopup(
@@ -158,8 +154,6 @@ export function SignUpForm({
       setError(
         err instanceof Error ? err.message : '구글 회원가입에 실패했습니다.'
       );
-    } finally {
-      setIsOAuthLoading(null);
     }
   };
 
@@ -171,7 +165,6 @@ export function SignUpForm({
     }
 
     setError(null);
-    setIsOAuthLoading(AuthProvider.APPLE);
 
     try {
       const { accessToken, refreshToken, user } = await openSocialLoginPopup(
@@ -189,8 +182,6 @@ export function SignUpForm({
       setError(
         err instanceof Error ? err.message : '애플 회원가입에 실패했습니다.'
       );
-    } finally {
-      setIsOAuthLoading(null);
     }
   };
 

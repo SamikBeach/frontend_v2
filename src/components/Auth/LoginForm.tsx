@@ -205,8 +205,16 @@ export function LoginForm({
         <Button
           type="submit"
           className="w-full rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800 focus:ring-offset-0"
+          disabled={loginMutation.isPending}
         >
-          {loginMutation.isPending ? '로그인 중...' : '로그인'}
+          {loginMutation.isPending ? (
+            <div className="flex items-center justify-center">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+              <span className="ml-2">로그인</span>
+            </div>
+          ) : (
+            '로그인'
+          )}
         </Button>
       </form>
 
