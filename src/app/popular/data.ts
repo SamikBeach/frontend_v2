@@ -1,7 +1,7 @@
 import { Book } from '@/components/BookCard';
 import { Category } from './components/CategoryFilter';
 
-// 분야 카테고리 및 세부 카테고리 데이터 (이미지 기반 카테고리 체계 반영)
+// 고전 산책을 위한 분야별 인기 도서 카테고리 및 세부 카테고리 데이터
 export const categories: Category[] = [
   {
     id: 'all',
@@ -14,14 +14,12 @@ export const categories: Category[] = [
     name: '철학',
     color: '#DBEAFE',
     subcategories: [
+      { id: 'western', name: '서양철학' },
+      { id: 'eastern', name: '동양철학' },
       { id: 'ethics', name: '윤리학' },
-      { id: 'aesthetics', name: '미학' },
-      { id: 'epistemology', name: '인식론' },
-      { id: 'metaphysics', name: '형이상학' },
       { id: 'logic', name: '논리학' },
-      { id: 'political-philosophy', name: '정치철학' },
-      { id: 'philosophy-of-science', name: '과학철학' },
-      { id: 'existentialism', name: '실존주의' },
+      { id: 'philosophy-intro', name: '철학 입문/해설' },
+      { id: 'philosophy-biography', name: '철학자 전기' },
     ],
   },
   {
@@ -29,14 +27,12 @@ export const categories: Category[] = [
     name: '문학',
     color: '#FCE7F3',
     subcategories: [
-      { id: 'novel', name: '소설' },
-      { id: 'poetry', name: '시' },
-      { id: 'drama', name: '희곡' },
-      { id: 'essays', name: '수필' },
-      { id: 'criticism', name: '문학비평' },
-      { id: 'world-literature', name: '세계문학' },
       { id: 'korean-literature', name: '한국문학' },
-      { id: 'classic-literature', name: '고전문학' },
+      { id: 'foreign-literature', name: '외국문학' },
+      { id: 'poetry', name: '시/시집' },
+      { id: 'classics', name: '고전문학' },
+      { id: 'literature-intro', name: '문학 입문/해설' },
+      { id: 'literature-biography', name: '작가 전기' },
     ],
   },
   {
@@ -45,28 +41,11 @@ export const categories: Category[] = [
     color: '#FFEDD5',
     subcategories: [
       { id: 'korean-history', name: '한국사' },
-      { id: 'asian-history', name: '아시아사' },
-      { id: 'western-history', name: '서양사' },
+      { id: 'world-history', name: '세계사' },
       { id: 'ancient-history', name: '고대사' },
       { id: 'modern-history', name: '근현대사' },
-      { id: 'social-history', name: '사회사' },
-      { id: 'economic-history', name: '경제사' },
-      { id: 'art-history', name: '미술사' },
-    ],
-  },
-  {
-    id: 'science',
-    name: '과학',
-    color: '#ECFCCB',
-    subcategories: [
-      { id: 'physics', name: '물리학' },
-      { id: 'chemistry', name: '화학' },
-      { id: 'biology', name: '생물학' },
-      { id: 'astronomy', name: '천문학' },
-      { id: 'earth-science', name: '지구과학' },
-      { id: 'math', name: '수학' },
-      { id: 'medicine', name: '의학' },
-      { id: 'environmental-science', name: '환경과학' },
+      { id: 'history-intro', name: '역사 입문/해설' },
+      { id: 'history-biography', name: '역사인물 전기' },
     ],
   },
   {
@@ -75,13 +54,11 @@ export const categories: Category[] = [
     color: '#D1FAE5',
     subcategories: [
       { id: 'political-science', name: '정치학' },
-      { id: 'international-relations', name: '국제관계' },
-      { id: 'political-theory', name: '정치이론' },
+      { id: 'international-relations', name: '국제정치' },
       { id: 'political-thought', name: '정치사상' },
-      { id: 'democracy', name: '민주주의' },
-      { id: 'political-systems', name: '정치체제' },
-      { id: 'political-parties', name: '정당정치' },
-      { id: 'constitutional-law', name: '헌법' },
+      { id: 'political-history', name: '정치사' },
+      { id: 'political-intro', name: '정치학 입문/해설' },
+      { id: 'political-biography', name: '정치인 전기' },
     ],
   },
   {
@@ -89,14 +66,12 @@ export const categories: Category[] = [
     name: '경제',
     color: '#FEF3C7',
     subcategories: [
-      { id: 'microeconomics', name: '미시경제학' },
-      { id: 'macroeconomics', name: '거시경제학' },
-      { id: 'economic-policy', name: '경제정책' },
+      { id: 'economic-theory', name: '경제이론' },
       { id: 'economic-history', name: '경제사' },
-      { id: 'finance', name: '금융' },
-      { id: 'trade', name: '무역' },
-      { id: 'business', name: '경영' },
-      { id: 'global-economy', name: '세계경제' },
+      { id: 'economic-thought', name: '경제사상' },
+      { id: 'economic-classics', name: '경제 고전' },
+      { id: 'economics-intro', name: '경제학 입문/해설' },
+      { id: 'economist-biography', name: '경제학자 전기' },
     ],
   },
   {
@@ -105,13 +80,37 @@ export const categories: Category[] = [
     color: '#E0E7FF',
     subcategories: [
       { id: 'sociology', name: '사회학' },
-      { id: 'anthropology', name: '인류학' },
-      { id: 'gender-studies', name: '젠더연구' },
-      { id: 'cultural-studies', name: '문화연구' },
-      { id: 'communication', name: '커뮤니케이션' },
-      { id: 'education', name: '교육' },
-      { id: 'social-policy', name: '사회정책' },
+      { id: 'psychology', name: '심리학' },
+      { id: 'social-thought', name: '사회사상' },
       { id: 'social-issues', name: '사회문제' },
+      { id: 'society-intro', name: '사회학 입문/해설' },
+      { id: 'social-biography', name: '사회학자 전기' },
+    ],
+  },
+  {
+    id: 'science',
+    name: '과학',
+    color: '#ECFCCB',
+    subcategories: [
+      { id: 'physics', name: '물리학' },
+      { id: 'biology', name: '생명과학' },
+      { id: 'astronomy', name: '천문학' },
+      { id: 'history-science', name: '과학사' },
+      { id: 'science-intro', name: '과학 입문/해설' },
+      { id: 'scientist-biography', name: '과학자 전기' },
+    ],
+  },
+  {
+    id: 'religion',
+    name: '종교',
+    color: '#FEE2E2',
+    subcategories: [
+      { id: 'buddhism', name: '불교' },
+      { id: 'christianity', name: '기독교' },
+      { id: 'eastern-religion', name: '동양종교' },
+      { id: 'mythology', name: '신화/설화' },
+      { id: 'religion-intro', name: '종교학 입문/해설' },
+      { id: 'religious-biography', name: '종교인물 전기' },
     ],
   },
 ];
