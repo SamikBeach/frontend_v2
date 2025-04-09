@@ -16,24 +16,7 @@ export enum UserStatus {
   PENDING = 'pending',
 }
 
-/**
- * 사용자 정보 인터페이스
- */
-export interface User {
-  id: string;
-  email: string;
-  username?: string;
-  name?: string;
-  avatar?: string;
-  bio?: string;
-  provider: AuthProvider;
-  providerId?: string;
-  status: UserStatus;
-  isEmailVerified: boolean;
-  marketingConsent: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { User } from '../user/types';
 
 /**
  * 로그인 요청 파라미터
@@ -206,22 +189,6 @@ export interface SocialLoginResponse {
 }
 
 /**
- * 사용자 정보 업데이트 요청
- */
-export interface UpdateUserInfoRequest {
-  username?: string;
-}
-
-/**
- * 사용자 정보 업데이트 응답
- */
-export interface UpdateUserInfoResponse {
-  id: string;
-  email: string;
-  username?: string;
-}
-
-/**
  * 비밀번호 재설정 토큰 검증 요청
  */
 export interface VerifyResetTokenRequest {
@@ -236,4 +203,3 @@ export interface VerifyResetTokenResponse {
   isValid: boolean;
   message: string;
 }
- 

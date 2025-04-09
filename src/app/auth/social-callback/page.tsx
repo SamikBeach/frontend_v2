@@ -1,14 +1,15 @@
 'use client';
 
 import { authUtils } from '@/apis/axios';
-import { User } from '@/apis/types/auth';
 import { getCurrentUser } from '@/apis/user';
+import { User } from '@/apis/user/types';
 import { useEffect, useState } from 'react';
 
 /**
  * 소셜 로그인 콜백 처리 페이지
  * 백엔드에서 리다이렉트한 후 토큰을 추출하여 부모 창으로 전달합니다.
  */
+
 export default function SocialCallback() {
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
     'loading'

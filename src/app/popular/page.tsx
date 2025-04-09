@@ -1,20 +1,24 @@
 'use client';
 
-import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
+import { Book as ApiBook, Category as ApiCategory } from '@/apis';
+import { getAllPopularBooks, getBookById } from '@/apis/book/book';
+import { getAllCategories } from '@/apis/category/category';
 import { Book, BookCard } from '@/components/BookCard';
 import { BookDialog } from '@/components/BookDialog';
 import {
   SortDropdown,
-  TimeRange,
-  useSortedBooks,
+  TimeRange as UITimeRange,
 } from '@/components/SortDropdown';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 import { CategoryFilter, PopularBreadcrumb } from './components';
-import { books, categories } from './data';
 
 // 스크롤바 숨기는 CSS 추가
 const noScrollbarStyles = `
@@ -29,28 +33,169 @@ const noScrollbarStyles = `
   }
 `;
 
+// 파스텔 색상 목록
+const pastelColors = [
+  '#FFD6E0', // 연한 분홍색
+  '#FFEFB5', // 연한 노란색
+  '#D1F0C2', // 연한 녹색
+  '#C7CEEA', // 연한 파란색
+  '#F1DEDE', // 연한 보라색
+  '#E2F0CB', // 연한 민트색
+  '#FFCBC1', // 연한 주황색
+  '#CFE5F2', // 연한 하늘색
+  '#FFDAC1', // 연한 살구색
+  '#E2CFC4', // 연한 베이지색
+];
+
+// API Category를 UI Category로 변환하는 함수 (파스텔톤 컬러 적용)
+const mapApiCategoriesToUiCategories = (
+  apiCategories: ApiCategory[]
+): {
+  id: string;
+  name: string;
+  color: string;
+  subcategories: Array<{ id: string; name: string }>;
+}[] => {
+  // API에서 제공하는 카테고리 중 '전체' 카테고리가 있는지 확인
+  const hasAllCategory = apiCategories.some(
+    category => category.name === '전체' || category.id.toString() === 'all'
+  );
+
+  const mappedCategories = apiCategories.map((category, index) => ({
+    id: category.id.toString(),
+    name: category.name,
+    // 서버에서 온 컬러가 있으면 사용, 없으면 파스텔 컬러 배열에서 선택
+    color: category.color || pastelColors[index % pastelColors.length],
+    subcategories: category.subCategories.map(sub => ({
+      id: sub.id.toString(),
+      name: sub.name,
+    })),
+  }));
+
+  // API에서 '전체' 카테고리가 없는 경우에만 추가
+  if (!hasAllCategory) {
+    return [
+      {
+        id: 'all',
+        name: '전체',
+        color: '#E5E7EB',
+        subcategories: [],
+      },
+      ...mappedCategories,
+    ];
+  }
+
+  return mappedCategories;
+};
+
+// API Book을 UI Book으로 변환하는 함수
+const mapApiBookToUiBook = (apiBook: ApiBook): Book => {
+  return {
+    id: apiBook.id,
+    title: apiBook.title,
+    author: apiBook.author,
+    coverImage:
+      apiBook.coverImage || `https://picsum.photos/seed/${apiBook.id}/240/360`,
+    category: apiBook.category.id.toString(),
+    subcategory: apiBook.subcategory?.id.toString() || '',
+    rating:
+      typeof apiBook.rating === 'string'
+        ? parseFloat(apiBook.rating)
+        : apiBook.rating || 0,
+    reviews:
+      typeof apiBook.reviews === 'string'
+        ? parseInt(apiBook.reviews)
+        : apiBook.reviews || 0,
+    description: apiBook.description,
+    publishDate: new Date(apiBook.publishDate).toISOString().split('T')[0],
+    publisher: apiBook.publisher,
+  };
+};
+
 export default function PopularPage() {
   const { updateQueryParams, getQueryParam } = useQueryParams();
   const isMobile = useIsMobile();
+  const searchParams = useSearchParams();
 
   // URL에서 현재 선택된 필터/정렬 값 및 책 정보 가져오기
   const categoryParam = getQueryParam('category') || 'all';
   const subcategoryParam = getQueryParam('subcategory') || '';
   const sortParam = getQueryParam('sort') || 'reviews-desc';
-  const timeRangeParam = (getQueryParam('timeRange') as TimeRange) || 'all';
+  const timeRangeParam = (getQueryParam('timeRange') as UITimeRange) || 'all';
   const bookIdParam = getQueryParam('book');
 
-  // URL의 book ID에 해당하는 책 찾기
+  // 카테고리 데이터 가져오기
+  const { data: apiCategories, isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getAllCategories,
+  });
+
+  // 도서 데이터 가져오기
+  const { data: apiBooks, isLoading: isBooksLoading } = useQuery({
+    queryKey: [
+      'popular-books',
+      categoryParam,
+      subcategoryParam,
+      sortParam,
+      timeRangeParam,
+    ],
+    queryFn: async () => {
+      // API 요청 시 필요한 파라미터 구성
+      const params: {
+        sort?: string;
+        timeRange?: string;
+        category?: string;
+        subcategory?: string;
+      } = {};
+
+      // sort와 timeRange 값이 유효한 경우에만 설정
+      if (sortParam) params.sort = sortParam;
+      if (timeRangeParam) params.timeRange = timeRangeParam;
+
+      // 카테고리와 서브카테고리 값이 유효한 경우에만 설정
+      if (categoryParam !== 'all') {
+        params.category = categoryParam;
+      }
+
+      if (subcategoryParam) {
+        params.subcategory = subcategoryParam;
+      }
+
+      return getAllPopularBooks(params as any);
+    },
+    staleTime: 1000 * 60 * 2, // 2분 동안 캐시 유지
+  });
+
+  // 선택된 책 데이터 가져오기
+  const { data: selectedApiBook } = useQuery({
+    queryKey: ['book', bookIdParam],
+    queryFn: () => (bookIdParam ? getBookById(parseInt(bookIdParam)) : null),
+    enabled: !!bookIdParam,
+    staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유지
+  });
+
+  // API 데이터 또는 폴백 데이터 사용
+  const categories = apiCategories
+    ? mapApiCategoriesToUiCategories(apiCategories)
+    : [];
+
+  const books = apiBooks ? apiBooks.map(mapApiBookToUiBook) : [];
+
+  // selectedBook 상태 관리 - URL 파라미터 우선
+  const [selectedBookState, setSelectedBookState] = useState<Book | null>(null);
+
+  // URL이나 API에서 가져온 도서 정보 사용
   const bookFromUrl = React.useMemo(() => {
+    if (selectedApiBook) {
+      return mapApiBookToUiBook(selectedApiBook);
+    }
     if (bookIdParam) {
       const bookId = parseInt(bookIdParam);
       return books.find(b => b.id === bookId) || null;
     }
     return null;
-  }, [bookIdParam]);
+  }, [bookIdParam, selectedApiBook, books]);
 
-  // selectedBook 상태 관리 - URL 파라미터 우선
-  const [selectedBookState, setSelectedBookState] = useState<Book | null>(null);
   const selectedBook = bookFromUrl || selectedBookState;
 
   // 카테고리 클릭 핸들러
@@ -72,7 +217,7 @@ export default function PopularPage() {
   };
 
   // 기간 필터 변경 핸들러
-  const handleTimeRangeChange = (timeRange: TimeRange) => {
+  const handleTimeRangeChange = (timeRange: UITimeRange) => {
     updateQueryParams({ timeRange });
   };
 
@@ -103,26 +248,21 @@ export default function PopularPage() {
   // 다이얼로그가 열려있는지 여부
   const isDialogOpen = selectedBook !== null;
 
-  // 필터링 로직
-  let filteredBooks = books;
+  // 로딩 상태 처리
+  const isLoading = isCategoriesLoading || isBooksLoading;
 
-  if (categoryParam !== 'all') {
-    filteredBooks = books.filter(book => book.category === categoryParam);
+  // URL 파라미터에서 필터 상태 초기화
+  useEffect(() => {
+    const category = searchParams.get('category') || 'all';
+    const subcategory = searchParams.get('subcategory') || '';
+    const sort = searchParams.get('sort') || 'popular';
 
-    if (subcategoryParam) {
-      filteredBooks = filteredBooks.filter(
-        book => book.subcategory === subcategoryParam
-      );
-    }
-  }
-
-  // 정렬된 책 목록 가져오기
-  const sortedBooks = useSortedBooks(
-    filteredBooks,
-    sortParam,
-    undefined,
-    timeRangeParam
-  );
+    updateQueryParams({
+      category,
+      subcategory,
+      sort,
+    });
+  }, [searchParams, updateQueryParams]);
 
   return (
     <div className="bg-white pb-6">
@@ -160,15 +300,40 @@ export default function PopularPage() {
             </div>
 
             <div className="flex flex-col gap-2">
-              {/* 카테고리 필터 */}
-              <CategoryFilter
-                categories={categories}
-                selectedCategory={categoryParam}
-                selectedSubcategory={subcategoryParam}
-                onCategoryClick={handleCategoryClick}
-                onSubcategoryClick={handleSubcategoryClick}
-                className="w-full"
-              />
+              {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
+              {isCategoriesLoading ? (
+                <div className="w-full">
+                  <div
+                    className={`no-scrollbar flex w-full overflow-x-auto ${isMobile ? 'mb-2 py-1' : 'mb-3 py-1'}`}
+                  >
+                    <div className="flex gap-2 px-0.5">
+                      {[...Array(6)].map((_, i) => (
+                        <Skeleton key={i} className="h-9 w-20 rounded-full" />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 서브카테고리 스켈레톤 */}
+                  <div
+                    className={`no-scrollbar flex w-full overflow-x-auto ${isMobile ? 'mb-2 py-1' : 'mb-4 py-1'}`}
+                  >
+                    <div className="flex gap-2 px-0.5">
+                      {[...Array(4)].map((_, i) => (
+                        <Skeleton key={i} className="h-8 w-16 rounded-full" />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <CategoryFilter
+                  categories={categories}
+                  selectedCategory={categoryParam}
+                  selectedSubcategory={subcategoryParam}
+                  onCategoryClick={handleCategoryClick}
+                  onSubcategoryClick={handleSubcategoryClick}
+                  className="w-full"
+                />
+              )}
 
               {/* xl 미만 화면에서 보이는 정렬 버튼 */}
               <div className="w-full xl:hidden">
@@ -185,41 +350,52 @@ export default function PopularPage() {
         </div>
       </div>
 
-      {/* 도서 그리드 - 모바일에서 여백 줄임 */}
-      <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} pt-4`}>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {sortedBooks.map(book => (
-            <BookCard key={book.id} book={book} onClick={handleBookSelect} />
-          ))}
+      {/* 로딩 상태 */}
+      {isLoading ? (
+        <div className="flex h-[calc(100vh-250px)] w-full items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-gray-900"></div>
         </div>
-
-        {/* 결과가 없을 때 */}
-        {sortedBooks.length === 0 && (
-          <div className="mt-8 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-12 text-center">
-            <div className="text-3xl">📚</div>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">
-              검색 결과가 없습니다
-            </h3>
-            <p className="mt-2 text-sm text-gray-500">
-              다른 카테고리를 선택하거나 필터를 초기화해보세요.
-            </p>
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={handleClearFilters}
-            >
-              필터 초기화
-            </Button>
-          </div>
-        )}
-      </div>
+      ) : (
+        <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} pt-4`}>
+          {books.length > 0 ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {books.map(book => (
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  onClick={handleBookSelect}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-8 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-12 text-center">
+              <div className="text-3xl">📚</div>
+              <h3 className="mt-4 text-lg font-medium text-gray-900">
+                검색 결과가 없습니다
+              </h3>
+              <p className="mt-2 text-sm text-gray-500">
+                다른 카테고리를 선택하거나 필터를 초기화해보세요.
+              </p>
+              <Button
+                variant="outline"
+                className="mt-4"
+                onClick={handleClearFilters}
+              >
+                필터 초기화
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* 책 상세 정보 Dialog */}
       {selectedBook && (
         <BookDialog
           book={{
             ...selectedBook,
-            coverImage: `https://picsum.photos/seed/${selectedBook.id}/400/600`,
+            coverImage:
+              selectedBook.coverImage ||
+              `https://picsum.photos/seed/${selectedBook.id}/400/600`,
             toc: `제1장 도입부\n제2장 본론\n  제2.1절 첫 번째 주제\n  제2.2절 두 번째 주제\n제3장 결론`,
             authorInfo: `${selectedBook.author}는 해당 분야에서 20년 이상의 경력을 가진 저명한 작가입니다. 여러 저서를 통해 독자들에게 새로운 시각과 통찰을 제공해왔습니다.`,
             tags: [
@@ -260,7 +436,9 @@ export default function PopularPage() {
             ],
             similarBooks: books.slice(0, 3).map(book => ({
               ...book,
-              coverImage: `https://picsum.photos/seed/${book.id}/240/360`,
+              coverImage:
+                book.coverImage ||
+                `https://picsum.photos/seed/${book.id}/240/360`,
             })),
           }}
           open={isDialogOpen}

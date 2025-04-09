@@ -1,9 +1,13 @@
-import api from './axios';
+import api from '../axios';
 import {
+  AccountActionResponse,
+  ChangePasswordRequest,
+  ChangePasswordResponse,
   UpdateUserInfoRequest,
   UpdateUserInfoResponse,
+  UploadProfileImageResponse,
   User,
-} from './types/auth';
+} from './types';
 
 /**
  * 현재 로그인한 사용자 정보를 가져옵니다.
@@ -30,7 +34,7 @@ export const updateUserInfo = async (
  */
 export const uploadProfileImage = async (
   file: File
-): Promise<{ url: string }> => {
+): Promise<UploadProfileImageResponse> => {
   const formData = new FormData();
   formData.append('image', file);
 
@@ -45,24 +49,17 @@ export const uploadProfileImage = async (
 /**
  * 사용자의 비밀번호를 변경합니다.
  */
-export const changePassword = async ({
-  currentPassword,
-  newPassword,
-}: {
-  currentPassword: string;
-  newPassword: string;
-}): Promise<{ message: string }> => {
-  const response = await api.post('/user/change-password', {
-    currentPassword,
-    newPassword,
-  });
+export const changePassword = async (
+  data: ChangePasswordRequest
+): Promise<ChangePasswordResponse> => {
+  const response = await api.post('/user/change-password', data);
   return response.data;
 };
 
 /**
  * 사용자 계정을 비활성화합니다.
  */
-export const deactivateAccount = async (): Promise<{ message: string }> => {
+export const deactivateAccount = async (): Promise<AccountActionResponse> => {
   const response = await api.post('/user/deactivate');
   return response.data;
 };
@@ -70,7 +67,7 @@ export const deactivateAccount = async (): Promise<{ message: string }> => {
 /**
  * 사용자 계정을 삭제합니다.
  */
-export const deleteAccount = async (): Promise<{ message: string }> => {
+export const deleteAccount = async (): Promise<AccountActionResponse> => {
   const response = await api.delete('/user/delete');
   return response.data;
 };

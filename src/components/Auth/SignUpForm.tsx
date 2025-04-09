@@ -1,6 +1,6 @@
 import { checkEmail } from '@/apis/auth';
+import { AuthProvider } from '@/apis/auth/types';
 import { authUtils } from '@/apis/axios';
-import { AuthProvider } from '@/apis/types/auth';
 import { userAtom } from '@/atoms/user';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';

@@ -1,4 +1,4 @@
-import api from './axios';
+import api from '../axios';
 import {
   CheckEmailResponse,
   CompleteRegistrationRequest,
@@ -21,7 +21,7 @@ import {
   VerifyEmailResponse,
   VerifyResetTokenRequest,
   VerifyResetTokenResponse,
-} from './types/auth';
+} from './types';
 
 /**
  * 사용자 로그인 API

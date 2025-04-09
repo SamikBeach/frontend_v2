@@ -1,17 +1,14 @@
-import { User } from '@/apis/types/auth';
-
-export type { User };
-
+// User 타입은 컴포넌트에서 직접 정의하도록 변경
 export interface Notification {
   id: number;
-  type: 'comment' | 'like' | 'follow' | 'mention' | 'system' | 'library';
+  type: 'like' | 'comment' | 'follow' | 'mention' | 'system';
   title: string;
-  content: string;
-  timestamp: string;
+  message: string;
+  time: string;
   isRead: boolean;
   user?: {
     name: string;
     avatar: string;
   };
-  libraryId?: number;
+  link?: string;
 }

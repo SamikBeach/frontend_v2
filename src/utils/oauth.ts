@@ -1,4 +1,4 @@
-import { AuthProvider } from '@/apis/types/auth';
+import { AuthProvider } from '@/apis/auth/types';
 
 /**
  * 소셜 로그인을 위한 팝업 위치 계산
