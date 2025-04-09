@@ -124,9 +124,6 @@ export default function PopularPage() {
     timeRangeParam
   );
 
-  // 선택된 카테고리 정보
-  const currentCategory = categories.find(cat => cat.id === categoryParam);
-
   return (
     <div className="bg-white pb-6">
       {/* CSS 스타일 추가 */}
