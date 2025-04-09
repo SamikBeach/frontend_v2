@@ -10,10 +10,8 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 right-0 left-0 z-50 flex min-h-[56px] items-center justify-between border-b border-gray-200/50 ${
-        isMobile
-          ? 'bg-white px-2'
-          : 'bg-white/80 px-4 backdrop-blur-md backdrop-saturate-150 supports-[backdrop-filter]:bg-white/70'
+      className={`fixed top-0 right-0 left-0 z-50 flex min-h-[56px] items-center justify-between border-b border-gray-200/50 bg-white ${
+        isMobile ? 'px-2' : 'px-4'
       }`}
     >
       <div className="flex items-center gap-1">

@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
@@ -56,36 +56,24 @@ const mapApiCategoriesToUiCategories = (
   color: string;
   subcategories: Array<{ id: string; name: string }>;
 }[] => {
-  // API에서 제공하는 카테고리 중 '전체' 카테고리가 있는지 확인
-  const hasAllCategory = apiCategories.some(
-    category => category.name === '전체' || category.id.toString() === 'all'
-  );
-
-  const mappedCategories = apiCategories.map((category, index) => ({
-    id: category.id.toString(),
-    name: category.name,
-    // 서버에서 온 컬러가 있으면 사용, 없으면 파스텔 컬러 배열에서 선택
-    color: category.color || pastelColors[index % pastelColors.length],
-    subcategories: category.subCategories.map(sub => ({
-      id: sub.id.toString(),
-      name: sub.name,
+  return [
+    {
+      id: 'all',
+      name: '전체',
+      color: '#E5E7EB',
+      subcategories: [],
+    },
+    ...apiCategories.map((category, index) => ({
+      id: category.id.toString(),
+      name: category.name,
+      // 서버에서 온 컬러가 있으면 사용, 없으면 파스텔 컬러 배열에서 선택
+      color: category.color || pastelColors[index % pastelColors.length],
+      subcategories: category.subCategories.map(sub => ({
+        id: sub.id.toString(),
+        name: sub.name,
+      })),
     })),
-  }));
-
-  // API에서 '전체' 카테고리가 없는 경우에만 추가
-  if (!hasAllCategory) {
-    return [
-      {
-        id: 'all',
-        name: '전체',
-        color: '#E5E7EB',
-        subcategories: [],
-      },
-      ...mappedCategories,
-    ];
-  }
-
-  return mappedCategories;
+  ];
 };
 
 // API Book을 UI Book으로 변환하는 함수
@@ -130,6 +118,8 @@ export default function PopularPage() {
     queryFn: getAllCategories,
   });
 
+  // API 타입과 UI 타입 호환성 확보
+
   // 도서 데이터 가져오기
   const { data: apiBooks, isLoading: isBooksLoading } = useQuery({
     queryKey: [
@@ -148,11 +138,9 @@ export default function PopularPage() {
         subcategory?: string;
       } = {};
 
-      // sort와 timeRange 값이 유효한 경우에만 설정
       if (sortParam) params.sort = sortParam;
       if (timeRangeParam) params.timeRange = timeRangeParam;
 
-      // 카테고리와 서브카테고리 값이 유효한 경우에만 설정
       if (categoryParam !== 'all') {
         params.category = categoryParam;
       }
@@ -171,7 +159,7 @@ export default function PopularPage() {
     queryKey: ['book', bookIdParam],
     queryFn: () => (bookIdParam ? getBookById(parseInt(bookIdParam)) : null),
     enabled: !!bookIdParam,
-    staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유지
+    placeholderData: keepPreviousData,
   });
 
   // API 데이터 또는 폴백 데이터 사용
@@ -281,11 +269,7 @@ export default function PopularPage() {
       </div>
 
       {/* 필터 영역 - 스크롤 시 상단에 고정 */}
-      <div
-        className={`sticky top-[56px] z-30 ${
-          isMobile ? 'bg-white' : 'bg-white/95 backdrop-blur-md'
-        }`}
-      >
+      <div className={`sticky top-[56px] z-30 bg-white`}>
         {/* 카테고리 필터와 정렬 옵션 */}
         <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} py-2`}>
           <div className="relative">

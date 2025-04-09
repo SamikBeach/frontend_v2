@@ -25,9 +25,9 @@ export function BookCard({ book, onClick }: BookCardProps) {
   return (
     <div className="cursor-pointer" onClick={() => onClick(book)}>
       <div className="group h-full rounded-xl bg-[#F9FAFB] transition-all hover:bg-[#F2F4F6]">
-        <div className="relative aspect-[2/3] overflow-hidden rounded-t-xl">
+        <div className="relative aspect-[5/7] overflow-hidden rounded-t-xl">
           <img
-            src={`https://picsum.photos/seed/${book.id}/240/360`}
+            src={book.coverImage}
             alt={book.title}
             className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
             loading="lazy"

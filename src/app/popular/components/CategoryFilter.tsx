@@ -47,7 +47,7 @@ export const CategoryFilter = ({
       {/* 카테고리 목록 */}
       <div
         className={`no-scrollbar flex w-full overflow-x-auto ${
-          isMobile ? 'mb-2 py-1' : 'mb-3 py-1'
+          isMobile ? 'mb-1 py-1' : 'mb-2 py-1'
         }`}
       >
         <div className="flex gap-2 px-0.5">
@@ -78,7 +78,7 @@ export const CategoryFilter = ({
       {subcategories.length > 0 && (
         <div
           className={`no-scrollbar flex w-full overflow-x-auto ${
-            isMobile ? 'mb-2 py-1' : 'mb-4 py-1'
+            isMobile ? 'mb-0.5 py-0' : 'mb-1 py-0'
           }`}
         >
           <div className="flex gap-2 px-0.5">
