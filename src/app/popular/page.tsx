@@ -11,12 +11,27 @@ import {
 } from '@/components/SortDropdown';
 import { Button } from '@/components/ui/button';
 import { useQueryParams } from '@/hooks';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import { CategoryFilter, PopularBreadcrumb } from './components';
 import { books, categories } from './data';
 
+// 스크롤바 숨기는 CSS 추가
+const noScrollbarStyles = `
+  /* 스크롤바 숨김 */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+`;
+
 export default function PopularPage() {
   const { updateQueryParams, getQueryParam } = useQueryParams();
+  const isMobile = useIsMobile();
 
   // URL에서 현재 선택된 필터/정렬 값 및 책 정보 가져오기
   const categoryParam = getQueryParam('category') || 'all';
@@ -109,10 +124,18 @@ export default function PopularPage() {
     timeRangeParam
   );
 
+  // 선택된 카테고리 정보
+  const currentCategory = categories.find(cat => cat.id === categoryParam);
+  const hasSubcategories =
+    currentCategory?.subcategories && currentCategory.subcategories.length > 0;
+
   return (
-    <div className="bg-white">
+    <div className="bg-white pb-6">
+      {/* CSS 스타일 추가 */}
+      <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
+
       {/* 브레드크럼 */}
-      <div className="mx-auto w-full px-6 py-2">
+      <div className="mx-auto w-full px-4 py-2">
         <PopularBreadcrumb
           selectedCategory={categoryParam}
           selectedSubcategory={subcategoryParam}
@@ -122,28 +145,56 @@ export default function PopularPage() {
         />
       </div>
 
-      {/* 카테고리 필터와 정렬 옵션 */}
-      <div className="mx-auto w-full px-6 pt-3 pb-6">
-        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={categoryParam}
-            selectedSubcategory={subcategoryParam}
-            onCategoryClick={handleCategoryClick}
-            onSubcategoryClick={handleSubcategoryClick}
-          />
+      {/* 필터 영역 - 스크롤 시 상단에 고정 (shadow 효과 제거) */}
+      <div
+        className={`sticky top-[56px] z-30 ${
+          isMobile ? 'bg-white' : 'bg-white/95 backdrop-blur-md'
+        }`}
+      >
+        {/* 카테고리 필터와 정렬 옵션 */}
+        <div
+          className={`mx-auto w-full ${isMobile ? 'px-1 py-2' : 'px-4 py-2'}`}
+        >
+          <div className={`flex flex-col ${isMobile ? 'gap-2' : 'gap-2'}`}>
+            {/* 카테고리 필터 */}
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={categoryParam}
+              selectedSubcategory={subcategoryParam}
+              onCategoryClick={handleCategoryClick}
+              onSubcategoryClick={handleSubcategoryClick}
+              className="w-full"
+            />
 
-          <SortDropdown
-            selectedSort={sortParam}
-            onSortChange={handleSortChange}
-            className="ml-auto"
-            selectedTimeRange={timeRangeParam}
-            onTimeRangeChange={handleTimeRangeChange}
-          />
+            {/* 모바일에서는 필터 아래에, 데스크탑에서는 오른쪽에 정렬 버튼 배치 */}
+            <div className={`${isMobile ? 'mt-1 w-full' : 'hidden'}`}>
+              <SortDropdown
+                selectedSort={sortParam}
+                onSortChange={handleSortChange}
+                selectedTimeRange={timeRangeParam}
+                onTimeRangeChange={handleTimeRangeChange}
+                className="w-full"
+              />
+            </div>
+
+            {/* 데스크톱에서만 보이는 정렬 버튼 (오른쪽 위치) */}
+            <div
+              className={`${!isMobile ? 'absolute top-3 right-4' : 'hidden'}`}
+            >
+              <SortDropdown
+                selectedSort={sortParam}
+                onSortChange={handleSortChange}
+                selectedTimeRange={timeRangeParam}
+                onTimeRangeChange={handleTimeRangeChange}
+              />
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* 도서 그리드 */}
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+      {/* 도서 그리드 - 모바일에서 여백 줄임 */}
+      <div className={`mx-auto w-full ${isMobile ? 'px-1 pt-3' : 'px-4 pt-4'}`}>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {sortedBooks.map(book => (
             <BookCard key={book.id} book={book} onClick={handleBookSelect} />
           ))}
@@ -151,7 +202,7 @@ export default function PopularPage() {
 
         {/* 결과가 없을 때 */}
         {sortedBooks.length === 0 && (
-          <div className="mt-12 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-16 text-center">
+          <div className="mt-8 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-12 text-center">
             <div className="text-3xl">📚</div>
             <h3 className="mt-4 text-lg font-medium text-gray-900">
               검색 결과가 없습니다
