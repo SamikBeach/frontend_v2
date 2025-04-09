@@ -126,8 +126,6 @@ export default function PopularPage() {
 
   // 선택된 카테고리 정보
   const currentCategory = categories.find(cat => cat.id === categoryParam);
-  const hasSubcategories =
-    currentCategory?.subcategories && currentCategory.subcategories.length > 0;
 
   return (
     <div className="bg-white pb-6">
@@ -145,55 +143,53 @@ export default function PopularPage() {
         />
       </div>
 
-      {/* 필터 영역 - 스크롤 시 상단에 고정 (shadow 효과 제거) */}
+      {/* 필터 영역 - 스크롤 시 상단에 고정 */}
       <div
         className={`sticky top-[56px] z-30 ${
           isMobile ? 'bg-white' : 'bg-white/95 backdrop-blur-md'
         }`}
       >
         {/* 카테고리 필터와 정렬 옵션 */}
-        <div
-          className={`mx-auto w-full ${isMobile ? 'px-1 py-2' : 'px-4 py-2'}`}
-        >
-          <div className={`flex flex-col ${isMobile ? 'gap-2' : 'gap-2'}`}>
-            {/* 카테고리 필터 */}
-            <CategoryFilter
-              categories={categories}
-              selectedCategory={categoryParam}
-              selectedSubcategory={subcategoryParam}
-              onCategoryClick={handleCategoryClick}
-              onSubcategoryClick={handleSubcategoryClick}
-              className="w-full"
-            />
-
-            {/* 모바일에서는 필터 아래에, 데스크탑에서는 오른쪽에 정렬 버튼 배치 */}
-            <div className={`${isMobile ? 'mt-1 w-full' : 'hidden'}`}>
+        <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} py-2`}>
+          <div className="relative">
+            {/* xl 이상 화면에서만 보이는 정렬 버튼 (오른쪽 위치) */}
+            <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:block">
               <SortDropdown
                 selectedSort={sortParam}
                 onSortChange={handleSortChange}
                 selectedTimeRange={timeRangeParam}
                 onTimeRangeChange={handleTimeRangeChange}
-                className="w-full"
               />
             </div>
 
-            {/* 데스크톱에서만 보이는 정렬 버튼 (오른쪽 위치) */}
-            <div
-              className={`${!isMobile ? 'absolute top-3 right-4' : 'hidden'}`}
-            >
-              <SortDropdown
-                selectedSort={sortParam}
-                onSortChange={handleSortChange}
-                selectedTimeRange={timeRangeParam}
-                onTimeRangeChange={handleTimeRangeChange}
+            <div className="flex flex-col gap-2">
+              {/* 카테고리 필터 */}
+              <CategoryFilter
+                categories={categories}
+                selectedCategory={categoryParam}
+                selectedSubcategory={subcategoryParam}
+                onCategoryClick={handleCategoryClick}
+                onSubcategoryClick={handleSubcategoryClick}
+                className="w-full"
               />
+
+              {/* xl 미만 화면에서 보이는 정렬 버튼 */}
+              <div className="w-full xl:hidden">
+                <SortDropdown
+                  selectedSort={sortParam}
+                  onSortChange={handleSortChange}
+                  selectedTimeRange={timeRangeParam}
+                  onTimeRangeChange={handleTimeRangeChange}
+                  className="w-full"
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* 도서 그리드 - 모바일에서 여백 줄임 */}
-      <div className={`mx-auto w-full ${isMobile ? 'px-1 pt-3' : 'px-4 pt-4'}`}>
+      <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} pt-4`}>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {sortedBooks.map(book => (
             <BookCard key={book.id} book={book} onClick={handleBookSelect} />
