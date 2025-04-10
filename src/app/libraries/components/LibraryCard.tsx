@@ -10,8 +10,10 @@ import Link from 'next/link';
 import { LibraryCardProps } from '../types';
 
 export function LibraryCard({ library }: LibraryCardProps) {
+  // LibrarySummary 타입에는 category가 없으므로 카테고리 찾기 로직은 제거
+
   return (
-    <Link href={`/libraries/${library.id}`}>
+    <Link href={`/library/${library.id}`}>
       <Card className="group h-full rounded-xl border-none bg-[#F9FAFB] shadow-none transition-all duration-200 hover:bg-[#F2F4F6]">
         <CardHeader className="p-5 pb-3">
           <div className="flex items-center gap-3">
@@ -34,7 +36,7 @@ export function LibraryCard({ library }: LibraryCardProps) {
                   <span
                     className="ml-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-gray-700"
                     style={{
-                      backgroundColor: '#F9FAFB',
+                      backgroundColor: '#FFF8E2',
                     }}
                   >
                     {library.tags[0].name}
@@ -50,9 +52,24 @@ export function LibraryCard({ library }: LibraryCardProps) {
             {library.description || '설명이 없습니다.'}
           </p>
           <div className="grid grid-cols-2 gap-2.5">
-            {/* 더미 이미지 */}
-            <div className="aspect-[2/3] rounded-lg bg-gray-200"></div>
-            <div className="aspect-[2/3] rounded-lg bg-gray-200"></div>
+            <div className="overflow-hidden rounded-lg">
+              <div className="relative aspect-[2/3]">
+                <img
+                  src={`https://picsum.photos/seed/${library.id}1/240/360`}
+                  alt="책 표지"
+                  className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
+                />
+              </div>
+            </div>
+            <div className="overflow-hidden rounded-lg">
+              <div className="relative aspect-[2/3]">
+                <img
+                  src={`https://picsum.photos/seed/${library.id}2/240/360`}
+                  alt="책 표지"
+                  className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
+                />
+              </div>
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex items-center justify-between px-5 py-3 text-xs text-gray-500">
@@ -63,7 +80,7 @@ export function LibraryCard({ library }: LibraryCardProps) {
             </div>
             <div className="flex items-center gap-1.5">
               <BookOpen className="h-3.5 w-3.5 text-gray-400" />
-              <span>{library.bookCount}권</span>
+              <span>{library.bookCount}</span>
             </div>
           </div>
         </CardFooter>
