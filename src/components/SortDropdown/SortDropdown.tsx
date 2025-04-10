@@ -128,32 +128,6 @@ export function SortDropdown({
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="h-9 border-gray-200 bg-white">
-            <ArrowUpDown className="mr-2 h-4 w-4 text-gray-500" />
-            <span>{currentSortOption.label}</span>
-            <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align={align} className="w-[180px]">
-          {sortOptions.map(option => (
-            <DropdownMenuItem
-              key={option.id}
-              className={`flex items-center ${
-                option.id === selectedSort
-                  ? 'bg-gray-50 font-medium text-blue-600'
-                  : ''
-              }`}
-              onClick={() => onSortChange(option.id)}
-            >
-              {option.icon}
-              {option.label}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-
       {showTimeRangeFilter && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -183,6 +157,32 @@ export function SortDropdown({
           </DropdownMenuContent>
         </DropdownMenu>
       )}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="h-9 border-gray-200 bg-white">
+            <ArrowUpDown className="mr-2 h-4 w-4 text-gray-500" />
+            <span>{currentSortOption.label}</span>
+            <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align={align} className="w-[180px]">
+          {sortOptions.map(option => (
+            <DropdownMenuItem
+              key={option.id}
+              className={`flex items-center ${
+                option.id === selectedSort
+                  ? 'bg-gray-50 font-medium text-blue-600'
+                  : ''
+              }`}
+              onClick={() => onSortChange(option.id)}
+            >
+              {option.icon}
+              {option.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
