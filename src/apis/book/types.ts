@@ -54,7 +54,6 @@ export type SortOption =
   | 'rating-desc'
   | 'reviews-desc'
   | 'publishDate-desc'
-  | 'publishDate-asc'
   | 'title-asc';
 export type TimeRange = 'all' | 'month' | 'year' | 'today' | 'week';
 

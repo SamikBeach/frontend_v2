@@ -15,7 +15,6 @@ export function PopularSortDropdown({ className }: PopularSortDropdownProps) {
       sort === 'rating-desc' ||
       sort === 'reviews-desc' ||
       sort === 'publishDate-desc' ||
-      sort === 'publishDate-asc' ||
       sort === 'title-asc'
     ) {
       setSortOption(sort);

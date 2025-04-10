@@ -20,7 +20,6 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
       sort === 'rating-desc' ||
       sort === 'reviews-desc' ||
       sort === 'publishDate-desc' ||
-      sort === 'publishDate-asc' ||
       sort === 'title-asc'
     ) {
       setSortOption(sort);

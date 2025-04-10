@@ -57,13 +57,6 @@ export const defaultSortOptions: SortOption[] = [
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime(),
   },
   {
-    id: 'publishDate-asc',
-    label: '출간일 오래된순',
-    icon: <Calendar className="mr-2 h-4 w-4 text-gray-500" />,
-    sortFn: (a, b) =>
-      new Date(a.publishDate).getTime() - new Date(b.publishDate).getTime(),
-  },
-  {
     id: 'title-asc',
     label: '제목 가나다순',
     icon: <ArrowDownAZ className="mr-2 h-4 w-4 text-gray-500" />,
