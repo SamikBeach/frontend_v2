@@ -121,3 +121,86 @@ export const updateBook = async (
 export const deleteBook = async (id: number): Promise<void> => {
   await api.delete(`/books/${id}`);
 };
+
+/**
+ * 모든 발견하기 도서 조회
+ */
+export const getAllDiscoverBooks = async (
+  params?: PopularBooksParams
+): Promise<Book[]> => {
+  const response = await api.get<Book[]>('/books/discover/all', { params });
+  return response.data;
+};
+
+/**
+ * 특정 발견하기 카테고리의 도서 조회
+ */
+export const getBooksByDiscoverCategoryId = async (
+  discoverCategoryId: number,
+  discoverSubCategoryId?: number,
+  sort: SortOption = 'rating-desc',
+  timeRange: TimeRange = 'all'
+): Promise<Book[]> => {
+  // 쿼리 파라미터 구성
+  const params: Record<string, string> = {
+    sort,
+    timeRange,
+  };
+
+  if (discoverSubCategoryId) {
+    params.discoverSubCategoryId = discoverSubCategoryId.toString();
+  }
+
+  const response = await api.get<Book[]>(
+    `/books/discover/category/${discoverCategoryId}`,
+    { params }
+  );
+  return response.data;
+};
+
+/**
+ * 특정 발견하기 서브카테고리의 도서 조회
+ */
+export const getBooksByDiscoverSubCategoryId = async (
+  discoverSubCategoryId: number,
+  sort: SortOption = 'rating-desc',
+  timeRange: TimeRange = 'all'
+): Promise<Book[]> => {
+  // 쿼리 파라미터 구성
+  const params: Record<string, string> = {
+    sort,
+    timeRange,
+  };
+
+  const response = await api.get<Book[]>(
+    `/books/discover/subcategory/${discoverSubCategoryId}`,
+    { params }
+  );
+  return response.data;
+};
+
+/**
+ * 도서를 발견하기 카테고리에 추가
+ */
+export const addBookToDiscoverCategory = async (
+  bookId: number,
+  discoverCategoryId: number,
+  discoverSubCategoryId?: number
+): Promise<Book> => {
+  const response = await api.post<Book>('/books/discover/add', {
+    bookId,
+    discoverCategoryId,
+    discoverSubCategoryId,
+  });
+  return response.data;
+};
+
+/**
+ * 도서를 발견하기 카테고리에서 제거
+ */
+export const removeBookFromDiscoverCategory = async (
+  bookId: number
+): Promise<Book> => {
+  const response = await api.delete<Book>(`/books/discover/remove/${bookId}`);
+  return response.data;
+};

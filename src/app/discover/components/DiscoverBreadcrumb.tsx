@@ -1,25 +1,46 @@
+import { useDiscoverCategories } from '@/app/discover/hooks';
+import {
+  discoverCategoryFilterAtom,
+  discoverSubcategoryFilterAtom,
+} from '@/atoms/discover';
+import { useQueryParams } from '@/hooks';
+import { useAtom } from 'jotai';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
-import { Category } from '@/app/popular/components/CategoryFilter';
+export function DiscoverBreadcrumb() {
+  const { clearQueryParams, updateQueryParams } = useQueryParams();
+  const [selectedCategory, setSelectedCategory] = useAtom(
+    discoverCategoryFilterAtom
+  );
+  const [selectedSubcategory, setSelectedSubcategory] = useAtom(
+    discoverSubcategoryFilterAtom
+  );
 
-interface DiscoverBreadcrumbProps {
-  selectedCategory: string;
-  selectedSubcategory: string;
-  categories: Category[];
-  onCategoryClick: (categoryId: string) => void;
-  onClearFilters: () => void;
-}
+  // 카테고리 정보 가져오기
+  const { categories } = useDiscoverCategories();
 
-export function DiscoverBreadcrumb({
-  selectedCategory,
-  selectedSubcategory,
-  categories,
-  onCategoryClick,
-  onClearFilters,
-}: DiscoverBreadcrumbProps) {
   // 선택된 카테고리 정보
-  const currentCategory = categories.find(cat => cat.id === selectedCategory);
+  const currentCategory = categories?.find(
+    cat => cat.id.toString() === selectedCategory
+  );
+
+  const handleClearFilters = () => {
+    setSelectedCategory('all');
+    setSelectedSubcategory('all');
+    clearQueryParams();
+  };
+
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    setSelectedSubcategory('all');
+
+    // URL 쿼리 파라미터 업데이트
+    updateQueryParams({
+      category: categoryId,
+      subcategory: 'all',
+    });
+  };
 
   return (
     <div className="flex items-center text-[14px] text-gray-500">
@@ -27,7 +48,7 @@ export function DiscoverBreadcrumb({
         href="/discover"
         onClick={e => {
           e.preventDefault();
-          onClearFilters();
+          handleClearFilters();
         }}
         className={
           selectedCategory === 'all'
@@ -44,10 +65,10 @@ export function DiscoverBreadcrumb({
             href={`/discover?category=${selectedCategory}`}
             onClick={e => {
               e.preventDefault();
-              onCategoryClick(selectedCategory);
+              handleCategoryClick(selectedCategory);
             }}
             className={
-              !selectedSubcategory
+              selectedSubcategory === 'all'
                 ? 'font-medium text-gray-900'
                 : 'hover:text-gray-900'
             }
@@ -56,13 +77,13 @@ export function DiscoverBreadcrumb({
           </Link>
         </>
       )}
-      {selectedSubcategory && (
+      {selectedSubcategory !== 'all' && (
         <>
           <ChevronRight className="mx-1 h-4 w-4" />
           <span className="font-medium text-gray-900">
             {
-              currentCategory?.subcategories.find(
-                sub => sub.id === selectedSubcategory
+              currentCategory?.subCategories.find(
+                sub => sub.id.toString() === selectedSubcategory
               )?.name
             }
           </span>

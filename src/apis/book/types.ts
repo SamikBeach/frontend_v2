@@ -1,4 +1,8 @@
 import { Category, SubCategory } from '../category/types';
+import {
+  DiscoverCategory,
+  DiscoverSubCategory,
+} from '../discover-category/types';
 
 export interface Book {
   id: number;
@@ -15,6 +19,9 @@ export interface Book {
   category: Category;
   subcategory?: SubCategory;
   isFeatured?: boolean;
+  isDiscovered?: boolean;
+  discoverCategory?: DiscoverCategory;
+  discoverSubCategory?: DiscoverSubCategory;
 }
 
 export interface CreateBookDto {
