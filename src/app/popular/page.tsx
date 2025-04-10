@@ -1,5 +1,6 @@
 'use client';
 
+import { SortOption, TimeRange } from '@/apis/book/types';
 import { selectedBookIdAtom } from '@/atoms/book';
 import {
   categoryFilterAtom,
@@ -10,6 +11,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
 import { useSetAtom } from 'jotai';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
@@ -25,12 +27,36 @@ import {
 const noScrollbarStyles = `
   /* 스크롤바 숨김 */
   .no-scrollbar::-webkit-scrollbar {
-    display: none;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
   .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  /* 모바일 환경에서 스크롤바 추가 숨김 처리 */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 모바일 환경에서 추가 스크롤바 숨김 처리 */
+  @media (max-width: 768px) {
+    .overflow-x-auto::-webkit-scrollbar,
+    div::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+    
+    .overflow-x-auto,
+    div.overflow-x-auto {
+      -ms-overflow-style: none !important;
+      scrollbar-width: none !important;
+      -webkit-overflow-scrolling: touch;
+    }
   }
 `;
 
@@ -83,8 +109,16 @@ export default function PopularPage() {
   useEffect(() => {
     const category = searchParams.get('category') || 'all';
     const subcategory = searchParams.get('subcategory') || 'all';
-    const sort = searchParams.get('sort') || 'reviews-desc';
-    const timeRange = (searchParams.get('timeRange') || 'all') as any;
+    const sortValue = searchParams.get('sort') || 'reviews-desc';
+    const sort: SortOption = isValidSortOption(sortValue)
+      ? sortValue
+      : 'reviews-desc';
+
+    const timeRangeValue = searchParams.get('timeRange') || 'all';
+    const timeRange: TimeRange = isValidTimeRange(timeRangeValue)
+      ? timeRangeValue
+      : 'all';
+
     const bookId = searchParams.get('book');
 
     setCategoryFilter(category);

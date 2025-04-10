@@ -1,5 +1,5 @@
 import { getAllPopularBooks } from '@/apis/book/book';
-import { Book } from '@/apis/book/types';
+import { Book, PopularBooksParams, SortOption } from '@/apis/book/types';
 import { selectedBookIdAtom } from '@/atoms/book';
 import {
   categoryFilterAtom,
@@ -11,6 +11,7 @@ import { BookCard } from '@/components/BookCard';
 import { BookDialog } from '@/components/BookDialog/BookDialog';
 import { Button } from '@/components/ui/button';
 import { useQueryParams } from '@/hooks';
+import { isValidSortOption } from '@/utils/type-guards';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useMemo } from 'react';
@@ -19,9 +20,14 @@ export function BooksContent() {
   const { clearQueryParams } = useQueryParams();
   const categoryParam = useAtomValue(categoryFilterAtom);
   const subcategoryParam = useAtomValue(subcategoryFilterAtom);
-  const sortParam = useAtomValue(sortOptionAtom);
+  const sortParamRaw = useAtomValue(sortOptionAtom);
   const timeRangeParam = useAtomValue(timeRangeAtom);
   const [selectedBookId, setSelectedBookId] = useAtom(selectedBookIdAtom);
+
+  // 타입 가드를 사용하여 안전하게 처리
+  const sortParam: SortOption = isValidSortOption(sortParamRaw)
+    ? sortParamRaw
+    : 'reviews-desc';
 
   // 도서 데이터 가져오기
   const { data: books } = useSuspenseQuery({
@@ -34,25 +40,28 @@ export function BooksContent() {
     ],
     queryFn: async () => {
       // API 요청 시 필요한 파라미터 구성
-      const params: {
-        sort?: string;
-        timeRange?: string;
+      const params: PopularBooksParams = {
+        sort: sortParam,
+        timeRange: timeRangeParam,
+      };
+
+      // 추가 파라미터 (PopularBooksParams에는 없지만 API에서는 지원하는 파라미터)
+      type ExtendedParams = PopularBooksParams & {
         category?: string;
         subcategory?: string;
-      } = {};
+      };
 
-      if (sortParam) params.sort = sortParam;
-      if (timeRangeParam) params.timeRange = timeRangeParam;
+      const extendedParams: ExtendedParams = params;
 
       if (categoryParam !== 'all') {
-        params.category = categoryParam;
+        extendedParams.category = categoryParam;
       }
 
       if (subcategoryParam && subcategoryParam !== 'all') {
-        params.subcategory = subcategoryParam;
+        extendedParams.subcategory = subcategoryParam;
       }
 
-      return getAllPopularBooks(params as any);
+      return getAllPopularBooks(extendedParams);
     },
     staleTime: 1000 * 60 * 2, // 2분 동안 캐시 유지
   });

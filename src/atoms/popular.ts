@@ -1,4 +1,4 @@
-import { TimeRange as ApiTimeRange } from '@/apis/book/types';
+import { TimeRange as ApiTimeRange, SortOption } from '@/apis/book/types';
 import { atom } from 'jotai';
 
 // 파스텔 색상 목록 (CategoryFilter에서 사용)
@@ -22,7 +22,7 @@ export const categoryFilterAtom = atom<string>('all');
 export const subcategoryFilterAtom = atom<string>('all');
 
 // 정렬 옵션 atom
-export const sortOptionAtom = atom<string>('reviews-desc');
+export const sortOptionAtom = atom<SortOption>('reviews-desc');
 
 // 시간 범위 atom
 export const timeRangeAtom = atom<ApiTimeRange>('all');
