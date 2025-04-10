@@ -2,17 +2,60 @@
 
 import React, { useState } from 'react';
 
-import { CategoryFilter } from '@/app/popular/components/CategoryFilter';
-import { Book } from '@/components/BookCard';
+import { Book } from '@/apis/book/types';
 import { BookDialog } from '@/components/BookDialog';
 import { SortDropdown, TimeRange } from '@/components/SortDropdown';
 import { useQueryParams } from '@/hooks';
+import { useIsMobile } from '@/hooks/use-mobile';
 
-import { BookCarousel, BookGrid, DiscoverBreadcrumb } from './components';
+import {
+  BookCarousel,
+  BookGrid,
+  CategoryFilter,
+  DiscoverBreadcrumb,
+} from './components';
 import { allBooks, allCollections, curationCategories } from './data';
+
+// 스크롤바 숨기는 CSS 추가
+const noScrollbarStyles = `
+  /* 스크롤바 숨김 */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+  }
+
+  /* 모바일 환경에서 스크롤바 추가 숨김 처리 */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 모바일 환경에서 추가 스크롤바 숨김 처리 */
+  @media (max-width: 768px) {
+    .overflow-x-auto::-webkit-scrollbar,
+    div::-webkit-scrollbar {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+    }
+    
+    .overflow-x-auto,
+    div.overflow-x-auto {
+      -ms-overflow-style: none !important;
+      scrollbar-width: none !important;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+`;
 
 export default function DiscoverPage() {
   const { updateQueryParams, getQueryParam } = useQueryParams();
+  const isMobile = useIsMobile();
 
   // URL에서 현재 선택된 필터/정렬 값 및 책 정보 가져오기
   const categoryParam = getQueryParam('category') || 'all';
@@ -100,9 +143,12 @@ export default function DiscoverPage() {
   }
 
   return (
-    <div className="bg-white">
+    <div className="bg-white pb-6">
+      {/* CSS 스타일 추가 */}
+      <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
+
       {/* 브레드크럼 */}
-      <div className="mx-auto w-full px-6 py-2">
+      <div className="mx-auto w-full px-4 py-2">
         <DiscoverBreadcrumb
           selectedCategory={categoryParam}
           selectedSubcategory={subcategoryParam}
@@ -112,63 +158,84 @@ export default function DiscoverPage() {
         />
       </div>
 
-      {/* 카테고리 필터와 정렬 옵션 */}
-      <div className="mx-auto w-full px-6 pt-3 pb-6">
-        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-          <CategoryFilter
-            categories={curationCategories}
-            selectedCategory={categoryParam}
-            selectedSubcategory={subcategoryParam}
-            onCategoryClick={handleCategoryClick}
-            onSubcategoryClick={handleSubcategoryClick}
-          />
+      {/* 필터 영역 - 스크롤 시 상단에 고정 */}
+      <div className={`sticky top-[56px] z-30 bg-white`}>
+        {/* 카테고리 필터와 정렬 옵션 */}
+        <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} py-2`}>
+          <div className="relative">
+            {/* xl 이상 화면에서만 보이는 정렬 버튼 (오른쪽 위치) */}
+            {!subcategoryParam ? null : (
+              <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:block">
+                <SortDropdown
+                  selectedSort={sortParam}
+                  onSortChange={handleSortChange}
+                  selectedTimeRange={timeRangeParam}
+                  onTimeRangeChange={handleTimeRangeChange}
+                />
+              </div>
+            )}
 
-          {subcategoryParam && (
-            <SortDropdown
-              selectedSort={sortParam}
-              onSortChange={handleSortChange}
-              className="ml-auto"
-              selectedTimeRange={timeRangeParam}
-              onTimeRangeChange={handleTimeRangeChange}
-            />
-          )}
-        </div>
+            <div className="flex flex-col gap-2">
+              <CategoryFilter
+                categories={curationCategories}
+                selectedCategory={categoryParam}
+                selectedSubcategory={subcategoryParam}
+                onCategoryClick={handleCategoryClick}
+                onSubcategoryClick={handleSubcategoryClick}
+                className="w-full"
+              />
 
-        {/* 컬렉션 리스트 */}
-        <div className="mt-6">
-          {visibleCollections.length > 0 ? (
-            <>
-              {visibleCollections.map(collection => (
-                <div key={collection.id} className="mb-10">
-                  <h2 className="mb-4 text-[17px] font-semibold text-gray-900">
-                    {collection.title}
-                  </h2>
-                  {subcategoryParam ? (
-                    // 세부 카테고리가 선택된 경우 그리드 형태로 표시
-                    <BookGrid
-                      books={collection.books}
-                      onSelectBook={handleBookSelect}
-                      selectedSort={sortParam}
-                      selectedTimeRange={timeRangeParam}
-                    />
-                  ) : (
-                    // 세부 카테고리가 선택되지 않은 경우 캐러셀 형태로 표시
-                    <BookCarousel
-                      books={collection.books}
-                      onSelectBook={handleBookSelect}
-                    />
-                  )}
+              {/* xl 미만 화면에서 보이는 정렬 버튼 */}
+              {!subcategoryParam ? null : (
+                <div className="w-full xl:hidden">
+                  <SortDropdown
+                    selectedSort={sortParam}
+                    onSortChange={handleSortChange}
+                    selectedTimeRange={timeRangeParam}
+                    onTimeRangeChange={handleTimeRangeChange}
+                    className="w-full"
+                  />
                 </div>
-              ))}
-            </>
-          ) : (
-            <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
-              <p className="text-gray-500">
-                선택한 카테고리에 해당하는 큐레이션이 없습니다.
-              </p>
+              )}
             </div>
-          )}
+          </div>
         </div>
+      </div>
+
+      {/* 컬렉션 리스트 */}
+      <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} pt-4`}>
+        {visibleCollections.length > 0 ? (
+          <>
+            {visibleCollections.map(collection => (
+              <div key={collection.id} className="mb-10">
+                <h2 className="mb-4 text-[17px] font-semibold text-gray-900">
+                  {collection.title}
+                </h2>
+                {subcategoryParam ? (
+                  // 세부 카테고리가 선택된 경우 그리드 형태로 표시
+                  <BookGrid
+                    books={collection.books}
+                    onSelectBook={handleBookSelect}
+                    selectedSort={sortParam}
+                    selectedTimeRange={timeRangeParam}
+                  />
+                ) : (
+                  // 세부 카테고리가 선택되지 않은 경우 캐러셀 형태로 표시
+                  <BookCarousel
+                    books={collection.books}
+                    onSelectBook={handleBookSelect}
+                  />
+                )}
+              </div>
+            ))}
+          </>
+        ) : (
+          <div className="flex h-40 items-center justify-center rounded-lg bg-gray-50">
+            <p className="text-gray-500">
+              선택한 카테고리에 해당하는 큐레이션이 없습니다.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* 책 상세 정보 Dialog */}
