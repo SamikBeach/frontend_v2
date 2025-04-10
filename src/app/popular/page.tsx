@@ -4,15 +4,12 @@ import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Book as ApiBook, Category as ApiCategory } from '@/apis';
 import { getAllPopularBooks } from '@/apis/book/book';
+import { TimeRange as ApiTimeRange, Book } from '@/apis/book/types';
 import { getAllCategories } from '@/apis/category/category';
-import { Book, BookCard } from '@/components/BookCard';
+import { BookCard } from '@/components/BookCard';
 import { BookDialog } from '@/components/BookDialog';
-import {
-  SortDropdown,
-  TimeRange as UITimeRange,
-} from '@/components/SortDropdown';
+import { SortDropdown, TimeRange } from '@/components/SortDropdown';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
@@ -47,58 +44,13 @@ const pastelColors = [
   '#E2CFC4', // 연한 베이지색
 ];
 
-// API Category를 UI Category로 변환하는 함수 (파스텔톤 컬러 적용)
-const mapApiCategoriesToUiCategories = (
-  apiCategories: ApiCategory[]
-): {
+// UI 컴포넌트에서 사용할 카테고리 타입
+interface UICategory {
   id: string;
   name: string;
   color: string;
   subcategories: Array<{ id: string; name: string }>;
-}[] => {
-  return [
-    {
-      id: 'all',
-      name: '전체',
-      color: '#E5E7EB',
-      subcategories: [],
-    },
-    ...apiCategories.map((category, index) => ({
-      id: category.id.toString(),
-      name: category.name,
-      // 서버에서 온 컬러가 있으면 사용, 없으면 파스텔 컬러 배열에서 선택
-      color: category.color || pastelColors[index % pastelColors.length],
-      subcategories: category.subCategories.map(sub => ({
-        id: sub.id.toString(),
-        name: sub.name,
-      })),
-    })),
-  ];
-};
-
-// API Book을 UI Book으로 변환하는 함수
-const mapApiBookToUiBook = (apiBook: ApiBook): Book => {
-  return {
-    id: apiBook.id,
-    title: apiBook.title,
-    author: apiBook.author,
-    coverImage:
-      apiBook.coverImage || `https://picsum.photos/seed/${apiBook.id}/240/360`,
-    category: apiBook.category.id.toString(),
-    subcategory: apiBook.subcategory?.id.toString() || '',
-    rating:
-      typeof apiBook.rating === 'string'
-        ? parseFloat(apiBook.rating)
-        : apiBook.rating || 0,
-    reviews:
-      typeof apiBook.reviews === 'string'
-        ? parseInt(apiBook.reviews)
-        : apiBook.reviews || 0,
-    description: apiBook.description,
-    publishDate: new Date(apiBook.publishDate).toISOString().split('T')[0],
-    publisher: apiBook.publisher,
-  };
-};
+}
 
 export default function PopularPage() {
   const { updateQueryParams, getQueryParam } = useQueryParams();
@@ -109,19 +61,17 @@ export default function PopularPage() {
   const categoryParam = getQueryParam('category') || 'all';
   const subcategoryParam = getQueryParam('subcategory') || '';
   const sortParam = getQueryParam('sort') || 'reviews-desc';
-  const timeRangeParam = (getQueryParam('timeRange') as UITimeRange) || 'all';
+  const timeRangeParam = (getQueryParam('timeRange') as ApiTimeRange) || 'all';
   const bookIdParam = getQueryParam('book');
 
   // 카테고리 데이터 가져오기
-  const { data: apiCategories, isLoading: isCategoriesLoading } = useQuery({
+  const { data: rawCategories, isLoading: isCategoriesLoading } = useQuery({
     queryKey: ['categories'],
     queryFn: getAllCategories,
   });
 
-  // API 타입과 UI 타입 호환성 확보
-
   // 도서 데이터 가져오기
-  const { data: apiBooks, isLoading: isBooksLoading } = useQuery({
+  const { data: books, isLoading: isBooksLoading } = useQuery({
     queryKey: [
       'popular-books',
       categoryParam,
@@ -154,19 +104,42 @@ export default function PopularPage() {
     staleTime: 1000 * 60 * 2, // 2분 동안 캐시 유지
   });
 
-  // API 데이터 또는 폴백 데이터 사용
-  const categories = apiCategories
-    ? mapApiCategoriesToUiCategories(apiCategories)
-    : [];
+  // 카테고리 데이터에 컬러 추가 및 UI 형식으로 변환
+  const categories = useMemo<UICategory[]>(() => {
+    if (!rawCategories) return [];
 
-  const books = apiBooks ? apiBooks.map(mapApiBookToUiBook) : [];
+    // 전체 카테고리 옵션 추가
+    const formattedCategories: UICategory[] = [
+      {
+        id: 'all',
+        name: '전체',
+        color: '#E5E7EB',
+        subcategories: [],
+      },
+    ];
+
+    // 각 카테고리에 색상 부여하고 형식 변환
+    rawCategories.forEach((category, index) => {
+      formattedCategories.push({
+        id: category.id.toString(),
+        name: category.name,
+        color: pastelColors[index % pastelColors.length],
+        subcategories: category.subCategories.map(sub => ({
+          id: sub.id.toString(),
+          name: sub.name,
+        })),
+      });
+    });
+
+    return formattedCategories;
+  }, [rawCategories]);
 
   // 선택된 책 상태 관리 - 북 카드 클릭시 설정됨
   const [selectedBookState, setSelectedBookState] = useState<Book | null>(null);
 
   // URL 파라미터에서 책 ID를 가져와 해당 책 찾기
   const selectedBook = useMemo(() => {
-    if (!bookIdParam) return null;
+    if (!bookIdParam || !books) return null;
 
     const bookId = parseInt(bookIdParam);
     return books.find(book => book.id === bookId) || selectedBookState;
@@ -201,8 +174,23 @@ export default function PopularPage() {
 
   // 기간 필터 변경 핸들러
   const handleTimeRangeChange = useCallback(
-    (timeRange: UITimeRange) => {
-      updateQueryParams({ timeRange });
+    (timeRange: TimeRange) => {
+      // UI TimeRange를 API TimeRange로 변환
+      let apiTimeRange: ApiTimeRange;
+
+      // UI TimeRange가 API TimeRange와 호환되는 경우만 사용
+      if (
+        timeRange === 'all' ||
+        timeRange === 'month' ||
+        timeRange === 'year'
+      ) {
+        apiTimeRange = timeRange;
+      } else {
+        // 호환되지 않는 값은 기본값으로 설정
+        apiTimeRange = 'all';
+      }
+
+      updateQueryParams({ timeRange: apiTimeRange });
     },
     [updateQueryParams]
   );
@@ -344,7 +332,7 @@ export default function PopularPage() {
         </div>
       ) : (
         <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} pt-4`}>
-          {books.length > 0 ? (
+          {books && books.length > 0 ? (
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
               {books.map(book => (
                 <BookCard
@@ -378,56 +366,7 @@ export default function PopularPage() {
       {/* 책 상세 정보 Dialog */}
       {selectedBook && (
         <BookDialog
-          book={{
-            ...selectedBook,
-            coverImage:
-              selectedBook.coverImage ||
-              `https://picsum.photos/seed/${selectedBook.id}/400/600`,
-            toc: `제1장 도입부\n제2장 본론\n  제2.1절 첫 번째 주제\n  제2.2절 두 번째 주제\n제3장 결론`,
-            authorInfo: `${selectedBook.author}는 해당 분야에서 20년 이상의 경력을 가진 저명한 작가입니다. 여러 저서를 통해 독자들에게 새로운 시각과 통찰을 제공해왔습니다.`,
-            tags: [
-              '베스트셀러',
-              selectedBook.category,
-              selectedBook.subcategory,
-            ],
-            publisher: selectedBook.publisher,
-            publishDate: selectedBook.publishDate,
-            description: selectedBook.description,
-            reviews: [
-              {
-                id: 1,
-                user: {
-                  name: '김독서',
-                  avatar: `https://i.pravatar.cc/150?u=user1`,
-                },
-                rating: 4.5,
-                content:
-                  '정말 좋은 책이었습니다. 깊이 있는 통찰과 함께 현대적 해석이 인상적이었습니다.',
-                date: '2024-03-15',
-                likes: 24,
-                comments: 8,
-              },
-              {
-                id: 2,
-                user: {
-                  name: '이책벌레',
-                  avatar: `https://i.pravatar.cc/150?u=user2`,
-                },
-                rating: 5,
-                content:
-                  '필독서입니다. 이 분야에 관심이 있는 분들이라면 꼭 읽어보세요.',
-                date: '2024-02-28',
-                likes: 32,
-                comments: 12,
-              },
-            ],
-            similarBooks: books.slice(0, 3).map(book => ({
-              ...book,
-              coverImage:
-                book.coverImage ||
-                `https://picsum.photos/seed/${book.id}/240/360`,
-            })),
-          }}
+          book={selectedBook}
           open={!!selectedBook}
           onOpenChange={handleDialogOpenChange}
         />

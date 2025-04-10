@@ -1,19 +1,12 @@
-export interface BookDetails {
-  id: number;
-  title: string;
-  author: string;
+import { Book } from '@/apis/book/types';
+
+export interface BookDetails extends Book {
   coverImage: string;
-  category?: string;
-  rating?: number;
   totalRatings?: number;
-  publisher?: string;
-  publishDate?: string;
-  description?: string;
   toc?: string;
   authorInfo?: string;
   publisherReview?: string;
   pageCount?: number;
-  isbn?: string;
   originalTitle?: string;
   translator?: string;
   dimensions?: string;

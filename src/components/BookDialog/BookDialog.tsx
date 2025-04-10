@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { ChevronDown, ListPlus, PenLine, Share2, Star, X } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { getBookById } from '@/apis/book/book';
 import { ReviewDialog } from '@/components/ReviewDialog';
@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
+import { Book } from '@/apis/book/types';
 import { BookInfo } from './BookInfo';
 import { BookQuotes } from './BookQuotes';
 import { BookReviews } from './BookReviews';
@@ -23,12 +24,54 @@ import { SimilarBooks } from './SimilarBooks';
 import { BookDetails } from './types';
 
 interface BookDialogProps {
-  book: BookDetails;
+  book: Book; // 기본 Book 정보만 전달받음
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 type ReadingStatus = '읽고 싶어요' | '읽는 중' | '읽었어요' | '선택 안함';
+
+// 북 데이터를 BookDetails 형식으로 보강
+function enrichBookDetails(book: Book): BookDetails {
+  return {
+    ...book,
+    coverImage:
+      book.coverImage || `https://picsum.photos/seed/${book.id}/400/600`,
+    toc: `제1장 도입부\n제2장 본론\n  제2.1절 첫 번째 주제\n  제2.2절 두 번째 주제\n제3장 결론`,
+    authorInfo: `${book.author}는 해당 분야에서 20년 이상의 경력을 가진 저명한 작가입니다. 여러 저서를 통해 독자들에게 새로운 시각과 통찰을 제공해왔습니다.`,
+    tags: ['베스트셀러', book.category?.name, book.subcategory?.name].filter(
+      tag => !!tag
+    ) as string[],
+    reviews: [
+      {
+        id: 1,
+        user: {
+          name: '김독서',
+          avatar: `https://i.pravatar.cc/150?u=user1`,
+        },
+        rating: 4.5,
+        content:
+          '정말 좋은 책이었습니다. 깊이 있는 통찰과 함께 현대적 해석이 인상적이었습니다.',
+        date: '2024-03-15',
+        likes: 24,
+        comments: 8,
+      },
+      {
+        id: 2,
+        user: {
+          name: '이책벌레',
+          avatar: `https://i.pravatar.cc/150?u=user2`,
+        },
+        rating: 5,
+        content:
+          '필독서입니다. 이 분야에 관심이 있는 분들이라면 꼭 읽어보세요.',
+        date: '2024-02-28',
+        likes: 32,
+        comments: 12,
+      },
+    ],
+  };
+}
 
 export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
@@ -36,15 +79,19 @@ export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
     null
   );
 
-  // 책 상세 정보 가져오기 - 기존 방식 유지
-  const { data: bookDetail } = useQuery({
+  // 책 상세 정보 가져오기 (도서 ID로 API 호출)
+  const { data: bookDetail, isLoading } = useQuery({
     queryKey: ['book-detail', book.id],
     queryFn: () => getBookById(book.id),
-    enabled: open && false, // 임시로 비활성화 (타입 이슈 해결 후 활성화)
+    enabled: open, // 다이얼로그가 열려있을 때만 쿼리 실행
   });
 
-  // 원본 book props 사용 (타입 문제 해결 위해)
-  const displayBook = book;
+  // 상세 정보와 UI에 필요한 추가 정보를 합침
+  const displayBook = useMemo(() => {
+    // API에서 가져온 데이터가 있으면 사용, 없으면 기본 데이터로 보강
+    const baseBook = bookDetail || book;
+    return enrichBookDetails(baseBook);
+  }, [book, bookDetail]);
 
   // 닫기 핸들러 - 명시적으로 분리하여 다이얼로그 닫힘 보장
   const handleClose = useCallback(() => {
@@ -162,7 +209,12 @@ export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
                     )}
                     {displayBook.publishDate && (
                       <p className="text-sm text-gray-500">
-                        출간일: {displayBook.publishDate}
+                        출간일:{' '}
+                        {typeof displayBook.publishDate === 'string'
+                          ? displayBook.publishDate
+                          : new Date(displayBook.publishDate)
+                              .toISOString()
+                              .split('T')[0]}
                       </p>
                     )}
                   </div>

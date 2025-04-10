@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import React, { useMemo } from 'react';
 
-import { Book } from '@/components/BookCard';
+import { Book } from '@/apis/book/types';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -21,7 +21,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-export type TimeRange = 'all' | 'today' | 'week' | 'month' | 'year';
+// API와 일치하는 타입 사용
+import { TimeRange as ApiTimeRange } from '@/apis/book/types';
+
+// UI에서 사용하는 확장된 TimeRange
+export type TimeRange = ApiTimeRange | 'today' | 'week';
 
 export type SortOption = {
   id: string;

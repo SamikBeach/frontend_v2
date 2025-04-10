@@ -2,7 +2,6 @@ export interface Category {
   id: number;
   name: string;
   description?: string;
-  color?: string;
   subCategories: SubCategory[];
 }
 
