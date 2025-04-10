@@ -1,11 +1,11 @@
 'use client';
 
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Book as ApiBook, Category as ApiCategory } from '@/apis';
-import { getAllPopularBooks, getBookById } from '@/apis/book/book';
+import { getAllPopularBooks } from '@/apis/book/book';
 import { getAllCategories } from '@/apis/category/category';
 import { Book, BookCard } from '@/components/BookCard';
 import { BookDialog } from '@/components/BookDialog';
@@ -105,7 +105,7 @@ export default function PopularPage() {
   const isMobile = useIsMobile();
   const searchParams = useSearchParams();
 
-  // URL에서 현재 선택된 필터/정렬 값 및 책 정보 가져오기
+  // URL 파라미터 가져오기
   const categoryParam = getQueryParam('category') || 'all';
   const subcategoryParam = getQueryParam('subcategory') || '';
   const sortParam = getQueryParam('sort') || 'reviews-desc';
@@ -154,14 +154,6 @@ export default function PopularPage() {
     staleTime: 1000 * 60 * 2, // 2분 동안 캐시 유지
   });
 
-  // 선택된 책 데이터 가져오기
-  const { data: selectedApiBook } = useQuery({
-    queryKey: ['book', bookIdParam],
-    queryFn: () => (bookIdParam ? getBookById(parseInt(bookIdParam)) : null),
-    enabled: !!bookIdParam,
-    placeholderData: keepPreviousData,
-  });
-
   // API 데이터 또는 폴백 데이터 사용
   const categories = apiCategories
     ? mapApiCategoriesToUiCategories(apiCategories)
@@ -169,85 +161,83 @@ export default function PopularPage() {
 
   const books = apiBooks ? apiBooks.map(mapApiBookToUiBook) : [];
 
-  // selectedBook 상태 관리 - URL 파라미터 우선
+  // 선택된 책 상태 관리 - 북 카드 클릭시 설정됨
   const [selectedBookState, setSelectedBookState] = useState<Book | null>(null);
 
-  // URL이나 API에서 가져온 도서 정보 사용
-  const bookFromUrl = React.useMemo(() => {
-    if (selectedApiBook) {
-      return mapApiBookToUiBook(selectedApiBook);
-    }
-    if (bookIdParam) {
-      const bookId = parseInt(bookIdParam);
-      return books.find(b => b.id === bookId) || null;
-    }
-    return null;
-  }, [bookIdParam, selectedApiBook, books]);
+  // URL 파라미터에서 책 ID를 가져와 해당 책 찾기
+  const selectedBook = useMemo(() => {
+    if (!bookIdParam) return null;
 
-  const selectedBook = bookFromUrl || selectedBookState;
-
-  // bookIdParam이 변경될 때 selectedBookState도 함께 업데이트
-  useEffect(() => {
-    if (!bookIdParam) {
-      setSelectedBookState(null);
-    }
-  }, [bookIdParam]);
+    const bookId = parseInt(bookIdParam);
+    return books.find(book => book.id === bookId) || selectedBookState;
+  }, [bookIdParam, books, selectedBookState]);
 
   // 카테고리 클릭 핸들러
-  const handleCategoryClick = (categoryId: string) => {
-    updateQueryParams({
-      category: categoryId,
-      subcategory: undefined,
-    });
-  };
+  const handleCategoryClick = useCallback(
+    (categoryId: string) => {
+      updateQueryParams({
+        category: categoryId,
+        subcategory: undefined,
+      });
+    },
+    [updateQueryParams]
+  );
 
   // 서브카테고리 클릭 핸들러
-  const handleSubcategoryClick = (subcategoryId: string) => {
-    updateQueryParams({ subcategory: subcategoryId });
-  };
+  const handleSubcategoryClick = useCallback(
+    (subcategoryId: string) => {
+      updateQueryParams({ subcategory: subcategoryId });
+    },
+    [updateQueryParams]
+  );
 
   // 정렬 옵션 변경 핸들러
-  const handleSortChange = (sortId: string) => {
-    updateQueryParams({ sort: sortId });
-  };
+  const handleSortChange = useCallback(
+    (sortId: string) => {
+      updateQueryParams({ sort: sortId });
+    },
+    [updateQueryParams]
+  );
 
   // 기간 필터 변경 핸들러
-  const handleTimeRangeChange = (timeRange: UITimeRange) => {
-    updateQueryParams({ timeRange });
-  };
+  const handleTimeRangeChange = useCallback(
+    (timeRange: UITimeRange) => {
+      updateQueryParams({ timeRange });
+    },
+    [updateQueryParams]
+  );
 
   // URL params 초기화
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     updateQueryParams({
       category: undefined,
       subcategory: undefined,
       sort: undefined,
       timeRange: undefined,
     });
-  };
+  }, [updateQueryParams]);
 
   // 책 선택 핸들러
-  const handleBookSelect = (book: Book) => {
-    setSelectedBookState(book);
-    updateQueryParams({ book: book.id.toString() });
-  };
+  const handleBookSelect = useCallback(
+    (book: Book) => {
+      setSelectedBookState(book);
+      updateQueryParams({ book: book.id.toString() });
+    },
+    [updateQueryParams]
+  );
 
   // 다이얼로그 상태 변경 핸들러
-  const handleDialogOpenChange = (open: boolean) => {
-    if (open) {
-      // 이미 선택된 책이 있다면 그대로 유지
-      if (selectedBook) {
-        updateQueryParams({ book: selectedBook.id.toString() });
+  const handleDialogOpenChange = useCallback(
+    (open: boolean) => {
+      // 다이얼로그가 닫히면 URL에서 book 파라미터 제거
+      if (!open) {
+        console.log('dialog closing, removing book param');
+        setSelectedBookState(null); // 선택된 책 상태도 초기화
+        updateQueryParams({ book: undefined });
       }
-    } else {
-      // 다이얼로그를 닫을 때는 항상 상태와 URL 파라미터 초기화
-      setSelectedBookState(null);
-      updateQueryParams({ book: undefined });
-    }
-  };
-
-  // 다이얼로그가 열려있는지 여부
-  const isDialogOpen = !!bookIdParam;
+    },
+    [updateQueryParams]
+  );
 
   // 로딩 상태 처리
   const isLoading = isCategoriesLoading || isBooksLoading;
@@ -438,7 +428,7 @@ export default function PopularPage() {
                 `https://picsum.photos/seed/${book.id}/240/360`,
             })),
           }}
-          open={isDialogOpen}
+          open={!!selectedBook}
           onOpenChange={handleDialogOpenChange}
         />
       )}

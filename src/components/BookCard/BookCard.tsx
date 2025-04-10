@@ -1,6 +1,7 @@
 'use client';
 
 import { MessageSquare, Star } from 'lucide-react';
+import React from 'react';
 
 export interface Book {
   id: number;
@@ -21,7 +22,8 @@ interface BookCardProps {
   onClick: (book: Book) => void;
 }
 
-export function BookCard({ book, onClick }: BookCardProps) {
+// React.memo를 사용하여 props가 변경되지 않으면 리렌더링 방지
+export const BookCard = React.memo(({ book, onClick }: BookCardProps) => {
   return (
     <div className="cursor-pointer" onClick={() => onClick(book)}>
       <div className="group h-full rounded-xl bg-[#F9FAFB] transition-all hover:bg-[#F2F4F6]">
@@ -55,4 +57,4 @@ export function BookCard({ book, onClick }: BookCardProps) {
       </div>
     </div>
   );
-}
+});
