@@ -80,7 +80,7 @@ export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
   );
 
   // 책 상세 정보 가져오기 (도서 ID로 API 호출)
-  const { data: bookDetail, isLoading } = useQuery({
+  const { data: bookDetail } = useQuery({
     queryKey: ['book-detail', book.id],
     queryFn: () => getBookById(book.id),
     enabled: open, // 다이얼로그가 열려있을 때만 쿼리 실행
@@ -92,11 +92,6 @@ export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
     const baseBook = bookDetail || book;
     return enrichBookDetails(baseBook);
   }, [book, bookDetail]);
-
-  // 닫기 핸들러 - 명시적으로 분리하여 다이얼로그 닫힘 보장
-  const handleClose = useCallback(() => {
-    onOpenChange(false);
-  }, [onOpenChange]);
 
   // 리뷰 제출 처리
   const handleReviewSubmit = useCallback(

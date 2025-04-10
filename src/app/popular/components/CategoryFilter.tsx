@@ -1,39 +1,20 @@
+import { categoryFilterAtom, subcategoryFilterAtom } from '@/atoms/popular';
+import { useCategories } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-
-export interface Category {
-  id: string;
-  name: string;
-  color: string;
-  subcategories: Array<{
-    id: string;
-    name: string;
-  }>;
-}
+import { useAtom } from 'jotai';
 
 interface CategoryFilterProps {
-  categories: Array<{
-    id: string;
-    name: string;
-    color: string;
-    subcategories: Array<{ id: string; name: string }>;
-  }>;
-  selectedCategory: string;
-  selectedSubcategory: string;
-  onCategoryClick: (id: string) => void;
-  onSubcategoryClick: (id: string) => void;
   className?: string;
 }
 
-export const CategoryFilter = ({
-  categories,
-  selectedCategory,
-  selectedSubcategory,
-  onCategoryClick,
-  onSubcategoryClick,
-  className,
-}: CategoryFilterProps) => {
+export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   const isMobile = useIsMobile();
+  const [selectedCategory, setSelectedCategory] = useAtom(categoryFilterAtom);
+  const [selectedSubcategory, setSelectedSubcategory] = useAtom(
+    subcategoryFilterAtom
+  );
+  const categories = useCategories();
 
   // 현재 선택된 카테고리의 서브카테고리 가져오기
   const selectedCategoryObj = categories.find(
@@ -41,6 +22,15 @@ export const CategoryFilter = ({
   );
 
   const subcategories = selectedCategoryObj?.subcategories || [];
+
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    setSelectedSubcategory(''); // 카테고리 변경 시 서브카테고리 초기화
+  };
+
+  const handleSubcategoryClick = (subcategoryId: string) => {
+    setSelectedSubcategory(subcategoryId);
+  };
 
   return (
     <div className={className}>
@@ -54,7 +44,7 @@ export const CategoryFilter = ({
           {categories.map(category => (
             <button
               key={category.id}
-              onClick={() => onCategoryClick(category.id)}
+              onClick={() => handleCategoryClick(category.id)}
               className={cn(
                 'flex h-9 shrink-0 cursor-pointer items-center justify-center rounded-full px-4 text-sm font-medium transition-all',
                 category.id === selectedCategory
@@ -83,7 +73,7 @@ export const CategoryFilter = ({
         >
           <div className="flex gap-2 px-0.5">
             <button
-              onClick={() => onSubcategoryClick('')}
+              onClick={() => handleSubcategoryClick('')}
               className={cn(
                 'flex h-8 shrink-0 cursor-pointer items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors',
                 selectedSubcategory === ''
@@ -96,7 +86,7 @@ export const CategoryFilter = ({
             {subcategories.map(subcategory => (
               <button
                 key={subcategory.id}
-                onClick={() => onSubcategoryClick(subcategory.id)}
+                onClick={() => handleSubcategoryClick(subcategory.id)}
                 className={cn(
                   'flex h-8 shrink-0 cursor-pointer items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors',
                   subcategory.id === selectedSubcategory

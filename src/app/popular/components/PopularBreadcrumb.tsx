@@ -1,25 +1,30 @@
+import { categoryFilterAtom, subcategoryFilterAtom } from '@/atoms/popular';
+import { useCategories, useQueryParams } from '@/hooks';
+import { useAtom } from 'jotai';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
-import { Category } from './CategoryFilter';
+export function PopularBreadcrumb() {
+  const { clearQueryParams } = useQueryParams();
+  const [selectedCategory, setSelectedCategory] = useAtom(categoryFilterAtom);
+  const [selectedSubcategory, setSelectedSubcategory] = useAtom(
+    subcategoryFilterAtom
+  );
+  const categories = useCategories();
 
-interface PopularBreadcrumbProps {
-  selectedCategory: string;
-  selectedSubcategory: string;
-  categories: Category[];
-  onCategoryClick: (categoryId: string) => void;
-  onClearFilters: () => void;
-}
-
-export function PopularBreadcrumb({
-  selectedCategory,
-  selectedSubcategory,
-  categories,
-  onCategoryClick,
-  onClearFilters,
-}: PopularBreadcrumbProps) {
   // 선택된 카테고리 정보
   const currentCategory = categories.find(cat => cat.id === selectedCategory);
+
+  const handleClearFilters = () => {
+    setSelectedCategory('all');
+    setSelectedSubcategory('');
+    clearQueryParams();
+  };
+
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    setSelectedSubcategory('');
+  };
 
   return (
     <div className="flex items-center text-[14px] text-gray-500">
@@ -27,7 +32,7 @@ export function PopularBreadcrumb({
         href="/popular"
         onClick={e => {
           e.preventDefault();
-          onClearFilters();
+          handleClearFilters();
         }}
         className={
           selectedCategory === 'all'
@@ -44,7 +49,7 @@ export function PopularBreadcrumb({
             href={`/popular?category=${selectedCategory}`}
             onClick={e => {
               e.preventDefault();
-              onCategoryClick(selectedCategory);
+              handleCategoryClick(selectedCategory);
             }}
             className={
               !selectedSubcategory

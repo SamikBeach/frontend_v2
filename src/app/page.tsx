@@ -1,5 +1,6 @@
 'use client';
 
+import { Book } from '@/apis/book/types';
 import {
   BookOpen,
   Compass,
@@ -11,9 +12,24 @@ import {
 import Link from 'next/link';
 import React, { useState } from 'react';
 
+// 커스텀 Book 타입을 정의하여 더미 데이터에 사용
+interface SimpleBook {
+  id: number;
+  title: string;
+  author: string;
+  coverImage: string;
+  category: string;
+  subcategory: string;
+  rating: number;
+  reviews: number;
+  description: string;
+  publishDate: string;
+  publisher: string;
+}
+
 import { LibraryCard } from '@/app/libraries/components/LibraryCard';
-import { Book, BookCard } from '@/components/BookCard';
-import { BookDialog } from '@/components/BookDialog';
+import { BookCard } from '@/components/BookCard';
+import { BookDialog } from '@/components/BookDialog/BookDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,7 +42,7 @@ import { Separator } from '@/components/ui/separator';
 import { useQueryParams } from '@/hooks';
 
 // 더미 데이터
-const popularBooks: Book[] = [
+const popularBooks: SimpleBook[] = [
   {
     id: 1,
     title: '소크라테스의 변명',
@@ -108,7 +124,7 @@ const popularBooks: Book[] = [
 ];
 
 // 오늘의 발견 데이터
-const discoveryBooks: Book[] = [
+const discoveryBooks: SimpleBook[] = [
   {
     id: 101,
     title: '니코마코스 윤리학',
@@ -358,6 +374,20 @@ const communityPosts = [
   },
 ];
 
+// BookDialog에 전달할 추가 타입
+interface BookReview {
+  id: number;
+  user: {
+    name: string;
+    avatar: string;
+  };
+  rating: number;
+  content: string;
+  date: string;
+  likes: number;
+  comments: number;
+}
+
 export default function HomePage() {
   const { updateQueryParams, getQueryParam } = useQueryParams();
 
@@ -376,7 +406,9 @@ export default function HomePage() {
   }, [bookIdParam]);
 
   // selectedBook 상태 관리 - URL 파라미터 우선
-  const [selectedBookState, setSelectedBookState] = useState<Book | null>(null);
+  const [selectedBookState, setSelectedBookState] = useState<SimpleBook | null>(
+    null
+  );
   const selectedBook = bookFromUrl || selectedBookState;
 
   // 카테고리 찾기 함수
@@ -385,7 +417,7 @@ export default function HomePage() {
   };
 
   // 책 선택 핸들러
-  const handleBookSelect = (book: Book) => {
+  const handleBookSelect = (book: SimpleBook) => {
     setSelectedBookState(book);
     updateQueryParams({ book: book.id.toString() });
   };
@@ -427,7 +459,10 @@ export default function HomePage() {
           <div className="flex gap-4">
             {popularBooks.slice(0, 3).map(book => (
               <div key={book.id} className="w-1/3">
-                <BookCard book={book} onClick={handleBookSelect} />
+                <BookCard
+                  book={book as unknown as Book}
+                  onClick={handleBookSelect as any}
+                />
               </div>
             ))}
           </div>
@@ -455,7 +490,10 @@ export default function HomePage() {
           <div className="flex gap-4">
             {discoveryBooks.slice(0, 3).map(book => (
               <div key={book.id} className="w-1/3">
-                <BookCard book={book} onClick={handleBookSelect} />
+                <BookCard
+                  book={book as unknown as Book}
+                  onClick={handleBookSelect as any}
+                />
               </div>
             ))}
           </div>
@@ -598,36 +636,48 @@ export default function HomePage() {
       {/* Book detail Dialog */}
       {selectedBook && (
         <BookDialog
-          book={{
-            ...selectedBook,
-            coverImage: `https://picsum.photos/seed/book${selectedBook.id}/400/600`,
-            publisher: selectedBook.publisher,
-            publishDate: selectedBook.publishDate,
-            description: selectedBook.description,
-            toc: `1장. 서론\n2장. 본론\n  2.1 첫 번째 주제\n  2.2 두 번째 주제\n3장. 결론`,
-            authorInfo:
-              '저자는 해당 분야에서 30년 이상의 경력을 가진 전문가입니다. 다수의 저서를 통해 깊이 있는 통찰을 전달해 왔습니다.',
-            tags: ['고전', selectedBook.category, selectedBook.subcategory],
-            reviews: [
-              {
+          book={
+            {
+              ...selectedBook,
+              isbn: 'unknown',
+              isbn13: 'unknown',
+              coverImage: `https://picsum.photos/seed/book${selectedBook.id}/400/600`,
+              publisher: selectedBook.publisher,
+              publishDate: new Date(selectedBook.publishDate),
+              description: selectedBook.description,
+              category: {
                 id: 1,
-                user: {
-                  name: '김독서',
-                  avatar: `https://i.pravatar.cc/150?u=user1`,
-                },
-                rating: 5,
-                content:
-                  '정말 좋은 책이었습니다. 깊이 있는 통찰과 함께 현대적 해석이 인상적이었습니다.',
-                date: '2024-03-15',
-                likes: 24,
-                comments: 8,
+                name: selectedBook.category,
+                subCategories: [],
               },
-            ],
-            similarBooks: popularBooks.map(book => ({
-              ...book,
-              coverImage: `https://picsum.photos/seed/similar${book.id}/240/360`,
-            })),
-          }}
+              subcategory: selectedBook.subcategory
+                ? { id: 1, name: selectedBook.subcategory, category: {} as any }
+                : undefined,
+              toc: `1장. 서론\n2장. 본론\n  2.1 첫 번째 주제\n  2.2 두 번째 주제\n3장. 결론`,
+              authorInfo:
+                '저자는 해당 분야에서 30년 이상의 경력을 가진 전문가입니다. 다수의 저서를 통해 깊이 있는 통찰을 전달해 왔습니다.',
+              tags: ['고전', selectedBook.category, selectedBook.subcategory],
+              reviews: [
+                {
+                  id: 1,
+                  user: {
+                    name: '김독서',
+                    avatar: `https://i.pravatar.cc/150?u=user1`,
+                  },
+                  rating: 5,
+                  content:
+                    '정말 좋은 책이었습니다. 깊이 있는 통찰과 함께 현대적 해석이 인상적이었습니다.',
+                  date: '2024-03-15',
+                  likes: 24,
+                  comments: 8,
+                },
+              ] as BookReview[],
+              similarBooks: popularBooks.map(book => ({
+                ...book,
+                coverImage: `https://picsum.photos/seed/similar${book.id}/240/360`,
+              })),
+            } as any
+          }
           open={isDialogOpen}
           onOpenChange={handleDialogOpenChange}
         />
