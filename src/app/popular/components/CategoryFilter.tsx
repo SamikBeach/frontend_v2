@@ -1,5 +1,5 @@
 import { categoryFilterAtom, subcategoryFilterAtom } from '@/atoms/popular';
-import { useCategories } from '@/hooks';
+import { useCategories, useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
@@ -10,6 +10,7 @@ interface CategoryFilterProps {
 
 export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   const isMobile = useIsMobile();
+  const { updateQueryParams } = useQueryParams();
   const [selectedCategory, setSelectedCategory] = useAtom(categoryFilterAtom);
   const [selectedSubcategory, setSelectedSubcategory] = useAtom(
     subcategoryFilterAtom
@@ -25,11 +26,22 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    setSelectedSubcategory(''); // 카테고리 변경 시 서브카테고리 초기화
+    setSelectedSubcategory('all'); // 카테고리 변경 시 서브카테고리 'all'로 초기화
+
+    // URL 쿼리 파라미터 업데이트
+    updateQueryParams({
+      category: categoryId,
+      subcategory: 'all', // 서브카테고리 'all'로 초기화
+    });
   };
 
   const handleSubcategoryClick = (subcategoryId: string) => {
     setSelectedSubcategory(subcategoryId);
+
+    // URL 쿼리 파라미터 업데이트
+    updateQueryParams({
+      subcategory: subcategoryId,
+    });
   };
 
   return (
@@ -73,10 +85,10 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
         >
           <div className="flex gap-2 px-0.5">
             <button
-              onClick={() => handleSubcategoryClick('')}
+              onClick={() => handleSubcategoryClick('all')}
               className={cn(
                 'flex h-8 shrink-0 cursor-pointer items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors',
-                selectedSubcategory === ''
+                selectedSubcategory === 'all'
                   ? 'border-blue-200 bg-blue-50 text-blue-700'
                   : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
               )}

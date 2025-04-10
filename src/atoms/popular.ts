@@ -19,7 +19,7 @@ export const pastelColors = [
 export const categoryFilterAtom = atom<string>('all');
 
 // 서브카테고리 필터 atom
-export const subcategoryFilterAtom = atom<string>('');
+export const subcategoryFilterAtom = atom<string>('all');
 
 // 정렬 옵션 atom
 export const sortOptionAtom = atom<string>('reviews-desc');

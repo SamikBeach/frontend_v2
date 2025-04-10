@@ -48,7 +48,7 @@ export function BooksContent() {
         params.category = categoryParam;
       }
 
-      if (subcategoryParam) {
+      if (subcategoryParam && subcategoryParam !== 'all') {
         params.subcategory = subcategoryParam;
       }
 

@@ -5,7 +5,7 @@ import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 
 export function PopularBreadcrumb() {
-  const { clearQueryParams } = useQueryParams();
+  const { clearQueryParams, updateQueryParams } = useQueryParams();
   const [selectedCategory, setSelectedCategory] = useAtom(categoryFilterAtom);
   const [selectedSubcategory, setSelectedSubcategory] = useAtom(
     subcategoryFilterAtom
@@ -17,13 +17,19 @@ export function PopularBreadcrumb() {
 
   const handleClearFilters = () => {
     setSelectedCategory('all');
-    setSelectedSubcategory('');
+    setSelectedSubcategory('all');
     clearQueryParams();
   };
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
-    setSelectedSubcategory('');
+    setSelectedSubcategory('all');
+
+    // URL 쿼리 파라미터 업데이트
+    updateQueryParams({
+      category: categoryId,
+      subcategory: 'all',
+    });
   };
 
   return (
@@ -52,7 +58,7 @@ export function PopularBreadcrumb() {
               handleCategoryClick(selectedCategory);
             }}
             className={
-              !selectedSubcategory
+              selectedSubcategory === 'all'
                 ? 'font-medium text-gray-900'
                 : 'hover:text-gray-900'
             }
@@ -61,7 +67,7 @@ export function PopularBreadcrumb() {
           </Link>
         </>
       )}
-      {selectedSubcategory && (
+      {selectedSubcategory !== 'all' && (
         <>
           <ChevronRight className="mx-1 h-4 w-4" />
           <span className="font-medium text-gray-900">

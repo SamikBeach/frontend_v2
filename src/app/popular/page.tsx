@@ -82,7 +82,7 @@ export default function PopularPage() {
   // URL 파라미터에서 필터 상태 초기화
   useEffect(() => {
     const category = searchParams.get('category') || 'all';
-    const subcategory = searchParams.get('subcategory') || '';
+    const subcategory = searchParams.get('subcategory') || 'all';
     const sort = searchParams.get('sort') || 'reviews-desc';
     const timeRange = (searchParams.get('timeRange') || 'all') as any;
     const bookId = searchParams.get('book');
