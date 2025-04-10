@@ -186,6 +186,13 @@ export default function PopularPage() {
 
   const selectedBook = bookFromUrl || selectedBookState;
 
+  // bookIdParam이 변경될 때 selectedBookState도 함께 업데이트
+  useEffect(() => {
+    if (!bookIdParam) {
+      setSelectedBookState(null);
+    }
+  }, [bookIdParam]);
+
   // 카테고리 클릭 핸들러
   const handleCategoryClick = (categoryId: string) => {
     updateQueryParams({
@@ -227,14 +234,20 @@ export default function PopularPage() {
 
   // 다이얼로그 상태 변경 핸들러
   const handleDialogOpenChange = (open: boolean) => {
-    if (!open) {
+    if (open) {
+      // 이미 선택된 책이 있다면 그대로 유지
+      if (selectedBook) {
+        updateQueryParams({ book: selectedBook.id.toString() });
+      }
+    } else {
+      // 다이얼로그를 닫을 때는 항상 상태와 URL 파라미터 초기화
       setSelectedBookState(null);
       updateQueryParams({ book: undefined });
     }
   };
 
   // 다이얼로그가 열려있는지 여부
-  const isDialogOpen = selectedBook !== null;
+  const isDialogOpen = !!bookIdParam;
 
   // 로딩 상태 처리
   const isLoading = isCategoriesLoading || isBooksLoading;

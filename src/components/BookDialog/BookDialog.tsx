@@ -11,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useQueryParams } from '@/hooks/useQueryParams';
 
 import { BookInfo } from './BookInfo';
 import { BookQuotes } from './BookQuotes';
@@ -34,19 +33,9 @@ export function BookDialog({ book, open, onOpenChange }: BookDialogProps) {
   const [readingStatus, setReadingStatus] = useState<ReadingStatus | null>(
     null
   );
-  const { updateQueryParams } = useQueryParams();
 
   // 다이얼로그 상태 변경 핸들러
   const handleOpenChange = (isOpen: boolean) => {
-    if (isOpen) {
-      // 다이얼로그가 열릴 때 URL에 책 ID 추가
-      updateQueryParams({ book: book.id.toString() });
-    } else {
-      // 다이얼로그가 닫힐 때 URL 파라미터 제거
-      updateQueryParams({ book: undefined });
-    }
-
-    // 상위 컴포넌트에 상태 변경 알림
     onOpenChange(isOpen);
   };
 
