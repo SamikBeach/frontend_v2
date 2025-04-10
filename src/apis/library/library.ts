@@ -7,7 +7,8 @@ import {
   LibraryBook,
   LibrarySummary,
   LibraryTag,
-  Subscriber,
+  SubscriberInfo,
+  UpdateHistoryItem,
   UpdateLibraryDto,
 } from './types';
 
@@ -159,9 +160,24 @@ export const unsubscribeFromLibrary = async (
  */
 export const getLibrarySubscribers = async (
   libraryId: number
-): Promise<Subscriber[]> => {
-  const response = await api.get<Subscriber[]>(
+): Promise<SubscriberInfo[]> => {
+  const response = await api.get<SubscriberInfo[]>(
     `/libraries/${libraryId}/subscribers`
+  );
+  return response.data;
+};
+
+/**
+ * 서재의 최근 업데이트 이력 조회
+ */
+export const getLibraryUpdates = async (
+  libraryId: number,
+  limit?: number
+): Promise<UpdateHistoryItem[]> => {
+  const params = limit ? { limit } : undefined;
+  const response = await api.get<UpdateHistoryItem[]>(
+    `/libraries/${libraryId}/updates`,
+    { params }
   );
   return response.data;
 };

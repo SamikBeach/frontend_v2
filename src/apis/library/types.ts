@@ -35,6 +35,20 @@ export interface BookPreview {
   publisher: string;
 }
 
+// 서재 업데이트 이력 타입
+export interface UpdateHistoryItem {
+  date: Date;
+  message: string;
+}
+
+// 서재 구독자 정보 타입
+export interface SubscriberInfo {
+  id: number;
+  username: string;
+  email: string;
+  profileImage?: string;
+}
+
 // 서재 상세 응답 타입
 export interface Library {
   id: number;
@@ -46,6 +60,8 @@ export interface Library {
   books?: LibraryBook[];
   tags?: LibraryTag[];
   isSubscribed?: boolean;
+  subscribers?: SubscriberInfo[];
+  recentUpdates?: UpdateHistoryItem[];
   createdAt: Date;
   updatedAt?: Date;
 }
