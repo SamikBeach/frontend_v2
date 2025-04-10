@@ -53,22 +53,6 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
         }`}
       >
         <div className="flex gap-2 px-0.5">
-          <button
-            key="all"
-            onClick={() => handleCategoryClick('all')}
-            className={cn(
-              'flex h-9 shrink-0 cursor-pointer items-center justify-center rounded-full px-4 text-sm font-medium transition-all',
-              selectedCategory === 'all'
-                ? 'bg-gray-900 text-white'
-                : 'hover:bg-gray-50'
-            )}
-            style={{
-              backgroundColor:
-                selectedCategory === 'all' ? undefined : '#DBEAFE',
-            }}
-          >
-            전체
-          </button>
           {categories.map(category => (
             <button
               key={category.id}
