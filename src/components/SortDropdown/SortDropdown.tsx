@@ -50,11 +50,18 @@ export const defaultSortOptions: SortOption[] = [
     sortFn: (a, b) => b.rating - a.rating,
   },
   {
-    id: 'date-desc',
+    id: 'publishDate-desc',
     label: '출간일 최신순',
     icon: <Calendar className="mr-2 h-4 w-4 text-gray-500" />,
     sortFn: (a, b) =>
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime(),
+  },
+  {
+    id: 'publishDate-asc',
+    label: '출간일 오래된순',
+    icon: <Calendar className="mr-2 h-4 w-4 text-gray-500" />,
+    sortFn: (a, b) =>
+      new Date(a.publishDate).getTime() - new Date(b.publishDate).getTime(),
   },
   {
     id: 'title-asc',

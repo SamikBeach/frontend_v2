@@ -11,11 +11,25 @@ export function PopularSortDropdown({ className }: PopularSortDropdownProps) {
   const [timeRange, setTimeRange] = useAtom(timeRangeAtom);
 
   const handleSortChange = (sort: string) => {
-    setSortOption(sort);
+    if (
+      sort === 'rating-desc' ||
+      sort === 'reviews-desc' ||
+      sort === 'publishDate-desc' ||
+      sort === 'publishDate-asc' ||
+      sort === 'title-asc'
+    ) {
+      setSortOption(sort);
+    }
   };
 
   const handleTimeRangeChange = (range: TimeRange) => {
-    if (range === 'all' || range === 'month' || range === 'year') {
+    if (
+      range === 'all' ||
+      range === 'month' ||
+      range === 'year' ||
+      range === 'today' ||
+      range === 'week'
+    ) {
       setTimeRange(range);
     } else {
       setTimeRange('all');

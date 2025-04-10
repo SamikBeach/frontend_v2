@@ -1,4 +1,4 @@
-import { Book } from '@/components/BookCard';
+import { Book } from '@/apis/book/types';
 import {
   Carousel,
   CarouselContent,

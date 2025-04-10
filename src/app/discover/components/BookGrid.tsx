@@ -1,6 +1,5 @@
-import { useState } from 'react';
-
-import { Book, BookCard } from '@/components/BookCard';
+import { Book } from '@/apis/book/types';
+import { BookCard } from '@/components/BookCard';
 import { TimeRange, useSortedBooks } from '@/components/SortDropdown';
 
 interface BookGridProps {
@@ -13,20 +12,13 @@ interface BookGridProps {
 export function BookGrid({
   books,
   onSelectBook,
-  selectedSort: externalSelectedSort,
+  selectedSort,
   selectedTimeRange = 'all',
 }: BookGridProps) {
-  // 현재 선택된 정렬 상태 (외부에서 제공되지 않으면 내부 state 사용)
-  const [internalSelectedSort, setInternalSelectedSort] =
-    useState<string>('reviews-desc');
-
-  // 외부에서 제공된 정렬 상태 또는 내부 상태 사용
-  const selectedSort = externalSelectedSort || internalSelectedSort;
-
   // 정렬된 책 목록
   const sortedBooks = useSortedBooks(
     books,
-    selectedSort,
+    selectedSort ?? 'reviews-desc',
     undefined,
     selectedTimeRange
   );

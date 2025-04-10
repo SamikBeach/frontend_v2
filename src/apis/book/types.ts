@@ -50,8 +50,13 @@ export interface UpdateBookDto {
   isFeatured?: boolean;
 }
 
-export type SortOption = 'rating-desc' | 'reviews-desc' | 'publishDate-desc';
-export type TimeRange = 'all' | 'month' | 'year';
+export type SortOption =
+  | 'rating-desc'
+  | 'reviews-desc'
+  | 'publishDate-desc'
+  | 'publishDate-asc'
+  | 'title-asc';
+export type TimeRange = 'all' | 'month' | 'year' | 'today' | 'week';
 
 export interface PopularBooksParams {
   sort?: SortOption;

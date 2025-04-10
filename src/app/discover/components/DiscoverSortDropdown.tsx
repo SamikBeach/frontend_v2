@@ -1,4 +1,3 @@
-import { TimeRange as ApiTimeRange, SortOption } from '@/apis/book/types';
 import {
   discoverSortOptionAtom,
   discoverTimeRangeAtom,
@@ -20,16 +19,24 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
     if (
       sort === 'rating-desc' ||
       sort === 'reviews-desc' ||
-      sort === 'publishDate-desc'
+      sort === 'publishDate-desc' ||
+      sort === 'publishDate-asc' ||
+      sort === 'title-asc'
     ) {
-      setSortOption(sort as SortOption);
+      setSortOption(sort);
       updateQueryParams({ sort });
     }
   };
 
   const handleTimeRangeChange = (range: TimeRange) => {
-    if (range === 'all' || range === 'month' || range === 'year') {
-      setTimeRange(range as ApiTimeRange);
+    if (
+      range === 'all' ||
+      range === 'month' ||
+      range === 'year' ||
+      range === 'today' ||
+      range === 'week'
+    ) {
+      setTimeRange(range);
       updateQueryParams({ timeRange: range });
     } else {
       setTimeRange('all');
