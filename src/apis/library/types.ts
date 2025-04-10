@@ -25,6 +25,16 @@ export interface LibraryOwner {
   email: string;
 }
 
+// 책 미리보기 정보 타입
+export interface BookPreview {
+  id: number;
+  title: string;
+  author: string;
+  coverImage: string;
+  isbn: string;
+  publisher: string;
+}
+
 // 서재 상세 응답 타입
 export interface Library {
   id: number;
@@ -50,6 +60,7 @@ export interface LibrarySummary {
   bookCount: number;
   owner: LibraryOwner;
   tags?: LibraryTag[];
+  previewBooks?: BookPreview[];
   isSubscribed?: boolean;
   createdAt: Date;
 }

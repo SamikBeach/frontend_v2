@@ -52,24 +52,71 @@ export function LibraryCard({ library }: LibraryCardProps) {
             {library.description || '설명이 없습니다.'}
           </p>
           <div className="grid grid-cols-2 gap-2.5">
-            <div className="overflow-hidden rounded-lg">
-              <div className="relative aspect-[2/3]">
-                <img
-                  src={`https://picsum.photos/seed/${library.id}1/240/360`}
-                  alt="책 표지"
-                  className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
-                />
-              </div>
-            </div>
-            <div className="overflow-hidden rounded-lg">
-              <div className="relative aspect-[2/3]">
-                <img
-                  src={`https://picsum.photos/seed/${library.id}2/240/360`}
-                  alt="책 표지"
-                  className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
-                />
-              </div>
-            </div>
+            {/* previewBooks가 존재하고 최소 1개 이상 있는 경우 첫 번째 책 표시 */}
+            {library.previewBooks && library.previewBooks.length > 0 ? (
+              <>
+                <div className="overflow-hidden rounded-lg">
+                  <div className="relative aspect-[2/3]">
+                    <img
+                      src={
+                        library.previewBooks[0].coverImage ||
+                        `https://picsum.photos/seed/${library.id}1/240/360`
+                      }
+                      alt={library.previewBooks[0].title}
+                      className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
+                    />
+                  </div>
+                </div>
+                {/* previewBooks가 최소 2개 이상 있는 경우 두 번째 책 표시 */}
+                {library.previewBooks.length > 1 ? (
+                  <div className="overflow-hidden rounded-lg">
+                    <div className="relative aspect-[2/3]">
+                      <img
+                        src={
+                          library.previewBooks[1].coverImage ||
+                          `https://picsum.photos/seed/${library.id}2/240/360`
+                        }
+                        alt={library.previewBooks[1].title}
+                        className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  // 두 번째 책이 없는 경우 플레이스홀더 이미지 사용
+                  <div className="overflow-hidden rounded-lg">
+                    <div className="relative aspect-[2/3]">
+                      <img
+                        src={`https://picsum.photos/seed/${library.id}2/240/360`}
+                        alt="책 표지"
+                        className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              // previewBooks가 없는 경우 기존 플레이스홀더 이미지 표시
+              <>
+                <div className="overflow-hidden rounded-lg">
+                  <div className="relative aspect-[2/3]">
+                    <img
+                      src={`https://picsum.photos/seed/${library.id}1/240/360`}
+                      alt="책 표지"
+                      className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
+                    />
+                  </div>
+                </div>
+                <div className="overflow-hidden rounded-lg">
+                  <div className="relative aspect-[2/3]">
+                    <img
+                      src={`https://picsum.photos/seed/${library.id}2/240/360`}
+                      alt="책 표지"
+                      className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex items-center justify-between px-5 py-3 text-xs text-gray-500">
