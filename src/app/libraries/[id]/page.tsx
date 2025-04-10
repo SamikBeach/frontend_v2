@@ -1,14 +1,55 @@
 'use client';
 
-import { Book } from '@/components/BookCard/BookCard';
+import { Book } from '@/apis';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useParams, useRouter } from 'next/navigation';
+import { Suspense } from 'react';
 import { LibraryContent, LibrarySidebar } from '../components';
-import { useLibrary } from '../hooks';
+import { useLibraryDetail } from '../hooks/useLibraryDetail';
 
-export default function LibraryDetailPage() {
-  // 라우트 파라미터에서 서재 ID 가져오기
+// 서재 상세 로딩 스켈레톤
+function LibraryDetailSkeleton() {
+  return (
+    <div className="animate-pulse">
+      <div className="flex py-6">
+        <div className="flex-1 pl-8">
+          <div className="mb-2 h-8 w-64 rounded bg-gray-200"></div>
+          <div className="h-4 w-32 rounded bg-gray-200"></div>
+        </div>
+      </div>
+      <div className="grid gap-8 md:grid-cols-[1fr_320px]">
+        <div className="space-y-6 pl-8">
+          <div className="h-24 rounded-lg bg-gray-200"></div>
+          <div className="flex flex-wrap gap-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-6 w-16 rounded-full bg-gray-200"></div>
+            ))}
+          </div>
+          <div className="h-6 w-48 rounded bg-gray-200"></div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="aspect-[2/3] rounded-lg bg-gray-200"
+              ></div>
+            ))}
+          </div>
+        </div>
+        <div className="pr-8">
+          <div className="space-y-6">
+            <div className="h-48 rounded-xl bg-gray-200"></div>
+            <div className="h-48 rounded-xl bg-gray-200"></div>
+            <div className="h-48 rounded-xl bg-gray-200"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 라이브러리 상세 컨텐츠 컴포넌트
+function LibraryDetailContent() {
   const params = useParams();
   const router = useRouter();
   const libraryId = parseInt(params.id as string);
@@ -20,8 +61,7 @@ export default function LibraryDetailPage() {
     notificationsEnabled,
     handleSubscriptionToggle,
     handleNotificationToggle,
-    findLibraryCategory,
-  } = useLibrary(libraryId);
+  } = useLibraryDetail(libraryId);
 
   // 서재가 없으면 404 또는 오류 메시지 표시
   if (!library) {
@@ -46,17 +86,19 @@ export default function LibraryDetailPage() {
     console.log('Book clicked:', book);
   };
 
-  const libraryCategory = findLibraryCategory(library.category);
+  // 카테고리 색상 찾기
+  const libraryCategory =
+    library.tags && library.tags.length > 0
+      ? { name: library.tags[0].name, color: '#FFF8E2' }
+      : { name: '기타', color: '#E2E8F0' };
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
       {/* 상단 헤더 */}
       <div className="flex items-start bg-white py-6">
         <div className="flex-1 pl-8">
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold text-gray-900">
-              {library.title}
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900">{library.name}</h1>
             <Badge
               className="rounded-full px-2 py-0.5 text-xs"
               style={{ backgroundColor: libraryCategory.color }}
@@ -66,7 +108,7 @@ export default function LibraryDetailPage() {
           </div>
           <p className="text-sm text-gray-500">
             <span className="font-medium text-gray-700">
-              {library.owner.name}
+              {library.owner.username}
             </span>
             님의 서재
           </p>
@@ -93,6 +135,16 @@ export default function LibraryDetailPage() {
           </div>
         </div>
       </div>
+    </>
+  );
+}
+
+export default function LibraryDetailPage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <Suspense fallback={<LibraryDetailSkeleton />}>
+        <LibraryDetailContent />
+      </Suspense>
     </div>
   );
 }

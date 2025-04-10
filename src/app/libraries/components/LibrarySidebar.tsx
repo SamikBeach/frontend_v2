@@ -1,7 +1,9 @@
+import { Library } from '@/apis/library/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import { Bell, BookOpen, Calendar, Users } from 'lucide-react';
-import { Library } from '../types';
 
 export interface LibrarySidebarProps {
   library: Library;
@@ -18,19 +20,32 @@ export function LibrarySidebar({
   onSubscriptionToggle,
   onNotificationToggle,
 }: LibrarySidebarProps) {
+  // 책 제목 가져오기 (없으면 빈 문자열 반환)
+  const getFirstBookTitle = (): string => {
+    if (!library.books || library.books.length === 0) {
+      return '책';
+    }
+    return library.books[0].book.title || '책';
+  };
+
   return (
     <div className="space-y-6">
       {/* 서재 소유자 정보 */}
       <div className="rounded-xl bg-gray-50 p-4">
         <div className="flex items-center gap-3">
           <Avatar className="h-12 w-12">
-            <AvatarImage src={library.owner.avatar} alt={library.owner.name} />
+            <AvatarImage
+              src={`https://i.pravatar.cc/150?u=${library.owner.id}`}
+              alt={library.owner.username}
+            />
             <AvatarFallback className="bg-blue-100 text-blue-600">
-              {library.owner.name[0]}
+              {library.owner.username[0]}
             </AvatarFallback>
           </Avatar>
           <div>
-            <h3 className="font-medium text-gray-900">{library.owner.name}</h3>
+            <h3 className="font-medium text-gray-900">
+              {library.owner.username}
+            </h3>
             <p className="text-sm text-gray-500">@{library.owner.username}</p>
           </div>
         </div>
@@ -71,7 +86,7 @@ export function LibrarySidebar({
               <span>책</span>
             </div>
             <span className="font-medium text-gray-900">
-              {library.books.length}권
+              {library.books?.length || 0}권
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
@@ -80,7 +95,7 @@ export function LibrarySidebar({
               <span>구독자</span>
             </div>
             <span className="font-medium text-gray-900">
-              {library.followers}명
+              {library.subscriberCount}명
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
@@ -89,10 +104,8 @@ export function LibrarySidebar({
               <span>생성일</span>
             </div>
             <span className="font-medium text-gray-900">
-              {new Date(library.timestamp).toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
+              {format(new Date(library.createdAt), 'yyyy년 MM월 dd일', {
+                locale: ko,
               })}
             </span>
           </div>
@@ -150,7 +163,7 @@ export function LibrarySidebar({
           <div className="rounded-lg bg-white p-3">
             <span className="text-xs text-gray-500">2일 전</span>
             <p className="mt-1 text-gray-700">
-              새 책 &ldquo;{library.books[0].title}&rdquo; 추가됨
+              새 책 &ldquo;{getFirstBookTitle()}&rdquo; 추가됨
             </p>
           </div>
           <div className="rounded-lg bg-white p-3">

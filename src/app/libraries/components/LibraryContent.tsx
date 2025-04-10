@@ -1,46 +1,44 @@
-import { Book, BookCard } from '@/components/BookCard/BookCard';
+import { Book as BookType } from '@/apis/book';
+import { Library } from '@/apis/library';
+import { BookCard } from '@/components/BookCard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Grid, List } from 'lucide-react';
 import { useState } from 'react';
-import { Library } from '../types';
 
 export interface LibraryContentProps {
   library: Library;
-  onBookClick: (book: Book) => void;
+  onBookClick: (book: BookType) => void;
 }
 
 export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-  // 라이브러리 책을 BookCard 형식으로 변환
-  const booksWithDetails = library.books.map(book => ({
-    ...book,
-    category: library.category,
-    subcategory: library.tags[0] || '',
-    rating: 4.5, // 예시 데이터
-    reviews: 120, // 예시 데이터
-    description: `${book.title}에 대한 설명입니다.`,
-    publishDate: '2023-01-01',
-    publisher: '출판사',
-  }));
+  // 라이브러리 책 형식 변환
+  const booksWithDetails =
+    library.books?.map(libraryBook => ({
+      ...libraryBook.book,
+      id: libraryBook.bookId,
+    })) || [];
 
   return (
     <div className="space-y-8">
       {/* 서재 설명 */}
       <div>
-        <p className="text-gray-700">{library.description}</p>
+        <p className="text-gray-700">
+          {library.description || '설명이 없습니다.'}
+        </p>
 
         {/* 태그 목록 */}
         <div className="mt-4 flex flex-wrap gap-2">
-          {library.tags.map(tag => (
+          {library.tags?.map(tag => (
             <Badge
-              key={tag}
+              key={tag.id}
               variant="secondary"
               className="rounded-full bg-gray-100 text-xs"
             >
-              {tag}
+              {tag.name}
             </Badge>
           ))}
         </div>
@@ -52,7 +50,7 @@ export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
       <div>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-medium text-gray-900">
-            포함된 책 ({library.books.length})
+            포함된 책 ({booksWithDetails.length})
           </h2>
 
           <div className="mr-8 flex rounded-md p-1">
@@ -84,16 +82,20 @@ export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
         {viewMode === 'grid' ? (
           <div className="mr-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
             {booksWithDetails.map(book => (
-              <BookCard key={book.id} book={book} onClick={onBookClick} />
+              <BookCard
+                key={book.id}
+                book={book as BookType}
+                onClick={onBookClick}
+              />
             ))}
           </div>
         ) : (
           <div className="mr-8 space-y-2">
-            {library.books.map(book => (
+            {booksWithDetails.map(book => (
               <div
                 key={book.id}
                 className="flex cursor-pointer gap-4 rounded-xl p-2 transition-colors hover:bg-gray-50"
-                onClick={() => onBookClick(book as unknown as Book)}
+                onClick={() => onBookClick(book as BookType)}
               >
                 <div className="h-32 w-20 flex-shrink-0 overflow-hidden rounded-md">
                   <img

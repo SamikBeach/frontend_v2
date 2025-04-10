@@ -76,7 +76,7 @@ export interface SortDropdownProps {
 
 // 서재 카드 속성
 export interface LibraryCardProps {
-  library: Library;
+  library: import('@/apis/library/types').LibrarySummary;
 }
 
 // 책 이미지 속성

@@ -8,7 +8,6 @@ import {
   discoverSubcategoryFilterAtom,
   discoverTimeRangeAtom,
 } from '@/atoms/discover';
-import { LoadingSpinner } from '@/components';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -20,6 +19,7 @@ import { Suspense, useEffect } from 'react';
 import {
   BooksContent,
   CategoryFilter,
+  CategoryFilterSkeleton,
   DiscoverBreadcrumb,
   DiscoverSortDropdown,
 } from './components';
@@ -63,36 +63,28 @@ const noScrollbarStyles = `
 
 // 책 컨텐츠 로딩 스켈레톤
 function BooksLoading() {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="flex h-[calc(100vh-250px)] w-full items-center justify-center">
-      <LoadingSpinner />
+    <div
+      className={`grid gap-4 ${
+        isMobile
+          ? 'grid-cols-2'
+          : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
+      }`}
+    >
+      {[...Array(12)].map((_, i) => (
+        <div key={i} className="flex flex-col gap-2">
+          <Skeleton className="aspect-[3/4] w-full rounded-lg" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-3 w-1/2" />
+        </div>
+      ))}
     </div>
   );
 }
 
-// 카테고리 필터 로딩 스켈레톤
-function CategoryFilterSkeleton() {
-  return (
-    <div className="w-full">
-      <div className="no-scrollbar mb-2 flex w-full overflow-x-auto py-1">
-        <div className="flex gap-2 px-0.5">
-          {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-9 w-20 rounded-full" />
-          ))}
-        </div>
-      </div>
-
-      {/* 서브카테고리 스켈레톤 */}
-      <div className="no-scrollbar mb-4 flex w-full overflow-x-auto py-1">
-        <div className="flex gap-2 px-0.5">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-8 w-16 rounded-full" />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+// 카테고리 필터 로딩 스켈레톤 컴포넌트 제거 - 이제 CategoryFilter에서 import함
 
 export default function DiscoverPage() {
   const isMobile = useIsMobile();

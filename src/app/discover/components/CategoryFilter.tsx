@@ -3,26 +3,17 @@ import {
   discoverCategoryFilterAtom,
   discoverSubcategoryFilterAtom,
 } from '@/atoms/discover';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
 
-export interface Category {
-  id: string;
-  name: string;
-  color?: string;
-  subcategories: {
-    id: string;
-    name: string;
-  }[];
-}
-
 interface CategoryFilterProps {
   className?: string;
 }
 
-// 기본 파스텔톤 색상 배열 - 카테고리에 color가, 설정되지 않은 경우 이 배열에서 순차적으로 사용
+// 기본 파스텔톤 색상 배열 - 카테고리에 color가 설정되지 않은 경우 이 배열에서 순차적으로 사용
 const pastelColors = [
   '#DBEAFE', // 파스텔 블루
   '#FCE7F3', // 파스텔 핑크
@@ -35,6 +26,30 @@ const pastelColors = [
   '#F5F3FF', // 파스텔 퍼플
   '#FEE2E2', // 파스텔 레드
 ];
+
+// CategoryFilterSkeleton 컴포넌트
+export function CategoryFilterSkeleton() {
+  return (
+    <div className="w-full">
+      <div className="no-scrollbar mb-2 flex w-full overflow-x-auto py-1">
+        <div className="flex gap-2 px-0.5">
+          {[...Array(6)].map((_, i) => (
+            <Skeleton key={i} className="h-9 w-20 rounded-full" />
+          ))}
+        </div>
+      </div>
+
+      {/* 서브카테고리 스켈레톤 */}
+      <div className="no-scrollbar mb-4 flex w-full overflow-x-auto py-1">
+        <div className="flex gap-2 px-0.5">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-8 w-16 rounded-full" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   const isMobile = useIsMobile();

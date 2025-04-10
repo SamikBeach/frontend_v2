@@ -4,7 +4,7 @@ import { AuthProvider, UserStatus } from '../auth/types';
  * 사용자 정보 인터페이스
  */
 export interface User {
-  id: string;
+  id: number;
   email: string;
   username?: string;
   name?: string;
