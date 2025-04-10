@@ -1,5 +1,4 @@
 import { Book } from '@/apis/book/types';
-import { useDiscoverBooks } from '@/app/discover/hooks';
 import { selectedBookIdAtom } from '@/atoms/book';
 import {
   discoverCategoryFilterAtom,
@@ -13,40 +12,50 @@ import { Button } from '@/components/ui/button';
 import { useQueryParams } from '@/hooks';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback, useMemo } from 'react';
+import { useDiscoverBooks } from '../hooks/useDiscoverBooks';
 
 export function BooksContent() {
   const { clearQueryParams } = useQueryParams();
-  const categoryParam = useAtomValue(discoverCategoryFilterAtom);
-  const subcategoryParam = useAtomValue(discoverSubcategoryFilterAtom);
-  const sortParam = useAtomValue(discoverSortOptionAtom);
-  const timeRangeParam = useAtomValue(discoverTimeRangeAtom);
+
+  // Atom values
+  const categoryFilter = useAtomValue(discoverCategoryFilterAtom);
+  const subcategoryFilter = useAtomValue(discoverSubcategoryFilterAtom);
+  const sortOption = useAtomValue(discoverSortOptionAtom);
+  const timeRange = useAtomValue(discoverTimeRangeAtom);
   const [selectedBookId, setSelectedBookId] = useAtom(selectedBookIdAtom);
 
   // 도서 데이터 가져오기
-  const { books } = useDiscoverBooks();
+  const { books } = useDiscoverBooks({
+    category: categoryFilter,
+    subcategory: subcategoryFilter,
+    sort: sortOption,
+    timeRange: timeRange,
+  });
 
-  const handleBookSelect = (book: Book) => {
-    setSelectedBookId(book.id.toString());
-  };
+  // 도서 선택 핸들러
+  const handleBookSelect = useCallback(
+    (book: Book) => {
+      setSelectedBookId(book.id.toString());
+    },
+    [setSelectedBookId]
+  );
 
-  const handleClearFilters = () => {
+  // 필터 초기화 핸들러
+  const handleClearFilters = useCallback(() => {
     clearQueryParams();
-  };
+  }, [clearQueryParams]);
 
-  // 선택된 책 찾기
+  // 선택된 도서 찾기 (메모이제이션)
   const selectedBook = useMemo(() => {
-    if (!selectedBookId || !books) return null;
-
-    const bookId = parseInt(selectedBookId);
-    return books.find(book => book.id === bookId) || null;
+    if (!selectedBookId || !books.length) return null;
+    return books.find(book => book.id.toString() === selectedBookId) || null;
   }, [books, selectedBookId]);
 
   // 다이얼로그 상태 변경 핸들러
   const handleDialogOpenChange = useCallback(
     (open: boolean) => {
-      // 다이얼로그가 닫히면 URL에서 book 파라미터 제거
       if (!open) {
-        setSelectedBookId(null); // 선택된 책 상태도 초기화
+        setSelectedBookId(null);
       }
     },
     [setSelectedBookId]
@@ -82,7 +91,7 @@ export function BooksContent() {
       {selectedBook && (
         <BookDialog
           book={selectedBook}
-          open={!!selectedBook}
+          open={!!selectedBookId}
           onOpenChange={handleDialogOpenChange}
         />
       )}

@@ -8,24 +8,33 @@ import {
   SortOption,
   TimeRange,
 } from '@/apis/book/types';
-import {
-  discoverCategoryFilterAtom,
-  discoverSortOptionAtom,
-  discoverSubcategoryFilterAtom,
-  discoverTimeRangeAtom,
-} from '@/atoms/discover';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useAtomValue } from 'jotai';
+
+/**
+ * 숫자로 안전하게 파싱하는 헬퍼 함수
+ * 숫자로 변환될 수 없는 경우 undefined 반환
+ */
+const safeParseInt = (value: string): number | undefined => {
+  const parsed = parseInt(value, 10);
+  return isNaN(parsed) ? undefined : parsed;
+};
+
+interface UseDiscoverBooksParams {
+  category?: string;
+  subcategory?: string;
+  sort?: string;
+  timeRange?: string;
+}
 
 /**
  * 발견하기 도서 목록을 가져오는 훅
  */
-export function useDiscoverBooks() {
-  const categoryParam = useAtomValue(discoverCategoryFilterAtom);
-  const subcategoryParam = useAtomValue(discoverSubcategoryFilterAtom);
-  const sortParamRaw = useAtomValue(discoverSortOptionAtom);
-  const timeRangeParam = useAtomValue(discoverTimeRangeAtom);
+export function useDiscoverBooks(params?: UseDiscoverBooksParams) {
+  const categoryParam = params?.category || 'all';
+  const subcategoryParam = params?.subcategory || 'all';
+  const sortParamRaw = params?.sort || 'reviews-desc';
+  const timeRangeParam = params?.timeRange || 'all';
 
   // 타입 가드를 사용하여 안전하게 처리
   const sortParam: SortOption = isValidSortOption(sortParamRaw)
@@ -33,7 +42,7 @@ export function useDiscoverBooks() {
     : 'reviews-desc';
 
   // 도서 데이터 가져오기
-  const { data: books } = useSuspenseQuery<Book[]>({
+  const { data: books = [] } = useSuspenseQuery<Book[]>({
     queryKey: [
       'discover-books',
       categoryParam,
@@ -56,8 +65,14 @@ export function useDiscoverBooks() {
         return getAllDiscoverBooks(params);
       }
 
-      // 카테고리만 선택된 경우
-      const categoryId = parseInt(categoryParam);
+      // 카테고리 ID 파싱
+      const categoryId = safeParseInt(categoryParam);
+      if (!categoryId) {
+        // 잘못된 카테고리 ID인 경우 전체 도서 반환
+        return getAllDiscoverBooks({ sort: sortParam, timeRange });
+      }
+
+      // 서브카테고리가 'all'이거나 없는 경우
       if (subcategoryParam === 'all') {
         return getBooksByDiscoverCategoryId(
           categoryId,
@@ -67,8 +82,10 @@ export function useDiscoverBooks() {
         );
       }
 
+      // 서브카테고리 ID 파싱
+      const subcategoryId = safeParseInt(subcategoryParam);
+
       // 카테고리와 서브카테고리 모두 선택된 경우
-      const subcategoryId = parseInt(subcategoryParam);
       return getBooksByDiscoverCategoryId(
         categoryId,
         subcategoryId,
@@ -76,8 +93,8 @@ export function useDiscoverBooks() {
         timeRange
       );
     },
-    staleTime: 1000 * 60 * 2, // 2분 동안 캐시 유지
+    staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유지
   });
 
-  return { books: books || [] };
+  return { books };
 }

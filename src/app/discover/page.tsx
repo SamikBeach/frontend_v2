@@ -8,6 +8,7 @@ import {
   discoverSubcategoryFilterAtom,
   discoverTimeRangeAtom,
 } from '@/atoms/discover';
+import { LoadingSpinner } from '@/components';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -64,7 +65,7 @@ const noScrollbarStyles = `
 function BooksLoading() {
   return (
     <div className="flex h-[calc(100vh-250px)] w-full items-center justify-center">
-      <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-gray-900"></div>
+      <LoadingSpinner />
     </div>
   );
 }

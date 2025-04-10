@@ -24,7 +24,6 @@ interface CategoryFilterProps {
 
 // 기본 파스텔톤 색상 배열 - 카테고리에 color가, 설정되지 않은 경우 이 배열에서 순차적으로 사용
 const pastelColors = [
-  '#E5E7EB', // 기본 회색
   '#DBEAFE', // 파스텔 블루
   '#FCE7F3', // 파스텔 핑크
   '#FFEDD5', // 파스텔 오렌지
@@ -34,6 +33,7 @@ const pastelColors = [
   '#E0E7FF', // 파스텔 인디고
   '#FBCFE8', // 파스텔 로즈
   '#F5F3FF', // 파스텔 퍼플
+  '#FEE2E2', // 파스텔 레드
 ];
 
 export const CategoryFilter = ({ className }: CategoryFilterProps) => {
@@ -101,7 +101,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
             )}
             style={{
               backgroundColor:
-                selectedCategory === 'all' ? undefined : '#E5E7EB',
+                selectedCategory === 'all' ? undefined : '#DBEAFE', // 파스텔 블루 색상 사용
             }}
           >
             전체
