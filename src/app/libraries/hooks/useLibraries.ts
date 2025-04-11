@@ -1,3 +1,4 @@
+import { TimeRange } from '@/apis/book/types';
 import { getAllLibraries, LibrarySummary } from '@/apis/library';
 import {
   libraryCategoryFilterAtom,
@@ -5,21 +6,51 @@ import {
   librarySortOptionAtom,
   libraryTimeRangeAtom,
 } from '@/atoms/library';
+import { useQueryParams } from '@/hooks';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useAtomValue } from 'jotai';
-import { useMemo } from 'react';
+import { useAtom } from 'jotai';
+import { useEffect, useMemo, useState } from 'react';
 
 interface UseLibrariesResult {
   libraries: LibrarySummary[];
+  categoryFilter: string;
+  sortOption: string;
+  timeRange: TimeRange;
+  searchQuery: string;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  handleSortChange: (sortId: string) => void;
+  handleTimeRangeChange: (timeRange: TimeRange) => void;
+  handleSearchChange: (value: string) => void;
 }
 
 export function useLibraries(): UseLibrariesResult {
   const user = useCurrentUser();
-  const categoryFilter = useAtomValue(libraryCategoryFilterAtom);
-  const sortOption = useAtomValue(librarySortOptionAtom);
-  const timeRange = useAtomValue(libraryTimeRangeAtom);
-  const searchQuery = useAtomValue(librarySearchQueryAtom);
+  const [categoryFilter] = useAtom(libraryCategoryFilterAtom);
+  const [sortOption, setSortOption] = useAtom(librarySortOptionAtom);
+  const [timeRange, setTimeRange] = useAtom(libraryTimeRangeAtom);
+  const [searchQuery, setSearchQuery] = useAtom(librarySearchQueryAtom);
+  const [currentPage, setCurrentPage] = useState(1);
+  const { updateQueryParams } = useQueryParams();
+
+  // URL 쿼리 파라미터 업데이트
+  useEffect(() => {
+    updateQueryParams({
+      category: categoryFilter,
+      sort: sortOption,
+      timeRange,
+      q: searchQuery || undefined,
+      page: currentPage > 1 ? currentPage.toString() : undefined,
+    });
+  }, [
+    categoryFilter,
+    sortOption,
+    timeRange,
+    searchQuery,
+    currentPage,
+    updateQueryParams,
+  ]);
 
   // 데이터 가져오기 - 서버 컨트롤러와 동일하게 userId 파라미터 전달
   const { data: libraries = [] } = useSuspenseQuery({
@@ -31,6 +62,22 @@ export function useLibraries(): UseLibrariesResult {
     staleTime: 5 * 60 * 1000, // 5분 동안 데이터 유지
     retry: 1, // 실패 시 1번 재시도
   });
+
+  // 핸들러 함수들
+  const handleSortChange = (sortId: string) => {
+    setSortOption(sortId);
+    setCurrentPage(1); // 정렬 변경시 첫 페이지로 이동
+  };
+
+  const handleTimeRangeChange = (newTimeRange: TimeRange) => {
+    setTimeRange(newTimeRange);
+    setCurrentPage(1); // 기간 필터 변경시 첫 페이지로 이동
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1); // 검색어 변경시 첫 페이지로 이동
+  };
 
   // 필터링 및 정렬된 서재 목록
   const filteredAndSortedLibraries = useMemo(() => {
@@ -109,6 +156,15 @@ export function useLibraries(): UseLibrariesResult {
 
   return {
     libraries: filteredAndSortedLibraries || [],
+    categoryFilter,
+    sortOption,
+    timeRange,
+    searchQuery,
+    currentPage,
+    setCurrentPage,
+    handleSortChange,
+    handleTimeRangeChange,
+    handleSearchChange,
   };
 }
 

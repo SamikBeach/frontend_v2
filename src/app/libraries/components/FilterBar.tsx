@@ -11,47 +11,37 @@ export interface Category {
 }
 
 export interface FilterBarProps {
-  categories?: Category[];
-  selectedCategory?: string;
-  onCategoryClick?: (id: string) => void;
   isLoading?: boolean;
 }
 
-export function FilterBar({
-  categories: externalCategories,
-  selectedCategory: externalSelectedCategory,
-  onCategoryClick: externalOnCategoryClick,
-  isLoading = false,
-}: FilterBarProps) {
+export function FilterBar({ isLoading = false }: FilterBarProps) {
   const [categoryFilter, setCategoryFilter] = useAtom(
     libraryCategoryFilterAtom
   );
-  const { tags: popularTags } = usePopularTags();
+  const { tags: popularTags, isLoading: isLoadingTags } = usePopularTags(10);
 
-  // 외부에서 전달받은 props가 있으면 사용하고, 없으면 내부 상태 사용
-  const selectedCategory = externalSelectedCategory ?? categoryFilter;
-  const onCategoryClick = externalOnCategoryClick ?? setCategoryFilter;
-
-  // 외부에서 전달받은 카테고리가 있으면 사용하고, 없으면 내부에서 생성
-  const categories: Category[] = externalCategories ?? [
+  // 카테고리 생성
+  const categories: Category[] = [
+    // "전체" 카테고리
     {
       id: 'all',
       name: '전체',
       color: '#E2E8F0',
     },
-    ...(popularTags?.map((tag: TagResponseDto, index: number) => ({
+    // 인기 태그 기반 카테고리
+    ...(popularTags || []).map((tag: TagResponseDto, index: number) => ({
       id: String(tag.id),
       name: tag.name,
       color: getTagColor(index),
-    })) || []),
+    })),
   ];
 
   const handleCategoryClick = (categoryId: string) => {
-    onCategoryClick(categoryId);
+    setCategoryFilter(categoryId);
   };
 
   // 로딩 중일 때 스켈레톤 표시
-  if (isLoading) {
+  if (isLoading || isLoadingTags) {
     return (
       <div className="no-scrollbar flex gap-2 overflow-x-auto py-1">
         <div className="flex gap-2 px-0.5">
@@ -71,13 +61,13 @@ export function FilterBar({
             key={category.id}
             onClick={() => handleCategoryClick(category.id)}
             className={`flex h-9 shrink-0 cursor-pointer items-center justify-center rounded-full px-4 text-sm font-medium transition-all ${
-              selectedCategory === category.id
+              categoryFilter === category.id
                 ? 'bg-gray-900 text-white'
                 : 'hover:bg-gray-50'
             }`}
             style={{
               backgroundColor:
-                selectedCategory === category.id ? undefined : category.color,
+                categoryFilter === category.id ? undefined : category.color,
             }}
           >
             {category.name}

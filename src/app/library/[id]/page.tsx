@@ -1,54 +1,28 @@
 'use client';
 
 import { Book } from '@/apis/book';
-import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { selectedBookAtom, selectedBookIdAtom } from '@/atoms/book';
 import { BookDialog } from '@/components/BookDialog';
 import { useAtom } from 'jotai';
-import { useParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { LibraryContent } from './LibraryContent';
+import { LibraryDetailSkeleton } from './LibraryDetailSkeleton';
 import { LibraryHeader } from './LibraryHeader';
 import { LibrarySidebar } from './LibrarySidebar';
 
 function LibraryDetailContent() {
-  const params = useParams();
-  const libraryId = parseInt(params.id as string, 10);
   const [isBookDialogOpen, setIsBookDialogOpen] = useState(false);
-
-  const {
-    library,
-    isSubscribed,
-    notificationsEnabled,
-    handleSubscriptionToggle,
-    handleNotificationToggle,
-  } = useLibraryDetail(libraryId);
-
-  if (!library) {
-    return <div>서재를 찾을 수 없습니다.</div>;
-  }
 
   return (
     <div className="mx-auto max-w-[1600px]">
-      <LibraryHeader
-        library={library}
-        isSubscribed={isSubscribed}
-        notificationsEnabled={notificationsEnabled}
-        onSubscriptionToggle={handleSubscriptionToggle}
-        onNotificationToggle={handleNotificationToggle}
-      />
+      <LibraryHeader />
+
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
         <div>
-          <LibraryContent library={library} />
+          <LibraryContent />
         </div>
         <div className="w-full min-w-[360px]">
-          <LibrarySidebar
-            library={library}
-            isSubscribed={isSubscribed}
-            notificationsEnabled={notificationsEnabled}
-            onSubscriptionToggle={handleSubscriptionToggle}
-            onNotificationToggle={handleNotificationToggle}
-          />
+          <LibrarySidebar />
         </div>
       </div>
 
@@ -63,7 +37,7 @@ function LibraryDetailContent() {
 
 export default function LibraryDetailPage() {
   return (
-    <Suspense fallback={<div>서재 정보를 불러오는 중...</div>}>
+    <Suspense fallback={<LibraryDetailSkeleton />}>
       <LibraryDetailContent />
     </Suspense>
   );

@@ -1,17 +1,9 @@
-import { Library, LibraryTag } from '@/apis/library/types';
+import { LibraryTag } from '@/apis/library/types';
 import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { BellIcon, BellOffIcon } from 'lucide-react';
 import { useParams } from 'next/navigation';
-
-interface LibraryHeaderProps {
-  library: Library;
-  isSubscribed: boolean;
-  notificationsEnabled: boolean;
-  onSubscriptionToggle: () => Promise<void>;
-  onNotificationToggle: () => void;
-}
 
 // 실제 API에서 오는 태그 타입 (LibraryTag 인터페이스와 일치하지 않는 경우를 위한 추가 타입)
 interface ApiTag extends Omit<LibraryTag, 'name' | 'tagName'> {
@@ -29,19 +21,22 @@ const pastelColors = [
   '#E2F0CB', // 연한 민트
 ];
 
-export function LibraryHeader({
-  library,
-  isSubscribed,
-  notificationsEnabled,
-}: LibraryHeaderProps) {
+export function LibraryHeader() {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
 
-  // 구독 및 알림 상태 관리
+  // useLibraryDetail 훅으로 상태와 핸들러 함수 가져오기
+  const {
+    library,
+    isSubscribed,
+    notificationsEnabled,
+    handleSubscriptionToggle,
+    handleNotificationToggle,
+  } = useLibraryDetail(libraryId);
 
-  // useLibraryDetail hook에서 상태 변경 함수만 가져오기
-  const { handleSubscriptionToggle, handleNotificationToggle } =
-    useLibraryDetail(libraryId);
+  if (!library) {
+    return null;
+  }
 
   // 태그가 있는지 확인
   const hasTags = library.tags && library.tags.length > 0;

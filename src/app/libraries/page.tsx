@@ -1,29 +1,10 @@
 'use client';
 
-import { TimeRange as ApiTimeRange } from '@/apis/book/types';
-import { getAllLibraries } from '@/apis/library/library';
 import { LibrarySummary } from '@/apis/library/types';
-import {
-  libraryCategoryFilterAtom,
-  librarySearchQueryAtom,
-  librarySortOptionAtom,
-  libraryTimeRangeAtom,
-} from '@/atoms/library';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useQueryParams } from '@/hooks';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { useAtom } from 'jotai';
 import { BookOpen, Clock, Users } from 'lucide-react';
-import { Suspense, useEffect, useState } from 'react';
-import { EmptyState } from './components/EmptyState';
-import { Category, FilterBar } from './components/FilterBar';
-import { LibraryBreadcrumb } from './components/LibraryBreadcrumb';
-import { LibraryCard } from './components/LibraryCard';
-import { Pagination } from './components/Pagination';
-import { SearchBar } from './components/SearchBar';
-import { SortDropdown } from './components/SortDropdown';
-import { usePagination } from './hooks/usePagination';
-import { usePopularTags } from './hooks/usePopularTags';
+import { Suspense } from 'react';
+import { Libraries } from './components/Libraries';
 import { SortOption } from './types';
 
 // 스크롤바 숨기는 CSS 추가
@@ -89,212 +70,44 @@ function LibraryCardSkeleton() {
   );
 }
 
-function Libraries() {
-  const [categoryFilter] = useAtom(libraryCategoryFilterAtom);
-  const { tags: popularTags } = usePopularTags(10);
-  const [sortOption, setSortOption] = useAtom(librarySortOptionAtom);
-  const [timeRange, setTimeRange] = useAtom(libraryTimeRangeAtom);
-  const [searchQuery, setSearchQuery] = useAtom(librarySearchQueryAtom);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  const { updateQueryParams } = useQueryParams();
-
-  // URL 쿼리 파라미터 업데이트를 useEffect로 이동
-  useEffect(() => {
-    updateQueryParams({
-      category: categoryFilter,
-      sort: sortOption,
-      timeRange,
-      q: searchQuery || undefined,
-      page: currentPage > 1 ? currentPage.toString() : undefined,
-    });
-  }, [
-    categoryFilter,
-    sortOption,
-    timeRange,
-    searchQuery,
-    currentPage,
-    updateQueryParams,
-  ]);
-
-  // 인기 태그에서 카테고리 생성
-  const categories: Category[] = [
-    // "전체" 카테고리
-    {
-      id: 'all',
-      name: '전체',
-      color: '#E2E8F0',
-    },
-    // 인기 태그 기반 카테고리
-    ...(popularTags || []).map((tag, index) => ({
-      id: String(tag.id),
-      name: tag.name,
-      color: getTagColor(index),
-    })),
-  ];
-
-  // 정렬 옵션 변경 핸들러
-  const handleSortChange = (sortId: string) => {
-    setSortOption(sortId);
-  };
-
-  // 기간 필터 변경 핸들러
-  const handleTimeRangeChange = (timeRange: ApiTimeRange) => {
-    setTimeRange(timeRange);
-  };
-
-  // 검색어 변경 핸들러
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
-
+// 로딩 상태를 위한 스켈레톤 컴포넌트
+function LibrariesSkeleton() {
   return (
-    <>
-      {/* 브레드크럼 */}
+    <div className="mx-auto flex w-full flex-col">
+      {/* 브레드크럼 스켈레톤 */}
       <div className="mx-auto w-full px-4 py-2">
-        <LibraryBreadcrumb />
+        <Skeleton className="h-6 w-32" />
       </div>
 
-      {/* 필터 영역 - 스크롤 시 상단에 고정 */}
+      {/* 필터 바 및 검색/정렬 영역 스켈레톤 */}
       <div className="sticky top-[56px] z-30 bg-white">
         <div className="mx-auto w-full px-4 py-2">
           <div className="relative">
-            {/* xl 이상 화면에서 보이는 검색바와 정렬 버튼 */}
             <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:flex xl:items-center xl:gap-4">
-              <SearchBar value={searchQuery} onChange={handleSearchChange} />
-              <SortDropdown
-                selectedSort={sortOption}
-                onSortChange={handleSortChange}
-                sortOptions={sortOptions}
-                selectedTimeRange={timeRange}
-                onTimeRangeChange={handleTimeRangeChange}
-              />
+              <Skeleton className="h-10 w-32 rounded-lg" />
             </div>
-
-            <div className="flex flex-col gap-4">
-              <FilterBar categories={categories} />
-              {/* xl 미만 화면에서 보이는 검색바와 정렬 버튼 */}
-              <div className="flex items-center gap-4 xl:hidden">
-                <div className="flex-1">
-                  <SearchBar
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                  />
-                </div>
-                <SortDropdown
-                  selectedSort={sortOption}
-                  onSortChange={handleSortChange}
-                  sortOptions={sortOptions}
-                  selectedTimeRange={timeRange}
-                  onTimeRangeChange={handleTimeRangeChange}
-                />
+            <div className="flex flex-col gap-2">
+              <div className="no-scrollbar flex gap-2 overflow-x-auto py-1">
+                {[...Array(6)].map((_, i) => (
+                  <Skeleton key={i} className="h-9 w-20 rounded-full" />
+                ))}
+              </div>
+              <div className="w-full xl:hidden">
+                <Skeleton className="h-10 w-32 rounded-lg" />
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 메인 콘텐츠 */}
-      <div className="px-4">
-        {/* 서재 목록 */}
-        <Suspense fallback={<LibraryCardSkeleton />}>
-          <LibraryList
-            categoryFilter={categoryFilter}
-            sortOption={sortOption}
-            timeRange={timeRange}
-            searchQuery={searchQuery}
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-          />
-        </Suspense>
+      {/* 서재 카드 스켈레톤 */}
+      <div className="grid grid-cols-1 gap-4 px-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <Skeleton key={index} className="h-[300px] rounded-xl" />
+        ))}
       </div>
-    </>
+    </div>
   );
-}
-
-// 서재 목록 컴포넌트
-function LibraryList({
-  categoryFilter,
-  sortOption,
-  timeRange,
-  searchQuery,
-  currentPage,
-  setCurrentPage,
-}: {
-  categoryFilter: string;
-  sortOption: string;
-  timeRange: ApiTimeRange;
-  searchQuery: string;
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
-}) {
-  const { data: libraries } = useSuspenseQuery<LibrarySummary[]>({
-    queryKey: ['libraries', categoryFilter, sortOption, timeRange, searchQuery],
-    queryFn: () => getAllLibraries(),
-  });
-
-  // 페이지네이션 설정
-  const ITEMS_PER_PAGE = 12;
-  const pagination = usePagination({
-    initialPage: currentPage,
-    pageSize: ITEMS_PER_PAGE,
-    totalItems: libraries.length,
-  });
-
-  // 현재 페이지 아이템만 가져오기
-  const pagedLibraries = pagination.getItemsForPage(libraries);
-
-  // 페이지 변경 핸들러
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    pagination.setPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  return (
-    <>
-      {libraries.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-          {pagedLibraries.map(library => (
-            <LibraryCard key={library.id} library={library} />
-          ))}
-        </div>
-      ) : (
-        <EmptyState
-          searchQuery={searchQuery}
-          selectedCategory={categoryFilter}
-        />
-      )}
-
-      {/* 페이지네이션 */}
-      {pagination.totalPages > 1 && (
-        <div className="mt-8 flex justify-center">
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
-    </>
-  );
-}
-
-// 태그 색상 배열 - 파스텔톤
-const TAG_COLORS = [
-  '#FFF8E2', // 파스텔 옐로우
-  '#F2E2FF', // 파스텔 퍼플
-  '#FFE2EC', // 파스텔 코럴
-  '#E2FFFC', // 파스텔 민트
-  '#E2F0FF', // 파스텔 블루
-  '#FFECDA', // 파스텔 오렌지
-  '#ECFFE2', // 파스텔 그린
-  '#FFE2F7', // 파스텔 핑크
-];
-
-// 태그 인덱스에 따른 색상 반환
-function getTagColor(index: number): string {
-  return TAG_COLORS[index % TAG_COLORS.length];
 }
 
 // 메인 페이지 컴포넌트
@@ -304,44 +117,7 @@ export default function LibrariesPage() {
       {/* CSS 스타일 추가 */}
       <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
 
-      <Suspense
-        fallback={
-          <div className="mx-auto flex w-full flex-col">
-            {/* 브레드크럼 스켈레톤 */}
-            <div className="mx-auto w-full px-4 py-2">
-              <Skeleton className="h-6 w-32" />
-            </div>
-
-            {/* 필터 바 및 검색/정렬 영역 스켈레톤 */}
-            <div className="sticky top-[56px] z-30 bg-white">
-              <div className="mx-auto w-full px-4 py-2">
-                <div className="relative">
-                  <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:flex xl:items-center xl:gap-4">
-                    <Skeleton className="h-10 w-32 rounded-lg" />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <div className="no-scrollbar flex gap-2 overflow-x-auto py-1">
-                      {[...Array(6)].map((_, i) => (
-                        <Skeleton key={i} className="h-9 w-20 rounded-full" />
-                      ))}
-                    </div>
-                    <div className="w-full xl:hidden">
-                      <Skeleton className="h-10 w-32 rounded-lg" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 서재 카드 스켈레톤 */}
-            <div className="grid grid-cols-1 gap-4 px-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-              {Array.from({ length: 8 }).map((_, index) => (
-                <LibraryCardSkeleton key={index} />
-              ))}
-            </div>
-          </div>
-        }
-      >
+      <Suspense fallback={<LibrariesSkeleton />}>
         <Libraries />
       </Suspense>
     </div>

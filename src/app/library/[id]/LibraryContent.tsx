@@ -1,21 +1,26 @@
 import { Book as BookType } from '@/apis/book';
-import { Library } from '@/apis/library/types';
+import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { selectedBookAtom, selectedBookIdAtom } from '@/atoms/book';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useSetAtom } from 'jotai';
 import { Grid, List } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 
-interface LibraryContentProps {
-  library: Library;
-}
+export function LibraryContent() {
+  const params = useParams();
+  const libraryId = parseInt(params.id as string, 10);
+  const { library } = useLibraryDetail(libraryId);
 
-export function LibraryContent({ library }: LibraryContentProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const setSelectedBookId = useSetAtom(selectedBookIdAtom);
   const setSelectedBook = useSetAtom(selectedBookAtom);
+
+  if (!library) {
+    return null;
+  }
 
   // 라이브러리 책 형식 변환
   const booksWithDetails =

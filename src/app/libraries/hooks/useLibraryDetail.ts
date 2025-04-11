@@ -1,16 +1,18 @@
 import {
   getLibraryById,
+  getLibraryUpdates,
   Library,
   subscribeToLibrary,
   unsubscribeFromLibrary,
+  UpdateHistoryItem,
 } from '@/apis/library';
 import {
   notificationsEnabledAtom,
   subscriptionStatusAtom,
 } from '@/atoms/library';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 interface UseLibraryDetailResult {
   library: Library;
@@ -34,10 +36,27 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
     retry: 1, // 실패 시 1번 재시도
   });
 
+  // 최근 업데이트 가져오기 (useSuspenseQuery 대신 useQuery 사용)
+  const { data: recentUpdates } = useQuery<UpdateHistoryItem[]>({
+    queryKey: ['library-updates', libraryId],
+    queryFn: () => getLibraryUpdates(libraryId, 5), // 최신 5개 항목만 가져오기
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+    enabled: !!library, // useQuery에서는 enabled 옵션 사용 가능
+  });
+
   // 구독 상태 업데이트 - useEffect 대신 직접 업데이트
   if (library && library.isSubscribed !== isSubscribed) {
     setIsSubscribed(!!library.isSubscribed);
   }
+
+  // 최근 업데이트 정보를 library 객체에 추가
+  useEffect(() => {
+    if (library && recentUpdates && Array.isArray(recentUpdates)) {
+      // 명시적으로 타입 확인 후 할당
+      (library as any).recentUpdates = recentUpdates;
+    }
+  }, [library, recentUpdates]);
 
   // 구독 토글 핸들러
   const handleSubscriptionToggle = useCallback(async () => {
