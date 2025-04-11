@@ -1,4 +1,5 @@
-import { SortOption, TimeRange } from '@/apis/book/types';
+import { SortOption } from '@/apis/book/types';
+import { TimeRange } from '@/components/SortDropdown';
 import { atom } from 'jotai';
 
 // 발견하기 페이지 필터 상태
