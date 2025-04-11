@@ -62,7 +62,7 @@ export default function LibraryDetailPage({
       <LibraryHeader library={library} />
 
       {/* 메인 콘텐츠와 사이드바 */}
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-4 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-4">
         {/* 메인 컨텐츠 영역 */}
         <div className="md:col-span-2 lg:col-span-3">
           <LibraryContent library={library} />
