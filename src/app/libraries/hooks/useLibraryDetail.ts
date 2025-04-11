@@ -30,8 +30,8 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
 
   // 서재 데이터 가져오기
   const { data: library, refetch } = useSuspenseQuery({
-    queryKey: ['library', libraryId, user?.id],
-    queryFn: () => getLibraryById(libraryId, user?.id),
+    queryKey: ['library', libraryId],
+    queryFn: () => getLibraryById(libraryId),
     select: data => {
       // 데이터를 가져온 후 구독 상태 업데이트
       setIsSubscribed(!!data.isSubscribed);

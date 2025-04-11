@@ -1,0 +1,60 @@
+import { Library, LibraryTag } from '@/apis/library/types';
+import { Badge } from '@/components/ui/badge';
+
+interface LibraryHeaderProps {
+  library: Library;
+}
+
+// 실제 API에서 오는 태그 타입 (LibraryTag 인터페이스와 일치하지 않는 경우를 위한 추가 타입)
+interface ApiTag extends LibraryTag {
+  tagName?: string;
+}
+
+// 파스텔톤 색상 배열
+const pastelColors = [
+  '#FFD6E0', // 연한 분홍
+  '#FFEFB5', // 연한 노랑
+  '#D1F0C2', // 연한 초록
+  '#C7CEEA', // 연한 파랑
+  '#F0E6EF', // 연한 보라
+  '#E2F0CB', // 연한 민트
+];
+
+export function LibraryHeader({ library }: LibraryHeaderProps) {
+  // 태그가 있는지 확인
+  const hasTags = library.tags && library.tags.length > 0;
+
+  // API 응답 데이터를 콘솔에 출력하여 디버깅
+  console.log('Library tags:', library.tags);
+
+  return (
+    <div className="flex items-center justify-between bg-white py-6 pr-8 pl-8">
+      <div className="flex-1">
+        <div className="mb-2 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-gray-900">{library.name}</h1>
+          {hasTags && library.tags && (
+            <div className="flex gap-1.5">
+              {library.tags.map((tag, index) => (
+                <Badge
+                  key={tag.id}
+                  className="rounded-full border-0 px-3 py-0.5 text-xs font-medium text-gray-700"
+                  style={{
+                    backgroundColor: pastelColors[index % pastelColors.length],
+                  }}
+                >
+                  {(tag as ApiTag).tagName || tag.name}
+                </Badge>
+              ))}
+            </div>
+          )}
+        </div>
+        <p className="text-sm text-gray-500">
+          <span className="font-medium text-gray-700">
+            {library.owner.username}
+          </span>
+          님의 서재
+        </p>
+      </div>
+    </div>
+  );
+}

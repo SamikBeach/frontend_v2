@@ -13,7 +13,7 @@ export function LibraryCard({ library }: LibraryCardProps) {
   // LibrarySummary 타입에는 category가 없으므로 카테고리 찾기 로직은 제거
 
   return (
-    <Link href={`/libraries/${library.id}`}>
+    <Link href={`/library/${library.id}`}>
       <Card className="group h-full rounded-xl border-none bg-[#F9FAFB] shadow-none transition-all duration-200 hover:bg-[#F2F4F6]">
         <CardHeader className="p-5 pb-3">
           <div className="flex items-center gap-3">

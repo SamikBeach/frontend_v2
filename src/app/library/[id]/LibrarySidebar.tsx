@@ -29,17 +29,17 @@ export function LibrarySidebar({
   const previewSubscribers = library.subscribers?.slice(0, 3) || [];
 
   return (
-    <div className="space-y-6">
-      {/* 서재 소유자 정보 */}
-      <div className="rounded-xl bg-gray-50 p-4">
+    <div className="space-y-5">
+      {/* 서재 소유자 정보 & 구독 버튼 */}
+      <div className="rounded-2xl bg-gray-50 p-5">
         <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12 border border-gray-200">
+          <Avatar className="h-12 w-12">
             <AvatarImage
               src={`https://i.pravatar.cc/150?u=${library.owner.id}`}
               alt={library.owner.username}
             />
-            <AvatarFallback className="bg-blue-100 text-blue-600">
-              {library.owner.username[0]}
+            <AvatarFallback className="bg-blue-50 text-blue-600">
+              {library.owner.username[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div>
@@ -77,7 +77,7 @@ export function LibrarySidebar({
       </div>
 
       {/* 서재 정보 */}
-      <div className="rounded-xl bg-gray-50 p-4">
+      <div className="rounded-2xl bg-gray-50 p-5">
         <h3 className="mb-3 font-medium text-gray-900">서재 정보</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
@@ -86,7 +86,7 @@ export function LibrarySidebar({
               <span>책</span>
             </div>
             <span className="font-medium text-gray-900">
-              {library.books?.length || 0}권
+              {library.books?.length || 0}
             </span>
           </div>
           <div className="flex items-center justify-between text-sm">
@@ -114,7 +114,7 @@ export function LibrarySidebar({
 
       {/* 구독자 미리보기 */}
       {library.subscribers && library.subscribers.length > 0 && (
-        <div className="rounded-xl bg-gray-50 p-4">
+        <div className="rounded-2xl bg-gray-50 p-5">
           <div className="flex items-center justify-between">
             <h3 className="font-medium text-gray-900">구독자</h3>
             <Button
@@ -131,7 +131,7 @@ export function LibrarySidebar({
             {previewSubscribers.length > 0 ? (
               previewSubscribers.map(subscriber => (
                 <div key={subscriber.id} className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8 border border-gray-200">
+                  <Avatar className="h-8 w-8">
                     <AvatarImage
                       src={
                         subscriber.profileImage ||
@@ -139,8 +139,8 @@ export function LibrarySidebar({
                       }
                       alt={subscriber.username}
                     />
-                    <AvatarFallback className="bg-gray-200">
-                      {subscriber.username[0]}
+                    <AvatarFallback className="bg-gray-100">
+                      {subscriber.username[0].toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
@@ -171,11 +171,11 @@ export function LibrarySidebar({
 
       {/* 업데이트 알림 섹션 */}
       {library.recentUpdates && library.recentUpdates.length > 0 && (
-        <div className="rounded-xl bg-gray-50 p-4">
+        <div className="rounded-2xl bg-gray-50 p-5">
           <h3 className="mb-3 font-medium text-gray-900">최근 업데이트</h3>
           <div className="space-y-3 text-sm">
             {library.recentUpdates.map((update, index) => (
-              <div key={index} className="rounded-lg bg-white p-3 shadow-sm">
+              <div key={index} className="rounded-lg bg-white p-3">
                 <span className="text-xs text-gray-500">
                   {formatRelativeTime(update.date)}
                 </span>

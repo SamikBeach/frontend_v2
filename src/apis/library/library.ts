@@ -48,12 +48,8 @@ export const getSubscribedLibraries = async (): Promise<LibrarySummary[]> => {
 /**
  * 특정 서재 상세 조회
  */
-export const getLibraryById = async (
-  id: number,
-  userId?: number
-): Promise<Library> => {
-  const params = userId ? { userId } : undefined;
-  const response = await api.get<Library>(`/library/${id}`, { params });
+export const getLibraryById = async (id: number): Promise<Library> => {
+  const response = await api.get<Library>(`/library/${id}`);
   return response.data;
 };
 
