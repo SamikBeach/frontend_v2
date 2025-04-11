@@ -1,25 +1,37 @@
 import { Library } from '@/apis/library/types';
+import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
+import {
+  notificationsEnabledAtom,
+  subscriptionStatusAtom,
+} from '@/atoms/library';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { useAtom } from 'jotai';
 import { Bell, BookOpen, Calendar, Users } from 'lucide-react';
+import { useParams } from 'next/navigation';
 
-export interface LibrarySidebarProps {
+interface LibrarySidebarProps {
   library: Library;
-  isSubscribed: boolean;
-  notificationsEnabled: boolean;
-  onSubscriptionToggle: () => void;
-  onNotificationToggle: () => void;
 }
 
-export function LibrarySidebar({
-  library,
-  isSubscribed,
-  notificationsEnabled,
-  onSubscriptionToggle,
-  onNotificationToggle,
-}: LibrarySidebarProps) {
+export function LibrarySidebar({ library }: LibrarySidebarProps) {
+  const params = useParams();
+  const libraryId = parseInt(params.id as string, 10);
+  const user = useCurrentUser();
+
+  // 구독 및 알림 상태 관리
+  const [isSubscribed, setIsSubscribed] = useAtom(subscriptionStatusAtom);
+  const [notificationsEnabled, setNotificationsEnabled] = useAtom(
+    notificationsEnabledAtom
+  );
+
+  // useLibraryDetail hook에서 상태 변경 함수만 가져오기
+  const { handleSubscriptionToggle, handleNotificationToggle } =
+    useLibraryDetail(libraryId, user?.id);
+
   // 상대적 시간 포맷팅 (예: "2일 전")
   const formatRelativeTime = (date: Date): string => {
     return formatDistanceToNow(new Date(date), { addSuffix: true, locale: ko });
@@ -54,7 +66,7 @@ export function LibrarySidebar({
           <Button
             className="w-full rounded-full"
             variant={isSubscribed ? 'outline' : 'default'}
-            onClick={onSubscriptionToggle}
+            onClick={handleSubscriptionToggle}
           >
             {isSubscribed ? '구독 중' : '구독하기'}
           </Button>
@@ -63,7 +75,7 @@ export function LibrarySidebar({
             <Button
               className="w-full rounded-full"
               variant="outline"
-              onClick={onNotificationToggle}
+              onClick={handleNotificationToggle}
             >
               <Bell
                 className={`mr-2 h-4 w-4 ${

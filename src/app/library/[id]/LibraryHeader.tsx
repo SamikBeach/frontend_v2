@@ -1,14 +1,18 @@
 import { Library, LibraryTag } from '@/apis/library/types';
+import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
+import {
+  notificationsEnabledAtom,
+  subscriptionStatusAtom,
+} from '@/atoms/library';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useAtom } from 'jotai';
 import { BellIcon, BellOffIcon } from 'lucide-react';
+import { useParams } from 'next/navigation';
 
 interface LibraryHeaderProps {
   library: Library;
-  isSubscribed?: boolean;
-  notificationsEnabled?: boolean;
-  onSubscriptionToggle?: () => void;
-  onNotificationToggle?: () => void;
 }
 
 // 실제 API에서 오는 태그 타입 (LibraryTag 인터페이스와 일치하지 않는 경우를 위한 추가 타입)
@@ -26,18 +30,21 @@ const pastelColors = [
   '#E2F0CB', // 연한 민트
 ];
 
-export function LibraryHeader({
-  library,
-  isSubscribed = false,
-  notificationsEnabled = false,
-  onSubscriptionToggle,
-  onNotificationToggle,
-}: LibraryHeaderProps) {
+export function LibraryHeader({ library }: LibraryHeaderProps) {
+  const params = useParams();
+  const libraryId = parseInt(params.id as string, 10);
+  const user = useCurrentUser();
+
+  // 구독 및 알림 상태 관리
+  const [isSubscribed] = useAtom(subscriptionStatusAtom);
+  const [notificationsEnabled] = useAtom(notificationsEnabledAtom);
+
+  // useLibraryDetail hook에서 상태 변경 함수만 가져오기
+  const { handleSubscriptionToggle, handleNotificationToggle } =
+    useLibraryDetail(libraryId, user?.id);
+
   // 태그가 있는지 확인
   const hasTags = library.tags && library.tags.length > 0;
-
-  // API 응답 데이터를 콘솔에 출력하여 디버깅
-  console.log('Library tags:', library.tags);
 
   return (
     <div className="flex items-center justify-between bg-white py-6 pr-8 pl-8">
@@ -69,32 +76,30 @@ export function LibraryHeader({
       </div>
 
       {/* 구독 버튼 영역 */}
-      {onSubscriptionToggle && (
-        <div className="flex gap-2">
-          {isSubscribed && onNotificationToggle && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onNotificationToggle}
-              className="text-gray-600 hover:bg-gray-100"
-            >
-              {notificationsEnabled ? (
-                <BellIcon className="mr-2 h-4 w-4" />
-              ) : (
-                <BellOffIcon className="mr-2 h-4 w-4" />
-              )}
-              {notificationsEnabled ? '알림 켜짐' : '알림 꺼짐'}
-            </Button>
-          )}
+      <div className="flex gap-2">
+        {isSubscribed && (
           <Button
-            variant={isSubscribed ? 'outline' : 'default'}
+            variant="ghost"
             size="sm"
-            onClick={onSubscriptionToggle}
+            onClick={handleNotificationToggle}
+            className="text-gray-600 hover:bg-gray-100"
           >
-            {isSubscribed ? '구독 중' : '구독하기'}
+            {notificationsEnabled ? (
+              <BellIcon className="mr-2 h-4 w-4" />
+            ) : (
+              <BellOffIcon className="mr-2 h-4 w-4" />
+            )}
+            {notificationsEnabled ? '알림 켜짐' : '알림 꺼짐'}
           </Button>
-        </div>
-      )}
+        )}
+        <Button
+          variant={isSubscribed ? 'outline' : 'default'}
+          size="sm"
+          onClick={handleSubscriptionToggle}
+        >
+          {isSubscribed ? '구독 중' : '구독하기'}
+        </Button>
+      </div>
     </div>
   );
 }

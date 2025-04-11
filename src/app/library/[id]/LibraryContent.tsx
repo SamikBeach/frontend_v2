@@ -1,18 +1,21 @@
 import { Book as BookType } from '@/apis/book';
 import { Library } from '@/apis/library/types';
+import { selectedBookAtom, selectedBookIdAtom } from '@/atoms/book';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { useSetAtom } from 'jotai';
 import { Grid, List } from 'lucide-react';
 import { useState } from 'react';
 
-export interface LibraryContentProps {
+interface LibraryContentProps {
   library: Library;
-  onBookClick: (book: BookType) => void;
 }
 
-export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
+export function LibraryContent({ library }: LibraryContentProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const setSelectedBookId = useSetAtom(selectedBookIdAtom);
+  const setSelectedBook = useSetAtom(selectedBookAtom);
 
   // 라이브러리 책 형식 변환
   const booksWithDetails =
@@ -20,6 +23,13 @@ export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
       ...libraryBook.book,
       id: libraryBook.bookId,
     })) || [];
+
+  // 책 선택 핸들러
+  const handleBookClick = (book: BookType) => {
+    // 선택된 책 ID 및 데이터 모두 저장
+    setSelectedBookId(book.id.toString());
+    setSelectedBook(book);
+  };
 
   return (
     <div className="space-y-3">
@@ -73,7 +83,7 @@ export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
             {booksWithDetails.length > 0 ? (
               booksWithDetails.map(book => (
                 <div key={book.id} className="flex aspect-[3/4] flex-col">
-                  <BookCard book={book as BookType} onClick={onBookClick} />
+                  <BookCard book={book as BookType} onClick={handleBookClick} />
                 </div>
               ))
             ) : (
@@ -89,7 +99,7 @@ export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
                 <div
                   key={book.id}
                   className="flex cursor-pointer gap-4 rounded-xl bg-gray-50 p-3 transition-colors hover:bg-gray-100"
-                  onClick={() => onBookClick(book as BookType)}
+                  onClick={() => handleBookClick(book as BookType)}
                 >
                   <div className="h-32 w-20 flex-shrink-0 overflow-hidden rounded-lg">
                     <img
