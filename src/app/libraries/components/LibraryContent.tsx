@@ -41,7 +41,7 @@ export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
               variant="secondary"
               className="rounded-full bg-gray-100 text-xs"
             >
-              {mainTag.name}
+              {mainTag.tagName}
             </Badge>
           </div>
         )}

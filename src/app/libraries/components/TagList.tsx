@@ -18,7 +18,7 @@ export function TagList({ tags }: TagListProps) {
           variant="outline"
           className="border-gray-200 bg-white text-xs font-normal text-gray-600"
         >
-          {tag.name}
+          {tag.tagName}
         </Badge>
       ))}
     </div>

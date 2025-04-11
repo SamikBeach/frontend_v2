@@ -44,20 +44,20 @@ const sortOptions: SortOption[] = [
   {
     id: 'subscribers',
     label: '구독자순',
-    icon: () => <Users className="h-4 w-4" />,
+    icon: <Users className="h-4 w-4" />,
     sortFn: (a: LibrarySummary, b: LibrarySummary) =>
       b.subscriberCount - a.subscriberCount,
   },
   {
     id: 'books',
     label: '도서순',
-    icon: () => <BookOpen className="h-4 w-4" />,
+    icon: <BookOpen className="h-4 w-4" />,
     sortFn: (a: LibrarySummary, b: LibrarySummary) => b.bookCount - a.bookCount,
   },
   {
     id: 'created',
     label: '최신순',
-    icon: () => <Clock className="h-4 w-4" />,
+    icon: <Clock className="h-4 w-4" />,
     sortFn: (a: LibrarySummary, b: LibrarySummary) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   },
@@ -90,10 +90,8 @@ function LibraryCardSkeleton() {
 }
 
 function Libraries() {
-  const [categoryFilter, setCategoryFilter] = useAtom(
-    libraryCategoryFilterAtom
-  );
-  const { tags: popularTags, isLoading: isTagsLoading } = usePopularTags(10);
+  const [categoryFilter] = useAtom(libraryCategoryFilterAtom);
+  const { tags: popularTags } = usePopularTags(10);
   const [sortOption, setSortOption] = useAtom(librarySortOptionAtom);
   const [timeRange, setTimeRange] = useAtom(libraryTimeRangeAtom);
   const [searchQuery, setSearchQuery] = useAtom(librarySearchQueryAtom);
@@ -118,14 +116,6 @@ function Libraries() {
     currentPage,
     updateQueryParams,
   ]);
-
-  // 페이지네이션 설정
-  const ITEMS_PER_PAGE = 12;
-  const pagination = usePagination({
-    initialPage: currentPage,
-    pageSize: ITEMS_PER_PAGE,
-    totalItems: 0, // 초기값은 0으로 설정
-  });
 
   // 인기 태그에서 카테고리 생성
   const categories: Category[] = [

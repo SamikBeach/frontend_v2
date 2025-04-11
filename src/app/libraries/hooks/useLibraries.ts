@@ -46,7 +46,7 @@ export function useLibraries(): UseLibrariesResult {
           library.tags &&
           Array.isArray(library.tags) &&
           library.tags.length > 0 &&
-          library.tags.some(tag => tag && tag.name === categoryFilter)
+          library.tags.some(tag => tag && tag.tagName === categoryFilter)
         );
       });
     }
@@ -66,7 +66,8 @@ export function useLibraries(): UseLibrariesResult {
           Array.isArray(library.tags) &&
           library.tags.length > 0 &&
           library.tags.some(
-            tag => tag && tag.name && tag.name.toLowerCase().includes(query)
+            tag =>
+              tag && tag.tagName && tag.tagName.toLowerCase().includes(query)
           );
 
         return nameMatch || descMatch || tagMatch;

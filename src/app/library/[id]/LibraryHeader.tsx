@@ -1,13 +1,7 @@
 import { Library, LibraryTag } from '@/apis/library/types';
 import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
-import {
-  notificationsEnabledAtom,
-  subscriptionStatusAtom,
-} from '@/atoms/library';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useAtom } from 'jotai';
 import { BellIcon, BellOffIcon } from 'lucide-react';
 import { useParams } from 'next/navigation';
 
@@ -39,20 +33,15 @@ export function LibraryHeader({
   library,
   isSubscribed,
   notificationsEnabled,
-  onSubscriptionToggle,
-  onNotificationToggle,
 }: LibraryHeaderProps) {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
-  const user = useCurrentUser();
 
   // 구독 및 알림 상태 관리
-  const [isSubscribedState] = useAtom(subscriptionStatusAtom);
-  const [notificationsEnabledState] = useAtom(notificationsEnabledAtom);
 
   // useLibraryDetail hook에서 상태 변경 함수만 가져오기
   const { handleSubscriptionToggle, handleNotificationToggle } =
-    useLibraryDetail(libraryId, user?.id);
+    useLibraryDetail(libraryId);
 
   // 태그가 있는지 확인
   const hasTags = library.tags && library.tags.length > 0;

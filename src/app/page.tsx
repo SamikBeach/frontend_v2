@@ -567,7 +567,16 @@ export default function HomePage() {
           <div className="grid grid-cols-2 gap-4">
             {popularLibraries.slice(0, 2).map(library => (
               <div key={library.id}>
-                <LibraryCard library={library} />
+                <LibraryCard
+                  library={{
+                    ...library,
+                    tags: library.tags.map(tag => ({
+                      ...tag,
+                      tagId: tag.id,
+                      tagName: tag.name,
+                    })),
+                  }}
+                />
               </div>
             ))}
           </div>

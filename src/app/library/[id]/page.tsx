@@ -4,38 +4,17 @@ import { Book } from '@/apis/book';
 import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { selectedBookAtom, selectedBookIdAtom } from '@/atoms/book';
 import { BookDialog } from '@/components/BookDialog';
-import { Button } from '@/components/ui/button';
 import { useAtom } from 'jotai';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import { LibraryContent } from './LibraryContent';
 import { LibraryHeader } from './LibraryHeader';
 import { LibrarySidebar } from './LibrarySidebar';
 
-// 서재가 없을 때 표시할 컴포넌트
-function LibraryNotFound() {
-  const router = useRouter();
-
-  return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center">
-      <h1 className="text-2xl font-bold text-gray-900">
-        서재를 찾을 수 없습니다
-      </h1>
-      <p className="mt-2 text-gray-500">
-        요청하신 서재가 존재하지 않거나 삭제되었습니다.
-      </p>
-      <Button className="mt-4" onClick={() => router.push('/libraries')}>
-        서재 목록으로 돌아가기
-      </Button>
-    </div>
-  );
-}
-
 function LibraryDetailContent() {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
   const [isBookDialogOpen, setIsBookDialogOpen] = useState(false);
-  const [selectedBookId] = useAtom(selectedBookIdAtom);
 
   const {
     library,

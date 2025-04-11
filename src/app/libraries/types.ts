@@ -1,12 +1,9 @@
-import { TimeRange as ApiTimeRange } from '@/apis/book/types';
-import { LucideIcon } from 'lucide-react';
-import React from 'react';
+import { LibrarySummary } from '@/apis/library/types';
 
 // 서재 카테고리 타입
 export interface Category {
   id: string;
   name: string;
-  icon?: LucideIcon;
   color: string;
 }
 
@@ -39,14 +36,18 @@ export interface Library {
   timestamp: string;
 }
 
+// 인기순 기간 필터 타입
+export type TimeRange = 'all' | 'today' | 'week' | 'month' | 'year';
+
 // 정렬 옵션 타입
-export type SortOption = {
+export interface SortOption {
   id: string;
   label: string;
   icon: React.ReactNode;
-  sortFn: (a: Book, b: Book) => number;
+  sortFn: (a: LibrarySummary, b: LibrarySummary) => number;
+  // 인기순 정렬에만 기간 필터가 적용됨
   supportsTimeRange?: boolean;
-};
+}
 
 // 카테고리 버튼 속성
 export interface CategoryButtonProps {
@@ -60,17 +61,17 @@ export interface FilterBarProps {
   categories: Category[];
   selectedCategory: string;
   onCategoryClick: (id: string) => void;
-  isLoading?: boolean;
 }
 
 // 정렬 드롭다운 속성
 export interface SortDropdownProps {
   selectedSort: string;
-  onSortChange: (sortId: string) => void;
+  onSortChange: (id: string) => void;
   sortOptions: SortOption[];
-  selectedTimeRange: ApiTimeRange;
-  onTimeRangeChange: (timeRange: ApiTimeRange) => void;
   className?: string;
+  // 기간 필터 관련 props 추가
+  selectedTimeRange?: TimeRange;
+  onTimeRangeChange?: (range: TimeRange) => void;
 }
 
 // 서재 카드 속성
