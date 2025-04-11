@@ -1,3 +1,4 @@
+import { usePopularTags } from '@/app/libraries/hooks/usePopularTags';
 import {
   libraryCategoryFilterAtom,
   librarySearchQueryAtom,
@@ -13,6 +14,15 @@ export function LibraryBreadcrumb() {
     libraryCategoryFilterAtom
   );
   const [searchQuery, setSearchQuery] = useAtom(librarySearchQueryAtom);
+  const { tags: popularTags } = usePopularTags(10);
+
+  // 카테고리 이름 가져오기
+  const getCategoryName = (categoryId: string) => {
+    if (categoryId === 'all') return '전체';
+
+    const tag = popularTags.find(tag => String(tag.id) === categoryId);
+    return tag ? tag.name : categoryId;
+  };
 
   const handleClearFilters = () => {
     setSelectedCategory('all');
@@ -46,7 +56,9 @@ export function LibraryBreadcrumb() {
       {selectedCategory !== 'all' && (
         <>
           <ChevronRight className="mx-1 h-4 w-4" />
-          <span className="font-medium text-gray-900">{selectedCategory}</span>
+          <span className="font-medium text-gray-900">
+            {getCategoryName(selectedCategory)}
+          </span>
         </>
       )}
       {searchQuery && (

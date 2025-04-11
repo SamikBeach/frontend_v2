@@ -40,12 +40,13 @@ export interface Library {
 }
 
 // 정렬 옵션 타입
-export interface SortOption {
+export type SortOption = {
   id: string;
   label: string;
-  icon: () => React.ReactElement;
-  sortFn: (a: any, b: any) => number;
-}
+  icon: React.ReactNode;
+  sortFn: (a: Book, b: Book) => number;
+  supportsTimeRange?: boolean;
+};
 
 // 카테고리 버튼 속성
 export interface CategoryButtonProps {
