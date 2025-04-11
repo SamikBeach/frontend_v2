@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAtom } from 'jotai';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useLibraryDetail } from '../../libraries/hooks/useLibraryDetail';
 import { LibraryContent } from './LibraryContent';
 import { LibraryHeader } from './LibraryHeader';
@@ -35,9 +35,11 @@ function LibraryNotFound() {
 export default function LibraryDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const libraryId = parseInt(params.id, 10);
+  // params를 React.use()로 감싸서 Promise 해결
+  const resolvedParams = use(params);
+  const libraryId = parseInt(resolvedParams.id, 10);
   const user = useCurrentUser();
   const [isBookDialogOpen, setIsBookDialogOpen] = useState(false);
   const [selectedBookId] = useAtom(selectedBookIdAtom);
