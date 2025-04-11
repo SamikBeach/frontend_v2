@@ -13,6 +13,10 @@ import { useParams } from 'next/navigation';
 
 interface LibraryHeaderProps {
   library: Library;
+  isSubscribed: boolean;
+  notificationsEnabled: boolean;
+  onSubscriptionToggle: () => Promise<void>;
+  onNotificationToggle: () => void;
 }
 
 // 실제 API에서 오는 태그 타입 (LibraryTag 인터페이스와 일치하지 않는 경우를 위한 추가 타입)
@@ -31,14 +35,20 @@ const pastelColors = [
   '#E2F0CB', // 연한 민트
 ];
 
-export function LibraryHeader({ library }: LibraryHeaderProps) {
+export function LibraryHeader({
+  library,
+  isSubscribed,
+  notificationsEnabled,
+  onSubscriptionToggle,
+  onNotificationToggle,
+}: LibraryHeaderProps) {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
   const user = useCurrentUser();
 
   // 구독 및 알림 상태 관리
-  const [isSubscribed] = useAtom(subscriptionStatusAtom);
-  const [notificationsEnabled] = useAtom(notificationsEnabledAtom);
+  const [isSubscribedState] = useAtom(subscriptionStatusAtom);
+  const [notificationsEnabledState] = useAtom(notificationsEnabledAtom);
 
   // useLibraryDetail hook에서 상태 변경 함수만 가져오기
   const { handleSubscriptionToggle, handleNotificationToggle } =
@@ -48,7 +58,7 @@ export function LibraryHeader({ library }: LibraryHeaderProps) {
   const hasTags = library.tags && library.tags.length > 0;
 
   return (
-    <div className="flex items-center justify-between bg-white px-8 py-6">
+    <div className="flex items-center justify-between bg-white px-6 py-6">
       <div className="flex-1">
         <div className="mb-2 flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900">{library.name}</h1>

@@ -32,7 +32,7 @@ export function LibraryContent({ library }: LibraryContentProps) {
   };
 
   return (
-    <div className="space-y-3 px-8">
+    <div className="space-y-3 px-6">
       {/* 서재 설명 */}
       <div className="rounded-xl bg-white py-2">
         <p className="text-gray-700">

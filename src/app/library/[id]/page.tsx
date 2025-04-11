@@ -1,14 +1,13 @@
 'use client';
 
 import { Book } from '@/apis/book';
+import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { selectedBookAtom, selectedBookIdAtom } from '@/atoms/book';
 import { BookDialog } from '@/components/BookDialog';
 import { Button } from '@/components/ui/button';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAtom } from 'jotai';
-import { useRouter } from 'next/navigation';
-import { use, useEffect, useState } from 'react';
-import { useLibraryDetail } from '../../libraries/hooks/useLibraryDetail';
+import { useParams, useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import { LibraryContent } from './LibraryContent';
 import { LibraryHeader } from './LibraryHeader';
 import { LibrarySidebar } from './LibrarySidebar';
@@ -32,45 +31,45 @@ function LibraryNotFound() {
   );
 }
 
-export default function LibraryDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  // params를 React.use()로 감싸서 Promise 해결
-  const resolvedParams = use(params);
-  const libraryId = parseInt(resolvedParams.id, 10);
-  const user = useCurrentUser();
+function LibraryDetailContent() {
+  const params = useParams();
+  const libraryId = parseInt(params.id as string, 10);
   const [isBookDialogOpen, setIsBookDialogOpen] = useState(false);
   const [selectedBookId] = useAtom(selectedBookIdAtom);
 
-  // 서재 데이터 가져오기
-  const { library, isLoading } = useLibraryDetail(libraryId, user?.id);
-
-  // 서재가 없으면 NotFound 컴포넌트 표시
-  if (!library && !isLoading) {
-    return <LibraryNotFound />;
-  }
+  const {
+    library,
+    isSubscribed,
+    notificationsEnabled,
+    handleSubscriptionToggle,
+    handleNotificationToggle,
+  } = useLibraryDetail(libraryId);
 
   if (!library) {
-    return <div>로딩 중...</div>;
+    return <div>서재를 찾을 수 없습니다.</div>;
   }
 
   return (
-    <>
-      {/* 상단 헤더 */}
-      <LibraryHeader library={library} />
-
-      {/* 메인 콘텐츠와 사이드바 */}
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-3 lg:grid-cols-4">
-        {/* 메인 컨텐츠 영역 */}
-        <div className="md:col-span-2 lg:col-span-3">
+    <div className="mx-auto max-w-[1600px]">
+      <LibraryHeader
+        library={library}
+        isSubscribed={isSubscribed}
+        notificationsEnabled={notificationsEnabled}
+        onSubscriptionToggle={handleSubscriptionToggle}
+        onNotificationToggle={handleNotificationToggle}
+      />
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
+        <div>
           <LibraryContent library={library} />
         </div>
-
-        {/* 사이드바 영역 */}
-        <div className="md:col-span-1">
-          <LibrarySidebar library={library} />
+        <div className="w-full min-w-[360px]">
+          <LibrarySidebar
+            library={library}
+            isSubscribed={isSubscribed}
+            notificationsEnabled={notificationsEnabled}
+            onSubscriptionToggle={handleSubscriptionToggle}
+            onNotificationToggle={handleNotificationToggle}
+          />
         </div>
       </div>
 
@@ -79,7 +78,15 @@ export default function LibraryDetailPage({
         isOpen={isBookDialogOpen}
         onOpenChange={setIsBookDialogOpen}
       />
-    </>
+    </div>
+  );
+}
+
+export default function LibraryDetailPage() {
+  return (
+    <Suspense fallback={<div>서재 정보를 불러오는 중...</div>}>
+      <LibraryDetailContent />
+    </Suspense>
   );
 }
 

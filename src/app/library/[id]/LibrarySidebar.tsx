@@ -15,16 +15,25 @@ import { useParams } from 'next/navigation';
 
 interface LibrarySidebarProps {
   library: Library;
+  isSubscribed: boolean;
+  notificationsEnabled: boolean;
+  onSubscriptionToggle: () => Promise<void>;
+  onNotificationToggle: () => void;
 }
 
-export function LibrarySidebar({ library }: LibrarySidebarProps) {
+export function LibrarySidebar({
+  library,
+  isSubscribed,
+  notificationsEnabled,
+  onSubscriptionToggle,
+  onNotificationToggle,
+}: LibrarySidebarProps) {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
   const user = useCurrentUser();
-
-  // 구독 및 알림 상태 관리
-  const [isSubscribed, setIsSubscribed] = useAtom(subscriptionStatusAtom);
-  const [notificationsEnabled, setNotificationsEnabled] = useAtom(
+  const { mutate: toggleSubscription } = useLibraryDetail(libraryId);
+  const [isSubscribedState, setIsSubscribed] = useAtom(subscriptionStatusAtom);
+  const [notificationsEnabledState, setNotificationsEnabled] = useAtom(
     notificationsEnabledAtom
   );
 
@@ -41,7 +50,7 @@ export function LibrarySidebar({ library }: LibrarySidebarProps) {
   const previewSubscribers = library.subscribers?.slice(0, 3) || [];
 
   return (
-    <div className="space-y-5 px-8">
+    <div className="space-y-5 px-6">
       {/* 서재 소유자 정보 & 팔로우 버튼 */}
       <div className="rounded-2xl bg-gray-50 p-5">
         <div className="flex items-center gap-3">
