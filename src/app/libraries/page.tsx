@@ -169,8 +169,8 @@ function Libraries() {
       <div className="sticky top-[56px] z-30 bg-white">
         <div className="mx-auto w-full px-4 py-2">
           <div className="relative">
-            {/* 검색바와 정렬 드롭다운을 위한 컨테이너 */}
-            <div className="mb-4 flex flex-col gap-3 xl:absolute xl:top-0 xl:right-0 xl:mb-0 xl:flex-row">
+            {/* xl 이상 화면에서 보이는 검색바와 정렬 버튼 */}
+            <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:flex xl:items-center xl:gap-4">
               <SearchBar value={searchQuery} onChange={handleSearchChange} />
               <SortDropdown
                 selectedSort={sortOption}
@@ -178,18 +178,27 @@ function Libraries() {
                 sortOptions={sortOptions}
                 selectedTimeRange={timeRange}
                 onTimeRangeChange={handleTimeRangeChange}
-                className="xl:w-auto"
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              {/* 카테고리 필터 */}
-              <FilterBar
-                categories={categories}
-                selectedCategory={categoryFilter}
-                onCategoryClick={setCategoryFilter}
-                isLoading={isTagsLoading}
-              />
+            <div className="flex flex-col gap-4">
+              <FilterBar categories={categories} />
+              {/* xl 미만 화면에서 보이는 검색바와 정렬 버튼 */}
+              <div className="flex items-center gap-4 xl:hidden">
+                <div className="flex-1">
+                  <SearchBar
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                  />
+                </div>
+                <SortDropdown
+                  selectedSort={sortOption}
+                  onSortChange={handleSortChange}
+                  sortOptions={sortOptions}
+                  selectedTimeRange={timeRange}
+                  onTimeRangeChange={handleTimeRangeChange}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -317,7 +326,7 @@ export default function LibrariesPage() {
             <div className="sticky top-[56px] z-30 bg-white">
               <div className="mx-auto w-full px-4 py-2">
                 <div className="relative">
-                  <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:block">
+                  <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:flex xl:items-center xl:gap-4">
                     <Skeleton className="h-10 w-32 rounded-lg" />
                   </div>
                   <div className="flex flex-col gap-2">
