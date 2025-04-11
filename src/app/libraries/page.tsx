@@ -1,11 +1,8 @@
 'use client';
 
-import { LibrarySummary } from '@/apis/library/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BookOpen, Clock, Users } from 'lucide-react';
 import { Suspense } from 'react';
 import { Libraries } from './components/Libraries';
-import { SortOption } from './types';
 
 // 스크롤바 숨기는 CSS 추가
 const noScrollbarStyles = `
@@ -19,56 +16,6 @@ const noScrollbarStyles = `
     scrollbar-width: none;
   }
 `;
-
-// 정렬 옵션 정의
-const sortOptions: SortOption[] = [
-  {
-    id: 'subscribers',
-    label: '구독자순',
-    icon: <Users className="h-4 w-4" />,
-    sortFn: (a: LibrarySummary, b: LibrarySummary) =>
-      b.subscriberCount - a.subscriberCount,
-  },
-  {
-    id: 'books',
-    label: '도서순',
-    icon: <BookOpen className="h-4 w-4" />,
-    sortFn: (a: LibrarySummary, b: LibrarySummary) => b.bookCount - a.bookCount,
-  },
-  {
-    id: 'created',
-    label: '최신순',
-    icon: <Clock className="h-4 w-4" />,
-    sortFn: (a: LibrarySummary, b: LibrarySummary) =>
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  },
-];
-
-// 라이브러리 카드 로딩 스켈레톤
-function LibraryCardSkeleton() {
-  return (
-    <div className="group h-full rounded-xl border-none bg-[#F9FAFB] p-5 shadow-none">
-      <div className="mb-3 flex items-center gap-3">
-        <Skeleton className="h-9 w-9 rounded-full" />
-        <div>
-          <Skeleton className="mb-1 h-4 w-40" />
-          <Skeleton className="h-3 w-20" />
-        </div>
-      </div>
-      <Skeleton className="mb-4 h-10 w-full" />
-      <div className="grid grid-cols-2 gap-2.5">
-        <Skeleton className="h-32 rounded-lg" />
-        <Skeleton className="h-32 rounded-lg" />
-      </div>
-      <div className="mt-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Skeleton className="h-3 w-14" />
-          <Skeleton className="h-3 w-10" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 // 로딩 상태를 위한 스켈레톤 컴포넌트
 function LibrariesSkeleton() {

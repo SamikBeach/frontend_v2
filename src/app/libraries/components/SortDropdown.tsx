@@ -1,3 +1,4 @@
+import { LibrarySummary } from '@/apis/library/types';
 import { SortDropdown as CommonSortDropdown } from '@/components/SortDropdown';
 import { SortDropdownProps } from '../types';
 
@@ -10,7 +11,7 @@ export function SortDropdown({
   onTimeRangeChange,
 }: SortDropdownProps) {
   return (
-    <CommonSortDropdown
+    <CommonSortDropdown<LibrarySummary>
       selectedSort={selectedSort}
       onSortChange={onSortChange}
       sortOptions={sortOptions}

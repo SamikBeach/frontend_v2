@@ -27,15 +27,15 @@ import { TimeRange as ApiTimeRange } from '@/apis/book/types';
 // UI에서 사용하는 확장된 TimeRange
 export type TimeRange = ApiTimeRange | 'today' | 'week';
 
-export type SortOption = {
+export type SortOption<T = Book> = {
   id: string;
   label: string;
   icon: React.ReactNode;
-  sortFn: (a: Book, b: Book) => number;
+  sortFn: (a: T, b: T) => number;
   supportsTimeRange?: boolean;
 };
 
-export const defaultSortOptions: SortOption[] = [
+export const defaultSortOptions: SortOption<Book>[] = [
   {
     id: 'reviews-desc',
     label: '리뷰 많은순',
@@ -93,10 +93,10 @@ export const timeRangeOptions = [
   },
 ];
 
-interface SortDropdownProps {
+interface SortDropdownProps<T = Book> {
   selectedSort: string;
   onSortChange: (sortId: string) => void;
-  sortOptions?: SortOption[];
+  sortOptions?: SortOption<T>[];
   className?: string;
   align?: 'start' | 'center' | 'end';
   // 기간 필터 관련 props 추가
@@ -104,15 +104,15 @@ interface SortDropdownProps {
   onTimeRangeChange?: (range: TimeRange) => void;
 }
 
-export function SortDropdown({
+export function SortDropdown<T = Book>({
   selectedSort,
   onSortChange,
-  sortOptions = defaultSortOptions,
+  sortOptions = defaultSortOptions as unknown as SortOption<T>[],
   className = '',
   align = 'end',
   selectedTimeRange = 'all',
   onTimeRangeChange,
-}: SortDropdownProps) {
+}: SortDropdownProps<T>) {
   // 현재 선택된 정렬 옵션 가져오기
   const currentSortOption =
     sortOptions.find(option => option.id === selectedSort) || sortOptions[0];
@@ -217,10 +217,10 @@ export const getDateFromTimeRange = (timeRange: TimeRange): Date | null => {
   }
 };
 
-export function useSortedBooks<T extends Book>(
+export function useSortedBooks<T extends object>(
   books: T[],
   selectedSort: string,
-  sortOptions = defaultSortOptions,
+  sortOptions: SortOption<T>[],
   selectedTimeRange: TimeRange = 'all'
 ): T[] {
   // 현재 선택된 정렬 옵션 가져오기
@@ -234,9 +234,9 @@ export function useSortedBooks<T extends Book>(
     // 기간별 필터링 (supportsTimeRange가 true인 정렬 옵션일 때만)
     if (currentSortOption.supportsTimeRange && selectedTimeRange !== 'all') {
       const cutoffDate = getDateFromTimeRange(selectedTimeRange);
-      if (cutoffDate) {
+      if (cutoffDate && books.length > 0 && 'publishDate' in books[0]) {
         filteredBooks = filteredBooks.filter(book => {
-          const bookDate = new Date(book.publishDate);
+          const bookDate = new Date((book as any).publishDate);
           return bookDate >= cutoffDate;
         });
       }

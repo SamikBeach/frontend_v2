@@ -59,7 +59,7 @@ export function LibrarySidebar() {
             variant={isSubscribed ? 'outline' : 'default'}
             onClick={handleSubscriptionToggle}
           >
-            {isSubscribed ? '구독 중' : '구독하기'}
+            {isSubscribed ? '팔로우 중' : '팔로우'}
           </Button>
 
           {isSubscribed && (
@@ -178,7 +178,7 @@ export function LibrarySidebar() {
           <h3 className="mb-3 font-medium text-gray-900">최근 업데이트</h3>
           <div className="space-y-3 text-sm">
             {library.recentUpdates.map((update, index) => (
-              <div key={index} className="rounded-lg bg-white p-3 shadow-sm">
+              <div key={index} className="rounded-lg bg-white p-3">
                 <span className="text-xs text-gray-500">
                   {formatRelativeTime(update.date)}
                 </span>
