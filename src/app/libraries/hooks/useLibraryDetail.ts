@@ -11,11 +11,10 @@ import {
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
 interface UseLibraryDetailResult {
-  library: Library | undefined;
-  isLoading: boolean;
+  library: Library;
   isSubscribed: boolean;
   notificationsEnabled: boolean;
   handleSubscriptionToggle: () => Promise<void>;
@@ -30,21 +29,15 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
   );
 
   // 서재 데이터 가져오기
-  const {
-    data: library,
-    isLoading,
-    refetch,
-  } = useSuspenseQuery({
+  const { data: library, refetch } = useSuspenseQuery({
     queryKey: ['library', libraryId, user?.id],
     queryFn: () => getLibraryById(libraryId, user?.id),
+    select: data => {
+      // 데이터를 가져온 후 구독 상태 업데이트
+      setIsSubscribed(!!data.isSubscribed);
+      return data;
+    },
   });
-
-  // 구독 상태 초기화
-  useEffect(() => {
-    if (library) {
-      setIsSubscribed(!!library.isSubscribed);
-    }
-  }, [library, setIsSubscribed]);
 
   // 구독 토글 핸들러
   const handleSubscriptionToggle = useCallback(async () => {
@@ -81,7 +74,6 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
 
   return {
     library,
-    isLoading,
     isSubscribed,
     notificationsEnabled,
     handleSubscriptionToggle,

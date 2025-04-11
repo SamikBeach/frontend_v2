@@ -12,7 +12,6 @@ import { useMemo } from 'react';
 
 interface UseLibrariesResult {
   libraries: LibrarySummary[];
-  isLoading: boolean;
 }
 
 export function useLibraries(): UseLibrariesResult {
@@ -23,7 +22,7 @@ export function useLibraries(): UseLibrariesResult {
   const searchQuery = useAtomValue(librarySearchQueryAtom);
 
   // 데이터 가져오기
-  const { data: libraries, isLoading } = useSuspenseQuery({
+  const { data: libraries } = useSuspenseQuery({
     queryKey: ['libraries', user?.id],
     queryFn: () => getAllLibraries(user?.id),
   });
@@ -88,7 +87,6 @@ export function useLibraries(): UseLibrariesResult {
 
   return {
     libraries: filteredAndSortedLibraries || [],
-    isLoading,
   };
 }
 

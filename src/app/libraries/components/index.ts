@@ -8,3 +8,4 @@ export * from './LibrarySidebar';
 export * from './SearchBar';
 export * from './SortDropdown';
 export * from './TagList';
+export * from './TagSelector';

@@ -49,6 +49,22 @@ export interface SubscriberInfo {
   profileImage?: string;
 }
 
+// 태그 정보 타입
+export interface TagResponseDto {
+  id: number;
+  name: string;
+  description?: string;
+  usageCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// 태그 목록 응답 타입
+export interface TagListResponseDto {
+  tags: TagResponseDto[];
+  totalCount: number;
+}
+
 // 서재 상세 응답 타입
 export interface Library {
   id: number;
@@ -110,5 +126,7 @@ export interface AddBookToLibraryDto {
 
 // 서재에 태그 추가 DTO
 export interface AddTagToLibraryDto {
-  name: string;
+  tagId?: number;
+  name?: string;
+  note?: string;
 }

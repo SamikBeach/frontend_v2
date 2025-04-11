@@ -2,7 +2,6 @@
 
 import { Book } from '@/apis';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { useParams, useRouter } from 'next/navigation';
 import { Suspense } from 'react';
 import { LibraryContent, LibrarySidebar } from '../components';
@@ -62,23 +61,6 @@ function LibraryDetailContent() {
     handleSubscriptionToggle,
     handleNotificationToggle,
   } = useLibraryDetail(libraryId);
-
-  // 서재가 없으면 404 또는 오류 메시지 표시
-  if (!library) {
-    return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center">
-        <h1 className="text-2xl font-bold text-gray-900">
-          서재를 찾을 수 없습니다
-        </h1>
-        <p className="mt-2 text-gray-500">
-          요청하신 서재가 존재하지 않거나 삭제되었습니다.
-        </p>
-        <Button className="mt-4" onClick={() => router.push('/libraries')}>
-          서재 목록으로 돌아가기
-        </Button>
-      </div>
-    );
-  }
 
   // BookCard에 필요한 onClick 핸들러
   const handleBookClick = (book: Book) => {
