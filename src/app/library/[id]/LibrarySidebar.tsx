@@ -10,7 +10,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useAtom } from 'jotai';
-import { Bell, BookOpen, Calendar, Users } from 'lucide-react';
+import { BookOpen, Calendar, Users } from 'lucide-react';
 import { useParams } from 'next/navigation';
 
 interface LibrarySidebarProps {
@@ -41,8 +41,8 @@ export function LibrarySidebar({ library }: LibrarySidebarProps) {
   const previewSubscribers = library.subscribers?.slice(0, 3) || [];
 
   return (
-    <div className="space-y-5">
-      {/* 서재 소유자 정보 & 구독 버튼 */}
+    <div className="space-y-5 px-8">
+      {/* 서재 소유자 정보 & 팔로우 버튼 */}
       <div className="rounded-2xl bg-gray-50 p-5">
         <div className="flex items-center gap-3">
           <Avatar className="h-12 w-12">
@@ -50,7 +50,7 @@ export function LibrarySidebar({ library }: LibrarySidebarProps) {
               src={`https://i.pravatar.cc/150?u=${library.owner.id}`}
               alt={library.owner.username}
             />
-            <AvatarFallback className="bg-blue-50 text-blue-600">
+            <AvatarFallback className="bg-gray-100 text-gray-600">
               {library.owner.username[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -62,29 +62,14 @@ export function LibrarySidebar({ library }: LibrarySidebarProps) {
           </div>
         </div>
 
-        <div className="mt-4 space-y-2">
+        <div className="mt-4">
           <Button
-            className="w-full rounded-full"
-            variant={isSubscribed ? 'outline' : 'default'}
+            className="w-full rounded-full bg-gray-900 text-white hover:bg-gray-800"
+            variant="default"
             onClick={handleSubscriptionToggle}
           >
-            {isSubscribed ? '구독 중' : '구독하기'}
+            {isSubscribed ? '팔로잉' : '팔로우'}
           </Button>
-
-          {isSubscribed && (
-            <Button
-              className="w-full rounded-full"
-              variant="outline"
-              onClick={handleNotificationToggle}
-            >
-              <Bell
-                className={`mr-2 h-4 w-4 ${
-                  notificationsEnabled ? 'text-blue-500' : 'text-gray-500'
-                }`}
-              />
-              {notificationsEnabled ? '알림 켜짐' : '알림 켜기'}
-            </Button>
-          )}
         </div>
       </div>
 
@@ -164,9 +149,9 @@ export function LibrarySidebar({ library }: LibrarySidebarProps) {
                     </p>
                   </div>
                   <Button
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="h-7 rounded-full text-xs"
+                    className="h-7 rounded-full border-gray-200 px-3 text-xs text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   >
                     팔로우
                   </Button>
