@@ -11,33 +11,45 @@ import {
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 
 interface UseLibraryDetailResult {
   library: Library;
+  isLoading: boolean;
   isSubscribed: boolean;
   notificationsEnabled: boolean;
   handleSubscriptionToggle: () => Promise<void>;
   handleNotificationToggle: () => void;
 }
 
-export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
+export function useLibraryDetail(
+  libraryId: number,
+  userId?: number
+): UseLibraryDetailResult {
   const user = useCurrentUser();
   const [isSubscribed, setIsSubscribed] = useAtom(subscriptionStatusAtom);
   const [notificationsEnabled, setNotificationsEnabled] = useAtom(
     notificationsEnabledAtom
   );
 
-  // 서재 데이터 가져오기
-  const { data: library, refetch } = useSuspenseQuery({
-    queryKey: ['library', libraryId],
-    queryFn: () => getLibraryById(libraryId),
-    select: data => {
-      // 데이터를 가져온 후 구독 상태 업데이트
-      setIsSubscribed(!!data.isSubscribed);
-      return data;
-    },
+  // 서재 데이터 가져오기 - userId 전달하여 서버 컨트롤러에 일치시킴
+  const {
+    data: library,
+    refetch,
+    isLoading,
+  } = useSuspenseQuery({
+    queryKey: ['library', libraryId, userId],
+    queryFn: () => getLibraryById(libraryId, userId || user?.id),
+    staleTime: 5 * 60 * 1000, // 5분 동안 데이터 유지
+    retry: 1, // 실패 시 1번 재시도
   });
+
+  // 데이터가 로드되면 구독 상태 업데이트
+  useEffect(() => {
+    if (library) {
+      setIsSubscribed(!!library.isSubscribed);
+    }
+  }, [library, setIsSubscribed]);
 
   // 구독 토글 핸들러
   const handleSubscriptionToggle = useCallback(async () => {
@@ -74,6 +86,7 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
 
   return {
     library,
+    isLoading,
     isSubscribed,
     notificationsEnabled,
     handleSubscriptionToggle,

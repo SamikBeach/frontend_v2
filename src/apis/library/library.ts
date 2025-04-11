@@ -18,7 +18,7 @@ import {
 export const getAllLibraries = async (
   userId?: number
 ): Promise<LibrarySummary[]> => {
-  const params = userId ? { userId } : undefined;
+  const params = userId ? { userId: userId.toString() } : undefined;
   const response = await api.get<LibrarySummary[]>('/library', { params });
   return response.data;
 };
@@ -30,7 +30,9 @@ export const getLibrariesByUser = async (
   userId: number,
   requestingUserId?: number
 ): Promise<LibrarySummary[]> => {
-  const params = requestingUserId ? { requestingUserId } : undefined;
+  const params = requestingUserId
+    ? { requestingUserId: requestingUserId.toString() }
+    : undefined;
   const response = await api.get<LibrarySummary[]>(`/library/user/${userId}`, {
     params,
   });
@@ -48,8 +50,12 @@ export const getSubscribedLibraries = async (): Promise<LibrarySummary[]> => {
 /**
  * 특정 서재 상세 조회
  */
-export const getLibraryById = async (id: number): Promise<Library> => {
-  const response = await api.get<Library>(`/library/${id}`);
+export const getLibraryById = async (
+  id: number,
+  userId?: number
+): Promise<Library> => {
+  const params = userId ? { userId: userId.toString() } : undefined;
+  const response = await api.get<Library>(`/library/${id}`, { params });
   return response.data;
 };
 
@@ -164,7 +170,7 @@ export const getLibraryUpdates = async (
   libraryId: number,
   limit?: number
 ): Promise<UpdateHistoryItem[]> => {
-  const params = limit ? { limit } : undefined;
+  const params = limit ? { limit: limit.toString() } : undefined;
   const response = await api.get<UpdateHistoryItem[]>(
     `/library/${libraryId}/updates`,
     { params }

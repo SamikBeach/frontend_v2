@@ -1,4 +1,4 @@
-import { getAllTags, getPopularTags } from '@/apis/library';
+import { getAllTags, getPopularTags } from '@/apis/library/tag';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';

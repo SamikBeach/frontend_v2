@@ -1,13 +1,13 @@
 'use client';
 
-import { Book } from '@/apis';
+import type { Book } from '@/apis/book';
 import { BookDialog } from '@/components/BookDialog';
 import { Button } from '@/components/ui/button';
-import { useParams, useRouter } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useLibraryDetail } from '../../libraries/hooks/useLibraryDetail';
 import { LibraryContent } from './LibraryContent';
-import { LibraryDetailSkeleton } from './LibraryDetailSkeleton';
 import { LibraryHeader } from './LibraryHeader';
 import { LibrarySidebar } from './LibrarySidebar';
 
@@ -23,39 +23,47 @@ function LibraryNotFound() {
       <p className="mt-2 text-gray-500">
         요청하신 서재가 존재하지 않거나 삭제되었습니다.
       </p>
-      <Button className="mt-4" onClick={() => router.push('/library')}>
+      <Button className="mt-4" onClick={() => router.push('/libraries')}>
         서재 목록으로 돌아가기
       </Button>
     </div>
   );
 }
 
-// 라이브러리 상세 컨텐츠 컴포넌트
-function LibraryDetailContent() {
-  const params = useParams();
-  const libraryId = parseInt(params.id as string);
+export default function LibraryDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const libraryId = parseInt(params.id, 10);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [isBookDialogOpen, setIsBookDialogOpen] = useState(false);
+  const user = useCurrentUser();
 
   // 서재 데이터와 상태 가져오기
   const {
     library,
+    isLoading,
     isSubscribed,
     notificationsEnabled,
     handleSubscriptionToggle,
     handleNotificationToggle,
-  } = useLibraryDetail(libraryId);
+  } = useLibraryDetail(libraryId, user?.id);
 
   // 서재가 없으면 NotFound 컴포넌트 표시
-  if (!library) {
+  if (!library && !isLoading) {
     return <LibraryNotFound />;
   }
 
-  // BookCard에 필요한 onClick 핸들러
+  // 책 선택 핸들러
   const handleBookClick = (book: Book) => {
     setSelectedBook(book);
     setIsBookDialogOpen(true);
   };
+
+  if (!library) {
+    return <div>로딩 중...</div>;
+  }
 
   return (
     <>
@@ -63,23 +71,21 @@ function LibraryDetailContent() {
       <LibraryHeader library={library} />
 
       {/* 메인 콘텐츠와 사이드바 */}
-      <div className="w-full pb-12">
-        <div className="grid gap-6 md:grid-cols-[1fr_400px]">
-          {/* 왼쪽: 서재 정보 및 책 목록 */}
-          <div className="pl-8">
-            <LibraryContent library={library} onBookClick={handleBookClick} />
-          </div>
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-4 md:grid-cols-3 lg:grid-cols-4">
+        {/* 메인 컨텐츠 영역 */}
+        <div className="md:col-span-2 lg:col-span-3">
+          <LibraryContent library={library} onBookClick={handleBookClick} />
+        </div>
 
-          {/* 오른쪽: 사이드바 */}
-          <div className="pr-8">
-            <LibrarySidebar
-              library={library}
-              isSubscribed={isSubscribed}
-              notificationsEnabled={notificationsEnabled}
-              onSubscriptionToggle={handleSubscriptionToggle}
-              onNotificationToggle={handleNotificationToggle}
-            />
-          </div>
+        {/* 사이드바 영역 */}
+        <div className="md:col-span-1">
+          <LibrarySidebar
+            library={library}
+            isSubscribed={isSubscribed}
+            notificationsEnabled={notificationsEnabled}
+            onSubscriptionToggle={handleSubscriptionToggle}
+            onNotificationToggle={handleNotificationToggle}
+          />
         </div>
       </div>
 
@@ -92,15 +98,5 @@ function LibraryDetailContent() {
         />
       )}
     </>
-  );
-}
-
-export default function LibraryDetailPage() {
-  return (
-    <div className="min-h-screen bg-white">
-      <Suspense fallback={<LibraryDetailSkeleton />}>
-        <LibraryDetailContent />
-      </Suspense>
-    </div>
   );
 }

@@ -8,14 +8,16 @@ export function CategoryButton({
 }: CategoryButtonProps) {
   return (
     <button
-      onClick={() => onClick(category.id)}
       className={cn(
-        'flex h-10 min-w-max cursor-pointer items-center rounded-full px-4 text-[15px] font-medium whitespace-nowrap transition-colors',
-        isSelected ? 'bg-gray-900 text-white' : 'text-gray-700 hover:opacity-90'
+        'flex h-9 shrink-0 cursor-pointer items-center justify-center rounded-full px-4 text-sm font-medium transition-all',
+        isSelected
+          ? 'bg-gray-900 text-white'
+          : 'bg-[#F9FAFB] text-gray-700 hover:bg-gray-100'
       )}
       style={{
-        backgroundColor: isSelected ? undefined : category.color || '#F9FAFB',
+        backgroundColor: isSelected ? undefined : category.color,
       }}
+      onClick={() => onClick(category.id)}
     >
       {category.name}
     </button>

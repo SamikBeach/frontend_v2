@@ -11,6 +11,10 @@ import { LibraryCardProps } from '../types';
 
 export function LibraryCard({ library }: LibraryCardProps) {
   // LibrarySummary 타입에는 category가 없으므로 카테고리 찾기 로직은 제거
+  // 태그가 있는지 확인 (태그가 없거나 배열이 비어있는 경우 처리)
+  const firstTag =
+    library.tags && library.tags.length > 0 ? library.tags[0] : null;
+  const hasValidTag = Boolean(firstTag?.name);
 
   return (
     <Link href={`/library/${library.id}`}>
@@ -32,14 +36,14 @@ export function LibraryCard({ library }: LibraryCardProps) {
                 <h3 className="text-[15px] font-medium text-gray-900 transition-colors duration-150 group-hover:text-[#3182F6]">
                   {library.name}
                 </h3>
-                {library.tags && library.tags.length > 0 && (
+                {hasValidTag && firstTag && (
                   <span
                     className="ml-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-gray-700"
                     style={{
                       backgroundColor: '#FFF8E2',
                     }}
                   >
-                    {library.tags[0].name}
+                    {firstTag.name}
                   </span>
                 )}
               </div>

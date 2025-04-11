@@ -5,10 +5,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { ArrowUpDown, ChevronDown } from 'lucide-react';
+import { ArrowUpDown, ChevronDown, Clock } from 'lucide-react';
 import React from 'react';
-import { timeRangeOptions } from '../data';
 import { SortDropdownProps, TimeRange } from '../types';
+
+// 기간 필터 옵션
+const timeRangeOptions = [
+  { id: 'all', label: '전체 기간', icon: <Clock className="h-4 w-4" /> },
+  { id: 'today', label: '오늘', icon: <Clock className="h-4 w-4" /> },
+  { id: 'week', label: '이번 주', icon: <Clock className="h-4 w-4" /> },
+  { id: 'month', label: '이번 달', icon: <Clock className="h-4 w-4" /> },
+  { id: 'year', label: '올해', icon: <Clock className="h-4 w-4" /> },
+];
 
 export function SortDropdown({
   selectedSort,
