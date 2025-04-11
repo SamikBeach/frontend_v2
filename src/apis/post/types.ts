@@ -1,4 +1,9 @@
-export type PostType = 'general' | 'discussion' | 'review' | 'question' | 'meetup';
+export type PostType =
+  | 'general'
+  | 'discussion'
+  | 'review'
+  | 'question'
+  | 'meetup';
 
 export interface Author {
   id: number;
@@ -59,4 +64,27 @@ export interface PostsResponse {
   total: number;
   page: number;
   totalPages: number;
-} 
+}
+
+// 홈화면용 인기 게시물 프리뷰 타입
+export interface HomePostPreview {
+  id: number;
+  content: string;
+  type: PostType;
+  authorName: string;
+  previewImage?: string;
+  likeCount: number;
+  commentCount: number;
+  books?: {
+    id: number;
+    title: string;
+    author: string;
+    coverImage: string;
+  }[];
+  createdAt: Date | string;
+}
+
+// 홈화면용 인기 게시물 응답 타입
+export interface HomePopularPostsResponse {
+  posts: HomePostPreview[];
+}

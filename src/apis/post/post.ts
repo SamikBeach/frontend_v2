@@ -3,9 +3,11 @@ import {
   Comment,
   CreateCommentDto,
   CreatePostDto,
+  HomePopularPostsResponse,
   PostResponseDto,
   PostsResponse,
   PostType,
+  UpdatePostDto,
 } from './types';
 
 /**
@@ -41,32 +43,63 @@ export const getPostById = async (id: number): Promise<PostResponseDto> => {
  * 게시물 생성
  */
 export const createPost = async (
-  createPostDto: CreatePostDto,
-  images?: FileList | File[]
+  data: CreatePostDto
 ): Promise<PostResponseDto> => {
-  // FormData 객체 생성하여 이미지와 함께 전송
   const formData = new FormData();
+  formData.append('content', data.content);
+  formData.append('type', data.type);
 
-  // JSON 데이터는 블롭으로 변환하여 추가
-  formData.append(
-    'createPostDto',
-    new Blob([JSON.stringify(createPostDto)], { type: 'application/json' })
-  );
-
-  // 이미지가 있으면 추가
-  if (images) {
-    Array.from(images).forEach(file => {
-      formData.append('images', file);
+  if (data.bookIds && data.bookIds.length > 0) {
+    data.bookIds.forEach(bookId => {
+      formData.append('bookIds', bookId.toString());
     });
   }
 
-  const response = await api.post<PostResponseDto>('/post', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
+  const response = await api.post<PostResponseDto>('/post', formData);
+  return response.data;
+};
+
+/**
+ * 이미지와 함께 게시물 생성
+ */
+export const createPostWithImages = async (
+  data: CreatePostDto,
+  images: File[]
+): Promise<PostResponseDto> => {
+  const formData = new FormData();
+  formData.append('content', data.content);
+  formData.append('type', data.type);
+
+  if (data.bookIds && data.bookIds.length > 0) {
+    data.bookIds.forEach(bookId => {
+      formData.append('bookIds', bookId.toString());
+    });
+  }
+
+  images.forEach(image => {
+    formData.append('images', image);
   });
 
+  const response = await api.post<PostResponseDto>('/post', formData);
   return response.data;
+};
+
+/**
+ * 게시물 수정
+ */
+export const updatePost = async (
+  id: number,
+  data: UpdatePostDto
+): Promise<PostResponseDto> => {
+  const response = await api.put<PostResponseDto>(`/post/${id}`, data);
+  return response.data;
+};
+
+/**
+ * 게시물 삭제
+ */
+export const deletePost = async (id: number): Promise<void> => {
+  await api.delete(`/post/${id}`);
 };
 
 /**
@@ -84,16 +117,11 @@ export const unlikePost = async (postId: number): Promise<void> => {
 };
 
 /**
- * 게시물 삭제
- */
-export const deletePost = async (postId: number): Promise<void> => {
-  await api.delete(`/post/${postId}`);
-};
-
-/**
  * 게시물의 댓글 목록 조회
  */
-export const getPostComments = async (postId: number): Promise<Comment[]> => {
+export const getCommentsByPostId = async (
+  postId: number
+): Promise<Comment[]> => {
   const response = await api.get<Comment[]>(`/post/${postId}/comment`);
   return response.data;
 };
@@ -103,12 +131,9 @@ export const getPostComments = async (postId: number): Promise<Comment[]> => {
  */
 export const createComment = async (
   postId: number,
-  createCommentDto: CreateCommentDto
+  data: CreateCommentDto
 ): Promise<Comment> => {
-  const response = await api.post<Comment>(
-    `/post/${postId}/comment`,
-    createCommentDto
-  );
+  const response = await api.post<Comment>(`/post/${postId}/comment`, data);
   return response.data;
 };
 
@@ -117,4 +142,19 @@ export const createComment = async (
  */
 export const deleteComment = async (commentId: number): Promise<void> => {
   await api.delete(`/post/comment/${commentId}`);
+};
+
+/**
+ * 홈화면용 인기 게시물 조회
+ */
+export const getPopularPostsForHome = async (
+  limit: number = 4
+): Promise<HomePopularPostsResponse> => {
+  const response = await api.get<HomePopularPostsResponse>(
+    '/post/popular/home',
+    {
+      params: { limit },
+    }
+  );
+  return response.data;
 };

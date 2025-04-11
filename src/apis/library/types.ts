@@ -132,3 +132,23 @@ export interface AddTagToLibraryDto {
   name?: string;
   note?: string;
 }
+
+// 홈화면용 인기 서재 정보 타입
+export interface HomeLibraryPreview {
+  id: number;
+  name: string;
+  ownerName: string;
+  subscriberCount: number;
+  bookCount: number;
+  previewBooks: {
+    id: number;
+    title: string;
+    author: string;
+    coverImage: string;
+  }[];
+}
+
+// 홈화면용 인기 서재 응답 타입
+export interface HomePopularLibrariesResponse {
+  libraries: HomeLibraryPreview[];
+}

@@ -3,6 +3,7 @@ import {
   AddBookToLibraryDto,
   AddTagToLibraryDto,
   CreateLibraryDto,
+  HomePopularLibrariesResponse,
   Library,
   LibraryBook,
   LibrarySummary,
@@ -170,6 +171,21 @@ export const getLibraryUpdates = async (
   const response = await api.get<UpdateHistoryItem[]>(
     `/library/${libraryId}/updates`,
     { params }
+  );
+  return response.data;
+};
+
+/**
+ * 홈화면용 인기 서재 조회
+ */
+export const getPopularLibrariesForHome = async (
+  limit: number = 3
+): Promise<HomePopularLibrariesResponse> => {
+  const response = await api.get<HomePopularLibrariesResponse>(
+    '/library/popular/home',
+    {
+      params: { limit },
+    }
   );
   return response.data;
 };
