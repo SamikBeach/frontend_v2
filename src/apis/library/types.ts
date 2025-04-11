@@ -13,8 +13,10 @@ export interface LibraryBook {
 // 서재 태그 타입
 export interface LibraryTag {
   id: number;
-  name: string;
+  tagId: number;
+  tagName: string;
   libraryId: number;
+  note?: string | null;
   createdAt: Date;
 }
 

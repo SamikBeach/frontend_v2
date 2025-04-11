@@ -10,11 +10,8 @@ import Link from 'next/link';
 import { LibraryCardProps } from '../types';
 
 export function LibraryCard({ library }: LibraryCardProps) {
-  // LibrarySummary 타입에는 category가 없으므로 카테고리 찾기 로직은 제거
-  // 태그가 있는지 확인 (태그가 없거나 배열이 비어있는 경우 처리)
-  const firstTag =
-    library.tags && library.tags.length > 0 ? library.tags[0] : null;
-  const hasValidTag = Boolean(firstTag?.name);
+  // 태그가 있는지 확인
+  const hasTags = library.tags && library.tags.length > 0;
 
   return (
     <Link href={`/library/${library.id}`}>
@@ -25,112 +22,65 @@ export function LibraryCard({ library }: LibraryCardProps) {
               <AvatarImage
                 src={`https://i.pravatar.cc/150?u=${library.owner.id}`}
                 alt={library.owner.username}
-                className="object-cover"
               />
-              <AvatarFallback className="bg-gray-100 text-gray-800">
-                {library.owner.username[0]}
+              <AvatarFallback>
+                {library.owner.username.slice(0, 2).toUpperCase()}
               </AvatarFallback>
             </Avatar>
-            <div>
+            <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="text-[15px] font-medium text-gray-900 transition-colors duration-150 group-hover:text-[#3182F6]">
+                <h3 className="truncate text-base font-semibold text-gray-900">
                   {library.name}
                 </h3>
-                {hasValidTag && firstTag && (
-                  <span
-                    className="ml-1 rounded-full px-2 py-0.5 text-[11px] font-medium text-gray-700"
-                    style={{
-                      backgroundColor: '#FFF8E2',
-                    }}
-                  >
-                    {firstTag.name}
-                  </span>
+                {/* 태그 목록 */}
+                {hasTags && library.tags && (
+                  <div className="flex flex-wrap gap-1">
+                    {library.tags.map((tag, index) => (
+                      <span
+                        key={tag.id}
+                        className="rounded-full px-2 py-0.5 text-[11px] font-medium text-gray-700"
+                        style={{
+                          backgroundColor: getTagColor(index),
+                        }}
+                      >
+                        {tag.tagName}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </div>
-              <p className="text-xs text-gray-500">{library.owner.username}</p>
+              <p className="text-sm text-gray-500">{library.owner.username}</p>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="px-5 pt-0 pb-3">
+        <CardContent className="p-5 pt-0">
           <p className="mb-4 line-clamp-2 text-sm text-gray-600">
             {library.description || '설명이 없습니다.'}
           </p>
-          <div className="grid grid-cols-2 gap-2.5">
-            {/* previewBooks가 존재하고 최소 1개 이상 있는 경우 첫 번째 책 표시 */}
-            {library.previewBooks && library.previewBooks.length > 0 ? (
-              <>
-                <div className="overflow-hidden rounded-lg">
-                  <div className="relative aspect-[2/3]">
-                    <img
-                      src={
-                        library.previewBooks[0].coverImage ||
-                        `https://picsum.photos/seed/${library.id}1/240/360`
-                      }
-                      alt={library.previewBooks[0].title}
-                      className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
-                    />
-                  </div>
-                </div>
-                {/* previewBooks가 최소 2개 이상 있는 경우 두 번째 책 표시 */}
-                {library.previewBooks.length > 1 ? (
-                  <div className="overflow-hidden rounded-lg">
-                    <div className="relative aspect-[2/3]">
-                      <img
-                        src={
-                          library.previewBooks[1].coverImage ||
-                          `https://picsum.photos/seed/${library.id}2/240/360`
-                        }
-                        alt={library.previewBooks[1].title}
-                        className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
-                      />
-                    </div>
-                  </div>
-                ) : (
-                  // 두 번째 책이 없는 경우 플레이스홀더 이미지 사용
-                  <div className="overflow-hidden rounded-lg">
-                    <div className="relative aspect-[2/3]">
-                      <img
-                        src={`https://picsum.photos/seed/${library.id}2/240/360`}
-                        alt="책 표지"
-                        className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
-                      />
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              // previewBooks가 없는 경우 기존 플레이스홀더 이미지 표시
-              <>
-                <div className="overflow-hidden rounded-lg">
-                  <div className="relative aspect-[2/3]">
-                    <img
-                      src={`https://picsum.photos/seed/${library.id}1/240/360`}
-                      alt="책 표지"
-                      className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
-                    />
-                  </div>
-                </div>
-                <div className="overflow-hidden rounded-lg">
-                  <div className="relative aspect-[2/3]">
-                    <img
-                      src={`https://picsum.photos/seed/${library.id}2/240/360`}
-                      alt="책 표지"
-                      className="absolute inset-0 h-full w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
-                    />
-                  </div>
-                </div>
-              </>
-            )}
+          <div className="flex w-full gap-2">
+            {library.previewBooks?.slice(0, 3).map(book => (
+              <div
+                key={book.id}
+                className="flex-1 overflow-hidden rounded-lg"
+                style={{ aspectRatio: '2/3' }}
+              >
+                <img
+                  src={book.coverImage}
+                  alt={book.title}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
           </div>
         </CardContent>
-        <CardFooter className="flex items-center justify-between px-5 py-3 text-xs text-gray-500">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5 text-gray-400" />
-              <span>{library.subscriberCount.toLocaleString()}</span>
+        <CardFooter className="p-5 pt-0">
+          <div className="flex items-center gap-4 text-sm text-gray-500">
+            <div className="flex items-center gap-1">
+              <Users className="h-4 w-4" />
+              <span>{library.subscriberCount}</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5 text-gray-400" />
+            <div className="flex items-center gap-1">
+              <BookOpen className="h-4 w-4" />
               <span>{library.bookCount}</span>
             </div>
           </div>
@@ -138,4 +88,20 @@ export function LibraryCard({ library }: LibraryCardProps) {
       </Card>
     </Link>
   );
+}
+
+// 태그 색상 배열
+const tagColors = [
+  '#FEE2E2', // 빨간색
+  '#FEF3C7', // 노란색
+  '#D1FAE5', // 초록색
+  '#DBEAFE', // 파란색
+  '#EDE9FE', // 보라색
+  '#FCE7F3', // 분홍색
+  '#F3F4F6', // 회색
+];
+
+// 태그 색상 반환 함수
+function getTagColor(index: number): string {
+  return tagColors[index % tagColors.length];
 }

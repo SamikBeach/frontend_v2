@@ -137,7 +137,7 @@ function Libraries() {
     },
     // 인기 태그 기반 카테고리
     ...(popularTags || []).map((tag, index) => ({
-      id: tag.name,
+      id: String(tag.id),
       name: tag.name,
       color: getTagColor(index),
     })),
@@ -169,18 +169,17 @@ function Libraries() {
       <div className="sticky top-[56px] z-30 bg-white">
         <div className="mx-auto w-full px-4 py-2">
           <div className="relative">
-            {/* xl 이상 화면에서만 보이는 정렬 버튼 (오른쪽 위치) */}
-            <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:block">
-              <div className="flex items-center gap-3">
-                <SearchBar value={searchQuery} onChange={handleSearchChange} />
-                <SortDropdown
-                  selectedSort={sortOption}
-                  onSortChange={handleSortChange}
-                  sortOptions={sortOptions}
-                  selectedTimeRange={timeRange}
-                  onTimeRangeChange={handleTimeRangeChange}
-                />
-              </div>
+            {/* 검색바와 정렬 드롭다운을 위한 컨테이너 */}
+            <div className="mb-4 flex flex-col gap-3 xl:absolute xl:top-0 xl:right-0 xl:mb-0 xl:flex-row">
+              <SearchBar value={searchQuery} onChange={handleSearchChange} />
+              <SortDropdown
+                selectedSort={sortOption}
+                onSortChange={handleSortChange}
+                sortOptions={sortOptions}
+                selectedTimeRange={timeRange}
+                onTimeRangeChange={handleTimeRangeChange}
+                className="xl:w-auto"
+              />
             </div>
 
             <div className="flex flex-col gap-2">
@@ -191,20 +190,6 @@ function Libraries() {
                 onCategoryClick={setCategoryFilter}
                 isLoading={isTagsLoading}
               />
-
-              {/* xl 미만 화면에서 보이는 정렬 버튼 */}
-              <div className="w-full xl:hidden">
-                <div className="flex items-center gap-3">
-                  <SortDropdown
-                    selectedSort={sortOption}
-                    onSortChange={handleSortChange}
-                    sortOptions={sortOptions}
-                    selectedTimeRange={timeRange}
-                    onTimeRangeChange={handleTimeRangeChange}
-                    className="w-full"
-                  />
-                </div>
-              </div>
             </div>
           </div>
         </div>
