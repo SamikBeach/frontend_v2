@@ -101,7 +101,7 @@ export function BookSearchDialog({
     };
 
     // 북 다이얼로그 대신 URL 파라미터만 업데이트
-    updateQueryParams({ book: book.id.toString() });
+    // updateQueryParams({ book: book.id.toString() });
     handleClose();
   };
 

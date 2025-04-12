@@ -1,10 +1,5 @@
 import api from '../axios';
-import {
-  PopularSearch,
-  RecentSearch,
-  SaveSearchTermRequest,
-  SearchBook,
-} from './types';
+import { PopularSearch, RecentSearch, SearchBook } from './types';
 
 /**
  * 도서 검색 API
@@ -68,20 +63,17 @@ export const getRecentSearchTerms = async (
 };
 
 /**
- * 검색어 저장 API
- */
-export const saveSearchTerm = async (
-  request: SaveSearchTermRequest
-): Promise<void> => {
-  // 검색어 자동 저장은 백엔드에서 처리되므로 여기서는 별도 API 호출 불필요
-  console.log('검색어 자동 저장됨:', request.term);
-};
-
-/**
  * 최근 검색어 전체 삭제 API
  */
 export const deleteAllRecentSearches = async (): Promise<void> => {
   await api.delete('/search/recent');
+};
+
+/**
+ * 최근 검색어 개별 삭제 API
+ */
+export const deleteRecentSearch = async (id: number): Promise<void> => {
+  await api.delete(`/search/recent/${id}`);
 };
 
 /**
@@ -92,12 +84,9 @@ export const logBookSelection = async (request: {
   bookId: number;
   title: string;
   author: string;
-  coverImage: string;
-  publisher: string;
+  coverImage?: string;
+  publisher?: string;
   description?: string;
 }): Promise<void> => {
-  await api.post('/search/log-book-selection', {
-    ...request,
-    bookId: request.bookId.toString(),
-  });
+  await api.post('/search/log-book-selection', request);
 };

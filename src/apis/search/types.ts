@@ -31,12 +31,14 @@ export interface BookSearchResult {
 }
 
 export interface RecentSearch {
+  id: number;
   term: string;
   bookId?: number;
   title?: string;
   author?: string;
   coverImage?: string;
   publisher?: string;
+  description?: string;
   createdAt: string;
 }
 
@@ -48,4 +50,9 @@ export interface PopularSearch {
 export interface SaveSearchTermRequest {
   term: string;
   bookId?: number;
+  title?: string;
+  author?: string;
+  coverImage?: string;
+  publisher?: string;
+  description?: string;
 }

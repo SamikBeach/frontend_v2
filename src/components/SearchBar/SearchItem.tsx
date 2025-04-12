@@ -44,6 +44,20 @@ export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
     );
   };
 
+  // 평점 형식화 함수
+  const formatRating = (rating: any): string => {
+    if (typeof rating === 'number') {
+      return rating.toFixed(1);
+    }
+
+    if (typeof rating === 'string') {
+      const parsedRating = parseFloat(rating);
+      return Number.isNaN(parsedRating) ? rating : parsedRating.toFixed(1);
+    }
+
+    return String(rating);
+  };
+
   return (
     <CommandItem
       value={`${item.type}-${item.id}-${item.title}`}
@@ -88,7 +102,7 @@ export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
             {item.rating && (
               <div className="flex items-center gap-1">
                 <Star className="h-3.5 w-3.5 text-yellow-500" />
-                <span>{item.rating.toFixed(1)}</span>
+                <span>{formatRating(item.rating)}</span>
               </div>
             )}
             {item.rating && item.reviews && <span>·</span>}
@@ -105,11 +119,13 @@ export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
       {/* 삭제 버튼 (최근 검색어에만 표시) */}
       {onDelete && (
         <button
-          className="absolute top-1/2 right-4 flex-shrink-0 -translate-y-1/2 rounded-full p-1 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-100 hover:text-gray-600"
+          className="absolute top-1/2 right-4 flex-shrink-0 -translate-y-1/2 transform cursor-pointer rounded-full p-1.5 text-gray-400 opacity-0 transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-gray-900 hover:text-white hover:shadow-md focus:ring-2 focus:ring-gray-300 focus:outline-none"
           onClick={e => {
             e.stopPropagation();
             onDelete();
           }}
+          title="검색어 삭제"
+          aria-label="검색어 삭제"
         >
           <X className="h-4 w-4" />
         </button>

@@ -9,10 +9,10 @@ import { RecentSearchList } from './RecentSearchList';
 import { SearchItem } from './SearchItem';
 import {
   useDeleteAllRecentSearches,
+  useDeleteRecentSearch,
   useLogBookSelection,
   usePopularSearches,
   useRecentSearches,
-  useSaveSearchTerm,
 } from './hooks';
 
 interface SearchResultsProps {
@@ -33,6 +33,7 @@ function RecentSearches({
 }: Pick<SearchResultsProps, 'onItemClick' | 'onOpenChange' | 'setQuery'>) {
   const { data: recentSearchData } = useRecentSearches();
   const { mutate: deleteAllRecentSearches } = useDeleteAllRecentSearches();
+  const { mutate: deleteRecentSearch } = useDeleteRecentSearch();
 
   const recentSearches = recentSearchData?.recentSearches || [];
 
@@ -57,9 +58,9 @@ function RecentSearches({
             searches={recentSearches}
             onOpenChange={onOpenChange}
             onItemClick={onItemClick}
-            onDeleteSearch={term => {
-              // 특정 검색어 삭제 기능은 백엔드 API에 없어서 전체 삭제만 구현
-              console.log('삭제할 검색어:', term);
+            onDeleteSearch={searchId => {
+              // 특정 검색어 삭제
+              deleteRecentSearch(searchId);
             }}
           />
         </div>
@@ -119,7 +120,6 @@ export function SearchResults({
   searchResults,
   isLoading,
 }: SearchResultsProps) {
-  const saveSearchTerm = useSaveSearchTerm();
   const { mutate: logSelection } = useLogBookSelection();
   const searchResultsRef = useRef<SearchResult[]>([]);
 
@@ -130,11 +130,8 @@ export function SearchResults({
 
   // 검색 아이템 클릭 시 검색어 저장
   const handleItemClick = (item: any) => {
-    // 검색 API에 검색어와 선택한 책 ID 저장
+    // 책 선택 로그 저장 - 백엔드에서 자동으로 검색어도 함께 저장
     if (query) {
-      saveSearchTerm(query, item.id);
-
-      // 책 선택 로그 저장
       logSelection({
         term: query,
         bookId: item.id,
@@ -211,7 +208,7 @@ export function SearchResults({
 
           return (
             <SearchItem
-              key={`book-${book.id}`}
+              key={`book-${book.title}`}
               item={searchItem}
               onClick={() => handleItemClick(searchItem)}
             />

@@ -1,4 +1,4 @@
-import { logBookSelection, saveSearchTerm, searchBooks } from '@/apis/search';
+import { logBookSelection, searchBooks } from '@/apis/search';
 import { SearchBook } from '@/apis/search/types';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 
@@ -23,21 +23,6 @@ export function useSearchQuery(
 }
 
 /**
- * 검색어 저장 훅
- */
-export function useSaveSearchTerm() {
-  return async (term: string, bookId?: number) => {
-    if (!term.trim()) return;
-
-    try {
-      await saveSearchTerm({ term, bookId });
-    } catch (error) {
-      console.error('검색어 저장 실패:', error);
-    }
-  };
-}
-
-/**
  * 책 선택 로그 저장 훅
  */
 export function useLogBookSelection() {
@@ -47,8 +32,8 @@ export function useLogBookSelection() {
       bookId: number;
       title: string;
       author: string;
-      coverImage: string;
-      publisher: string;
+      coverImage?: string;
+      publisher?: string;
       description?: string;
     }) => logBookSelection(params),
   });

@@ -1,10 +1,7 @@
 export { usePopularSearches } from './usePopularSearches';
 export {
   useDeleteAllRecentSearches,
+  useDeleteRecentSearch,
   useRecentSearches,
 } from './useRecentSearches';
-export {
-  useLogBookSelection,
-  useSaveSearchTerm,
-  useSearchQuery,
-} from './useSearchQuery';
+export { useLogBookSelection, useSearchQuery } from './useSearchQuery';

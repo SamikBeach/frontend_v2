@@ -8,7 +8,7 @@ interface RecentSearchListProps {
   searches: RecentSearch[];
   onOpenChange: (open: boolean) => void;
   onItemClick: (item: any) => void;
-  onDeleteSearch: (term: string) => void;
+  onDeleteSearch: (searchId: number) => void;
 }
 
 export function RecentSearchList({
@@ -28,6 +28,7 @@ export function RecentSearchList({
           author: search.author,
           image: search.coverImage,
           subtitle: search.author,
+          searchId: search.id,
         };
 
         return (
@@ -38,7 +39,14 @@ export function RecentSearchList({
               onItemClick(searchItem);
               onOpenChange(false);
             }}
-            onDelete={() => onDeleteSearch(search.term)}
+            onDelete={() => {
+              // search.id가 존재할 때만 삭제 요청
+              if (typeof search.id === 'number') {
+                onDeleteSearch(search.id);
+              } else {
+                console.error('검색어 ID가 정의되지 않았습니다.');
+              }
+            }}
           />
         );
       })}
