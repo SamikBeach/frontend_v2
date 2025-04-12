@@ -83,7 +83,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
           </div>
         </div>
         <DropdownMenuSeparator />
-        <Link href="/profile">
+        <Link href={`/profile/${user.id}`}>
           <DropdownMenuItem>
             <UserIcon className="mr-2 h-4 w-4" />
             <span>내 프로필</span>
