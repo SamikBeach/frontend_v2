@@ -3,6 +3,7 @@
 import { CommandItem } from '@/components/ui/command';
 import { MessageSquare, Star, X } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 interface SearchItemProps {
   item: {
@@ -21,6 +22,8 @@ interface SearchItemProps {
 }
 
 export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
+  const [imageError, setImageError] = useState(false);
+
   // 하이라이트 텍스트 처리
   const highlightText = (text: string, highlight?: string) => {
     if (!highlight) return text;
@@ -53,13 +56,20 @@ export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
           <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
             <span className="text-xl text-gray-300">📖</span>
           </div>
-          <Image
-            src={item.image}
-            alt={item.title}
-            fill
-            className="object-cover"
-            sizes="112px"
-          />
+          {!imageError ? (
+            <Image
+              src={item.image}
+              alt={item.title}
+              fill
+              className="object-cover"
+              sizes="112px"
+              onError={() => setImageError(true)}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <span className="text-2xl">📚</span>
+            </div>
+          )}
         </div>
       )}
 

@@ -1,0 +1,38 @@
+import { saveSearchTerm, searchBooks } from '@/apis/search';
+import { SearchBook } from '@/apis/search/types';
+import { useSuspenseQuery } from '@tanstack/react-query';
+
+/**
+ * 도서 검색을 위한 React Query 훅
+ */
+export function useSearchQuery(
+  query: string,
+  page: number = 1,
+  limit: number = 10
+) {
+  return useSuspenseQuery<{
+    books: SearchBook[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }>({
+    queryKey: ['books', 'search', query, page, limit],
+    queryFn: () => searchBooks(query, page, limit),
+    staleTime: 1000 * 60 * 5, // 5분
+  });
+}
+
+/**
+ * 검색어 저장 훅
+ */
+export function useSaveSearchTerm() {
+  return async (term: string, bookId?: number) => {
+    if (!term.trim()) return;
+
+    try {
+      await saveSearchTerm({ term, bookId });
+    } catch (error) {
+      console.error('검색어 저장 실패:', error);
+    }
+  };
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Book } from '@/components/BookCard';
+import { Book } from '@/apis/book/types';
 import { Command, CommandInput } from '@/components/ui/command';
 import {
   Dialog,
@@ -11,14 +11,46 @@ import {
 } from '@/components/ui/dialog';
 import { useQueryParams } from '@/hooks';
 import { useDebounce } from '@/hooks/useDebounce';
-import { MutableRefObject, useEffect, useRef, useState } from 'react';
+import { MutableRefObject, Suspense, useRef, useState } from 'react';
 import { SearchResults } from './SearchResults';
+import { useSearchQuery } from './hooks';
 
 interface BookSearchDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   searchBarRef: MutableRefObject<HTMLDivElement | null>;
   overlayClassName?: string;
+}
+
+// 검색 결과를 로드하는 컴포넌트 (서스펜스로 감싸기 위함)
+function SearchResultsLoader({
+  query,
+  view,
+  onItemClick,
+  onOpenChange,
+  setQuery,
+}: {
+  query: string;
+  view: 'recent' | 'results';
+  onItemClick: (item: any) => void;
+  onOpenChange: (open: boolean) => void;
+  setQuery: (query: string) => void;
+}) {
+  // query가 공백이고 최근 검색어 보기 모드일 때는 API 호출을 하지 않음
+  const { data } = useSearchQuery(query);
+  const isLoading = !data && !!query.trim();
+
+  return (
+    <SearchResults
+      query={query}
+      view={view}
+      onItemClick={onItemClick}
+      onOpenChange={onOpenChange}
+      setQuery={setQuery}
+      searchResults={data?.books || []}
+      isLoading={isLoading}
+    />
+  );
 }
 
 export function BookSearchDialog({
@@ -32,14 +64,7 @@ export function BookSearchDialog({
   const inputRef = useRef<HTMLInputElement>(null);
   const { updateQueryParams } = useQueryParams();
 
-  // isOpen 상태가 변경될 때 검색어 초기화
-  useEffect(() => {
-    if (!isOpen) {
-      setQuery('');
-    }
-  }, [isOpen]);
-
-  // Dialog close 핸들러
+  // 다이얼로그 닫기 핸들러
   const handleClose = () => {
     setIsOpen(false);
   };
@@ -53,13 +78,15 @@ export function BookSearchDialog({
       author: item.author || item.subtitle,
       coverImage:
         item.image || `https://picsum.photos/seed/book${item.id}/240/360`,
-      category: 'book',
-      subcategory: 'general',
+      category: item.category || 'general',
+      subcategory: item.subcategory || 'general',
       rating: item.rating || 4.5,
       reviews: item.reviews || 120,
-      description: `${item.title}에 대한 설명입니다.`,
-      publishDate: '2023-01-01',
-      publisher: '출판사',
+      description: item.description || `${item.title}에 대한 설명입니다.`,
+      publishDate: item.publishDate || '2023-01-01',
+      publisher: item.publisher || '출판사',
+      isbn: item.isbn || '',
+      isbn13: item.isbn13 || '',
     };
 
     // 북 다이얼로그 대신 URL 파라미터만 업데이트
@@ -106,11 +133,21 @@ export function BookSearchDialog({
                 />
               </div>
               <div className="max-h-[80vh] overflow-y-auto py-2">
-                <SearchResults
-                  query={debouncedQuery}
-                  view={view}
-                  onItemClick={handleItemClick}
-                />
+                <Suspense
+                  fallback={
+                    <div className="flex h-[300px] items-center justify-center">
+                      로딩 중...
+                    </div>
+                  }
+                >
+                  <SearchResultsLoader
+                    query={debouncedQuery}
+                    view={view}
+                    onItemClick={handleItemClick}
+                    onOpenChange={setIsOpen}
+                    setQuery={setQuery}
+                  />
+                </Suspense>
               </div>
             </Command>
           </div>

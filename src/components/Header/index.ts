@@ -1,13 +1,5 @@
-export { AuthorItem } from './AuthorItem';
-export { BookItem } from './BookItem';
-export { BookSearchDialog } from './BookSearchDialog';
 export { DeleteButton } from './DeleteButton';
 export { Header } from './Header';
+export { LeftSlot } from './LeftSlot';
 export { NotificationButton } from './NotificationButton';
-export { RecentSearchList } from './RecentSearchList';
-export { SearchBar } from './SearchBar';
-export { SearchDialog } from './SearchDialog';
-export { SearchDialogContent } from './SearchDialogContent';
-export { SearchItem } from './SearchItem';
-export { SearchResultList } from './SearchResultList';
-export { SearchResults } from './SearchResults';
+export { RightSlot } from './RightSlot';

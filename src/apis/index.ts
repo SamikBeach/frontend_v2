@@ -6,4 +6,5 @@ export * from './book';
 export * from './category';
 export * from './library';
 export * from './post';
+export * from './search';
 export * from './user';
