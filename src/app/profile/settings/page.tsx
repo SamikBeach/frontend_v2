@@ -10,7 +10,6 @@ import { useState } from 'react';
 // Import components
 import AccountSettings from './components/AccountSettings';
 import LanguageSettings from './components/LanguageSettings';
-import NotificationSettings from './components/NotificationSettings';
 import PrivacySettings from './components/PrivacySettings';
 import ProfileSettings from './components/ProfileSettings';
 import SecuritySettings from './components/SecuritySettings';
@@ -66,8 +65,6 @@ export default function ProfileSettingsPage() {
     switch (activeTab) {
       case 'profile':
         return <ProfileSettings user={user} onSave={handleSaveSettings} />;
-      case 'notifications':
-        return <NotificationSettings onSave={handleSaveSettings} />;
       case 'privacy':
         return <PrivacySettings onSave={handleSaveSettings} />;
       case 'security':

@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Bell, Globe, Lock, LogOut, Shield, User, UserCog } from 'lucide-react';
+import { Globe, Lock, LogOut, Shield, User, UserCog } from 'lucide-react';
 
 // 설정 탭 인터페이스 정의
 export interface SettingTab {
@@ -29,11 +29,6 @@ export const settingTabs: SettingTab[] = [
     id: 'security',
     label: '보안',
     icon: Lock,
-  },
-  {
-    id: 'notifications',
-    label: '알림',
-    icon: Bell,
   },
   {
     id: 'privacy',
