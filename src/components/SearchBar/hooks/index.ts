@@ -3,4 +3,8 @@ export {
   useDeleteAllRecentSearches,
   useRecentSearches,
 } from './useRecentSearches';
-export { useSaveSearchTerm, useSearchQuery } from './useSearchQuery';
+export {
+  useLogBookSelection,
+  useSaveSearchTerm,
+  useSearchQuery,
+} from './useSearchQuery';

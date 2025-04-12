@@ -9,6 +9,7 @@ import { RecentSearchList } from './RecentSearchList';
 import { SearchItem } from './SearchItem';
 import {
   useDeleteAllRecentSearches,
+  useLogBookSelection,
   usePopularSearches,
   useRecentSearches,
   useSaveSearchTerm,
@@ -119,6 +120,7 @@ export function SearchResults({
   isLoading,
 }: SearchResultsProps) {
   const saveSearchTerm = useSaveSearchTerm();
+  const { mutate: logSelection } = useLogBookSelection();
   const searchResultsRef = useRef<SearchResult[]>([]);
 
   // 검색 결과 캐싱
@@ -131,6 +133,17 @@ export function SearchResults({
     // 검색 API에 검색어와 선택한 책 ID 저장
     if (query) {
       saveSearchTerm(query, item.id);
+
+      // 책 선택 로그 저장
+      logSelection({
+        term: query,
+        bookId: item.id,
+        title: item.title,
+        author: item.author || '',
+        coverImage: item.image || '',
+        publisher: item.publisher || '',
+        description: item.description || '',
+      });
     }
 
     // 부모 컴포넌트에 아이템 클릭 이벤트 전달

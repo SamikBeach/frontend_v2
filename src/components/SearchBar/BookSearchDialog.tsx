@@ -11,7 +11,8 @@ import {
 } from '@/components/ui/dialog';
 import { useQueryParams } from '@/hooks';
 import { useDebounce } from '@/hooks/useDebounce';
-import { MutableRefObject, Suspense, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { MutableRefObject, Suspense, useEffect, useRef, useState } from 'react';
 import { SearchResults } from './SearchResults';
 import { useSearchQuery } from './hooks';
 
@@ -63,10 +64,20 @@ export function BookSearchDialog({
   const debouncedQuery = useDebounce(query, 300);
   const inputRef = useRef<HTMLInputElement>(null);
   const { updateQueryParams } = useQueryParams();
+  const queryClient = useQueryClient();
 
   // 다이얼로그 닫기 핸들러
   const handleClose = () => {
     setIsOpen(false);
+    setQuery(''); // 검색어 초기화
+  };
+
+  // Dialog가 닫힐 때 검색어 초기화
+  const handleOpenChange = (isOpen: boolean) => {
+    setIsOpen(isOpen);
+    if (!isOpen) {
+      setQuery(''); // 검색어 초기화
+    }
   };
 
   // 검색 아이템 클릭 핸들러
@@ -97,8 +108,15 @@ export function BookSearchDialog({
   // 검색 결과 또는 최근 검색 표시 여부
   const view = debouncedQuery ? 'results' : 'recent';
 
+  // 다이얼로그가 열릴 때 최근 검색어 데이터를 다시 가져오도록 수정
+  useEffect(() => {
+    if (isOpen) {
+      queryClient.invalidateQueries({ queryKey: ['search', 'recent'] });
+    }
+  }, [isOpen, queryClient]);
+
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogPortal>
         <DialogOverlay
           className={`data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 ${overlayClassName}`}
@@ -144,7 +162,7 @@ export function BookSearchDialog({
                     query={debouncedQuery}
                     view={view}
                     onItemClick={handleItemClick}
-                    onOpenChange={setIsOpen}
+                    onOpenChange={handleOpenChange}
                     setQuery={setQuery}
                   />
                 </Suspense>

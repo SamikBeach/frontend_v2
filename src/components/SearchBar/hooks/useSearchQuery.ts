@@ -1,6 +1,6 @@
-import { saveSearchTerm, searchBooks } from '@/apis/search';
+import { logBookSelection, saveSearchTerm, searchBooks } from '@/apis/search';
 import { SearchBook } from '@/apis/search/types';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 
 /**
  * 도서 검색을 위한 React Query 훅
@@ -35,4 +35,21 @@ export function useSaveSearchTerm() {
       console.error('검색어 저장 실패:', error);
     }
   };
+}
+
+/**
+ * 책 선택 로그 저장 훅
+ */
+export function useLogBookSelection() {
+  return useMutation({
+    mutationFn: (params: {
+      term: string;
+      bookId: number;
+      title: string;
+      author: string;
+      coverImage: string;
+      publisher: string;
+      description?: string;
+    }) => logBookSelection(params),
+  });
 }

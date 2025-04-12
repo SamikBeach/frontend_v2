@@ -16,7 +16,7 @@ export function useRecentSearches(limit: number = 5) {
   }>({
     queryKey: ['search', 'recent', limit],
     queryFn: () => getRecentSearchTerms(limit),
-    staleTime: 1000 * 60 * 5, // 5분
+    staleTime: 0, // 항상 최신 데이터를 가져오도록 0으로 설정
   });
 }
 
