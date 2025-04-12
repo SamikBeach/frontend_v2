@@ -3,11 +3,13 @@ import {
   AddBookToLibraryDto,
   AddTagToLibraryDto,
   CreateLibraryDto,
+  HomePopularLibrariesResponse,
   Library,
   LibraryBook,
   LibrarySummary,
   LibraryTag,
-  Subscriber,
+  SubscriberInfo,
+  UpdateHistoryItem,
   UpdateLibraryDto,
 } from './types';
 
@@ -17,8 +19,8 @@ import {
 export const getAllLibraries = async (
   userId?: number
 ): Promise<LibrarySummary[]> => {
-  const params = userId ? { userId } : undefined;
-  const response = await api.get<LibrarySummary[]>('/libraries', { params });
+  const params = userId ? { userId: userId.toString() } : undefined;
+  const response = await api.get<LibrarySummary[]>('/library', { params });
   return response.data;
 };
 
@@ -29,13 +31,12 @@ export const getLibrariesByUser = async (
   userId: number,
   requestingUserId?: number
 ): Promise<LibrarySummary[]> => {
-  const params = requestingUserId ? { requestingUserId } : undefined;
-  const response = await api.get<LibrarySummary[]>(
-    `/libraries/user/${userId}`,
-    {
-      params,
-    }
-  );
+  const params = requestingUserId
+    ? { requestingUserId: requestingUserId.toString() }
+    : undefined;
+  const response = await api.get<LibrarySummary[]>(`/library/user/${userId}`, {
+    params,
+  });
   return response.data;
 };
 
@@ -43,19 +44,15 @@ export const getLibrariesByUser = async (
  * 사용자가 구독한 서재 목록 조회
  */
 export const getSubscribedLibraries = async (): Promise<LibrarySummary[]> => {
-  const response = await api.get<LibrarySummary[]>('/libraries/subscribed');
+  const response = await api.get<LibrarySummary[]>('/library/subscribed');
   return response.data;
 };
 
 /**
  * 특정 서재 상세 조회
  */
-export const getLibraryById = async (
-  id: number,
-  userId?: number
-): Promise<Library> => {
-  const params = userId ? { userId } : undefined;
-  const response = await api.get<Library>(`/libraries/${id}`, { params });
+export const getLibraryById = async (id: number): Promise<Library> => {
+  const response = await api.get<Library>(`/library/${id}`);
   return response.data;
 };
 
@@ -65,7 +62,7 @@ export const getLibraryById = async (
 export const createLibrary = async (
   createLibraryDto: CreateLibraryDto
 ): Promise<Library> => {
-  const response = await api.post<Library>('/libraries', createLibraryDto);
+  const response = await api.post<Library>('/library', createLibraryDto);
   return response.data;
 };
 
@@ -76,10 +73,7 @@ export const updateLibrary = async (
   id: number,
   updateLibraryDto: UpdateLibraryDto
 ): Promise<Library> => {
-  const response = await api.patch<Library>(
-    `/libraries/${id}`,
-    updateLibraryDto
-  );
+  const response = await api.patch<Library>(`/library/${id}`, updateLibraryDto);
   return response.data;
 };
 
@@ -87,7 +81,7 @@ export const updateLibrary = async (
  * 서재 삭제
  */
 export const deleteLibrary = async (id: number): Promise<void> => {
-  await api.delete(`/libraries/${id}`);
+  await api.delete(`/library/${id}`);
 };
 
 /**
@@ -98,7 +92,7 @@ export const addBookToLibrary = async (
   addBookToLibraryDto: AddBookToLibraryDto
 ): Promise<LibraryBook> => {
   const response = await api.post<LibraryBook>(
-    `/libraries/${libraryId}/books`,
+    `/library/${libraryId}/books`,
     addBookToLibraryDto
   );
   return response.data;
@@ -111,7 +105,7 @@ export const removeBookFromLibrary = async (
   libraryId: number,
   bookId: number
 ): Promise<void> => {
-  await api.delete(`/libraries/${libraryId}/books/${bookId}`);
+  await api.delete(`/library/${libraryId}/book/${bookId}`);
 };
 
 /**
@@ -122,7 +116,7 @@ export const addTagToLibrary = async (
   addTagToLibraryDto: AddTagToLibraryDto
 ): Promise<LibraryTag> => {
   const response = await api.post<LibraryTag>(
-    `/libraries/${libraryId}/tags`,
+    `/library/${libraryId}/tag`,
     addTagToLibraryDto
   );
   return response.data;
@@ -135,14 +129,14 @@ export const removeTagFromLibrary = async (
   libraryId: number,
   tagId: number
 ): Promise<void> => {
-  await api.delete(`/libraries/${libraryId}/tags/${tagId}`);
+  await api.delete(`/library/${libraryId}/tag/${tagId}`);
 };
 
 /**
  * 서재 구독하기
  */
 export const subscribeToLibrary = async (libraryId: number): Promise<void> => {
-  await api.post(`/libraries/${libraryId}/subscribe`);
+  await api.post(`/library/${libraryId}/subscribe`);
 };
 
 /**
@@ -151,7 +145,7 @@ export const subscribeToLibrary = async (libraryId: number): Promise<void> => {
 export const unsubscribeFromLibrary = async (
   libraryId: number
 ): Promise<void> => {
-  await api.delete(`/libraries/${libraryId}/subscribe`);
+  await api.delete(`/library/${libraryId}/subscribe`);
 };
 
 /**
@@ -159,9 +153,39 @@ export const unsubscribeFromLibrary = async (
  */
 export const getLibrarySubscribers = async (
   libraryId: number
-): Promise<Subscriber[]> => {
-  const response = await api.get<Subscriber[]>(
-    `/libraries/${libraryId}/subscribers`
+): Promise<SubscriberInfo[]> => {
+  const response = await api.get<SubscriberInfo[]>(
+    `/library/${libraryId}/subscribers`
+  );
+  return response.data;
+};
+
+/**
+ * 서재의 최근 업데이트 이력 조회
+ */
+export const getLibraryUpdates = async (
+  libraryId: number,
+  limit?: number
+): Promise<UpdateHistoryItem[]> => {
+  const params = limit ? { limit: limit.toString() } : undefined;
+  const response = await api.get<UpdateHistoryItem[]>(
+    `/library/${libraryId}/updates`,
+    { params }
+  );
+  return response.data;
+};
+
+/**
+ * 홈화면용 인기 서재 조회
+ */
+export const getPopularLibrariesForHome = async (
+  limit: number = 3
+): Promise<HomePopularLibrariesResponse> => {
+  const response = await api.get<HomePopularLibrariesResponse>(
+    '/library/popular/home',
+    {
+      params: { limit },
+    }
   );
   return response.data;
 };

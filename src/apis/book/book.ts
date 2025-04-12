@@ -2,6 +2,8 @@ import api from '../axios';
 import {
   Book,
   CreateBookDto,
+  HomeDiscoverBooksResponse,
+  HomePopularBooksResponse,
   PopularBooksParams,
   SortOption,
   TimeRange,
@@ -26,6 +28,7 @@ export const getBookById = async (id: number): Promise<Book> => {
 
 /**
  * ISBN으로 도서 조회
+ * isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
  */
 export const getBookByIsbn = async (isbn: string): Promise<Book> => {
   const response = await api.get<Book>(`/books/isbn/${isbn}`);
@@ -202,5 +205,35 @@ export const removeBookFromDiscoverCategory = async (
   bookId: number
 ): Promise<Book> => {
   const response = await api.delete<Book>(`/books/discover/remove/${bookId}`);
+  return response.data;
+};
+
+/**
+ * 홈화면용 인기 도서 조회
+ */
+export const getPopularBooksForHome = async (
+  limit: number = 4
+): Promise<HomePopularBooksResponse> => {
+  const response = await api.get<HomePopularBooksResponse>(
+    '/books/popular/home',
+    {
+      params: { limit },
+    }
+  );
+  return response.data;
+};
+
+/**
+ * 홈화면용 오늘의 발견 도서 조회
+ */
+export const getDiscoverBooksForHome = async (
+  limit: number = 6
+): Promise<HomeDiscoverBooksResponse[]> => {
+  const response = await api.get<HomeDiscoverBooksResponse[]>(
+    '/books/discover/home',
+    {
+      params: { limit },
+    }
+  );
   return response.data;
 };

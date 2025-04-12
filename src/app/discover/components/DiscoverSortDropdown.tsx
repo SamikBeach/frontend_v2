@@ -3,16 +3,13 @@ import {
   discoverSortOptionAtom,
   discoverTimeRangeAtom,
 } from '@/atoms/discover';
-import { useQueryParams } from '@/hooks';
-import { cn } from '@/lib/utils';
-import { useAtom } from 'jotai';
 import {
-  BarChart3,
-  CheckIcon,
-  ChevronDown,
-  ClockIcon,
-  Star,
-} from 'lucide-react';
+  SortDropdown,
+  TimeRange as SortTimeRange,
+} from '@/components/SortDropdown';
+import { useQueryParams } from '@/hooks';
+import { useAtom } from 'jotai';
+import { BarChart3, ClockIcon, Star } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 // 정렬 옵션 타입
@@ -59,7 +56,11 @@ const timeRangeOptions = [
   { id: 'year', label: '최근 1년', value: 'year' },
 ];
 
-export function DiscoverSortDropdown({ className }: { className?: string }) {
+interface DiscoverSortDropdownProps {
+  className?: string;
+}
+
+export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [sortOption, setSortOption] = useAtom(discoverSortOptionAtom);
   const [timeRange, setTimeRange] = useAtom(discoverTimeRangeAtom);
@@ -73,83 +74,42 @@ export function DiscoverSortDropdown({ className }: { className?: string }) {
   }, [sortOption]);
 
   // 정렬 옵션 변경 핸들러
-  const handleSortChange = (value: ApiSortOption) => {
-    setSortOption(value);
-    updateQueryParams({ sort: value });
+  const handleSortChange = (sort: string) => {
+    if (
+      sort === 'rating-desc' ||
+      sort === 'reviews-desc' ||
+      sort === 'publishDate-desc' ||
+      sort === 'title-asc'
+    ) {
+      setSortOption(sort);
+      updateQueryParams({ sort });
+    }
+  };
 
-    // 기간 필터 지원 여부 확인
-    const option = sortOptions.find(opt => opt.value === value);
-    if (!option?.supportsTimeRange) {
+  // 기간 필터 변경 핸들러
+  const handleTimeRangeChange = (range: SortTimeRange) => {
+    if (
+      range === 'all' ||
+      range === 'month' ||
+      range === 'year' ||
+      range === 'today' ||
+      range === 'week'
+    ) {
+      setTimeRange(range);
+      updateQueryParams({ timeRange: range });
+    } else {
       setTimeRange('all');
       updateQueryParams({ timeRange: 'all' });
     }
   };
 
-  // 기간 필터 변경 핸들러
-  const handleTimeRangeChange = (value: TimeRange) => {
-    setTimeRange(value);
-    updateQueryParams({ timeRange: value });
-  };
-
   return (
-    <div className={cn('relative', className)}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-      >
-        <span>{displaySortLabel}</span>
-        <ChevronDown className="h-4 w-4" />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full right-0 z-10 mt-1 w-48 rounded-md border border-gray-100 bg-white shadow-md">
-          <div className="py-1">
-            {sortOptions.map(option => (
-              <div
-                key={option.id}
-                className="flex w-full cursor-pointer items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                onClick={() => {
-                  handleSortChange(option.value);
-                  if (!option.supportsTimeRange) {
-                    setIsOpen(false);
-                  }
-                }}
-              >
-                <div className="mr-2">{option.icon}</div>
-                <span>{option.label}</span>
-                {sortOption === option.value && (
-                  <CheckIcon className="ml-auto h-4 w-4 text-blue-500" />
-                )}
-              </div>
-            ))}
-          </div>
-
-          {/* 현재 선택된 정렬 옵션이 기간 필터를 지원하는 경우에만 표시 */}
-          {sortOptions.find(opt => opt.value === sortOption)
-            ?.supportsTimeRange && (
-            <>
-              <div className="border-t border-gray-100" />
-              <div className="py-1">
-                {timeRangeOptions.map(option => (
-                  <div
-                    key={option.id}
-                    className="flex w-full cursor-pointer items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
-                    onClick={() => {
-                      handleTimeRangeChange(option.value as TimeRange);
-                      setIsOpen(false);
-                    }}
-                  >
-                    <span>{option.label}</span>
-                    {timeRange === option.value && (
-                      <CheckIcon className="ml-auto h-4 w-4 text-blue-500" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
-        </div>
-      )}
-    </div>
+    <SortDropdown
+      selectedSort={sortOption}
+      onSortChange={handleSortChange}
+      selectedTimeRange={timeRange}
+      onTimeRangeChange={handleTimeRangeChange}
+      className={className}
+    />
   );
 }

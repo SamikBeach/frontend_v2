@@ -1,4 +1,7 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
+import { useCurrentUser } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import { SubscriptionCard } from './SubscriptionCard';
 
@@ -66,6 +69,7 @@ export function SubscriptionsList({
   limit = 3,
 }: SubscriptionsListProps) {
   const router = useRouter();
+  const currentUser = useCurrentUser();
 
   const subscriptions = mockSubscriptions.slice(0, limit);
 
@@ -74,7 +78,11 @@ export function SubscriptionsList({
   };
 
   const handleViewAllClick = () => {
-    router.push('/profile/subscriptions');
+    if (currentUser) {
+      router.push(`/profile/${currentUser.id}?section=subscriptions`);
+    } else {
+      router.push('/home');
+    }
   };
 
   return (

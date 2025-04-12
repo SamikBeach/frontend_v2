@@ -1,21 +1,21 @@
 import {
   getLibraryById,
+  getLibraryUpdates,
   Library,
   subscribeToLibrary,
   unsubscribeFromLibrary,
+  UpdateHistoryItem,
 } from '@/apis/library';
 import {
   notificationsEnabledAtom,
   subscriptionStatusAtom,
 } from '@/atoms/library';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
 
 interface UseLibraryDetailResult {
-  library: Library | undefined;
-  isLoading: boolean;
+  library: Library;
   isSubscribed: boolean;
   notificationsEnabled: boolean;
   handleSubscriptionToggle: () => Promise<void>;
@@ -23,32 +23,44 @@ interface UseLibraryDetailResult {
 }
 
 export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
-  const user = useCurrentUser();
   const [isSubscribed, setIsSubscribed] = useAtom(subscriptionStatusAtom);
   const [notificationsEnabled, setNotificationsEnabled] = useAtom(
     notificationsEnabledAtom
   );
 
   // 서재 데이터 가져오기
-  const {
-    data: library,
-    isLoading,
-    refetch,
-  } = useSuspenseQuery({
-    queryKey: ['library', libraryId, user?.id],
-    queryFn: () => getLibraryById(libraryId, user?.id),
+  const { data: library, refetch } = useSuspenseQuery({
+    queryKey: ['library', libraryId],
+    queryFn: () => getLibraryById(libraryId),
+    staleTime: 5 * 60 * 1000, // 5분 동안 데이터 유지
+    retry: 1, // 실패 시 1번 재시도
   });
 
-  // 구독 상태 초기화
+  // 최근 업데이트 가져오기 (useSuspenseQuery 대신 useQuery 사용)
+  const { data: recentUpdates } = useQuery<UpdateHistoryItem[]>({
+    queryKey: ['library-updates', libraryId],
+    queryFn: () => getLibraryUpdates(libraryId, 5), // 최신 5개 항목만 가져오기
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+    enabled: !!library, // useQuery에서는 enabled 옵션 사용 가능
+  });
+
+  // 구독 상태 업데이트 - useEffect 대신 직접 업데이트
+  if (library && library.isSubscribed !== isSubscribed) {
+    setIsSubscribed(!!library.isSubscribed);
+  }
+
+  // 최근 업데이트 정보를 library 객체에 추가
   useEffect(() => {
-    if (library) {
-      setIsSubscribed(!!library.isSubscribed);
+    if (library && recentUpdates && Array.isArray(recentUpdates)) {
+      // 명시적으로 타입 확인 후 할당
+      (library as any).recentUpdates = recentUpdates;
     }
-  }, [library, setIsSubscribed]);
+  }, [library, recentUpdates]);
 
   // 구독 토글 핸들러
   const handleSubscriptionToggle = useCallback(async () => {
-    if (!library || !user) return;
+    if (!library) return;
 
     try {
       if (isSubscribed) {
@@ -67,7 +79,6 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
     }
   }, [
     library,
-    user,
     isSubscribed,
     refetch,
     setIsSubscribed,
@@ -81,7 +92,6 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
 
   return {
     library,
-    isLoading,
     isSubscribed,
     notificationsEnabled,
     handleSubscriptionToggle,

@@ -27,9 +27,12 @@ export const BookCard = React.memo(({ book, onClick }: BookCardProps) => {
       : book.reviews || 0;
 
   return (
-    <div className="cursor-pointer" onClick={() => onClick(book)}>
-      <div className="group h-full rounded-xl bg-[#F9FAFB] transition-all hover:bg-[#F2F4F6]">
-        <div className="relative aspect-[5/7] overflow-hidden rounded-t-xl">
+    <div
+      className="flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-xl"
+      onClick={() => onClick(book)}
+    >
+      <div className="group h-full w-full bg-[#F9FAFB] transition-all hover:bg-[#F2F4F6]">
+        <div className="relative aspect-[3/4] overflow-hidden">
           <img
             src={coverImage}
             alt={book.title}
@@ -37,14 +40,14 @@ export const BookCard = React.memo(({ book, onClick }: BookCardProps) => {
             loading="lazy"
           />
         </div>
-        <div className="p-3">
+        <div className="p-2.5">
           <h3 className="line-clamp-1 text-[15px] font-medium text-gray-900 group-hover:text-[#3182F6]">
             {book.title}
           </h3>
           <p className="mt-0.5 line-clamp-1 text-[13px] text-gray-500">
             {book.author}
           </p>
-          <div className="mt-2 flex items-center gap-2 text-[13px] text-gray-600">
+          <div className="mt-1.5 flex items-center gap-2 text-[13px] text-gray-600">
             <div className="flex items-center gap-1">
               <Star className="h-3.5 w-3.5 text-[#FFAB00]" />
               <span>{rating.toFixed(1)}</span>
@@ -60,3 +63,5 @@ export const BookCard = React.memo(({ book, onClick }: BookCardProps) => {
     </div>
   );
 });
+
+BookCard.displayName = 'BookCard';

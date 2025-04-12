@@ -61,3 +61,31 @@ export interface PopularBooksParams {
   sort?: SortOption;
   timeRange?: TimeRange;
 }
+
+// 홈 화면용 간소화된 도서 정보
+export interface HomeBookPreview {
+  id: number;
+  title: string;
+  author: string;
+  coverImage: string;
+  rating: number;
+  isbn: string;
+  isbn13?: string;
+  category?: {
+    id: number;
+    name: string;
+  };
+  publisher?: string;
+}
+
+// 홈 화면용 발견하기 응답 타입
+export interface HomeDiscoverBooksResponse {
+  categoryId: number;
+  categoryName: string;
+  books: HomeBookPreview[];
+}
+
+// 홈 화면용 인기 도서 응답 타입
+export interface HomePopularBooksResponse {
+  books: HomeBookPreview[];
+}

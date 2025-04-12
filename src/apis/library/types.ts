@@ -13,8 +13,10 @@ export interface LibraryBook {
 // 서재 태그 타입
 export interface LibraryTag {
   id: number;
-  name: string;
+  tagId: number;
+  tagName: string;
   libraryId: number;
+  note?: string | null;
   createdAt: Date;
 }
 
@@ -23,6 +25,46 @@ export interface LibraryOwner {
   id: number;
   username: string;
   email: string;
+}
+
+// 책 미리보기 정보 타입
+export interface BookPreview {
+  id: number;
+  title: string;
+  author: string;
+  coverImage: string;
+  isbn: string;
+  publisher: string;
+}
+
+// 서재 업데이트 이력 타입
+export interface UpdateHistoryItem {
+  date: Date;
+  message: string;
+}
+
+// 서재 구독자 정보 타입
+export interface SubscriberInfo {
+  id: number;
+  username: string;
+  email: string;
+  profileImage?: string;
+}
+
+// 태그 정보 타입
+export interface TagResponseDto {
+  id: number;
+  name: string;
+  description?: string;
+  usageCount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// 태그 목록 응답 타입
+export interface TagListResponseDto {
+  tags: TagResponseDto[];
+  totalCount: number;
 }
 
 // 서재 상세 응답 타입
@@ -36,6 +78,8 @@ export interface Library {
   books?: LibraryBook[];
   tags?: LibraryTag[];
   isSubscribed?: boolean;
+  subscribers?: SubscriberInfo[];
+  recentUpdates?: UpdateHistoryItem[];
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -50,6 +94,7 @@ export interface LibrarySummary {
   bookCount: number;
   owner: LibraryOwner;
   tags?: LibraryTag[];
+  previewBooks?: BookPreview[];
   isSubscribed?: boolean;
   createdAt: Date;
 }
@@ -83,5 +128,27 @@ export interface AddBookToLibraryDto {
 
 // 서재에 태그 추가 DTO
 export interface AddTagToLibraryDto {
+  tagId?: number;
+  name?: string;
+  note?: string;
+}
+
+// 홈화면용 인기 서재 정보 타입
+export interface HomeLibraryPreview {
+  id: number;
   name: string;
+  ownerName: string;
+  subscriberCount: number;
+  bookCount: number;
+  previewBooks: {
+    id: number;
+    title: string;
+    author: string;
+    coverImage: string;
+  }[];
+}
+
+// 홈화면용 인기 서재 응답 타입
+export interface HomePopularLibrariesResponse {
+  libraries: HomeLibraryPreview[];
 }

@@ -2,6 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks';
 import { UserCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export default function ProfileHeader() {
   const user = useCurrentUser();
@@ -62,13 +63,15 @@ export default function ProfileHeader() {
               </div>
             </div>
           </div>
-          <Button
-            className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
-            variant="outline"
-          >
-            <UserCircle className="h-4 w-4" />
-            프로필 편집
-          </Button>
+          <Link href="/profile/settings">
+            <Button
+              className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
+              variant="outline"
+            >
+              <UserCircle className="h-4 w-4" />
+              프로필 편집
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

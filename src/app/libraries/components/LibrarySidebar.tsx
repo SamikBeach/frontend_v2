@@ -1,7 +1,7 @@
 import { Library } from '@/apis/library/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { Bell, BookOpen, Calendar, Users } from 'lucide-react';
 
@@ -20,20 +20,20 @@ export function LibrarySidebar({
   onSubscriptionToggle,
   onNotificationToggle,
 }: LibrarySidebarProps) {
-  // 책 제목 가져오기 (없으면 빈 문자열 반환)
-  const getFirstBookTitle = (): string => {
-    if (!library.books || library.books.length === 0) {
-      return '책';
-    }
-    return library.books[0].book.title || '책';
+  // 상대적 시간 포맷팅 (예: "2일 전")
+  const formatRelativeTime = (date: Date): string => {
+    return formatDistanceToNow(new Date(date), { addSuffix: true, locale: ko });
   };
+
+  // 구독자 정보 (최대 3명)
+  const previewSubscribers = library.subscribers?.slice(0, 3) || [];
 
   return (
     <div className="space-y-6">
       {/* 서재 소유자 정보 */}
       <div className="rounded-xl bg-gray-50 p-4">
         <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12">
+          <Avatar className="h-12 w-12 border border-gray-200">
             <AvatarImage
               src={`https://i.pravatar.cc/150?u=${library.owner.id}`}
               alt={library.owner.username}
@@ -70,7 +70,7 @@ export function LibrarySidebar({
                   notificationsEnabled ? 'text-blue-500' : 'text-gray-500'
                 }`}
               />
-              {notificationsEnabled ? '알림 켜짐' : '알림 꺼짐'}
+              {notificationsEnabled ? '알림 켜짐' : '알림 켜기'}
             </Button>
           )}
         </div>
@@ -79,7 +79,7 @@ export function LibrarySidebar({
       {/* 서재 정보 */}
       <div className="rounded-xl bg-gray-50 p-4">
         <h3 className="mb-3 font-medium text-gray-900">서재 정보</h3>
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center gap-2 text-gray-600">
               <BookOpen className="h-4 w-4" />
@@ -113,70 +113,83 @@ export function LibrarySidebar({
       </div>
 
       {/* 구독자 미리보기 */}
-      <div className="rounded-xl bg-gray-50 p-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-medium text-gray-900">구독자</h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-sm text-gray-500 hover:text-gray-900"
-            onClick={() => {}}
-          >
-            모두 보기
-          </Button>
-        </div>
+      {library.subscribers && library.subscribers.length > 0 && (
+        <div className="rounded-xl bg-gray-50 p-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-medium text-gray-900">구독자</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-sm text-gray-500 hover:text-gray-900"
+              onClick={() => {}}
+            >
+              모두 보기
+            </Button>
+          </div>
 
-        <div className="mt-3 space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
-                <AvatarImage
-                  src={`https://i.pravatar.cc/150?u=follower${
-                    library.id * 3 + i
-                  }`}
-                  alt="구독자"
-                />
-                <AvatarFallback className="bg-gray-200">U</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
-                  사용자 {i + 1}
-                </p>
-                <p className="text-xs text-gray-500">@user{i + 1}</p>
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 rounded-full text-xs"
-              >
-                팔로우
-              </Button>
-            </div>
-          ))}
+          <div className="mt-3 space-y-3">
+            {previewSubscribers.length > 0 ? (
+              previewSubscribers.map(subscriber => (
+                <div key={subscriber.id} className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8 border border-gray-200">
+                    <AvatarImage
+                      src={
+                        subscriber.profileImage ||
+                        `https://i.pravatar.cc/150?u=${subscriber.id}`
+                      }
+                      alt={subscriber.username}
+                    />
+                    <AvatarFallback className="bg-gray-200">
+                      {subscriber.username[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-900">
+                      {subscriber.username}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      @{subscriber.username}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 rounded-full text-xs"
+                  >
+                    팔로우
+                  </Button>
+                </div>
+              ))
+            ) : (
+              <p className="text-center text-sm text-gray-500">
+                아직 구독자가 없습니다.
+              </p>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 업데이트 알림 섹션 */}
-      <div className="rounded-xl bg-gray-50 p-4">
-        <h3 className="mb-3 font-medium text-gray-900">최근 업데이트</h3>
-        <div className="space-y-3 text-sm">
-          <div className="rounded-lg bg-white p-3">
-            <span className="text-xs text-gray-500">2일 전</span>
-            <p className="mt-1 text-gray-700">
-              새 책 &ldquo;{getFirstBookTitle()}&rdquo; 추가됨
-            </p>
+      {library.recentUpdates && library.recentUpdates.length > 0 && (
+        <div className="rounded-xl bg-gray-50 p-4">
+          <h3 className="mb-3 font-medium text-gray-900">최근 업데이트</h3>
+          <div className="space-y-3 text-sm">
+            {library.recentUpdates.map((update, index) => (
+              <div key={index} className="rounded-lg bg-white p-3 shadow-sm">
+                <span className="text-xs text-gray-500">
+                  {formatRelativeTime(update.date)}
+                </span>
+                <p className="mt-1 text-gray-700">{update.message}</p>
+              </div>
+            ))}
           </div>
-          <div className="rounded-lg bg-white p-3">
-            <span className="text-xs text-gray-500">1주일 전</span>
-            <p className="mt-1 text-gray-700">서재 설명이 업데이트됨</p>
-          </div>
-        </div>
 
-        <div className="mt-3 text-xs text-gray-500">
-          구독하고 알림을 켜면 이 서재의 모든 업데이트 소식을 받아볼 수
-          있습니다.
+          <div className="mt-3 text-xs text-gray-500">
+            구독하고 알림을 켜면 이 서재의 모든 업데이트 소식을 받아볼 수
+            있습니다.
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

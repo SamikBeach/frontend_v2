@@ -1,4 +1,8 @@
-import { ReactNode } from 'react';
+import { LibrarySummary } from '@/apis/library/types';
+import {
+  SortOption as BaseSortOption,
+  TimeRange,
+} from '@/components/SortDropdown';
 
 // 서재 카테고리 타입
 export interface Category {
@@ -36,18 +40,8 @@ export interface Library {
   timestamp: string;
 }
 
-// 인기순 기간 필터 타입
-export type TimeRange = 'all' | 'today' | 'week' | 'month' | 'year';
-
-// 정렬 옵션 타입
-export interface SortOption {
-  id: string;
-  label: string;
-  icon: () => ReactNode;
-  sortFn: (a: Library, b: Library) => number;
-  // 인기순 정렬에만 기간 필터가 적용됨
-  supportsTimeRange?: boolean;
-}
+// 정렬 옵션 타입 (라이브러리 용)
+export type SortOption = BaseSortOption<LibrarySummary>;
 
 // 카테고리 버튼 속성
 export interface CategoryButtonProps {

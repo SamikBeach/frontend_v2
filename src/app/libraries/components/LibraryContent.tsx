@@ -22,6 +22,10 @@ export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
       id: libraryBook.bookId,
     })) || [];
 
+  // 메인 태그 (첫 번째 태그만 사용)
+  const mainTag =
+    library.tags && library.tags.length > 0 ? library.tags[0] : null;
+
   return (
     <div className="space-y-8">
       {/* 서재 설명 */}
@@ -30,18 +34,17 @@ export function LibraryContent({ library, onBookClick }: LibraryContentProps) {
           {library.description || '설명이 없습니다.'}
         </p>
 
-        {/* 태그 목록 */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          {library.tags?.map(tag => (
+        {/* 메인 태그 표시 */}
+        {mainTag && (
+          <div className="mt-4">
             <Badge
-              key={tag.id}
               variant="secondary"
               className="rounded-full bg-gray-100 text-xs"
             >
-              {tag.name}
+              {mainTag.tagName}
             </Badge>
-          ))}
-        </div>
+          </div>
+        )}
       </div>
 
       <Separator className="border-none" />

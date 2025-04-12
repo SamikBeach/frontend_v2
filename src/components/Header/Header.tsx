@@ -1,9 +1,9 @@
 'use client';
 
+import { SearchBar } from '@/components/SearchBar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { LeftSlot } from './LeftSlot';
 import { RightSlot } from './RightSlot';
-import { SearchBar } from './SearchBar';
 
 export function Header() {
   const isMobile = useIsMobile();
