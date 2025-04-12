@@ -140,6 +140,8 @@ export function SearchResults({
         coverImage: item.image || '',
         publisher: item.publisher || '',
         description: item.description || '',
+        isbn: item.isbn || '',
+        isbn13: item.isbn13 || '',
       });
     }
 
@@ -204,6 +206,8 @@ export function SearchResults({
             highlight: query,
             rating: book.rating,
             reviews: book.reviews || book.reviewCount,
+            isbn: book.isbn || '',
+            isbn13: book.isbn13 || '',
           };
 
           return (

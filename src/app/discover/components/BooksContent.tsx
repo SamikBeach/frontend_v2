@@ -36,7 +36,9 @@ export function BooksContent() {
   const handleBookSelect = useCallback(
     (book: Book) => {
       setSelectedBookId(book.id.toString());
-      openBookDialog(book.id);
+      // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
+      const bookIsbn = book.isbn13 || book.isbn;
+      openBookDialog(bookIsbn);
     },
     [setSelectedBookId, openBookDialog]
   );

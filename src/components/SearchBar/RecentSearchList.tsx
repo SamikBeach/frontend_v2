@@ -28,6 +28,8 @@ export function RecentSearchList({
           author: search.author,
           image: search.coverImage,
           subtitle: search.author,
+          isbn: search.isbn || '',
+          isbn13: search.isbn13 || '',
           searchId: search.id,
         };
 

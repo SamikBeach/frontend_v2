@@ -1,6 +1,5 @@
 'use client';
 
-import { Book } from '@/apis/book/types';
 import { Command, CommandInput } from '@/components/ui/command';
 import {
   Dialog,
@@ -9,7 +8,7 @@ import {
   DialogPortal,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useQueryParams } from '@/hooks';
+import { useDialogQuery } from '@/hooks';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useQueryClient } from '@tanstack/react-query';
 import { MutableRefObject, Suspense, useEffect, useRef, useState } from 'react';
@@ -63,7 +62,7 @@ export function BookSearchDialog({
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
   const inputRef = useRef<HTMLInputElement>(null);
-  const { updateQueryParams } = useQueryParams();
+  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
   const queryClient = useQueryClient();
 
   // 다이얼로그 닫기 핸들러
@@ -82,26 +81,9 @@ export function BookSearchDialog({
 
   // 검색 아이템 클릭 핸들러
   const handleItemClick = (item: any) => {
-    // 책 정보로 변환
-    const book: Book = {
-      id: item.id,
-      title: item.title,
-      author: item.author || item.subtitle,
-      coverImage:
-        item.image || `https://picsum.photos/seed/book${item.id}/240/360`,
-      category: item.category || 'general',
-      subcategory: item.subcategory || 'general',
-      rating: item.rating || 4.5,
-      reviews: item.reviews || 120,
-      description: item.description || `${item.title}에 대한 설명입니다.`,
-      publishDate: item.publishDate || '2023-01-01',
-      publisher: item.publisher || '출판사',
-      isbn: item.isbn || '',
-      isbn13: item.isbn13 || '',
-    };
-
-    // 북 다이얼로그 대신 URL 파라미터만 업데이트
-    // updateQueryParams({ book: book.id.toString() });
+    // isbn13을 우선적으로 사용하고, 없으면 isbn 사용
+    const bookIsbn = item.isbn13 || item.isbn || '';
+    openBookDialog(bookIsbn);
     handleClose();
   };
 

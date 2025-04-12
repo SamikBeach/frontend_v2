@@ -10,6 +10,8 @@ export interface SearchResult {
   totalTranslationCount?: number;
   likeCount?: number;
   reviewCount?: number;
+  isbn?: string;
+  isbn13?: string;
 }
 
 export interface SearchBook {
@@ -21,6 +23,8 @@ export interface SearchBook {
   description?: string;
   rating?: number;
   reviews?: number;
+  isbn?: string;
+  isbn13?: string;
 }
 
 export interface BookSearchResult {
@@ -39,6 +43,8 @@ export interface RecentSearch {
   coverImage?: string;
   publisher?: string;
   description?: string;
+  isbn?: string;
+  isbn13?: string;
   createdAt: string;
 }
 

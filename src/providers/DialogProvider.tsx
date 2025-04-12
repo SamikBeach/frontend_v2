@@ -12,10 +12,10 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const dialog = searchParams.get('dialog');
-    const urlId = searchParams.get('id');
+    const isbn = searchParams.get('isbn');
 
-    if (dialog === 'book' && urlId) {
-      setDialogState({ type: 'book', id: Number(urlId) });
+    if (dialog === 'book' && isbn) {
+      setDialogState({ type: 'book', id: isbn });
     } else {
       setDialogState(null);
     }

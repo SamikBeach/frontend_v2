@@ -2,7 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChevronDown, ListPlus, PenLine, Share2, Star, X } from 'lucide-react';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 
-import { getBookById } from '@/apis/book';
+import { getBookByIsbn } from '@/apis/book';
 import { ReviewDialog } from '@/components/ReviewDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -70,19 +70,19 @@ function enrichBookDetails(book: Book): BookDetails {
 }
 
 function BookDialogContent() {
-  const { isOpen, id, close } = useDialogQuery({ type: 'book' });
+  const { isOpen, isbn, close } = useDialogQuery({ type: 'book' });
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [readingStatus, setReadingStatus] = useState<ReadingStatus | null>(
     null
   );
 
-  // id가 없으면 다이얼로그를 렌더링하지 않음
-  if (!id) return null;
+  // isbn이 없으면 다이얼로그를 렌더링하지 않음
+  if (!isbn) return null;
 
-  // 책 상세 정보 가져오기 (도서 ID로 API 호출)
+  // 책 상세 정보 가져오기 (ISBN으로 API 호출)
   const { data: book } = useSuspenseQuery({
-    queryKey: ['book-detail', id],
-    queryFn: () => getBookById(id),
+    queryKey: ['book-detail', isbn],
+    queryFn: () => getBookByIsbn(isbn),
   });
 
   // 상세 정보와 UI에 필요한 추가 정보를 합침
@@ -95,12 +95,12 @@ function BookDialogContent() {
   // 리뷰 제출 처리
   const handleReviewSubmit = useCallback(
     (rating: number, content: string) => {
-      if (!id) return;
+      if (!isbn) return;
       // 리뷰 제출 로직 구현 (API 호출 등)
-      console.log('리뷰 제출:', { rating, content, bookId: id });
+      console.log('리뷰 제출:', { rating, content, isbn });
       setReviewDialogOpen(false);
     },
-    [id]
+    [isbn]
   );
 
   // 예시용 데이터
@@ -149,8 +149,8 @@ function BookDialogContent() {
 
   // 서재에 담기 핸들러
   const handleAddToBookshelf = (bookshelfId: number) => {
-    if (!id) return;
-    console.log(`서재에 담기: 책 ID ${id}, 서재 ID ${bookshelfId}`);
+    if (!isbn) return;
+    console.log(`서재에 담기: 책 ISBN ${isbn}, 서재 ID ${bookshelfId}`);
     // 여기에 API 호출 등 구현
   };
 

@@ -38,7 +38,9 @@ function HomePageContent() {
   // 책 선택 핸들러
   const handleBookSelect = (book: HomeBookPreview) => {
     setSelectedBookId(book.id.toString());
-    openBookDialog(book.id);
+    // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
+    const bookIsbn = book.isbn13 || book.isbn;
+    openBookDialog(bookIsbn);
   };
 
   return (

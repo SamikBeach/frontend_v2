@@ -87,6 +87,8 @@ export const logBookSelection = async (request: {
   coverImage?: string;
   publisher?: string;
   description?: string;
+  isbn?: string;
+  isbn13?: string;
 }): Promise<void> => {
   await api.post('/search/log-book-selection', request);
 };

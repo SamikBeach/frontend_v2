@@ -69,6 +69,8 @@ export interface HomeBookPreview {
   author: string;
   coverImage: string;
   rating: number;
+  isbn: string;
+  isbn13?: string;
   category?: {
     id: number;
     name: string;

@@ -16,6 +16,8 @@ interface SearchItemProps {
     highlight?: string;
     rating?: number;
     reviews?: number;
+    isbn?: string;
+    isbn13?: string;
   };
   onClick: () => void;
   onDelete?: () => void;

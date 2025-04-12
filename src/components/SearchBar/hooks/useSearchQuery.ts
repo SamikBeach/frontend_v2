@@ -35,6 +35,8 @@ export function useLogBookSelection() {
       coverImage?: string;
       publisher?: string;
       description?: string;
+      isbn?: string;
+      isbn13?: string;
     }) => logBookSelection(params),
   });
 }

@@ -15,20 +15,20 @@ export function useDialogQuery({ type }: DialogQueryOptions) {
 
   const isOpen = dialogState?.type === type && dialogState?.id !== null;
 
-  const id = isOpen ? dialogState?.id : null;
+  const isbn = isOpen ? dialogState?.id : null;
 
   const open = useCallback(
-    (id: number) => {
-      setDialogState({ type, id });
-      updateQueryParams({ dialog: type, id: id.toString() });
+    (isbn: string) => {
+      setDialogState({ type, id: isbn });
+      updateQueryParams({ dialog: type, isbn });
     },
     [type, setDialogState, updateQueryParams]
   );
 
   const close = useCallback(() => {
     setDialogState({ type: null, id: null });
-    updateQueryParams({ dialog: undefined, id: undefined });
+    updateQueryParams({ dialog: undefined, isbn: undefined });
   }, [setDialogState, updateQueryParams]);
 
-  return { isOpen, id, open, close };
+  return { isOpen, isbn, open, close };
 }
