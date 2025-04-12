@@ -8,13 +8,11 @@ import {
   timeRangeAtom,
 } from '@/atoms/popular';
 import { BookCard } from '@/components/BookCard';
-import { BookDialog } from '@/components/BookDialog/BookDialog';
 import { Button } from '@/components/ui/button';
-import { useQueryParams } from '@/hooks';
+import { useDialogQuery, useQueryParams } from '@/hooks';
 import { isValidSortOption } from '@/utils/type-guards';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom, useAtomValue } from 'jotai';
-import { useCallback, useMemo } from 'react';
 
 export function BooksContent() {
   const { clearQueryParams } = useQueryParams();
@@ -23,6 +21,7 @@ export function BooksContent() {
   const sortParamRaw = useAtomValue(sortOptionAtom);
   const timeRangeParam = useAtomValue(timeRangeAtom);
   const [selectedBookId, setSelectedBookId] = useAtom(selectedBookIdAtom);
+  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
 
   // 타입 가드를 사용하여 안전하게 처리
   const sortParam: SortOption = isValidSortOption(sortParamRaw)
@@ -68,30 +67,12 @@ export function BooksContent() {
 
   const handleBookSelect = (book: Book) => {
     setSelectedBookId(book.id.toString());
+    openBookDialog(book.id);
   };
 
   const handleClearFilters = () => {
     clearQueryParams();
   };
-
-  // 선택된 책 찾기
-  const selectedBook = useMemo(() => {
-    if (!selectedBookId || !books) return null;
-
-    const bookId = parseInt(selectedBookId);
-    return books.find(book => book.id === bookId) || null;
-  }, [books, selectedBookId]);
-
-  // 다이얼로그 상태 변경 핸들러
-  const handleDialogOpenChange = useCallback(
-    (open: boolean) => {
-      // 다이얼로그가 닫히면 URL에서 book 파라미터 제거
-      if (!open) {
-        setSelectedBookId(null); // 선택된 책 상태도 초기화
-      }
-    },
-    [setSelectedBookId]
-  );
 
   return (
     <>
@@ -118,14 +99,6 @@ export function BooksContent() {
             필터 초기화
           </Button>
         </div>
-      )}
-
-      {selectedBook && (
-        <BookDialog
-          book={selectedBook}
-          open={!!selectedBook}
-          onOpenChange={handleDialogOpenChange}
-        />
       )}
     </>
   );

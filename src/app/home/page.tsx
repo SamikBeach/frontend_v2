@@ -1,10 +1,10 @@
 'use client';
 
 import { HomeBookPreview } from '@/apis/book/types';
-import { selectedBookAtom } from '@/atoms/book';
-import { BookDialog } from '@/components/BookDialog/BookDialog';
+import { selectedBookIdAtom } from '@/atoms/book';
+import { useDialogQuery } from '@/hooks';
 import { useAtom } from 'jotai';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect } from 'react';
 import {
   DiscoverBooksSection,
   PopularBooksSection,
@@ -21,6 +21,8 @@ function HomePageContent() {
     popularPosts,
     isLoading,
   } = useHomeData();
+  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
+  const [, setSelectedBookId] = useAtom(selectedBookIdAtom);
 
   // 데이터 디버깅을 위한 콘솔 로그
   useEffect(() => {
@@ -33,26 +35,10 @@ function HomePageContent() {
     });
   }, [popularBooks, discoverBooks, popularLibraries, popularPosts, isLoading]);
 
-  // 선택된 책 및 다이얼로그 상태 관리
-  const [selectedBookState, setSelectedBookState] =
-    useState<HomeBookPreview | null>(null);
-  const [, setSelectedBookId] = useAtom(selectedBookAtom);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   // 책 선택 핸들러
   const handleBookSelect = (book: HomeBookPreview) => {
-    setSelectedBookState(book);
     setSelectedBookId(book.id.toString());
-    setIsDialogOpen(true);
-  };
-
-  // 다이얼로그 상태 변경 핸들러
-  const handleDialogOpenChange = (open: boolean) => {
-    setIsDialogOpen(open);
-    if (!open) {
-      setSelectedBookState(null);
-      setSelectedBookId('');
-    }
+    openBookDialog(book.id);
   };
 
   return (
@@ -82,15 +68,6 @@ function HomePageContent() {
         {/* 커뮤니티 */}
         <PopularPostsSection posts={popularPosts} isLoading={isLoading} />
       </div>
-
-      {/* Book detail Dialog */}
-      {selectedBookState && (
-        <BookDialog
-          book={selectedBookState as any}
-          open={isDialogOpen}
-          onOpenChange={handleDialogOpenChange}
-        />
-      )}
     </div>
   );
 }
