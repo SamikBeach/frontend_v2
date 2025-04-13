@@ -1,4 +1,4 @@
-export type PostType =
+export type ReviewType =
   | 'general'
   | 'discussion'
   | 'review'
@@ -11,13 +11,13 @@ export interface Author {
   email: string;
 }
 
-export interface PostImage {
+export interface ReviewImage {
   id: number;
   url: string;
   caption?: string;
 }
 
-export interface PostBook {
+export interface ReviewBook {
   id: number;
   title: string;
   author: string;
@@ -25,13 +25,13 @@ export interface PostBook {
   publisher: string;
 }
 
-export interface PostResponseDto {
+export interface ReviewResponseDto {
   id: number;
   content: string;
-  type: PostType;
+  type: ReviewType;
   author: Author;
-  images: PostImage[];
-  books: PostBook[];
+  images: ReviewImage[];
+  books: ReviewBook[];
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
@@ -48,9 +48,15 @@ export interface Comment {
   replies?: Comment[];
 }
 
-export interface CreatePostDto {
+export interface CreateReviewDto {
   content: string;
-  type: PostType;
+  type: ReviewType;
+  bookIds?: number[];
+}
+
+export interface UpdateReviewDto {
+  content?: string;
+  type?: ReviewType;
   bookIds?: number[];
 }
 
@@ -59,18 +65,18 @@ export interface CreateCommentDto {
   parentCommentId?: number;
 }
 
-export interface PostsResponse {
-  posts: PostResponseDto[];
+export interface ReviewsResponse {
+  reviews: ReviewResponseDto[];
   total: number;
   page: number;
   totalPages: number;
 }
 
-// 홈화면용 인기 게시물 프리뷰 타입
-export interface HomePostPreview {
+// 홈화면용 인기 리뷰 프리뷰 타입
+export interface HomeReviewPreview {
   id: number;
   content: string;
-  type: PostType;
+  type: ReviewType;
   authorName: string;
   previewImage?: string;
   likeCount: number;
@@ -84,7 +90,7 @@ export interface HomePostPreview {
   createdAt: Date | string;
 }
 
-// 홈화면용 인기 게시물 응답 타입
-export interface HomePopularPostsResponse {
-  posts: HomePostPreview[];
+// 홈화면용 인기 리뷰 응답 타입
+export interface HomePopularReviewsResponse {
+  reviews: HomeReviewPreview[];
 }

@@ -1,4 +1,4 @@
-import { Comment, Event, Post, ReadingGroup, UserProfile } from './types';
+import { Comment, Event, ReadingGroup, Review, UserProfile } from './types';
 
 // 더미 사용자 데이터
 export const users: UserProfile[] = [
@@ -86,7 +86,7 @@ export const sortOptions = [
 export const comments: Comment[] = [
   {
     id: 1,
-    postId: 1,
+    reviewId: 1,
     author: users[1],
     content:
       '칸트의 인식론에 대한 통찰이 정말 훌륭한 것 같아요. 저도 읽어봐야겠어요!',
@@ -95,7 +95,7 @@ export const comments: Comment[] = [
   },
   {
     id: 2,
-    postId: 1,
+    reviewId: 1,
     author: users[2],
     content:
       '선험적 종합판단이라는 개념이 어려웠는데, 이 책을 통해 조금 더 이해할 수 있었습니다.',
@@ -104,7 +104,7 @@ export const comments: Comment[] = [
   },
   {
     id: 3,
-    postId: 2,
+    reviewId: 2,
     author: users[0],
     content:
       '도스토예프스키의 심리묘사는 정말 타의 추종을 불허하는 것 같아요. 특히 라스콜니코프의 내면 묘사가 인상적이었습니다.',
@@ -113,7 +113,7 @@ export const comments: Comment[] = [
   },
   {
     id: 4,
-    postId: 3,
+    reviewId: 3,
     author: users[3],
     content:
       '니체의 초인 개념에 대해 더 자세히 알고 싶습니다. 혹시 추천할만한 해설서가 있을까요?',
@@ -122,7 +122,7 @@ export const comments: Comment[] = [
   },
   {
     id: 5,
-    postId: 4,
+    reviewId: 4,
     author: users[1],
     content:
       '아리스토텔레스의 행복론이 현대 심리학과 연결된다는 점이 흥미롭네요. 웰빙에 대한 고전적 관점과 현대적 관점의 비교가 인상적입니다.',
@@ -131,8 +131,8 @@ export const comments: Comment[] = [
   },
 ];
 
-// 더미 피드 포스트 데이터
-export const posts: Post[] = [
+// 더미 피드 리뷰 데이터
+export const reviews: Review[] = [
   {
     id: 1,
     category: 'discussion',

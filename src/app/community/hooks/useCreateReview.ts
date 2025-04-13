@@ -1,18 +1,18 @@
-import { createPost } from '@/apis/post';
+import { createReview } from '@/apis/review/review';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
-interface UseCreatePostResult {
+interface UseCreateReviewResult {
   content: string;
   setContent: (content: string) => void;
   images: File[];
   handleImageChange: (files: FileList | null) => void;
   removeImage: (index: number) => void;
-  handleCreatePost: () => Promise<void>;
+  handleCreateReview: () => Promise<void>;
   isLoading: boolean;
 }
 
-export function useCreatePost(): UseCreatePostResult {
+export function useCreateReview(): UseCreateReviewResult {
   const queryClient = useQueryClient();
   const [content, setContent] = useState('');
   const [type, setType] = useState<
@@ -35,10 +35,10 @@ export function useCreatePost(): UseCreatePostResult {
   };
 
   // 게시물 생성 mutation
-  const { mutateAsync: createPostMutation, isPending: isLoading } = useMutation(
-    {
+  const { mutateAsync: createReviewMutation, isPending: isLoading } =
+    useMutation({
       mutationFn: async () => {
-        return createPost(
+        return createReview(
           {
             content,
             type,
@@ -49,23 +49,22 @@ export function useCreatePost(): UseCreatePostResult {
       },
       onSuccess: () => {
         // 게시물 목록 새로고침
-        queryClient.invalidateQueries({ queryKey: ['community-posts'] });
+        queryClient.invalidateQueries({ queryKey: ['community-reviews'] });
 
         // 입력 필드 초기화
         setContent('');
         setImages([]);
       },
-    }
-  );
+    });
 
   // 게시물 생성 핸들러
-  const handleCreatePost = async () => {
+  const handleCreateReview = async () => {
     if (!content.trim()) return;
 
     try {
-      await createPostMutation();
+      await createReviewMutation();
     } catch (error) {
-      console.error('Failed to create post:', error);
+      console.error('Failed to create review:', error);
     }
   };
 
@@ -75,7 +74,7 @@ export function useCreatePost(): UseCreatePostResult {
     images,
     handleImageChange,
     removeImage,
-    handleCreatePost,
+    handleCreateReview,
     isLoading,
   };
 }
