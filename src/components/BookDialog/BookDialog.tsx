@@ -26,7 +26,6 @@ import { BookInfo } from './BookInfo';
 import { BookQuotes } from './BookQuotes';
 import { BookReviews } from './BookReviews';
 import { BookShelves } from './BookShelves';
-import { SimilarBooks } from './SimilarBooks';
 import { BookDetails } from './types';
 
 type ReadingStatus = '읽고 싶어요' | '읽는 중' | '읽었어요' | '선택 안함';
@@ -267,7 +266,7 @@ function BookDialogContent() {
   return (
     <>
       <div className="mx-auto w-full max-w-screen-xl px-10 pt-4 pb-10">
-        <div className="grid gap-8 md:grid-cols-[380px_1fr]">
+        <div className="grid gap-10 md:grid-cols-[380px_1fr]">
           {/* 왼쪽: 책 표지 및 기본 정보 */}
           <div className="space-y-6">
             {/* 책 표지 이미지 */}
@@ -281,9 +280,6 @@ function BookDialogContent() {
                 className="h-full w-full object-cover"
                 loading="eager"
               />
-              <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/60 to-transparent px-3 py-2 text-[10px] text-white opacity-0 transition-opacity hover:opacity-100">
-                알라딘에서 보기
-              </div>
             </div>
 
             {/* 책 정보(제목, 저자, 출판사, 출간일)는 이미지 아래에 배치 */}
@@ -503,9 +499,6 @@ function BookDialogContent() {
             <BookQuotes quotes={displayBook.quotes} />
           </div>
         </div>
-
-        {/* 비슷한 책 */}
-        <SimilarBooks similarBooks={displayBook.similarBooks} />
       </div>
 
       {/* 리뷰 작성 다이얼로그 */}
@@ -646,8 +639,8 @@ function BookDialogHeader({
   const bookTitle = title || (book ? book.title : '도서 상세 정보');
 
   return (
-    <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-lg bg-white/80 px-6 backdrop-blur-xl">
-      <DialogTitle className="max-w-[80%] truncate text-base font-medium">
+    <div className="sticky top-0 z-10 flex h-16 items-center justify-between rounded-t-lg bg-white/80 px-10 backdrop-blur-xl">
+      <DialogTitle className="max-w-[80%] truncate pl-2 text-xl font-bold text-gray-900">
         {bookTitle}
       </DialogTitle>
       <Button
