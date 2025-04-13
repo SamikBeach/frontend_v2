@@ -572,11 +572,11 @@ function BookDialogSkeleton() {
           </div>
 
           {/* 등록된 서재 스켈레톤 */}
-          <div className="space-y-4">
+          <div className="space-y-2.5">
             <Skeleton className="h-5 w-32" />
-            <div className="grid grid-cols-2 gap-4">
-              <Skeleton className="h-28 w-full rounded-xl" />
-              <Skeleton className="h-28 w-full rounded-xl" />
+            <div className="space-y-2.5">
+              <Skeleton className="h-20 w-full rounded-xl" />
+              <Skeleton className="h-20 w-full rounded-xl" />
             </div>
           </div>
 

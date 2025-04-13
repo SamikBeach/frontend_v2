@@ -35,7 +35,7 @@ export function CompactLibraryCard({
       <div
         className={`cursor-pointer rounded-xl border border-gray-100 bg-gray-50 p-4 transition-all duration-200 hover:bg-gray-100 ${className}`}
       >
-        <div className="mb-2 flex items-center gap-3">
+        <div className="mb-2.5 flex items-center gap-3">
           {library.thumbnail ? (
             <div className="h-10 w-10 overflow-hidden rounded-lg">
               <img
@@ -50,10 +50,27 @@ export function CompactLibraryCard({
             </div>
           )}
           <div className="flex-1">
-            <h3 className="text-base font-medium text-gray-900 transition-colors duration-150 hover:text-blue-600">
-              {library.name}
-            </h3>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <h3 className="text-sm font-medium text-gray-900 transition-colors duration-150 hover:text-blue-600">
+                {library.name}
+              </h3>
+
+              {/* 태그를 제목 옆으로 이동, 모든 태그 표시 */}
+              {library.tags && library.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1">
+                  {library.tags.map((tag, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="rounded-full bg-gray-100 px-1.5 py-0 text-[10px] font-normal text-gray-700"
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="mt-0.5 flex items-center gap-2">
               <Avatar className="h-4 w-4 border-0">
                 <AvatarImage
                   src={library.owner.avatar}
@@ -70,23 +87,9 @@ export function CompactLibraryCard({
         </div>
 
         {library.description && (
-          <p className="mb-2 line-clamp-2 text-sm text-gray-600">
+          <p className="mb-2.5 line-clamp-2 text-xs leading-relaxed text-gray-600">
             {library.description}
           </p>
-        )}
-
-        {library.tags && library.tags.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-1.5">
-            {library.tags.map((tag, index) => (
-              <Badge
-                key={index}
-                variant="outline"
-                className="rounded-full border-gray-200 bg-white px-2 py-0 text-xs font-normal text-gray-600"
-              >
-                {tag}
-              </Badge>
-            ))}
-          </div>
         )}
 
         <div className="flex items-center justify-between text-xs text-gray-500">
@@ -97,7 +100,7 @@ export function CompactLibraryCard({
             </div>
             <div className="flex items-center gap-1.5">
               <BookOpen className="h-3.5 w-3.5 text-gray-400" />
-              <span>{library.bookCount}권</span>
+              <span>{library.bookCount}</span>
             </div>
           </div>
           {library.isSubscribed && (
