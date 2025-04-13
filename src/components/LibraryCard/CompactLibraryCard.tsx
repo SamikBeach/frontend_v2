@@ -35,7 +35,7 @@ export function CompactLibraryCard({
       <div
         className={`cursor-pointer rounded-xl border border-gray-100 bg-gray-50 p-4 transition-all duration-200 hover:bg-gray-100 ${className}`}
       >
-        <div className="mb-2.5 flex items-center gap-3">
+        <div className="mb-2.5 flex items-start gap-3">
           {library.thumbnail ? (
             <div className="h-12 w-12 overflow-hidden rounded-lg">
               <img
@@ -50,27 +50,26 @@ export function CompactLibraryCard({
             </div>
           )}
           <div className="flex-1">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <h3 className="text-base font-medium text-gray-900 transition-colors duration-150 hover:text-blue-600">
-                {library.name}
-              </h3>
+            <h3 className="text-base font-medium text-gray-900 transition-colors duration-150 hover:text-blue-600">
+              {library.name}
+            </h3>
 
-              {/* 태그를 제목 옆으로 이동, 모든 태그 표시 */}
-              {library.tags && library.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {library.tags.map((tag, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-700"
-                    >
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="mt-1 flex items-center gap-2">
+            {/* 태그를 제목 아래로 이동, 모든 태그 표시 */}
+            {library.tags && library.tags.length > 0 && (
+              <div className="mt-1 flex flex-wrap gap-1">
+                {library.tags.map((tag, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-700"
+                  >
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-1.5 flex items-center gap-2">
               <Avatar className="h-5 w-5 border-0">
                 <AvatarImage
                   src={library.owner.avatar}

@@ -1,13 +1,15 @@
 import { Share2, ThumbsUp } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { BookDetails } from './types';
+import { useBookDetails } from './hooks';
 
-interface BookQuotesProps {
-  quotes: BookDetails['quotes'];
-}
+export function BookQuotes() {
+  const { book } = useBookDetails();
 
-export function BookQuotes({ quotes = [] }: BookQuotesProps) {
+  if (!book) return null;
+
+  const quotes = book.quotes || [];
+
   if (quotes.length === 0) return null;
 
   return (

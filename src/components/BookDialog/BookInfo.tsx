@@ -1,10 +1,10 @@
-import { BookDetails } from './types';
+import { useBookDetails } from './hooks';
 
-interface BookInfoProps {
-  book: BookDetails;
-}
+export function BookInfo() {
+  const { book } = useBookDetails();
 
-export function BookInfo({ book }: BookInfoProps) {
+  if (!book) return null;
+
   return (
     <div className="space-y-6">
       {/* 책 소개 섹션 */}

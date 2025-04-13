@@ -6,12 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
-import { BookDetails } from './types';
-
-interface BookReviewsProps {
-  book: BookDetails;
-  onOpenReviewDialog: () => void;
-}
+import { useBookDetails, useReviewDialog } from './hooks';
 
 interface ReviewComment {
   id: number;
@@ -23,7 +18,12 @@ interface ReviewComment {
   date: string;
 }
 
-export function BookReviews({ book, onOpenReviewDialog }: BookReviewsProps) {
+export function BookReviews() {
+  const { book } = useBookDetails();
+  const { handleOpenReviewDialog } = useReviewDialog();
+
+  if (!book) return null;
+
   const reviews = book.reviews || [];
   const displayReviews = reviews.slice(0, 10);
 
@@ -270,7 +270,7 @@ export function BookReviews({ book, onOpenReviewDialog }: BookReviewsProps) {
           <Button
             variant="outline"
             className="mt-3 rounded-full text-sm font-medium"
-            onClick={onOpenReviewDialog}
+            onClick={() => handleOpenReviewDialog()}
           >
             첫 리뷰를 작성해보세요
           </Button>
