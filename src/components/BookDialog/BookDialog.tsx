@@ -3,6 +3,7 @@ import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { josa } from 'josa';
 import { ChevronDown, ListPlus, PenLine, Star, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 
 import { getBookByIsbn } from '@/apis/book';
@@ -85,6 +86,8 @@ function BookDialogContent() {
 
   // 리뷰 다이얼로그로부터 받은 별점을 저장
   const [reviewRating, setReviewRating] = useState(0);
+
+  const router = useRouter();
 
   // isbn이 없으면 다이얼로그를 렌더링하지 않음
   if (!isbn) return null;
@@ -233,8 +236,14 @@ function BookDialogContent() {
         `${displayBook.title}#{이} ${bookshelf?.name || '서재'}에 담겼습니다`
       ),
       {
-        description: '내 서재에서 확인할 수 있습니다.',
-        duration: 3000,
+        duration: 5000, // 5초로 늘림
+        action: {
+          label: '서재로 이동',
+          onClick: () => {
+            // 서재 페이지로 이동
+            router.push('/profile/library');
+          },
+        },
         // 기본 스타일링 유지
         style: {
           fontWeight: 'bold',
