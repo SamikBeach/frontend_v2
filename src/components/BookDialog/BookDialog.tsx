@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { josa } from 'josa';
 import { ChevronDown, ListPlus, PenLine, Star, X } from 'lucide-react';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 
@@ -19,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { Book } from '@/apis/book/types';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
+import { toast } from 'sonner';
 import { BookInfo } from './BookInfo';
 import { BookQuotes } from './BookQuotes';
 import { BookReviews } from './BookReviews';
@@ -81,6 +83,9 @@ function BookDialogContent() {
   const [isRatingHovered, setIsRatingHovered] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(0);
 
+  // 리뷰 다이얼로그로부터 받은 별점을 저장
+  const [reviewRating, setReviewRating] = useState(0);
+
   // isbn이 없으면 다이얼로그를 렌더링하지 않음
   if (!isbn) return null;
 
@@ -97,16 +102,47 @@ function BookDialogContent() {
     return enrichBookDetails(book);
   }, [book]);
 
+  // 별점 추가 핸들러
+  const handleRatingClick = (rating: number) => {
+    setUserRating(rating);
+    // 리뷰 별점도 함께 업데이트
+    setReviewRating(rating);
+    // TODO: API 호출로 별점 저장
+    console.log(`별점 추가: ${rating}점`);
+  };
+
+  // 별점 호버 핸들러
+  const handleRatingHover = (rating: number) => {
+    setHoveredRating(rating);
+    setIsRatingHovered(true);
+  };
+
+  // 별점 호버 아웃 핸들러
+  const handleRatingLeave = () => {
+    setIsRatingHovered(false);
+  };
+
   // 리뷰 제출 처리
   const handleReviewSubmit = useCallback(
     (rating: number, content: string) => {
       if (!isbn) return;
+      // 리뷰 별점으로 BookDialog의 별점도 업데이트
+      setUserRating(rating);
       // 리뷰 제출 로직 구현 (API 호출 등)
       console.log('리뷰 제출:', { rating, content, isbn });
       setReviewDialogOpen(false);
     },
     [isbn]
   );
+
+  // 리뷰 다이얼로그 열기 핸들러
+  const handleOpenReviewDialog = () => {
+    // 현재 별점이 있으면 리뷰 별점으로 설정
+    if (userRating > 0) {
+      setReviewRating(userRating);
+    }
+    setReviewDialogOpen(true);
+  };
 
   // 알라딘으로 이동하는 함수 추가
   const handleOpenAladin = useCallback(() => {
@@ -161,33 +197,54 @@ function BookDialogContent() {
     // 여기에 API 호출 등 구현
   };
 
+  // 읽기 상태에 따른 색상 및 스타일 결정
+  const getReadingStatusStyle = (status: ReadingStatus | null) => {
+    if (!status || status === '선택 안함') {
+      return 'bg-gray-50 text-gray-700';
+    }
+
+    switch (status) {
+      case '읽고 싶어요':
+        return 'bg-blue-50 text-blue-600 border-blue-200';
+      case '읽는 중':
+        return 'bg-green-50 text-green-600 border-green-200';
+      case '읽었어요':
+        return 'bg-purple-50 text-purple-600 border-purple-200';
+      default:
+        return 'bg-gray-50 text-gray-700';
+    }
+  };
+
   // 서재에 담기 핸들러
   const handleAddToBookshelf = (bookshelfId: number) => {
-    if (!isbn) return;
+    if (!isbn || !displayBook) return;
+
+    // 서재 정보 찾기
+    const bookshelf = defaultBookshelves.find(
+      shelf => shelf.id === bookshelfId
+    );
+
+    // API 호출 등 구현
     console.log(`서재에 담기: 책 ISBN ${isbn}, 서재 ID ${bookshelfId}`);
-    // 여기에 API 호출 등 구현
+
+    // 토스트 알림 표시 - josa 사용하여 조사 처리
+    toast.success(
+      josa(
+        `${displayBook.title}#{이} ${bookshelf?.name || '서재'}에 담겼습니다`
+      ),
+      {
+        description: '내 서재에서 확인할 수 있습니다.',
+        duration: 3000,
+        // 기본 스타일링 유지
+        style: {
+          fontWeight: 'bold',
+        },
+      }
+    );
   };
 
   // 읽기 상태 표시 텍스트
   const readingStatusText = readingStatus || '읽기 상태';
-
-  // 별점 추가 핸들러
-  const handleRatingClick = (rating: number) => {
-    setUserRating(rating);
-    // TODO: API 호출로 별점 저장
-    console.log(`별점 추가: ${rating}점`);
-  };
-
-  // 별점 호버 핸들러
-  const handleRatingHover = (rating: number) => {
-    setHoveredRating(rating);
-    setIsRatingHovered(true);
-  };
-
-  // 별점 호버 아웃 핸들러
-  const handleRatingLeave = () => {
-    setIsRatingHovered(false);
-  };
 
   if (!displayBook) return null;
 
@@ -342,7 +399,7 @@ function BookDialogContent() {
                   {/* 리뷰 작성하기 버튼 - 별점 옆으로 이동 */}
                   <Button
                     className="h-8 rounded-full bg-gray-100 px-3 text-xs text-gray-700 hover:bg-gray-200"
-                    onClick={() => setReviewDialogOpen(true)}
+                    onClick={handleOpenReviewDialog}
                   >
                     <PenLine className="mr-1 h-3 w-3" />
                     리뷰 쓰기
@@ -359,7 +416,7 @@ function BookDialogContent() {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-between rounded-full border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      className={`w-full justify-between rounded-full border-gray-300 hover:bg-gray-100 hover:text-gray-900 ${getReadingStatusStyle(readingStatus)}`}
                     >
                       <span>{readingStatus || '책 상태 설정'}</span>
                       <ChevronDown className="h-4 w-4" />
@@ -367,19 +424,19 @@ function BookDialogContent() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-48 rounded-xl">
                     <DropdownMenuItem
-                      className="cursor-pointer rounded-lg py-2"
+                      className="cursor-pointer rounded-lg py-2 hover:bg-blue-50 hover:text-blue-600"
                       onClick={() => handleReadingStatusChange('읽고 싶어요')}
                     >
                       읽고 싶어요
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className="cursor-pointer rounded-lg py-2"
+                      className="cursor-pointer rounded-lg py-2 hover:bg-green-50 hover:text-green-600"
                       onClick={() => handleReadingStatusChange('읽는 중')}
                     >
                       읽는 중
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className="cursor-pointer rounded-lg py-2"
+                      className="cursor-pointer rounded-lg py-2 hover:bg-purple-50 hover:text-purple-600"
                       onClick={() => handleReadingStatusChange('읽었어요')}
                     >
                       읽었어요
@@ -422,7 +479,12 @@ function BookDialogContent() {
             </div>
 
             {/* 책 설명, 저자 소개 */}
-            <BookInfo book={displayBook} />
+            <div className="space-y-1">
+              <BookInfo book={displayBook} />
+              <p className="mt-2 text-right text-xs text-gray-400">
+                정보제공: 알라딘
+              </p>
+            </div>
           </div>
 
           {/* 오른쪽: 리뷰 및 관련 정보 */}
@@ -437,7 +499,7 @@ function BookDialogContent() {
 
               <BookReviews
                 book={displayBook}
-                onOpenReviewDialog={() => setReviewDialogOpen(true)}
+                onOpenReviewDialog={handleOpenReviewDialog}
               />
             </div>
 
@@ -466,6 +528,7 @@ function BookDialogContent() {
         onOpenChange={setReviewDialogOpen}
         bookTitle={displayBook.title}
         onSubmit={handleReviewSubmit}
+        initialRating={reviewRating}
       />
     </>
   );

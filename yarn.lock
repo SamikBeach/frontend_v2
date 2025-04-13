@@ -2545,6 +2545,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/josa@npm:^3.0.5":
+  version: 3.0.5
+  resolution: "@types/josa@npm:3.0.5"
+  checksum: 10c0/08f5dc77686674cda8fc395cf9d98a32a42777d875478214762a469a30f306d4df9b7bd7b2cc341056b7d10d2eb095002827056d43f39bec569026e34b798777
+  languageName: node
+  linkType: hard
+
 "@types/js-cookie@npm:^2.2.6":
   version: 2.2.7
   resolution: "@types/js-cookie@npm:2.2.7"
@@ -4524,6 +4531,7 @@ __metadata:
     "@semantic-release/git": "npm:^10.0.1"
     "@tailwindcss/postcss": "npm:^4.0.17"
     "@tanstack/react-query": "npm:^5.72.0"
+    "@types/josa": "npm:^3.0.5"
     "@types/node": "npm:22.13.14"
     "@types/react": "npm:^19.0.12"
     "@types/react-dom": "npm:^19.0.4"
@@ -4538,9 +4546,11 @@ __metadata:
     eslint-plugin-react: "npm:^7.37.4"
     framer-motion: "npm:^12.6.5"
     globals: "npm:^16.0.0"
+    josa: "npm:^3.0.1"
     jotai: "npm:^2.12.2"
     lucide-react: "npm:^0.486.0"
     next: "npm:^15.2.4"
+    next-themes: "npm:^0.4.6"
     postcss: "npm:^8.5.3"
     prettier: "npm:^3.5.3"
     prettier-plugin-organize-imports: "npm:^4.1.0"
@@ -4551,6 +4561,7 @@ __metadata:
     react-infinite-scroll-component: "npm:^6.1.0"
     react-use: "npm:^17.6.0"
     semantic-release: "npm:^24.2.3"
+    sonner: "npm:^2.0.3"
     tailwind-merge: "npm:^3.1.0"
     tailwindcss: "npm:^4.0.17"
     tw-animate-css: "npm:^1.2.5"
@@ -5542,6 +5553,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jongseong@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "jongseong@npm:0.4.2"
+  checksum: 10c0/2a0b909d01c5909ba8ccfcb2a122250794f9038500c26964005168047d76155c0ce3334eb26075929562ab0bad55d9344c20a4d656563d14f51b7a3f31ab74f8
+  languageName: node
+  linkType: hard
+
+"josa@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "josa@npm:3.0.1"
+  dependencies:
+    jongseong: "npm:^0.4.2"
+  checksum: 10c0/1c79d73f0d33e53373b6b646ede145085c8944ca5a6e78946a7101a545a4825f22eada3bd65c760ea0f15179c2b55e2960a05081d98e1c18fb46e909c731677f
+  languageName: node
+  linkType: hard
+
 "jotai@npm:^2.12.2":
   version: 2.12.2
   resolution: "jotai@npm:2.12.2"
@@ -6426,6 +6453,16 @@ __metadata:
   version: 1.0.0
   resolution: "nerf-dart@npm:1.0.0"
   checksum: 10c0/e19e17d7bd91dfcb1acd07cbdd8df1f0613f3408227538fe91793c6dfcf58e95b5f18b88b4a13e9b31587e89a119fd76d6df4b8d8c65564dd2c409d787819583
+  languageName: node
+  linkType: hard
+
+"next-themes@npm:^0.4.6":
+  version: 0.4.6
+  resolution: "next-themes@npm:0.4.6"
+  peerDependencies:
+    react: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+    react-dom: ^16.8 || ^17 || ^18 || ^19 || ^19.0.0-rc
+  checksum: 10c0/83590c11d359ce7e4ced14f6ea9dd7a691d5ce6843fe2dc520fc27e29ae1c535118478d03e7f172609c41b1ef1b8da6b8dd2d2acd6cd79cac1abbdbd5b99f2c4
   languageName: node
   linkType: hard
 
@@ -8220,6 +8257,16 @@ __metadata:
     ip-address: "npm:^9.0.5"
     smart-buffer: "npm:^4.2.0"
   checksum: 10c0/00c3271e233ccf1fb83a3dd2060b94cc37817e0f797a93c560b9a7a86c4a0ec2961fb31263bdd24a3c28945e24868b5f063cd98744171d9e942c513454b50ae5
+  languageName: node
+  linkType: hard
+
+"sonner@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "sonner@npm:2.0.3"
+  peerDependencies:
+    react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+    react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
+  checksum: 10c0/59f84142f7a692dd1ec90e6df2003a70ff0b325eaef1d5dd17ad250e7f992b71053824f1a7ab3912f8c4caa5ce30523a096b5f5108b3e8ae13f906048691aca1
   languageName: node
   linkType: hard
 

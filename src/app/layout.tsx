@@ -2,6 +2,7 @@ import { Header } from '@/components/Header';
 import { Initializer } from '@/components/Initializer';
 import { AppSidebar } from '@/components/Sidebar/AppSidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
+import { Toaster } from '@/components/ui/sonner';
 import { AtomsProvider } from '@/providers/AtomsProvider';
 import { DialogProvider } from '@/providers/DialogProvider';
 import ReactQueryProvider from '@/providers/ReactQueryProvider';
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                 <AppSidebar />
                 <main className="mt-[56px] w-full p-4">{children}</main>
               </SidebarProvider>
+              <Toaster />
             </DialogProvider>
           </AtomsProvider>
         </ReactQueryProvider>

@@ -1,5 +1,5 @@
 import { PenLine, Star, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +15,7 @@ interface ReviewDialogProps {
   onOpenChange: (open: boolean) => void;
   bookTitle: string;
   onSubmit: (rating: number, content: string) => void;
+  initialRating?: number;
 }
 
 export function ReviewDialog({
@@ -22,9 +23,17 @@ export function ReviewDialog({
   onOpenChange,
   bookTitle,
   onSubmit,
+  initialRating = 0,
 }: ReviewDialogProps) {
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(initialRating);
   const [content, setContent] = useState('');
+
+  // Dialog가 열릴 때마다 initialRating 값으로 rating 업데이트
+  useEffect(() => {
+    if (open && initialRating > 0) {
+      setRating(initialRating);
+    }
+  }, [open, initialRating]);
 
   const handleSubmit = () => {
     onSubmit(rating, content);
