@@ -161,8 +161,8 @@ function BookDialogContent() {
 
   return (
     <>
-      <div className="mx-auto max-w-5xl p-6">
-        <div className="grid gap-8 md:grid-cols-[300px_1fr]">
+      <div className="mx-auto w-full max-w-screen-xl p-10">
+        <div className="grid gap-8 md:grid-cols-[380px_1fr]">
           {/* 왼쪽: 책 표지 및 기본 정보 */}
           <div className="space-y-6">
             {/* 책 표지 이미지 */}
@@ -360,18 +360,43 @@ function BookDialogContent() {
 // 로딩 중일 때 보여줄 스켈레톤 UI
 function BookDialogSkeleton() {
   return (
-    <div className="mx-auto max-w-5xl p-6">
-      <div className="grid gap-8 md:grid-cols-[300px_1fr]">
+    <div className="mx-auto w-full max-w-screen-xl p-10">
+      <div className="grid gap-8 md:grid-cols-[380px_1fr]">
         <div className="space-y-6">
-          <Skeleton className="aspect-[3/4] h-[400px] w-full rounded-2xl" />
+          <Skeleton className="aspect-[3/4] h-[420px] w-full rounded-2xl" />
           <div className="space-y-2">
             <Skeleton className="h-7 w-full" />
             <Skeleton className="h-5 w-2/3" />
             <Skeleton className="h-4 w-1/2" />
             <Skeleton className="h-4 w-1/3" />
           </div>
+
+          {/* 별점 정보 스켈레톤 */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-5 w-5 rounded-full" />
+              <Skeleton className="h-5 w-10" />
+            </div>
+            <Skeleton className="h-8 w-20 rounded-full" />
+          </div>
+
+          {/* 태그 스켈레톤 */}
+          <div className="flex flex-wrap gap-1.5">
+            <Skeleton className="h-6 w-16 rounded-full" />
+            <Skeleton className="h-6 w-20 rounded-full" />
+            <Skeleton className="h-6 w-14 rounded-full" />
+          </div>
+
+          {/* 버튼 스켈레톤 */}
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-full rounded-full" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </div>
         </div>
+
+        {/* 오른쪽 영역 스켈레톤 */}
         <div className="space-y-7">
+          {/* 리뷰 섹션 스켈레톤 */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Skeleton className="h-5 w-24" />
@@ -382,6 +407,42 @@ function BookDialogSkeleton() {
               <Skeleton className="h-24 w-full rounded-xl" />
             </div>
           </div>
+
+          {/* 등록된 서재 스켈레톤 */}
+          <div className="space-y-4">
+            <Skeleton className="h-5 w-32" />
+            <div className="grid grid-cols-2 gap-4">
+              <Skeleton className="h-28 w-full rounded-xl" />
+              <Skeleton className="h-28 w-full rounded-xl" />
+            </div>
+          </div>
+
+          {/* 독서 모임 스켈레톤 */}
+          <div className="space-y-4">
+            <Skeleton className="h-5 w-28" />
+            <div className="grid grid-cols-2 gap-4">
+              <Skeleton className="h-28 w-full rounded-xl" />
+              <Skeleton className="h-28 w-full rounded-xl" />
+            </div>
+          </div>
+
+          {/* 인상적인 구절 스켈레톤 */}
+          <div className="space-y-4">
+            <Skeleton className="h-5 w-36" />
+            <Skeleton className="h-20 w-full rounded-xl" />
+          </div>
+        </div>
+      </div>
+
+      {/* 비슷한 책 스켈레톤 */}
+      <div className="mt-8 space-y-4">
+        <Skeleton className="h-5 w-28" />
+        <div className="grid grid-cols-5 gap-4">
+          <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+          <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+          <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+          <Skeleton className="aspect-[2/3] w-full rounded-lg" />
+          <Skeleton className="aspect-[2/3] w-full rounded-lg" />
         </div>
       </div>
     </div>
@@ -389,24 +450,20 @@ function BookDialogSkeleton() {
 }
 
 export function BookDialog() {
-  const { isOpen, close } = useDialogQuery({ type: 'book' });
+  const { isOpen, isbn, close } = useDialogQuery({ type: 'book' });
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && close()}>
-      <DialogContent className="max-w-4xl rounded-lg bg-white p-0">
-        <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-lg bg-white/80 px-6 backdrop-blur-xl">
-          <DialogTitle className="text-base font-medium">
-            도서 상세 정보
-          </DialogTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            onClick={() => close()}
+      <DialogContent className="w-full max-w-none rounded-lg bg-white p-0 md:max-w-screen-xl">
+        {isOpen && (
+          <Suspense
+            fallback={
+              <BookDialogHeader title="도서 로딩 중..." close={close} />
+            }
           >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+            <BookDialogHeader close={close} />
+          </Suspense>
+        )}
         {isOpen && (
           <Suspense fallback={<BookDialogSkeleton />}>
             <BookDialogContent />
@@ -414,5 +471,39 @@ export function BookDialog() {
         )}
       </DialogContent>
     </Dialog>
+  );
+}
+
+function BookDialogHeader({
+  title,
+  close,
+}: {
+  title?: string;
+  close: () => void;
+}) {
+  const { isbn } = useDialogQuery({ type: 'book' });
+
+  // 책 정보가 있을 때만 책 제목 가져오기
+  const { data: book } = useSuspenseQuery({
+    queryKey: ['book-detail', isbn],
+    queryFn: () => (isbn ? getBookByIsbn(isbn) : null),
+  });
+
+  const bookTitle = title || (book ? book.title : '도서 상세 정보');
+
+  return (
+    <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-lg bg-white/80 px-6 backdrop-blur-xl">
+      <DialogTitle className="max-w-[80%] truncate text-base font-medium">
+        {bookTitle}
+      </DialogTitle>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="rounded-full"
+        onClick={() => close()}
+      >
+        <X className="h-4 w-4" />
+      </Button>
+    </div>
   );
 }
