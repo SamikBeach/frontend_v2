@@ -1,7 +1,11 @@
-import { BookOpen, Users } from 'lucide-react';
+import { Library, LibraryCard } from '@/components/LibraryCard';
+import { Button } from '@/components/ui/button';
+import { PlusCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useIsMyProfile } from '../hooks';
 
-// 샘플 서재 데이터
-const userLibraries = [
+// 샘플 서재 데이터 (LibraryCard에 맞게 수정)
+const userLibraries: Library[] = [
   {
     id: 1,
     title: '철학 고전',
@@ -9,9 +13,13 @@ const userLibraries = [
     category: 'philosophy',
     owner: {
       name: '내 서재',
-      avatar: '/path/to/avatar.jpg',
+      username: 'mybooks',
+      avatar: 'https://i.pravatar.cc/150?u=mybooks1',
     },
     followers: 42,
+    isPublic: true,
+    tags: ['철학', '고전', '서양철학'],
+    timestamp: '2023-01-15',
     books: [
       {
         id: 1,
@@ -46,9 +54,13 @@ const userLibraries = [
     category: 'literature',
     owner: {
       name: '내 서재',
-      avatar: '/path/to/avatar.jpg',
+      username: 'mybooks',
+      avatar: 'https://i.pravatar.cc/150?u=mybooks2',
     },
     followers: 35,
+    isPublic: true,
+    tags: ['문학', '소설', '현대문학'],
+    timestamp: '2023-02-20',
     books: [
       {
         id: 5,
@@ -83,9 +95,13 @@ const userLibraries = [
     category: 'science',
     owner: {
       name: '내 서재',
-      avatar: '/path/to/avatar.jpg',
+      username: 'mybooks',
+      avatar: 'https://i.pravatar.cc/150?u=mybooks3',
     },
     followers: 27,
+    isPublic: true,
+    tags: ['과학', '교양', '물리학'],
+    timestamp: '2023-03-10',
     books: [
       {
         id: 9,
@@ -116,56 +132,52 @@ const userLibraries = [
 ];
 
 export default function ProfileBooks() {
+  const isMyProfile = useIsMyProfile();
+  const router = useRouter();
+
+  // 새 서재 만들기 클릭 핸들러
+  const handleCreateLibrary = () => {
+    // TODO: 새 서재 만들기 페이지로 이동
+    router.push('/library/new');
+  };
+
+  // 전체 책 수 계산
+  const totalBooks = userLibraries.reduce(
+    (sum, library) => sum + library.books.length,
+    0
+  );
+
+  // 전체 구독자 수 계산
+  const totalFollowers = userLibraries.reduce(
+    (sum, library) => sum + library.followers,
+    0
+  );
+
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {userLibraries.map(library => (
-        <div key={library.id} className="group cursor-pointer">
-          <div className="group h-full rounded-xl bg-[#F9FAFB] transition-all duration-200 hover:bg-[#F2F4F6]">
-            <div className="p-5 pb-3">
-              <div className="flex items-center gap-3">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-[15px] font-medium text-gray-900 transition-colors duration-150 group-hover:text-[#3182F6]">
-                      {library.title}
-                    </h3>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="px-5 pt-0 pb-3">
-              <p className="mb-4 line-clamp-2 text-sm text-gray-600">
-                {library.description}
-              </p>
-              <div className="grid grid-cols-2 gap-2.5">
-                {library.books.map(book => (
-                  <div
-                    key={book.id}
-                    className="aspect-[2/3] overflow-hidden rounded-md"
-                  >
-                    <img
-                      src={book.coverImage}
-                      alt={book.title}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center justify-between px-5 py-3 text-xs text-gray-500">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <Users className="h-3.5 w-3.5 text-gray-400" />
-                  <span>{library.followers.toLocaleString()}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <BookOpen className="h-3.5 w-3.5 text-gray-400" />
-                  <span>{library.books.length}권</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <>
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-semibold text-gray-900">내 서재</h2>
+          <p className="text-sm text-gray-500">
+            총 {userLibraries.length}개의 서재, {totalBooks}권의 책,{' '}
+            {totalFollowers}명의 구독자
+          </p>
         </div>
-      ))}
-    </div>
+        {isMyProfile && (
+          <Button
+            onClick={handleCreateLibrary}
+            className="flex items-center gap-1.5 rounded-full bg-gray-900 text-white hover:bg-gray-800"
+          >
+            <PlusCircle className="h-4 w-4" />새 서재 만들기
+          </Button>
+        )}
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {userLibraries.map(library => (
+          <LibraryCard key={library.id} library={library} />
+        ))}
+      </div>
+    </>
   );
 }

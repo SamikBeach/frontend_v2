@@ -11,6 +11,7 @@ import {
   ProfileReviews,
   ProfileStats,
   ProfileSummary,
+  SubscribedLibraries,
 } from '../components';
 
 // 로딩 컴포넌트
@@ -60,7 +61,7 @@ export default function ProfilePage() {
       case 'books':
         return <ProfileBooks />;
       case 'subscriptions':
-        return <ProfileBooks />;
+        return <SubscribedLibraries />;
       case 'read':
         return <ProfileRecentBooks />;
       case 'reviews':

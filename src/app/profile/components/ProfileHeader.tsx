@@ -1,11 +1,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks';
-import { UserCircle } from 'lucide-react';
+import { Check, UserCircle, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useState } from 'react';
+import { useIsMyProfile } from '../hooks';
 
 export default function ProfileHeader() {
-  const user = useCurrentUser();
+  const currentUser = useCurrentUser();
+  const params = useParams();
+  const profileId = params?.id as string;
+  const isMyProfile = useIsMyProfile();
+  const [isFollowing, setIsFollowing] = useState(false);
 
   /**
    * 임시 데이터: 팔로워/팔로잉 수
@@ -14,11 +21,22 @@ export default function ProfileHeader() {
   const followers = 128;
   const following = 75;
 
-  if (!user) return null;
+  // 사용자 정보가 없는 경우 로딩 표시
+  if (!currentUser) return null;
+
+  // 현재는 currentUser 정보를 사용하지만, 실제로는 profileId를 기반으로 해당 사용자 정보를 조회해야 함
+  // TODO: profileId를 이용하여 프로필 사용자 정보 조회 API 연동 필요
+  const user = currentUser;
 
   // 사용자 표시 정보 설정
   const displayName = user.name || user.username || user.email.split('@')[0];
   const initial = displayName.charAt(0).toUpperCase();
+
+  // 팔로우 버튼 클릭 핸들러
+  const handleFollowClick = () => {
+    // TODO: 실제 팔로우 API 연동
+    setIsFollowing(!isFollowing);
+  };
 
   return (
     <div className="bg-white">
@@ -63,15 +81,40 @@ export default function ProfileHeader() {
               </div>
             </div>
           </div>
-          <Link href="/profile/settings">
+
+          {isMyProfile ? (
+            <Link href="/profile/settings">
+              <Button
+                className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
+                variant="outline"
+              >
+                <UserCircle className="h-4 w-4" />
+                프로필 편집
+              </Button>
+            </Link>
+          ) : (
             <Button
-              className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
-              variant="outline"
+              onClick={handleFollowClick}
+              className={`mt-4 flex items-center gap-1.5 rounded-full ${
+                isFollowing
+                  ? 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                  : 'bg-gray-900 text-white hover:bg-gray-800'
+              } text-sm font-medium sm:mt-0`}
+              variant={isFollowing ? 'outline' : 'default'}
             >
-              <UserCircle className="h-4 w-4" />
-              프로필 편집
+              {isFollowing ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  팔로잉
+                </>
+              ) : (
+                <>
+                  <UserPlus className="h-4 w-4" />
+                  팔로우
+                </>
+              )}
             </Button>
-          </Link>
+          )}
         </div>
       </div>
     </div>

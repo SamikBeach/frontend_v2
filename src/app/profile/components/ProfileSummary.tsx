@@ -85,6 +85,8 @@ export default function ProfileSummary({
   const booksRead = 37;
   // 작성한 리뷰 수
   const reviewsWritten = 18;
+  // 구독한 서재 수
+  const subscribedLibraries = 3;
 
   return (
     <div className="mx-auto w-full px-4 py-6">
@@ -161,7 +163,7 @@ export default function ProfileSummary({
           </div>
           <div className="mt-2 text-center">
             <span className="block text-xl font-bold text-gray-900">
-              &nbsp;
+              {subscribedLibraries}
             </span>
             <span className="text-xs text-gray-600">구독한 서재</span>
           </div>
