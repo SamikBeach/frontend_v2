@@ -91,12 +91,15 @@ export function LibraryCard({ library, categories = [] }: LibraryCardProps) {
           <p className="mb-4 line-clamp-2 text-sm text-gray-600">
             {library.description}
           </p>
-          <div className="flex h-36 gap-2">
-            {displayBooks.map(book => (
-              <BookImage key={book.id} book={book} />
-            ))}
-            {displayBooks.length === 0 && (
-              <div className="flex h-full w-full items-center justify-center rounded-lg bg-gray-100">
+          <div className="flex gap-2">
+            {displayBooks.length > 0 ? (
+              <div className="grid w-full grid-cols-3 gap-2">
+                {displayBooks.map(book => (
+                  <BookImage key={book.id} book={book} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex h-[150px] w-full items-center justify-center rounded-lg bg-gray-100">
                 <p className="text-sm text-gray-400">책이 없습니다</p>
               </div>
             )}
@@ -126,11 +129,11 @@ interface BookImageProps {
 
 export function BookImage({ book }: BookImageProps) {
   return (
-    <div className="flex-1 overflow-hidden rounded-lg">
+    <div className="aspect-[5/7] w-full overflow-hidden rounded-lg">
       <img
         src={book.coverImage}
         alt={book.title}
-        className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+        className="h-full w-full object-cover"
       />
     </div>
   );
