@@ -26,7 +26,6 @@ import { BookInfo } from './BookInfo';
 import { BookQuotes } from './BookQuotes';
 import { BookReviews } from './BookReviews';
 import { BookShelves } from './BookShelves';
-import { ReadingGroups } from './ReadingGroups';
 import { SimilarBooks } from './SimilarBooks';
 import { BookDetails } from './types';
 
@@ -176,23 +175,6 @@ function BookDialogContent() {
     },
   ];
 
-  const defaultReadingGroups = [
-    {
-      id: 1,
-      name: '주말 독서 모임',
-      memberCount: 18,
-      description: '매주 토요일 오전 함께 책을 읽어요',
-      thumbnail: 'https://picsum.photos/seed/group1/100/100',
-    },
-    {
-      id: 2,
-      name: '심야 독서 클럽',
-      memberCount: 12,
-      description: '밤에 책을 읽는 모임입니다',
-      thumbnail: 'https://picsum.photos/seed/group2/100/100',
-    },
-  ];
-
   // 읽기 상태 변경 핸들러
   const handleReadingStatusChange = (status: ReadingStatus) => {
     setReadingStatus(status);
@@ -284,7 +266,7 @@ function BookDialogContent() {
 
   return (
     <>
-      <div className="mx-auto w-full max-w-screen-xl p-10">
+      <div className="mx-auto w-full max-w-screen-xl px-10 pt-4 pb-10">
         <div className="grid gap-8 md:grid-cols-[380px_1fr]">
           {/* 왼쪽: 책 표지 및 기본 정보 */}
           <div className="space-y-6">
@@ -517,11 +499,6 @@ function BookDialogContent() {
               bookshelves={displayBook.bookshelves || defaultBookshelves}
             />
 
-            {/* 독서 모임 섹션 */}
-            <ReadingGroups
-              readingGroups={displayBook.readingGroups || defaultReadingGroups}
-            />
-
             {/* 인상적인 구절 */}
             <BookQuotes quotes={displayBook.quotes} />
           </div>
@@ -546,7 +523,7 @@ function BookDialogContent() {
 // 로딩 중일 때 보여줄 스켈레톤 UI
 function BookDialogSkeleton() {
   return (
-    <div className="mx-auto w-full max-w-screen-xl p-10">
+    <div className="mx-auto w-full max-w-7xl px-10 pt-4 pb-10">
       <div className="grid gap-8 md:grid-cols-[380px_1fr]">
         <div className="space-y-6">
           <Skeleton className="aspect-[3/4] h-[420px] w-full rounded-2xl" />
@@ -597,15 +574,6 @@ function BookDialogSkeleton() {
           {/* 등록된 서재 스켈레톤 */}
           <div className="space-y-4">
             <Skeleton className="h-5 w-32" />
-            <div className="grid grid-cols-2 gap-4">
-              <Skeleton className="h-28 w-full rounded-xl" />
-              <Skeleton className="h-28 w-full rounded-xl" />
-            </div>
-          </div>
-
-          {/* 독서 모임 스켈레톤 */}
-          <div className="space-y-4">
-            <Skeleton className="h-5 w-28" />
             <div className="grid grid-cols-2 gap-4">
               <Skeleton className="h-28 w-full rounded-xl" />
               <Skeleton className="h-28 w-full rounded-xl" />
