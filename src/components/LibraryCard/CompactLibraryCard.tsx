@@ -37,7 +37,7 @@ export function CompactLibraryCard({
       >
         <div className="mb-2.5 flex items-center gap-3">
           {library.thumbnail ? (
-            <div className="h-10 w-10 overflow-hidden rounded-lg">
+            <div className="h-12 w-12 overflow-hidden rounded-lg">
               <img
                 src={library.thumbnail}
                 alt={library.name}
@@ -45,13 +45,13 @@ export function CompactLibraryCard({
               />
             </div>
           ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-200 text-gray-500">
-              <BookOpen className="h-5 w-5" />
+            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-200 text-gray-500">
+              <BookOpen className="h-6 w-6" />
             </div>
           )}
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-1.5">
-              <h3 className="text-sm font-medium text-gray-900 transition-colors duration-150 hover:text-blue-600">
+              <h3 className="text-base font-medium text-gray-900 transition-colors duration-150 hover:text-blue-600">
                 {library.name}
               </h3>
 
@@ -62,7 +62,7 @@ export function CompactLibraryCard({
                     <Badge
                       key={index}
                       variant="secondary"
-                      className="rounded-full bg-gray-100 px-1.5 py-0 text-[10px] font-normal text-gray-700"
+                      className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-700"
                     >
                       {tag}
                     </Badge>
@@ -70,43 +70,43 @@ export function CompactLibraryCard({
                 </div>
               )}
             </div>
-            <div className="mt-0.5 flex items-center gap-2">
-              <Avatar className="h-4 w-4 border-0">
+            <div className="mt-1 flex items-center gap-2">
+              <Avatar className="h-5 w-5 border-0">
                 <AvatarImage
                   src={library.owner.avatar}
                   alt={library.owner.name}
                   className="object-cover"
                 />
-                <AvatarFallback className="text-[8px]">
+                <AvatarFallback className="text-[9px]">
                   {library.owner.name[0]}
                 </AvatarFallback>
               </Avatar>
-              <p className="text-xs text-gray-500">{library.owner.name}</p>
+              <p className="text-sm text-gray-500">{library.owner.name}</p>
             </div>
           </div>
         </div>
 
         {library.description && (
-          <p className="mb-2.5 line-clamp-2 text-xs leading-relaxed text-gray-600">
+          <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-gray-600">
             {library.description}
           </p>
         )}
 
-        <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <Users className="h-3.5 w-3.5 text-gray-400" />
+              <Users className="h-4 w-4 text-gray-400" />
               <span>{library.subscriberCount}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <BookOpen className="h-3.5 w-3.5 text-gray-400" />
+              <BookOpen className="h-4 w-4 text-gray-400" />
               <span>{library.bookCount}</span>
             </div>
           </div>
           {library.isSubscribed && (
             <Badge
               variant="outline"
-              className="rounded-full border-blue-200 bg-blue-50 px-2 py-0 text-[10px] font-normal text-blue-600"
+              className="rounded-full border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-normal text-blue-600"
             >
               구독 중
             </Badge>
