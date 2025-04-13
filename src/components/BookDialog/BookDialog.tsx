@@ -1,5 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { ChevronDown, ListPlus, PenLine, Share2, Star, X } from 'lucide-react';
+import { format, parseISO } from 'date-fns';
+import { ko } from 'date-fns/locale';
+import { ChevronDown, ListPlus, PenLine, Star, X } from 'lucide-react';
 import { Suspense, useCallback, useMemo, useState } from 'react';
 
 import { getBookByIsbn } from '@/apis/book';
@@ -75,6 +77,9 @@ function BookDialogContent() {
   const [readingStatus, setReadingStatus] = useState<ReadingStatus | null>(
     null
   );
+  const [userRating, setUserRating] = useState(0);
+  const [isRatingHovered, setIsRatingHovered] = useState(false);
+  const [hoveredRating, setHoveredRating] = useState(0);
 
   // isbn이 없으면 다이얼로그를 렌더링하지 않음
   if (!isbn) return null;
@@ -102,6 +107,15 @@ function BookDialogContent() {
     },
     [isbn]
   );
+
+  // 알라딘으로 이동하는 함수 추가
+  const handleOpenAladin = useCallback(() => {
+    if (!isbn) return;
+    window.open(
+      `https://www.aladin.co.kr/shop/wproduct.aspx?isbn=${isbn}`,
+      '_blank'
+    );
+  }, [isbn]);
 
   // 예시용 데이터
   const defaultBookshelves = [
@@ -157,7 +171,50 @@ function BookDialogContent() {
   // 읽기 상태 표시 텍스트
   const readingStatusText = readingStatus || '읽기 상태';
 
+  // 별점 추가 핸들러
+  const handleRatingClick = (rating: number) => {
+    setUserRating(rating);
+    // TODO: API 호출로 별점 저장
+    console.log(`별점 추가: ${rating}점`);
+  };
+
+  // 별점 호버 핸들러
+  const handleRatingHover = (rating: number) => {
+    setHoveredRating(rating);
+    setIsRatingHovered(true);
+  };
+
+  // 별점 호버 아웃 핸들러
+  const handleRatingLeave = () => {
+    setIsRatingHovered(false);
+  };
+
   if (!displayBook) return null;
+
+  // 출간일 포맷팅
+  const formattedDate = displayBook.publishDate
+    ? typeof displayBook.publishDate === 'string'
+      ? format(parseISO(displayBook.publishDate), 'yyyy년 MM월 dd일', {
+          locale: ko,
+        })
+      : format(new Date(displayBook.publishDate), 'yyyy년 MM월 dd일', {
+          locale: ko,
+        })
+    : '';
+
+  // 별점 출력 수정
+  const displayRating = displayBook.rating
+    ? typeof displayBook.rating === 'string'
+      ? displayBook.rating
+      : displayBook.rating.toFixed(1)
+    : '0.0';
+
+  // 리뷰 카운트 출력 수정
+  const reviewCount = displayBook.reviews
+    ? typeof displayBook.reviews === 'number'
+      ? displayBook.reviews
+      : parseInt(displayBook.reviews.toString()) || 0
+    : 0;
 
   return (
     <>
@@ -166,138 +223,202 @@ function BookDialogContent() {
           {/* 왼쪽: 책 표지 및 기본 정보 */}
           <div className="space-y-6">
             {/* 책 표지 이미지 */}
-            <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-gray-50">
+            <div
+              className="relative aspect-[3/4] cursor-pointer overflow-hidden rounded-2xl bg-gray-50"
+              onClick={handleOpenAladin}
+            >
               <img
                 src={displayBook.coverImage}
                 alt={displayBook.title}
                 className="h-full w-full object-cover"
                 loading="eager"
               />
+              <div className="absolute right-0 bottom-0 left-0 bg-gradient-to-t from-black/60 to-transparent px-3 py-2 text-[10px] text-white opacity-0 transition-opacity hover:opacity-100">
+                알라딘에서 보기
+              </div>
             </div>
 
             {/* 책 정보(제목, 저자, 출판사, 출간일)는 이미지 아래에 배치 */}
             <div className="space-y-2">
-              <h2 className="text-xl font-bold text-gray-900">
-                {displayBook.title}
-              </h2>
+              <div className="flex items-start gap-2">
+                <h2
+                  className="cursor-pointer text-xl font-bold text-gray-900"
+                  onClick={handleOpenAladin}
+                >
+                  {displayBook.title}
+                </h2>
+
+                {/* 카테고리 태그 - 제목 우측으로 이동 */}
+                {(displayBook.category || displayBook.subcategory) && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {displayBook.category && (
+                      <Badge className="rounded-full bg-gray-800 px-2 py-0.5 text-[10px] font-medium text-white">
+                        {displayBook.category.name}
+                      </Badge>
+                    )}
+                    {displayBook.subcategory && (
+                      <Badge className="rounded-full bg-gray-600 px-2 py-0.5 text-[10px] font-medium text-white">
+                        {displayBook.subcategory.name}
+                      </Badge>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <p className="text-gray-700">{displayBook.author}</p>
+
               {displayBook.publisher && (
                 <p className="text-sm text-gray-500">{displayBook.publisher}</p>
               )}
               {displayBook.publishDate && (
-                <p className="text-sm text-gray-500">
-                  출간일:{' '}
-                  {typeof displayBook.publishDate === 'string'
-                    ? displayBook.publishDate
-                    : new Date(displayBook.publishDate)
-                        .toISOString()
-                        .split('T')[0]}
-                </p>
+                <p className="text-sm text-gray-500">출간일: {formattedDate}</p>
               )}
             </div>
 
             {/* 별점 정보 */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                <span className="text-xl font-semibold">
-                  {displayBook.rating || 0}
-                </span>
-                {displayBook.totalRatings && (
-                  <span className="text-sm text-gray-500">
-                    ({displayBook.totalRatings}명)
+            <div className="rounded-xl bg-gray-50 p-4">
+              <div className="flex items-center">
+                <div className="flex items-center gap-2">
+                  <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                  <span className="text-2xl font-semibold">
+                    {displayRating}
                   </span>
-                )}
+                  <span className="text-sm text-gray-500">
+                    ({reviewCount}명)
+                  </span>
+                </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-full text-gray-600 hover:bg-gray-50"
-              >
-                <Share2 className="mr-1.5 h-4 w-4" />
-                공유
-              </Button>
+
+              {/* 사용자 별점 선택 UI */}
+              <div className="mt-3 border-t border-gray-200 pt-3">
+                <div className="flex items-center justify-between">
+                  <div
+                    className="flex items-center gap-1"
+                    onMouseLeave={handleRatingLeave}
+                  >
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <Star
+                        key={star}
+                        className={`h-6 w-6 cursor-pointer ${
+                          (
+                            isRatingHovered
+                              ? star <= hoveredRating
+                              : star <= userRating
+                          )
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'text-gray-200 hover:text-gray-300'
+                        }`}
+                        onClick={() => handleRatingClick(star)}
+                        onMouseEnter={() => handleRatingHover(star)}
+                      />
+                    ))}
+                    <span className="ml-2 text-xs text-gray-600">
+                      {isRatingHovered
+                        ? hoveredRating === 0
+                          ? ''
+                          : hoveredRating === 1
+                            ? '별로예요'
+                            : hoveredRating === 2
+                              ? '아쉬워요'
+                              : hoveredRating === 3
+                                ? '보통이에요'
+                                : hoveredRating === 4
+                                  ? '좋아요'
+                                  : '최고예요'
+                        : userRating === 0
+                          ? ''
+                          : userRating === 1
+                            ? '별로예요'
+                            : userRating === 2
+                              ? '아쉬워요'
+                              : userRating === 3
+                                ? '보통이에요'
+                                : userRating === 4
+                                  ? '좋아요'
+                                  : '최고예요'}
+                    </span>
+                  </div>
+
+                  {/* 리뷰 작성하기 버튼 - 별점 옆으로 이동 */}
+                  <Button
+                    className="h-8 rounded-full bg-gray-100 px-3 text-xs text-gray-700 hover:bg-gray-200"
+                    onClick={() => setReviewDialogOpen(true)}
+                  >
+                    <PenLine className="mr-1 h-3 w-3" />
+                    리뷰 쓰기
+                  </Button>
+                </div>
+              </div>
             </div>
 
-            {/* 태그 정보 */}
-            {displayBook.tags && (
-              <div className="flex flex-wrap gap-1.5">
-                {displayBook.tags.map(tag => (
-                  <Badge
-                    key={tag}
-                    variant="secondary"
-                    className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-            )}
-
-            {/* 읽기 상태 및 서재에 담기 버튼 */}
-            <div className="flex gap-2">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="flex-1 justify-between rounded-full border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 hover:text-blue-800"
-                  >
-                    <span>{readingStatusText}</span>
-                    <ChevronDown className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-48 rounded-xl">
-                  <DropdownMenuItem
-                    className="cursor-pointer rounded-lg py-2"
-                    onClick={() => handleReadingStatusChange('읽고 싶어요')}
-                  >
-                    읽고 싶어요
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer rounded-lg py-2"
-                    onClick={() => handleReadingStatusChange('읽는 중')}
-                  >
-                    읽는 중
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer rounded-lg py-2"
-                    onClick={() => handleReadingStatusChange('읽었어요')}
-                  >
-                    읽었어요
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer rounded-lg py-2"
-                    onClick={() => handleReadingStatusChange('선택 안함')}
-                  >
-                    선택 안함
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="rounded-full border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100 hover:text-purple-800"
-                  >
-                    <ListPlus className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-48 rounded-xl">
-                  {defaultBookshelves.map(shelf => (
-                    <DropdownMenuItem
-                      key={shelf.id}
-                      className="cursor-pointer rounded-lg py-2"
-                      onClick={() => handleAddToBookshelf(shelf.id)}
+            {/* 기능 버튼들 */}
+            <div className="flex flex-col gap-3">
+              {/* 읽기 상태 및 서재에 담기 버튼 */}
+              <div className="grid grid-cols-2 gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-between rounded-full border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                     >
-                      {shelf.name}
+                      <span>{readingStatus || '책 상태 설정'}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-48 rounded-xl">
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-lg py-2"
+                      onClick={() => handleReadingStatusChange('읽고 싶어요')}
+                    >
+                      읽고 싶어요
                     </DropdownMenuItem>
-                  ))}
-                  <DropdownMenuItem className="cursor-pointer rounded-lg py-2">
-                    + 새 서재 만들기
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-lg py-2"
+                      onClick={() => handleReadingStatusChange('읽는 중')}
+                    >
+                      읽는 중
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-lg py-2"
+                      onClick={() => handleReadingStatusChange('읽었어요')}
+                    >
+                      읽었어요
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-lg py-2"
+                      onClick={() => handleReadingStatusChange('선택 안함')}
+                    >
+                      선택 안함
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full rounded-full border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                    >
+                      <ListPlus className="mr-1.5 h-4 w-4" />
+                      <span className="text-sm">서재에 담기</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-48 rounded-xl">
+                    {defaultBookshelves.map(shelf => (
+                      <DropdownMenuItem
+                        key={shelf.id}
+                        className="cursor-pointer rounded-lg py-2"
+                        onClick={() => handleAddToBookshelf(shelf.id)}
+                      >
+                        {shelf.name}
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuItem className="cursor-pointer rounded-lg py-2">
+                      + 새 서재 만들기
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             </div>
 
             {/* 책 설명, 저자 소개 */}
@@ -312,13 +433,6 @@ function BookDialogContent() {
                 <p className="text-sm font-medium text-gray-900">
                   리뷰 ({displayBook.reviews?.length || 0})
                 </p>
-                <Button
-                  className="rounded-full bg-pink-100 text-pink-700 hover:bg-pink-200"
-                  onClick={() => setReviewDialogOpen(true)}
-                >
-                  <PenLine className="mr-1.5 h-4 w-4" />
-                  리뷰 작성하기
-                </Button>
               </div>
 
               <BookReviews
