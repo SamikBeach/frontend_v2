@@ -57,7 +57,7 @@ function DialogContent({
   return (
     <DialogPortal>
       <DialogOverlay className={cn('overflow-y-auto', overlayClassName)}>
-        <div className="min-h-full py-12">
+        <div className="min-h-full py-5">
           <DialogPrimitive.Content
             data-slot="dialog-content"
             className={cn(
