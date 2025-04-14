@@ -1,19 +1,13 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
 
-import { getBookByIsbn } from '@/apis/book';
 import { Button } from '@/components/ui/button';
 import { DialogTitle } from '@/components/ui/dialog';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
+import { useBookDetails } from '../hooks';
 
 export function BookHeader() {
-  const { isbn, close } = useDialogQuery({ type: 'book' });
-
-  // 책 정보가 있을 때만 책 제목 가져오기
-  const { data: book } = useSuspenseQuery({
-    queryKey: ['book-detail', isbn],
-    queryFn: () => (isbn ? getBookByIsbn(isbn) : null),
-  });
+  const { close } = useDialogQuery({ type: 'book' });
+  const { book } = useBookDetails();
 
   const bookTitle = book ? book.title : '도서 상세 정보';
 

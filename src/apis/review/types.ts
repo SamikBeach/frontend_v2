@@ -62,14 +62,16 @@ export interface UpdateReviewDto {
 
 export interface CreateCommentDto {
   content: string;
-  parentCommentId?: number;
 }
 
 export interface ReviewsResponse {
-  reviews: ReviewResponseDto[];
-  total: number;
-  page: number;
-  totalPages: number;
+  data: Review[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }
 
 // 홈화면용 인기 리뷰 프리뷰 타입
@@ -93,4 +95,37 @@ export interface HomeReviewPreview {
 // 홈화면용 인기 리뷰 응답 타입
 export interface HomePopularReviewsResponse {
   reviews: HomeReviewPreview[];
+}
+
+export interface ReviewUser {
+  id: number;
+  username: string;
+  email?: string;
+  profileImage?: string | null;
+}
+
+export interface ReviewComment {
+  id: number;
+  content: string;
+  author: ReviewUser;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Review {
+  id: number;
+  content: string;
+  type: string;
+  author: ReviewUser;
+  books: ReviewBook[];
+  images: ReviewImage[];
+  likeCount: number;
+  commentCount: number;
+  isLiked: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CommentsResponse {
+  comments: ReviewComment[];
 }

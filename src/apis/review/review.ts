@@ -1,9 +1,11 @@
 import api from '../axios';
 import {
   Comment,
+  CommentsResponse,
   CreateCommentDto,
   CreateReviewDto,
   HomePopularReviewsResponse,
+  Review,
   ReviewResponseDto,
   ReviewsResponse,
   ReviewType,
@@ -155,6 +157,43 @@ export const getPopularReviewsForHome = async (
     {
       params: { limit },
     }
+  );
+  return response.data;
+};
+
+/**
+ * 특정 책에 대한 리뷰 목록 조회
+ */
+export const getBookReviews = async (
+  bookId: number,
+  page: number = 1,
+  limit: number = 10
+): Promise<ReviewsResponse> => {
+  const response = await api.get<ReviewsResponse>(`/review/book/${bookId}`, {
+    params: { page, limit },
+  });
+  return response.data;
+};
+
+/**
+ * 리뷰에 댓글 작성
+ */
+export const addReviewComment = async (
+  reviewId: number,
+  data: CreateCommentDto
+): Promise<Review> => {
+  const response = await api.post(`/review/${reviewId}/comment`, data);
+  return response.data;
+};
+
+/**
+ * 리뷰의 댓글 목록 조회
+ */
+export const getReviewComments = async (
+  reviewId: number
+): Promise<CommentsResponse> => {
+  const response = await api.get<CommentsResponse>(
+    `/review/${reviewId}/comment`
   );
   return response.data;
 };

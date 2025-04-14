@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { PenLine, Star } from 'lucide-react';
+import { Suspense, useCallback } from 'react';
 import { useBookDetails, useBookRating, useReviewDialog } from '../hooks';
 
-export function BookRatingSection() {
-  const { book } = useBookDetails();
+// 별점을 표시하는 컴포넌트
+function RatingStars() {
   const {
     userRating,
     isRatingHovered,
@@ -12,6 +14,60 @@ export function BookRatingSection() {
     handleRatingHover,
     handleRatingLeave,
   } = useBookRating();
+
+  // 별 클릭 핸들러
+  const handleStarClick = useCallback(
+    (star: number) => {
+      handleRatingClick(star);
+    },
+    [handleRatingClick]
+  );
+
+  // 별 호버 핸들러
+  const handleStarHover = useCallback(
+    (star: number) => {
+      handleRatingHover(star);
+    },
+    [handleRatingHover]
+  );
+
+  return (
+    <div
+      className="text-muted-foreground flex items-center gap-1"
+      onMouseLeave={handleRatingLeave}
+    >
+      {Array.from({ length: 5 }, (_, i) => i + 1).map(star => (
+        <Star
+          key={star}
+          className={cn(
+            'h-5 w-5 cursor-pointer transition-colors',
+            (isRatingHovered ? hoveredRating >= star : userRating >= star)
+              ? 'fill-yellow-400 text-yellow-400'
+              : 'fill-none'
+          )}
+          onClick={() => handleStarClick(star)}
+          onMouseEnter={() => handleStarHover(star)}
+        />
+      ))}
+    </div>
+  );
+}
+
+// Fallback for rating stars while loading
+function RatingStarsFallback() {
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map(star => (
+        <Star key={star} className="h-6 w-6 text-gray-200" />
+      ))}
+      <span className="ml-2 text-xs text-gray-400">로딩 중...</span>
+    </div>
+  );
+}
+
+export function BookRatingSection() {
+  const { book } = useBookDetails();
+  const { userRating } = useBookRating();
   const { handleOpenReviewDialog } = useReviewDialog();
 
   if (!book) return null;
@@ -30,16 +86,6 @@ export function BookRatingSection() {
       : book.reviews.length || 0
     : 0;
 
-  // 별점 텍스트 가져오기
-  const getRatingText = (rating: number) => {
-    if (rating === 0) return '';
-    if (rating === 1) return '별로예요';
-    if (rating === 2) return '아쉬워요';
-    if (rating === 3) return '보통이에요';
-    if (rating === 4) return '좋아요';
-    return '최고예요';
-  };
-
   return (
     <div className="rounded-xl bg-gray-50 p-4">
       <div className="flex items-center">
@@ -53,28 +99,9 @@ export function BookRatingSection() {
       {/* 사용자 별점 선택 UI */}
       <div className="mt-3 border-t border-gray-200 pt-3">
         <div className="flex items-center justify-between">
-          <div
-            className="flex items-center gap-1"
-            onMouseLeave={handleRatingLeave}
-          >
-            {[1, 2, 3, 4, 5].map(star => (
-              <Star
-                key={star}
-                className={`h-6 w-6 cursor-pointer ${
-                  (isRatingHovered ? star <= hoveredRating : star <= userRating)
-                    ? 'fill-yellow-400 text-yellow-400'
-                    : 'text-gray-200 hover:text-gray-300'
-                }`}
-                onClick={() => handleRatingClick(star)}
-                onMouseEnter={() => handleRatingHover(star)}
-              />
-            ))}
-            <span className="ml-2 text-xs text-gray-600">
-              {isRatingHovered
-                ? getRatingText(hoveredRating)
-                : getRatingText(userRating)}
-            </span>
-          </div>
+          <Suspense fallback={<RatingStarsFallback />}>
+            <RatingStars />
+          </Suspense>
 
           {/* 리뷰 작성하기 버튼 - 별점 옆으로 이동 */}
           <Button

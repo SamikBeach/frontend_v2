@@ -1,7 +1,46 @@
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { BookLibraries } from '../BookLibraries';
 import { BookQuotes } from '../BookQuotes';
 import { BookReviews } from '../BookReviews';
-import { BookShelves } from '../BookShelves';
 import { useBookDetails } from '../hooks';
+
+// 라이브러리 로딩 컴포넌트
+function LibrariesLoading() {
+  return (
+    <div className="animate-pulse space-y-4">
+      <div className="h-6 w-48 rounded bg-gray-200"></div>
+      <div className="space-y-2">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-16 rounded-xl bg-gray-100"></div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 에러 컴포넌트
+function ErrorFallback({
+  error,
+  resetErrorBoundary,
+}: {
+  error: Error;
+  resetErrorBoundary: () => void;
+}) {
+  return (
+    <div className="p-4 text-center">
+      <p className="text-sm text-red-500">
+        데이터를 불러오는 중 오류가 발생했습니다
+      </p>
+      <button
+        onClick={resetErrorBoundary}
+        className="mt-2 cursor-pointer text-xs text-blue-500 hover:underline"
+      >
+        다시 시도
+      </button>
+    </div>
+  );
+}
 
 export function BookRightPanel() {
   const { book } = useBookDetails();
@@ -22,7 +61,11 @@ export function BookRightPanel() {
       </div>
 
       {/* 등록된 서재 섹션 */}
-      <BookShelves />
+      <ErrorBoundary FallbackComponent={ErrorFallback}>
+        <Suspense fallback={<LibrariesLoading />}>
+          <BookLibraries />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* 인상적인 구절 */}
       <BookQuotes />

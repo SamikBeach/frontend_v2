@@ -14,7 +14,7 @@ import {
  * 모든 도서 조회
  */
 export const getAllBooks = async (): Promise<Book[]> => {
-  const response = await api.get<Book[]>('/books');
+  const response = await api.get<Book[]>('/book');
   return response.data;
 };
 
@@ -22,7 +22,7 @@ export const getAllBooks = async (): Promise<Book[]> => {
  * ID로 도서 조회
  */
 export const getBookById = async (id: number): Promise<Book> => {
-  const response = await api.get<Book>(`/books/${id}`);
+  const response = await api.get<Book>(`/book/${id}`);
   return response.data;
 };
 
@@ -31,7 +31,7 @@ export const getBookById = async (id: number): Promise<Book> => {
  * isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
  */
 export const getBookByIsbn = async (isbn: string): Promise<Book> => {
-  const response = await api.get<Book>(`/books/isbn/${isbn}`);
+  const response = await api.get<Book>(`/book/isbn/${isbn}`);
   return response.data;
 };
 
@@ -39,7 +39,7 @@ export const getBookByIsbn = async (isbn: string): Promise<Book> => {
  * 추천 도서 조회
  */
 export const getFeaturedBooks = async (): Promise<Book[]> => {
-  const response = await api.get<Book[]>('/books/featured');
+  const response = await api.get<Book[]>('/book/featured');
   return response.data;
 };
 
@@ -49,7 +49,7 @@ export const getFeaturedBooks = async (): Promise<Book[]> => {
 export const getBooksByCategoryId = async (
   categoryId: number
 ): Promise<Book[]> => {
-  const response = await api.get<Book[]>(`/books/category/${categoryId}`);
+  const response = await api.get<Book[]>(`/book/category/${categoryId}`);
   return response.data;
 };
 
@@ -59,7 +59,7 @@ export const getBooksByCategoryId = async (
 export const getBooksBySubcategoryId = async (
   subcategoryId: number
 ): Promise<Book[]> => {
-  const response = await api.get<Book[]>(`/books/subcategory/${subcategoryId}`);
+  const response = await api.get<Book[]>(`/book/subcategory/${subcategoryId}`);
   return response.data;
 };
 
@@ -83,7 +83,7 @@ export const getPopularBooksByCategory = async (
   }
 
   const response = await api.get<Book[]>(
-    `/books/popular/category/${categoryId}`,
+    `/book/popular/category/${categoryId}`,
     { params }
   );
   return response.data;
@@ -95,7 +95,7 @@ export const getPopularBooksByCategory = async (
 export const getAllPopularBooks = async (
   params?: PopularBooksParams
 ): Promise<Book[]> => {
-  const response = await api.get<Book[]>('/books/popular/all', { params });
+  const response = await api.get<Book[]>('/book/popular/all', { params });
   return response.data;
 };
 
@@ -103,7 +103,7 @@ export const getAllPopularBooks = async (
  * 새 도서 생성
  */
 export const createBook = async (bookData: CreateBookDto): Promise<Book> => {
-  const response = await api.post<Book>('/books', bookData);
+  const response = await api.post<Book>('/book', bookData);
   return response.data;
 };
 
@@ -114,7 +114,7 @@ export const updateBook = async (
   id: number,
   bookData: UpdateBookDto
 ): Promise<Book> => {
-  const response = await api.patch<Book>(`/books/${id}`, bookData);
+  const response = await api.patch<Book>(`/book/${id}`, bookData);
   return response.data;
 };
 
@@ -122,7 +122,7 @@ export const updateBook = async (
  * 도서 삭제
  */
 export const deleteBook = async (id: number): Promise<void> => {
-  await api.delete(`/books/${id}`);
+  await api.delete(`/book/${id}`);
 };
 
 /**
@@ -131,7 +131,7 @@ export const deleteBook = async (id: number): Promise<void> => {
 export const getAllDiscoverBooks = async (
   params?: PopularBooksParams
 ): Promise<Book[]> => {
-  const response = await api.get<Book[]>('/books/discover/all', { params });
+  const response = await api.get<Book[]>('/book/discover/all', { params });
   return response.data;
 };
 
@@ -155,7 +155,7 @@ export const getBooksByDiscoverCategoryId = async (
   }
 
   const response = await api.get<Book[]>(
-    `/books/discover/category/${discoverCategoryId}`,
+    `/book/discover/category/${discoverCategoryId}`,
     { params }
   );
   return response.data;
@@ -176,7 +176,7 @@ export const getBooksByDiscoverSubCategoryId = async (
   };
 
   const response = await api.get<Book[]>(
-    `/books/discover/subcategory/${discoverSubCategoryId}`,
+    `/book/discover/subcategory/${discoverSubCategoryId}`,
     { params }
   );
   return response.data;
@@ -190,7 +190,7 @@ export const addBookToDiscoverCategory = async (
   discoverCategoryId: number,
   discoverSubCategoryId?: number
 ): Promise<Book> => {
-  const response = await api.post<Book>('/books/discover/add', {
+  const response = await api.post<Book>('/book/discover/add', {
     bookId,
     discoverCategoryId,
     discoverSubCategoryId,
@@ -204,7 +204,7 @@ export const addBookToDiscoverCategory = async (
 export const removeBookFromDiscoverCategory = async (
   bookId: number
 ): Promise<Book> => {
-  const response = await api.delete<Book>(`/books/discover/remove/${bookId}`);
+  const response = await api.delete<Book>(`/book/discover/remove/${bookId}`);
   return response.data;
 };
 
@@ -215,7 +215,7 @@ export const getPopularBooksForHome = async (
   limit: number = 4
 ): Promise<HomePopularBooksResponse> => {
   const response = await api.get<HomePopularBooksResponse>(
-    '/books/popular/home',
+    '/book/popular/home',
     {
       params: { limit },
     }
@@ -230,7 +230,7 @@ export const getDiscoverBooksForHome = async (
   limit: number = 6
 ): Promise<HomeDiscoverBooksResponse[]> => {
   const response = await api.get<HomeDiscoverBooksResponse[]>(
-    '/books/discover/home',
+    '/book/discover/home',
     {
       params: { limit },
     }

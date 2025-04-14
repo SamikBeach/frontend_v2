@@ -4,6 +4,7 @@ import {
   AddTagToLibraryDto,
   CreateLibraryDto,
   HomePopularLibrariesResponse,
+  LibrariesForBookResponse,
   Library,
   LibraryBook,
   LibrarySummary,
@@ -185,6 +186,42 @@ export const getPopularLibrariesForHome = async (
     '/library/popular/home',
     {
       params: { limit },
+    }
+  );
+  return response.data;
+};
+
+/**
+ * 서재에 책 추가 (BookshelfId, BookId, ISBN 사용)
+ */
+export const addBookToBookshelf = async ({
+  bookshelfId,
+  bookId,
+  isbn,
+}: {
+  bookshelfId: number;
+  bookId: number;
+  isbn: string;
+}): Promise<LibraryBook> => {
+  const response = await api.post<LibraryBook>(
+    `/library/${bookshelfId}/books`,
+    { bookId, note: `ISBN: ${isbn}` }
+  );
+  return response.data;
+};
+
+/**
+ * 특정 책이 등록된 서재 목록 조회
+ */
+export const getLibrariesByBookId = async (
+  bookId: number,
+  page: number = 1,
+  limit: number = 10
+): Promise<LibrariesForBookResponse> => {
+  const response = await api.get<LibrariesForBookResponse>(
+    `/library/book/${bookId}`,
+    {
+      params: { page, limit },
     }
   );
   return response.data;

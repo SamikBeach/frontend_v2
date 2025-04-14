@@ -1,59 +1,85 @@
+import { Book } from '@/apis/book/types';
+import { addBookToBookshelf } from '@/apis/library/library';
+import { LibrarySummary } from '@/apis/library/types';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { josa } from 'josa';
-import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { BookDetails } from '../types';
 
-interface Bookshelf {
-  id: number;
-  name: string;
-  owner: string;
-  bookCount: number;
-  followers: number;
-  thumbnail?: string;
-}
-
+// useBookshelf 훅 정의
 export function useBookshelf(
-  book: BookDetails | null,
-  isbn: string | null | undefined,
-  bookshelves: Bookshelf[]
+  book: Book | BookDetails | null,
+  isbn: string | null,
+  userLibraries: LibrarySummary[] = []
 ) {
-  const router = useRouter();
+  const queryClient = useQueryClient();
+  // 에러 상태 관리
+  const [error, setError] = useState<Error | null>(null);
 
-  // 서재에 담기 핸들러
-  const handleAddToBookshelf = useCallback(
-    (bookshelfId: number) => {
-      if (!isbn || !book) return;
+  // 책을 북쉘프에 추가하는 뮤테이션
+  const { mutate, isPending } = useMutation({
+    mutationFn: async ({
+      bookId,
+      bookshelfId,
+    }: {
+      bookId: number;
+      bookshelfId: number;
+    }) => {
+      if (!book || !isbn) {
+        throw new Error('책 정보가 없습니다.');
+      }
 
-      // 서재 정보 찾기
-      const bookshelf = bookshelves.find(shelf => shelf.id === bookshelfId);
-
-      // API 호출 등 구현
-      console.log(`서재에 담기: 책 ISBN ${isbn}, 서재 ID ${bookshelfId}`);
-
-      // 토스트 알림 표시 - josa 사용하여 조사 처리
-      toast.success(
-        josa(`${book.title}#{이} ${bookshelf?.name || '서재'}에 담겼습니다`),
-        {
-          duration: 5000, // 5초로 늘림
-          action: {
-            label: '서재로 이동',
-            onClick: () => {
-              // 서재 페이지로 이동
-              router.push('/profile/library');
-            },
-          },
-          // 기본 스타일링 유지
-          style: {
-            fontWeight: 'bold',
-          },
-        }
-      );
+      return addBookToBookshelf({
+        bookshelfId,
+        bookId,
+        isbn,
+      });
     },
-    [book, isbn, bookshelves, router]
-  );
+    onError: (err: Error) => {
+      setError(err);
+      toast.error('북쉘프에 책을 추가하는 데 실패했습니다.');
+    },
+  });
+
+  // 책을 북쉘프에 추가하는 핸들러 함수
+  const handleAddToBookshelf = (bookshelfId: number) => {
+    if (!book) {
+      toast.error('책 정보가 없습니다.');
+      return;
+    }
+
+    // 선택한 서재의 이름 가져오기
+    const selectedLibrary = userLibraries.find(lib => lib.id === bookshelfId);
+    const libraryName = selectedLibrary?.name || '서재';
+
+    mutate(
+      {
+        bookId: book.id,
+        bookshelfId,
+      },
+      {
+        onSuccess: () => {
+          // josa 라이브러리를 사용하여 적절한 조사 적용
+          const message = josa(`책이 '${libraryName}'#{에} 추가되었습니다.`);
+          toast.success(message);
+
+          // 서재 데이터 갱신
+          queryClient.invalidateQueries({ queryKey: ['user-libraries'] });
+        },
+      }
+    );
+  };
+
+  // 에러 초기화 함수
+  const resetError = useCallback(() => {
+    setError(null);
+  }, []);
 
   return {
     handleAddToBookshelf,
+    isPending,
+    error,
+    resetError,
   };
 }

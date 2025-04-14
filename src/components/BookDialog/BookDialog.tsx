@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
 
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { BookInfo } from './BookInfo';
 
+import { ErrorBoundary } from 'react-error-boundary';
 import {
   BookActionButtons,
   BookCoverSection,
@@ -13,6 +14,30 @@ import {
   BookRightPanel,
   BookSkeleton,
 } from './components';
+
+// Error fallback component
+function ErrorFallback({
+  error,
+  resetErrorBoundary,
+}: {
+  error: Error;
+  resetErrorBoundary: () => void;
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center p-6 text-center">
+      <p className="text-lg font-medium text-red-600">
+        데이터를 불러오는 중 오류가 발생했습니다
+      </p>
+      <p className="mt-1 text-sm text-gray-600">{error.message}</p>
+      <button
+        onClick={resetErrorBoundary}
+        className="mt-4 cursor-pointer rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+      >
+        다시 시도
+      </button>
+    </div>
+  );
+}
 
 function BookDialogContent() {
   return (
@@ -25,7 +50,9 @@ function BookDialogContent() {
             <BookCoverSection />
 
             {/* 별점 정보 */}
-            <BookRatingSection />
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <BookRatingSection />
+            </ErrorBoundary>
 
             {/* 기능 버튼들 */}
             <div className="flex flex-col gap-3">
@@ -43,7 +70,9 @@ function BookDialogContent() {
           </div>
 
           {/* 오른쪽: 리뷰 및 관련 정보 */}
-          <BookRightPanel />
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <BookRightPanel />
+          </ErrorBoundary>
         </div>
       </div>
     </>
@@ -51,17 +80,21 @@ function BookDialogContent() {
 }
 
 export function BookDialog() {
-  const { isOpen, close } = useDialogQuery({ type: 'book' });
+  const { isOpen, close, isbn } = useDialogQuery({ type: 'book' });
 
   if (!isOpen) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={open => !open && close()}>
       <DialogContent className="w-full max-w-none rounded-lg bg-white p-0 md:max-w-screen-xl">
-        <Suspense fallback={<BookSkeleton />}>
-          <BookHeader />
-          <BookDialogContent />
-        </Suspense>
+        {/* DialogTitle 컴포넌트는 접근성 목적으로 필요합니다. 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
+        <DialogTitle className="sr-only">도서 상세 정보</DialogTitle>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Suspense fallback={<BookSkeleton />}>
+            <BookHeader />
+            <BookDialogContent />
+          </Suspense>
+        </ErrorBoundary>
       </DialogContent>
     </Dialog>
   );
