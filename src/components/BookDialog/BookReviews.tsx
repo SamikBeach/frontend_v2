@@ -577,12 +577,12 @@ function ReviewsList() {
                   </div>
                 )}
 
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-3 flex items-center gap-0.5">
                   <Button
                     variant="ghost"
-                    className={`h-8 rounded-full p-0 px-2.5 ${
+                    className={`h-8 rounded-full p-0 px-2 ${
                       review.userLiked
-                        ? 'text-pink-500 hover:bg-pink-50'
+                        ? 'text-pink-500 hover:bg-pink-50 hover:text-pink-500'
                         : 'text-gray-600 hover:bg-gray-50'
                     }`}
                     onClick={() =>
@@ -595,13 +595,15 @@ function ReviewsList() {
                     ) : (
                       <ThumbsUp className="h-4 w-4" />
                     )}
-                    <span className="font-medium">
+                    <span
+                      className={`font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
+                    >
                       {review.likesCount || 0}
                     </span>
                   </Button>
                   <Button
                     variant="ghost"
-                    className="h-8 rounded-full p-0 px-2.5 text-gray-600 hover:bg-gray-50"
+                    className="h-8 rounded-full p-0 px-2 text-gray-600 hover:bg-gray-50"
                     onClick={() => toggleComments(review.id)}
                   >
                     <MessageSquare className="h-4 w-4" />
