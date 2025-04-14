@@ -11,7 +11,7 @@ export interface Book {
   coverImage: string;
 }
 
-export interface Post {
+export interface Review {
   id: number;
   category: string;
   author: UserProfile;
@@ -26,7 +26,7 @@ export interface Post {
 
 export interface Comment {
   id: number;
-  postId: number;
+  reviewId: number;
   author: UserProfile;
   content: string;
   timestamp: string;
@@ -58,4 +58,3 @@ export interface Category {
     name: string;
   }>;
 }
- 

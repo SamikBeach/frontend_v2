@@ -1,6 +1,6 @@
 'use client';
 
-import { PostType } from '@/apis/post';
+import { ReviewType } from '@/apis/review/types';
 import {
   communitySortOptionAtom,
   communityTypeFilterAtom,
@@ -10,11 +10,11 @@ import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
-import { CreatePostCard, FilterBar, PostCard } from './components';
-import { useCommunityPosts } from './hooks';
+import { CreateReviewCard, FilterBar, ReviewCard } from './components';
+import { useCommunityReviews } from './hooks';
 
 // 로딩 상태 컴포넌트
-function PostsLoading() {
+function ReviewsLoading() {
   return (
     <div className="flex h-[calc(100vh-250px)] w-full items-center justify-center">
       <LoadingSpinner />
@@ -42,9 +42,9 @@ function EmptyState({ selectedSort }: { selectedSort: string }) {
 }
 
 // 커뮤니티 게시물 컴포넌트 (Suspense로 감싸기 위해 분리)
-function PostsList() {
-  const { posts, totalPages, currentPage, sortOption, setCurrentPage } =
-    useCommunityPosts();
+function ReviewsList() {
+  const { reviews, totalPages, currentPage, sortOption, setCurrentPage } =
+    useCommunityReviews();
 
   // 현재 사용자 가져오기 (없으면 기본값 사용)
   const user = useCurrentUser();
@@ -62,14 +62,14 @@ function PostsList() {
         avatar: 'https://i.pravatar.cc/150?u=guest',
       };
 
-  if (posts.length === 0) {
+  if (reviews.length === 0) {
     return <EmptyState selectedSort={sortOption} />;
   }
 
   return (
     <>
-      {posts.map(post => (
-        <PostCard key={post.id} post={post} currentUser={currentUser} />
+      {reviews.map(review => (
+        <ReviewCard key={review.id} review={review} currentUser={currentUser} />
       ))}
 
       {/* 페이지네이션 */}
@@ -108,7 +108,7 @@ function CommunityContent() {
   const [typeFilter, setTypeFilter] = useAtom(communityTypeFilterAtom);
   const [sortOption, setSortOption] = useAtom(communitySortOptionAtom);
 
-  // 현재 사용자 가져오기 (CreatePostCard 위해 필요)
+  // 현재 사용자 가져오기 (CreateReviewCard 위해 필요)
   const user = useCurrentUser();
   const currentUser = user
     ? {
@@ -125,7 +125,7 @@ function CommunityContent() {
       };
 
   // 필터 변경 핸들러
-  const handleTypeFilterChange = (type: PostType | 'all') => {
+  const handleTypeFilterChange = (type: ReviewType | 'all') => {
     setTypeFilter(type);
   };
 
@@ -146,11 +146,11 @@ function CommunityContent() {
       {/* 메인 콘텐츠 */}
       <div className="pt-2">
         {/* 포스트 작성 */}
-        <CreatePostCard user={currentUser} />
+        <CreateReviewCard user={currentUser} />
 
         {/* 포스트 목록 - Suspense로 감싸서 필터가 변경되어도 페이지는 유지 */}
-        <Suspense fallback={<PostsLoading />}>
-          <PostsList />
+        <Suspense fallback={<ReviewsLoading />}>
+          <ReviewsList />
         </Suspense>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { PenLine, Star, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -15,6 +15,10 @@ interface ReviewDialogProps {
   onOpenChange: (open: boolean) => void;
   bookTitle: string;
   onSubmit: (rating: number, content: string) => void;
+  initialRating?: number;
+  initialContent?: string;
+  isEditMode?: boolean;
+  isSubmitting?: boolean;
 }
 
 export function ReviewDialog({
@@ -22,29 +26,59 @@ export function ReviewDialog({
   onOpenChange,
   bookTitle,
   onSubmit,
+  initialRating = 0,
+  initialContent = '',
+  isEditMode = false,
+  isSubmitting = false,
 }: ReviewDialogProps) {
-  const [rating, setRating] = useState(0);
-  const [content, setContent] = useState('');
+  const [rating, setRating] = useState(initialRating);
+  const [content, setContent] = useState(initialContent);
+
+  // 모달이 열릴 때 초기 데이터 설정
+  useEffect(() => {
+    // 다이얼로그가 열려있는 상태에서도 initialRating이 변경되면 업데이트
+    setRating(initialRating);
+  }, [initialRating]);
+
+  // 수정 모드일 때 초기 콘텐츠 설정
+  useEffect(() => {
+    if (isEditMode && initialContent) {
+      setContent(initialContent);
+    }
+  }, [isEditMode, initialContent, open]);
+
+  // Dialog가 닫힐 때 상태 초기화
+  useEffect(() => {
+    if (!open) {
+      // 수정 모드가 아닐 때만 내용 초기화
+      if (!isEditMode) {
+        setContent('');
+      }
+    }
+  }, [open, isEditMode]);
 
   const handleSubmit = () => {
     onSubmit(rating, content);
-    // 제출 후 상태 초기화
+  };
+
+  // 별점 취소 핸들러
+  const handleResetRating = () => {
     setRating(0);
-    setContent('');
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={isSubmitting ? undefined : onOpenChange}>
       <DialogContent className="fixed top-1/2 left-1/2 max-w-md -translate-x-1/2 -translate-y-1/2 transform rounded-2xl border-none p-0 shadow-lg">
         <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
           <DialogTitle className="text-base font-medium">
-            리뷰 작성하기
+            {isEditMode ? '리뷰 수정하기' : '리뷰 작성하기'}
           </DialogTitle>
           <Button
             variant="ghost"
             size="icon"
             className="rounded-full"
             onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -53,23 +87,36 @@ export function ReviewDialog({
         <div className="px-5 py-4">
           <DialogDescription className="mb-6 text-sm text-gray-600">
             <span className="font-medium text-gray-800">{bookTitle}</span>에
-            대한 솔직한 리뷰를 남겨주세요
+            대한 {isEditMode ? '리뷰를 수정해주세요' : '리뷰를 남겨주세요'}
           </DialogDescription>
 
           <div className="mb-6 flex flex-col items-center space-y-3">
-            <p className="text-sm text-gray-500">별점을 선택해주세요</p>
-            <div className="flex items-center space-x-2">
-              {[1, 2, 3, 4, 5].map(star => (
-                <Star
-                  key={star}
-                  className={`h-9 w-9 cursor-pointer ${
-                    star <= rating
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-200 hover:text-gray-300'
-                  }`}
-                  onClick={() => setRating(star)}
-                />
-              ))}
+            <div className="relative flex w-full items-center justify-center">
+              <div className="flex space-x-2">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <Star
+                    key={star}
+                    className={`h-9 w-9 cursor-pointer ${
+                      star <= rating
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-gray-200 hover:text-gray-300'
+                    }`}
+                    onClick={() => !isSubmitting && setRating(star)}
+                  />
+                ))}
+              </div>
+              {rating > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute -right-10 h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  onClick={handleResetRating}
+                  disabled={isSubmitting}
+                  title="별점 취소"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
             <p className="text-sm font-medium text-gray-900">
               {rating === 0
@@ -90,13 +137,10 @@ export function ReviewDialog({
             <textarea
               value={content}
               onChange={e => setContent(e.target.value)}
-              placeholder="이 책에 대한 솔직한 리뷰를 남겨주세요..."
+              placeholder="이 책에 대한 리뷰를 남겨주세요"
               className="min-h-[150px] w-full resize-none rounded-2xl border-gray-200 bg-gray-50 p-4 text-sm placeholder:text-gray-400 focus:border-pink-200 focus:bg-white focus:ring-2 focus:ring-pink-100"
+              disabled={isSubmitting}
             />
-          </div>
-
-          <div className="mt-2 text-xs text-gray-500">
-            최소 10자 이상 작성해주세요
           </div>
         </div>
 
@@ -105,16 +149,21 @@ export function ReviewDialog({
             variant="outline"
             className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
             onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
           >
             취소
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={rating === 0 || content.trim().length < 10}
-            className="rounded-xl bg-pink-500 text-white hover:bg-pink-600 disabled:bg-pink-100"
+            disabled={rating === 0 || isSubmitting}
+            className="rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-200"
           >
             <PenLine className="mr-1.5 h-4 w-4" />
-            리뷰 등록하기
+            {isSubmitting
+              ? '등록 중...'
+              : isEditMode
+                ? '리뷰 수정하기'
+                : '리뷰 등록하기'}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -7,6 +7,7 @@ import {
   UpdateUserInfoResponse,
   UploadProfileImageResponse,
   User,
+  UserDetailResponseDto,
 } from './types';
 
 /**
@@ -26,6 +27,18 @@ export const updateUserInfo = async (
   data: UpdateUserInfoRequest
 ): Promise<UpdateUserInfoResponse> => {
   const response = await api.put('/user/update', data);
+  return response.data;
+};
+
+/**
+ * 사용자의 프로필 정보를 가져옵니다.
+ * @param id 사용자 ID
+ * @returns 사용자 프로필 상세 정보
+ */
+export const getUserProfile = async (
+  id: number
+): Promise<UserDetailResponseDto> => {
+  const response = await api.get(`/user/${id}/profile`);
   return response.data;
 };
 

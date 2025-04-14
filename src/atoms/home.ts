@@ -1,6 +1,6 @@
 import { HomeBookPreview, HomeDiscoverBooksResponse } from '@/apis/book/types';
 import { HomeLibraryPreview } from '@/apis/library/types';
-import { HomePostPreview } from '@/apis/post/types';
+import { HomeReviewPreview } from '@/apis/review/types';
 import { atom } from 'jotai';
 
 // 홈화면 인기도서 atom
@@ -13,12 +13,12 @@ export const homeDiscoverBooksAtom = atom<HomeDiscoverBooksResponse[]>([]);
 export const homePopularLibrariesAtom = atom<HomeLibraryPreview[]>([]);
 
 // 홈화면 인기게시물 atom
-export const homePopularPostsAtom = atom<HomePostPreview[]>([]);
+export const homePopularReviewsAtom = atom<HomeReviewPreview[]>([]);
 
 // 홈화면 로딩 상태 atom
 export const homeLoadingStateAtom = atom({
   popularBooks: false,
   discoverBooks: false,
   popularLibraries: false,
-  popularPosts: false,
+  popularReviews: false,
 });

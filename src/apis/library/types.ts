@@ -13,18 +13,13 @@ export interface LibraryBook {
 // 서재 태그 타입
 export interface LibraryTag {
   id: number;
-  tagId: number;
-  tagName: string;
-  libraryId: number;
-  note?: string | null;
-  createdAt: Date;
+  name: string;
 }
 
 // 서재 소유자 타입
 export interface LibraryOwner {
   id: number;
   username: string;
-  email: string;
 }
 
 // 책 미리보기 정보 타입
@@ -151,4 +146,37 @@ export interface HomeLibraryPreview {
 // 홈화면용 인기 서재 응답 타입
 export interface HomePopularLibrariesResponse {
   libraries: HomeLibraryPreview[];
+}
+
+export interface BookForLibrary {
+  id: number;
+  title: string;
+  author: string;
+  coverImage: string;
+  isbn: string;
+  publisher: string;
+}
+
+export interface LibraryDetail {
+  id: number;
+  name: string;
+  description: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
+  owner: LibraryOwner;
+  booksCount: number;
+  subscribersCount: number;
+  isSubscribed: boolean;
+  tags: LibraryTag[];
+}
+
+export interface LibrariesForBookResponse {
+  data: LibraryDetail[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
 }

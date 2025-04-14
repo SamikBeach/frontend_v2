@@ -3,6 +3,7 @@ import {
   DiscoverCategory,
   DiscoverSubCategory,
 } from '../discover-category/types';
+import { RatingResponseDto } from '../rating/types';
 
 export interface Book {
   id: number;
@@ -22,6 +23,19 @@ export interface Book {
   isDiscovered?: boolean;
   discoverCategory?: DiscoverCategory;
   discoverSubCategory?: DiscoverSubCategory;
+  userRating?: RatingResponseDto;
+  userReadingStatus?: string;
+  readingStats?: {
+    currentReaders: number;
+    completedReaders: number;
+    averageReadingTime: string;
+    difficulty: string;
+    readingStatusCounts: {
+      WANT_TO_READ: number;
+      READING: number;
+      READ: number;
+    };
+  };
 }
 
 export interface CreateBookDto {

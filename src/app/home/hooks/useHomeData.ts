@@ -3,13 +3,13 @@ import {
   getPopularBooksForHome,
 } from '@/apis/book/book';
 import { getPopularLibrariesForHome } from '@/apis/library/library';
-import { getPopularPostsForHome } from '@/apis/post/post';
+import { getPopularReviewsForHome } from '@/apis/review/review';
 import {
   homeDiscoverBooksAtom,
   homeLoadingStateAtom,
   homePopularBooksAtom,
   homePopularLibrariesAtom,
-  homePopularPostsAtom,
+  homePopularReviewsAtom,
 } from '@/atoms/home';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
@@ -22,7 +22,7 @@ export function useHomeData() {
   const [popularLibraries, setPopularLibraries] = useAtom(
     homePopularLibrariesAtom
   );
-  const [popularPosts, setPopularPosts] = useAtom(homePopularPostsAtom);
+  const [popularReviews, setPopularReviews] = useAtom(homePopularReviewsAtom);
   const [loadingState, setLoadingState] = useAtom(homeLoadingStateAtom);
 
   // 인기 도서 데이터 가져오기
@@ -44,9 +44,9 @@ export function useHomeData() {
   });
 
   // 인기 게시물 데이터 가져오기
-  const { data: popularPostsData } = useSuspenseQuery({
-    queryKey: ['home', 'popularPosts'],
-    queryFn: () => getPopularPostsForHome(),
+  const { data: popularReviewsData } = useSuspenseQuery({
+    queryKey: ['home', 'popularReviews'],
+    queryFn: () => getPopularReviewsForHome(),
   });
 
   // API 응답 원본 데이터 로깅
@@ -55,13 +55,13 @@ export function useHomeData() {
       popularBooksData,
       discoverBooksData,
       popularLibrariesData,
-      popularPostsData,
+      popularReviewsData,
     });
   }, [
     popularBooksData,
     discoverBooksData,
     popularLibrariesData,
-    popularPostsData,
+    popularReviewsData,
   ]);
 
   // 데이터 업데이트
@@ -102,22 +102,22 @@ export function useHomeData() {
   }, [popularLibrariesData, setPopularLibraries, setLoadingState]);
 
   useEffect(() => {
-    if (popularPostsData) {
-      console.log('인기 게시물 데이터 구조:', popularPostsData);
-      // API 응답 형식에 맞게 수정: 응답이 배열 형태인 경우 그대로 설정, 아니면 posts 속성 추출
-      const postsToSet = Array.isArray(popularPostsData)
-        ? popularPostsData
-        : popularPostsData.posts || [];
-      setPopularPosts(postsToSet);
-      setLoadingState(prev => ({ ...prev, popularPosts: false }));
+    if (popularReviewsData) {
+      console.log('인기 게시물 데이터 구조:', popularReviewsData);
+      // API 응답 형식에 맞게 수정: 응답이 배열 형태인 경우 그대로 설정, 아니면 reviews 속성 추출
+      const reviewsToSet = Array.isArray(popularReviewsData)
+        ? popularReviewsData
+        : popularReviewsData.reviews || [];
+      setPopularReviews(reviewsToSet);
+      setLoadingState(prev => ({ ...prev, popularReviews: false }));
     }
-  }, [popularPostsData, setPopularPosts, setLoadingState]);
+  }, [popularReviewsData, setPopularReviews, setLoadingState]);
 
   return {
     popularBooks,
     discoverBooks,
     popularLibraries,
-    popularPosts,
+    popularReviews,
     isLoading: Object.values(loadingState).some(state => state),
   };
 }

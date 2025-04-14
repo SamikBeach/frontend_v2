@@ -4,9 +4,9 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { BookOpen, Image, SendHorizontal } from 'lucide-react';
 import { ChangeEvent, useRef } from 'react';
-import { useCreatePost } from '../hooks';
+import { useCreateReview } from '../hooks';
 
-interface CreatePostCardProps {
+interface CreateReviewCardProps {
   user: {
     id: number;
     name: string;
@@ -15,16 +15,16 @@ interface CreatePostCardProps {
   };
 }
 
-export function CreatePostCard({ user }: CreatePostCardProps) {
+export function CreateReviewCard({ user }: CreateReviewCardProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const {
     content,
     setContent,
     images,
     handleImageChange,
-    handleCreatePost,
+    handleCreateReview,
     isLoading,
-  } = useCreatePost();
+  } = useCreateReview();
 
   // Safely get first letter of name for avatar fallback
   const getNameInitial = () => {
@@ -83,7 +83,7 @@ export function CreatePostCard({ user }: CreatePostCardProps) {
               <Button
                 size="icon"
                 className="ml-auto h-9 w-9 rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800"
-                onClick={handleCreatePost}
+                onClick={handleCreateReview}
                 disabled={!content.trim() || isLoading}
               >
                 <SendHorizontal className="h-5 w-5" />

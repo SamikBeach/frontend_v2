@@ -1,8 +1,8 @@
-import { PostType } from '@/apis/post';
+import { ReviewType } from '@/apis/review/types';
 import { atom } from 'jotai';
 
 // 카테고리 필터 atom
-export const communityTypeFilterAtom = atom<PostType | 'all'>('all');
+export const communityTypeFilterAtom = atom<ReviewType | 'all'>('all');
 
 // 정렬 옵션 atom
 export const communitySortOptionAtom = atom<'popular' | 'latest' | 'following'>(
@@ -13,10 +13,10 @@ export const communitySortOptionAtom = atom<'popular' | 'latest' | 'following'>(
 export const communitySearchQueryAtom = atom<string>('');
 
 // 선택된 게시물 ID atom
-export const selectedPostIdAtom = atom<string | null>(null);
+export const selectedReviewIdAtom = atom<string | null>(null);
 
 // 커뮤니티 UI 상태 - 게시물 작성 모달 표시 여부
-export const postFormVisibleAtom = atom<boolean>(false);
+export const reviewFormVisibleAtom = atom<boolean>(false);
 
 // 파스텔 색상 목록 (커뮤니티 카테고리에서 사용)
 export const communityCategoryColors = {

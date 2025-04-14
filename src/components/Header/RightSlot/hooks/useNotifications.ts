@@ -198,8 +198,8 @@ export function useNotifications(initialLimit = 10) {
 
     // 소스 타입에 따라 링크 생성
     switch (notification.sourceType) {
-      case 'post':
-        return `/community?post=${notification.sourceId}`;
+      case 'review':
+        return `/community?review=${notification.sourceId}`;
       case 'library':
         return `/library/${notification.sourceId}`;
       case 'user':

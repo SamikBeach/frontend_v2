@@ -1,4 +1,5 @@
 import { Book } from '@/apis/book/types';
+import { ReadingStatusType } from '@/apis/reading-status/types';
 
 export interface BookDetails extends Book {
   coverImage: string;
@@ -39,12 +40,16 @@ export interface BookDetails extends Book {
     date: string;
     likes: number;
     comments: number;
+    isCurrentUser?: boolean;
+    comment?: string;
   }>;
   readingStatus?: {
     currentReaders: number;
     completedReaders: number;
     averageReadingTime: string;
     difficulty: 'easy' | 'medium' | 'hard';
+    userReadingStatus?: ReadingStatusType;
+    readingStatusCounts?: Record<ReadingStatusType, number>;
   };
   similarBooks?: Array<{
     id: number;
@@ -53,7 +58,7 @@ export interface BookDetails extends Book {
     author: string;
     rating?: number;
   }>;
-  bookshelves?: Array<{
+  libraries?: Array<{
     id: number;
     name: string;
     owner: string;

@@ -1,4 +1,8 @@
-import { getAllPosts, PostResponseDto, PostType } from '@/apis/post';
+import {
+  getAllReviews,
+  ReviewResponseDto,
+  ReviewType,
+} from '@/apis/review/review';
 import {
   communitySearchQueryAtom,
   communitySortOptionAtom,
@@ -10,17 +14,17 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import { useEffect, useState } from 'react';
 
-interface UseCommunityPostsResult {
-  posts: PostResponseDto[];
-  totalPosts: number;
+interface UseCommunityReviewsResult {
+  reviews: ReviewResponseDto[];
+  totalReviews: number;
   totalPages: number;
   currentPage: number;
-  typeFilter: PostType | 'all';
+  typeFilter: ReviewType | 'all';
   sortOption: 'popular' | 'latest' | 'following';
   setCurrentPage: (page: number) => void;
 }
 
-export function useCommunityPosts(): UseCommunityPostsResult {
+export function useCommunityReviews(): UseCommunityReviewsResult {
   // 상태는 atom에서 읽기만 하고 변경은 안함
   const [typeFilter] = useAtom(communityTypeFilterAtom);
   const [sortOption] = useAtom(communitySortOptionAtom);
@@ -42,24 +46,31 @@ export function useCommunityPosts(): UseCommunityPostsResult {
 
   // 게시물 데이터 가져오기
   const { data } = useSuspenseQuery({
-    queryKey: ['community-posts', typeFilter, sortOption, currentPage, userId],
+    queryKey: [
+      'community-reviews',
+      typeFilter,
+      sortOption,
+      currentPage,
+      userId,
+    ],
     queryFn: async () => {
       // type이 'all'이면 백엔드에 전달하지 않음
-      const type = typeFilter !== 'all' ? (typeFilter as PostType) : undefined;
+      const type =
+        typeFilter !== 'all' ? (typeFilter as ReviewType) : undefined;
       // 결과 반환
-      return await getAllPosts(currentPage, 10, type);
+      return await getAllReviews(currentPage, 10, type);
     },
     staleTime: 1000 * 60 * 5, // 5분
   });
 
   // 데이터 추출 (useSuspenseQuery는 항상 data를 반환하므로 기본값 필요 없음)
-  const posts = data.posts;
-  const totalPosts = data.total;
+  const reviews = data.reviews;
+  const totalReviews = data.total;
   const totalPages = data.totalPages;
 
   return {
-    posts,
-    totalPosts,
+    reviews,
+    totalReviews,
     totalPages,
     currentPage,
     typeFilter,

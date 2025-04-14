@@ -73,18 +73,22 @@ const menuItems: MenuItem[] = [
 interface ProfileSummaryProps {
   selectedSection: string;
   onSectionChange: (section: string) => void;
+  profileData: {
+    libraryCount: number;
+    readCount: number;
+    subscribedLibraryCount: number;
+    reviewCount: number;
+  };
 }
 
 export default function ProfileSummary({
   selectedSection,
   onSectionChange,
+  profileData,
 }: ProfileSummaryProps) {
-  // 평가한 책 수
-  const booksRated = 42;
-  // 읽은 책 수
-  const booksRead = 37;
-  // 작성한 리뷰 수
-  const reviewsWritten = 18;
+  // API에서 가져온 데이터 사용
+  const { libraryCount, readCount, subscribedLibraryCount, reviewCount } =
+    profileData;
 
   return (
     <div className="mx-auto w-full px-4 py-6">
@@ -102,7 +106,7 @@ export default function ProfileSummary({
           </div>
           <div className="mt-2 text-center">
             <span className="block text-xl font-bold text-gray-900">
-              {booksRated}
+              {libraryCount}
             </span>
             <span className="text-xs text-gray-600">내 서재</span>
           </div>
@@ -121,7 +125,7 @@ export default function ProfileSummary({
           </div>
           <div className="mt-2 text-center">
             <span className="block text-xl font-bold text-gray-900">
-              {booksRead}
+              {readCount}
             </span>
             <span className="text-xs text-gray-600">읽은 책</span>
           </div>
@@ -141,7 +145,7 @@ export default function ProfileSummary({
           </div>
           <div className="mt-2 text-center">
             <span className="block text-xl font-bold text-gray-900">
-              {reviewsWritten}
+              {reviewCount}
             </span>
             <span className="text-xs text-gray-600">내 리뷰</span>
           </div>
@@ -161,7 +165,7 @@ export default function ProfileSummary({
           </div>
           <div className="mt-2 text-center">
             <span className="block text-xl font-bold text-gray-900">
-              &nbsp;
+              {subscribedLibraryCount}
             </span>
             <span className="text-xs text-gray-600">구독한 서재</span>
           </div>

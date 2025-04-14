@@ -1,10 +1,10 @@
-import { BookDetails } from './types';
+import { useBookDetails } from './hooks';
 
-interface BookInfoProps {
-  book: BookDetails;
-}
+export function BookInfo() {
+  const { book } = useBookDetails();
 
-export function BookInfo({ book }: BookInfoProps) {
+  if (!book) return null;
+
   return (
     <div className="space-y-6">
       {/* 책 소개 섹션 */}
@@ -31,7 +31,7 @@ export function BookInfo({ book }: BookInfoProps) {
       {book.authorInfo && (
         <div className="space-y-3">
           <p className="text-sm font-medium text-gray-900">저자 소개</p>
-          <div className="rounded-xl bg-gray-50 p-4 text-sm leading-relaxed text-gray-700">
+          <div className="prose prose-gray max-w-none text-sm leading-relaxed text-gray-700">
             {book.authorInfo}
           </div>
         </div>

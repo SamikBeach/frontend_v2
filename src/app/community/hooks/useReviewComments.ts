@@ -2,12 +2,12 @@ import {
   Comment,
   createComment as apiCreateComment,
   deleteComment as apiDeleteComment,
-  getPostComments,
-} from '@/apis/post';
+  getReviewComments,
+} from '@/apis/review/review';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 
-interface UsePostCommentsResult {
+interface UseReviewCommentsResult {
   comments: Comment[];
   isLoading: boolean;
   error: Error | null;
@@ -19,7 +19,7 @@ interface UsePostCommentsResult {
   setReplyToCommentId: (id: number | null) => void;
 }
 
-export function usePostComments(postId: number): UsePostCommentsResult {
+export function useReviewComments(reviewId: number): UseReviewCommentsResult {
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
   const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
@@ -30,24 +30,26 @@ export function usePostComments(postId: number): UsePostCommentsResult {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['post-comments', postId],
-    queryFn: () => getPostComments(postId),
+    queryKey: ['review-comments', reviewId],
+    queryFn: () => getReviewComments(reviewId),
     staleTime: 1000 * 60 * 5, // 5분
   });
 
   // 댓글 추가 mutation
   const { mutateAsync: addComment, isPending: isAddingComment } = useMutation({
     mutationFn: async () => {
-      return apiCreateComment(postId, {
+      return apiCreateComment(reviewId, {
         content: commentText,
         parentCommentId: replyToCommentId || undefined,
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['post-comments', postId] });
+      queryClient.invalidateQueries({
+        queryKey: ['review-comments', reviewId],
+      });
       // 게시물 데이터의 댓글 수도 업데이트
-      queryClient.invalidateQueries({ queryKey: ['community-posts'] });
-      queryClient.invalidateQueries({ queryKey: ['post', postId] });
+      queryClient.invalidateQueries({ queryKey: ['community-reviews'] });
+      queryClient.invalidateQueries({ queryKey: ['review', reviewId] });
     },
   });
 
@@ -58,10 +60,12 @@ export function usePostComments(postId: number): UsePostCommentsResult {
         return apiDeleteComment(commentId);
       },
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['post-comments', postId] });
+        queryClient.invalidateQueries({
+          queryKey: ['review-comments', reviewId],
+        });
         // 게시물 데이터의 댓글 수도 업데이트
-        queryClient.invalidateQueries({ queryKey: ['community-posts'] });
-        queryClient.invalidateQueries({ queryKey: ['post', postId] });
+        queryClient.invalidateQueries({ queryKey: ['community-reviews'] });
+        queryClient.invalidateQueries({ queryKey: ['review', reviewId] });
       },
     });
 

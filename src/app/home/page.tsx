@@ -9,7 +9,7 @@ import {
   DiscoverBooksSection,
   PopularBooksSection,
   PopularLibrariesSection,
-  PopularPostsSection,
+  PopularReviewsSection,
 } from './components';
 import { useHomeData } from './hooks';
 
@@ -18,7 +18,7 @@ function HomePageContent() {
     popularBooks,
     discoverBooks,
     popularLibraries,
-    popularPosts,
+    popularReviews,
     isLoading,
   } = useHomeData();
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
@@ -30,10 +30,16 @@ function HomePageContent() {
       popularBooks,
       discoverBooks,
       popularLibraries,
-      popularPosts,
+      popularReviews,
       isLoading,
     });
-  }, [popularBooks, discoverBooks, popularLibraries, popularPosts, isLoading]);
+  }, [
+    popularBooks,
+    discoverBooks,
+    popularLibraries,
+    popularReviews,
+    isLoading,
+  ]);
 
   // 책 선택 핸들러
   const handleBookSelect = (book: HomeBookPreview) => {
@@ -68,7 +74,7 @@ function HomePageContent() {
         />
 
         {/* 커뮤니티 */}
-        <PopularPostsSection posts={popularPosts} isLoading={isLoading} />
+        <PopularReviewsSection reviews={popularReviews} isLoading={isLoading} />
       </div>
     </div>
   );

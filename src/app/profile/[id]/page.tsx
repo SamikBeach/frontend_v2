@@ -1,8 +1,11 @@
 'use client';
 
-import { useCurrentUser, useQueryParams } from '@/hooks';
-import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { getUserProfile } from '@/apis/user';
+import { UserDetailResponseDto } from '@/apis/user/types';
+import { useQueryParams } from '@/hooks';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { useParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
 
 import {
   ProfileBooks,
@@ -11,6 +14,7 @@ import {
   ProfileReviews,
   ProfileStats,
   ProfileSummary,
+  SubscribedLibraries,
 } from '../components';
 
 // 로딩 컴포넌트
@@ -22,21 +26,20 @@ function SectionLoading() {
   );
 }
 
-export default function ProfilePage() {
-  const currentUser = useCurrentUser();
-  const router = useRouter();
+function ProfileContent() {
   const params = useParams();
-  const userId = params.id as string;
-
+  const userId = Number(params.id as string);
   const { getQueryParam, updateQueryParams } = useQueryParams();
   const activeSection = getQueryParam('section') || 'books';
 
   // 선택한 메뉴 아이템에 기반한 섹션 상태
   const [selectedSection, setSelectedSection] = useState(activeSection);
 
-  // TODO: userId를 이용하여 프로필 사용자 정보 조회 API 연동 필요
-  // 현재는 로그인한 사용자 정보를 사용
-  const user = currentUser;
+  // API 호출로 프로필 데이터 가져오기
+  const { data: profileData } = useSuspenseQuery<UserDetailResponseDto>({
+    queryKey: ['profile', userId],
+    queryFn: () => getUserProfile(userId),
+  });
 
   // 섹션 변경 핸들러
   const handleSectionChange = (sectionId: string) => {
@@ -45,22 +48,13 @@ export default function ProfilePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // 사용자 정보가 없으면 로딩 상태 표시
-  if (!user) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-t-2 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
-
   // 선택된 섹션에 따라 컨텐츠 렌더링
   const renderSectionContent = () => {
     switch (selectedSection) {
       case 'books':
         return <ProfileBooks />;
       case 'subscriptions':
-        return <ProfileBooks />;
+        return <SubscribedLibraries />;
       case 'read':
         return <ProfileRecentBooks />;
       case 'reviews':
@@ -77,12 +71,13 @@ export default function ProfilePage() {
   return (
     <div className="bg-white">
       {/* 프로필 헤더 */}
-      <ProfileHeader />
+      <ProfileHeader profileData={profileData} />
 
       {/* 독서 정보 개요 */}
       <ProfileSummary
         selectedSection={selectedSection}
         onSectionChange={handleSectionChange}
+        profileData={profileData}
       />
 
       {/* 섹션 컨텐츠 */}
@@ -91,5 +86,19 @@ export default function ProfilePage() {
         {renderSectionContent()}
       </div>
     </div>
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-t-2 border-b-2 border-gray-900"></div>
+        </div>
+      }
+    >
+      <ProfileContent />
+    </Suspense>
   );
 }

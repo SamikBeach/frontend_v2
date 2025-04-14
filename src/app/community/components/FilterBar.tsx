@@ -1,4 +1,4 @@
-import { PostType } from '@/apis/post';
+import { ReviewType } from '@/apis/review/types';
 import {
   communityCategoryColors,
   communitySortColors,
@@ -6,9 +6,9 @@ import {
 import { cn } from '@/lib/utils';
 
 interface FilterBarProps {
-  selectedCategory: PostType | 'all';
+  selectedCategory: ReviewType | 'all';
   selectedSort: 'popular' | 'latest' | 'following';
-  onCategoryClick: (categoryId: PostType | 'all') => void;
+  onCategoryClick: (categoryId: ReviewType | 'all') => void;
   onSortClick: (sortId: 'popular' | 'latest' | 'following') => void;
 }
 
@@ -42,7 +42,7 @@ export function FilterBar({
         {mainCategories.map(category => (
           <button
             key={category.id}
-            onClick={() => onCategoryClick(category.id as PostType | 'all')}
+            onClick={() => onCategoryClick(category.id as ReviewType | 'all')}
             className={cn(
               'flex h-9 cursor-pointer items-center rounded-full px-4 text-[14px] font-medium transition-colors',
               selectedCategory === category.id

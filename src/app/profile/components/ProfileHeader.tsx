@@ -1,24 +1,30 @@
+import { UserDetailResponseDto } from '@/apis/user/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { useCurrentUser } from '@/hooks';
-import { UserCircle } from 'lucide-react';
+import { Check, UserCircle, UserPlus } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
+import { useIsMyProfile } from '../hooks';
 
-export default function ProfileHeader() {
-  const user = useCurrentUser();
+interface ProfileHeaderProps {
+  profileData: UserDetailResponseDto;
+}
 
-  /**
-   * 임시 데이터: 팔로워/팔로잉 수
-   * TODO: API 연동 시 실제 데이터로 대체
-   */
-  const followers = 128;
-  const following = 75;
+export default function ProfileHeader({ profileData }: ProfileHeaderProps) {
+  const isMyProfile = useIsMyProfile();
+  const [isFollowing, setIsFollowing] = useState(false);
 
-  if (!user) return null;
+  const { user, followers, following, isEditable } = profileData;
 
   // 사용자 표시 정보 설정
-  const displayName = user.name || user.username || user.email.split('@')[0];
+  const displayName = user.username || user.email?.split('@')[0] || '';
   const initial = displayName.charAt(0).toUpperCase();
+
+  // 팔로우 버튼 클릭 핸들러
+  const handleFollowClick = () => {
+    // TODO: 실제 팔로우 API 연동
+    setIsFollowing(!isFollowing);
+  };
 
   return (
     <div className="bg-white">
@@ -26,7 +32,7 @@ export default function ProfileHeader() {
         <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20 border-4 border-white">
-              <AvatarImage src={user.avatar} alt={displayName} />
+              <AvatarImage src="" alt={displayName} />
               <AvatarFallback className="bg-gray-200 text-2xl font-medium text-gray-700">
                 {initial}
               </AvatarFallback>
@@ -43,8 +49,9 @@ export default function ProfileHeader() {
                 )}
               </div>
               <p className="mt-1 max-w-xl text-sm text-gray-600">
-                {user.bio ||
-                  '고전 문학을 좋아하는 독서가입니다. 플라톤부터 도스토예프스키까지 다양한 작품을 읽고 있습니다.'}
+                {
+                  '고전 문학을 좋아하는 독서가입니다. 플라톤부터 도스토예프스키까지 다양한 작품을 읽고 있습니다.'
+                }
               </p>
               <div className="mt-2 flex gap-3 text-sm">
                 <div className="flex items-center gap-1">
@@ -63,15 +70,40 @@ export default function ProfileHeader() {
               </div>
             </div>
           </div>
-          <Link href="/profile/settings">
+
+          {isMyProfile ? (
+            <Link href="/profile/settings">
+              <Button
+                className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
+                variant="outline"
+              >
+                <UserCircle className="h-4 w-4" />
+                프로필 편집
+              </Button>
+            </Link>
+          ) : (
             <Button
-              className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
-              variant="outline"
+              onClick={handleFollowClick}
+              className={`mt-4 flex items-center gap-1.5 rounded-full ${
+                isFollowing
+                  ? 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                  : 'bg-gray-900 text-white hover:bg-gray-800'
+              } text-sm font-medium sm:mt-0`}
+              variant={isFollowing ? 'outline' : 'default'}
             >
-              <UserCircle className="h-4 w-4" />
-              프로필 편집
+              {isFollowing ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  팔로잉
+                </>
+              ) : (
+                <>
+                  <UserPlus className="h-4 w-4" />
+                  팔로우
+                </>
+              )}
             </Button>
-          </Link>
+          )}
         </div>
       </div>
     </div>

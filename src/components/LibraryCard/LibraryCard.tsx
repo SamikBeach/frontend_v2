@@ -49,6 +49,9 @@ export function LibraryCard({ library, categories = [] }: LibraryCardProps) {
   // 카테고리 찾기
   const category = categories.find(cat => cat.id === library.category);
 
+  // 최대 3권의 책만 표시
+  const displayBooks = library.books.slice(0, 3);
+
   return (
     <Link href={`/library/${library.id}`}>
       <Card className="group h-full rounded-xl border-none bg-[#F9FAFB] shadow-none transition-all duration-200 hover:bg-[#F2F4F6]">
@@ -88,10 +91,18 @@ export function LibraryCard({ library, categories = [] }: LibraryCardProps) {
           <p className="mb-4 line-clamp-2 text-sm text-gray-600">
             {library.description}
           </p>
-          <div className="grid grid-cols-2 gap-2.5">
-            {library.books.map(book => (
-              <BookImage key={book.id} book={book} />
-            ))}
+          <div className="flex gap-2">
+            {displayBooks.length > 0 ? (
+              <div className="grid w-full grid-cols-3 gap-2">
+                {displayBooks.map(book => (
+                  <BookImage key={book.id} book={book} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex h-[150px] w-full items-center justify-center rounded-lg bg-gray-100">
+                <p className="text-sm text-gray-400">책이 없습니다</p>
+              </div>
+            )}
           </div>
         </CardContent>
         <CardFooter className="flex items-center justify-between px-5 py-3 text-xs text-gray-500">
@@ -118,11 +129,11 @@ interface BookImageProps {
 
 export function BookImage({ book }: BookImageProps) {
   return (
-    <div className="overflow-hidden rounded-lg">
+    <div className="aspect-[5/7] w-full overflow-hidden rounded-lg">
       <img
         src={book.coverImage}
         alt={book.title}
-        className="h-24 w-full transform-gpu object-cover transition-transform duration-300 hover:scale-110"
+        className="h-full w-full object-cover"
       />
     </div>
   );
