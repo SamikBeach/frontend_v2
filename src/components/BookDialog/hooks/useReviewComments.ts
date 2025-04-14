@@ -25,14 +25,9 @@ export function useReviewComments(reviewId: number) {
     queryKey: ['review-comments', reviewId],
     queryFn: async () => {
       const response = await getReviewComments(reviewId);
-      console.log('API 응답 데이터:', response); // 응답 데이터 확인
       return response;
     },
   });
-
-  // 디버깅 로그 추가
-  console.log('useReviewComments 데이터:', data);
-  console.log('댓글 목록:', data?.comments);
 
   // 댓글 입력 변경 핸들러
   const handleCommentTextChange = useCallback((text: string) => {
@@ -74,7 +69,6 @@ export function useReviewComments(reviewId: number) {
     },
     onError: error => {
       // 오류 발생 시 사용자에게 알림
-      console.error('댓글 등록 실패:', error);
       toast.error('댓글 등록에 실패했습니다. 다시 시도해주세요.');
     },
   });
@@ -124,7 +118,6 @@ export function useReviewComments(reviewId: number) {
           context.previousComments
         );
       }
-      console.error('댓글 삭제 실패:', error);
       toast.error('댓글 삭제에 실패했습니다. 다시 시도해주세요.');
     },
   });

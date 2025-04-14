@@ -32,7 +32,6 @@ export function useBookReviews() {
 
       const page = pageParam as number;
       const reviewsData = await getBookReviews(bookId, page, limit);
-      console.log(`리뷰 API 응답 (페이지 ${page}):`, reviewsData);
       return reviewsData;
     },
     getNextPageParam: (lastPage: ReviewsResponse) => {
@@ -99,7 +98,6 @@ export function useBookReviews() {
           await likeReview(reviewId);
         }
       } catch (error) {
-        console.error('좋아요 처리 중 오류가 발생했습니다:', error);
         // 오류 발생시 데이터 재조회
         await refetch();
       } finally {

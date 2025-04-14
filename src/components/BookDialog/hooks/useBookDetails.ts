@@ -10,8 +10,6 @@ import { useUserLibraries } from './useUserLibraries';
 
 // 북 데이터를 BookDetails 형식으로 보강
 function enrichBookDetails(book: Book): BookDetails {
-  console.log('Original book data from API:', book);
-
   // TypeScript 타입 호환을 위한 중간 타입 생성
   const baseBook = {
     ...book,
@@ -21,7 +19,6 @@ function enrichBookDetails(book: Book): BookDetails {
   // unknown으로 캐스팅 후 BookDetails로 변환
   const enrichedBook = baseBook as unknown as BookDetails;
 
-  console.log('Enriched book data:', enrichedBook);
   return enrichedBook;
 }
 

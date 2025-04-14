@@ -93,7 +93,6 @@ export function useReviewDialog() {
       return data?.rating;
     },
     onError: error => {
-      console.error('리뷰 저장 오류:', error);
       toast.error('리뷰 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
     },
   });

@@ -94,9 +94,8 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
       setEditCommentText('');
       toast.success('댓글이 수정되었습니다');
     },
-    onError: error => {
+    onError: () => {
       toast.error('댓글 수정 중 오류가 발생했습니다');
-      console.error('댓글 수정 오류:', error);
     },
   });
 
