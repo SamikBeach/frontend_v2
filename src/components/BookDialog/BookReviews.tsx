@@ -55,23 +55,23 @@ export const formatDate = (dateStr: string) => {
 
 // 리뷰의 별점을 가져오는 헬퍼 함수
 const getReviewRating = (review: Review): number => {
-  // 새로운 API 응답 형식에서 userRating 확인
+  // 새로운 API 응답 형식에서 authorRating 확인
   const anyReview = review as any;
 
-  // 1. userRating 객체에서 rating 확인 (새 API 응답 형식)
+  // 1. authorRating 객체에서 rating 확인 (새 API 응답 형식)
   if (
-    anyReview.userRating?.rating !== undefined &&
-    typeof anyReview.userRating.rating === 'number'
+    anyReview.authorRating?.rating !== undefined &&
+    typeof anyReview.authorRating.rating === 'number'
   ) {
-    return anyReview.userRating.rating;
+    return anyReview.authorRating.rating;
   }
 
-  // 2. userRatings 배열에서 첫 번째 항목의 rating 확인 (새 API 응답 형식)
+  // 2. authorRatings 배열에서 첫 번째 항목의 rating 확인 (새 API 응답 형식)
   if (
-    Array.isArray(anyReview.userRatings) &&
-    anyReview.userRatings.length > 0
+    Array.isArray(anyReview.authorRatings) &&
+    anyReview.authorRatings.length > 0
   ) {
-    const firstRating = anyReview.userRatings[0].rating;
+    const firstRating = anyReview.authorRatings[0].rating;
     if (typeof firstRating === 'number') {
       return firstRating;
     }

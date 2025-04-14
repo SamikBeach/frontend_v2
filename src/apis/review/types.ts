@@ -119,7 +119,7 @@ export interface ReviewComment {
   updatedAt: string;
 }
 
-export interface UserRating {
+export interface AuthorRating {
   bookId: number;
   rating: number;
   comment?: string;
@@ -139,8 +139,8 @@ export interface Review {
   };
   books?: ReviewBook[];
   images: ReviewImage[];
-  userRating?: UserRating;
-  userRatings?: UserRating[];
+  authorRating?: AuthorRating;
+  authorRatings?: AuthorRating[];
   likeCount?: number;
   likesCount?: number;
   commentCount?: number;
