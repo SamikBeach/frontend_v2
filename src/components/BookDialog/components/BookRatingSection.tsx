@@ -76,6 +76,8 @@ export function BookRatingSection() {
     userRating: dialogUserRating,
     handleReviewSubmit,
     isSubmitting,
+    isEditMode,
+    initialContent,
   } = useReviewDialog();
 
   if (!book) return null;
@@ -127,6 +129,8 @@ export function BookRatingSection() {
         onOpenChange={setReviewDialogOpen}
         bookTitle={book?.title || ''}
         initialRating={userRating}
+        initialContent={initialContent}
+        isEditMode={isEditMode}
         onSubmit={handleReviewSubmit}
         isSubmitting={isSubmitting}
       />

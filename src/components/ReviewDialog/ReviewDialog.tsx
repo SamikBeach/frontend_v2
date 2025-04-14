@@ -16,6 +16,8 @@ interface ReviewDialogProps {
   bookTitle: string;
   onSubmit: (rating: number, content: string) => void;
   initialRating?: number;
+  initialContent?: string;
+  isEditMode?: boolean;
   isSubmitting?: boolean;
 }
 
@@ -25,23 +27,35 @@ export function ReviewDialog({
   bookTitle,
   onSubmit,
   initialRating = 0,
+  initialContent = '',
+  isEditMode = false,
   isSubmitting = false,
 }: ReviewDialogProps) {
   const [rating, setRating] = useState(initialRating);
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState(initialContent);
 
-  // Dialog가 열릴 때마다 initialRating 값으로 rating 업데이트
+  // 모달이 열릴 때 초기 데이터 설정
   useEffect(() => {
     // 다이얼로그가 열려있는 상태에서도 initialRating이 변경되면 업데이트
     setRating(initialRating);
   }, [initialRating]);
 
+  // 수정 모드일 때 초기 콘텐츠 설정
+  useEffect(() => {
+    if (isEditMode && initialContent) {
+      setContent(initialContent);
+    }
+  }, [isEditMode, initialContent, open]);
+
   // Dialog가 닫힐 때 상태 초기화
   useEffect(() => {
     if (!open) {
-      setContent('');
+      // 수정 모드가 아닐 때만 내용 초기화
+      if (!isEditMode) {
+        setContent('');
+      }
     }
-  }, [open]);
+  }, [open, isEditMode]);
 
   const handleSubmit = () => {
     onSubmit(rating, content);
@@ -52,7 +66,7 @@ export function ReviewDialog({
       <DialogContent className="fixed top-1/2 left-1/2 max-w-md -translate-x-1/2 -translate-y-1/2 transform rounded-2xl border-none p-0 shadow-lg">
         <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
           <DialogTitle className="text-base font-medium">
-            리뷰 작성하기
+            {isEditMode ? '리뷰 수정하기' : '리뷰 작성하기'}
           </DialogTitle>
           <Button
             variant="ghost"
@@ -68,7 +82,7 @@ export function ReviewDialog({
         <div className="px-5 py-4">
           <DialogDescription className="mb-6 text-sm text-gray-600">
             <span className="font-medium text-gray-800">{bookTitle}</span>에
-            대한 리뷰를 남겨주세요
+            대한 {isEditMode ? '리뷰를 수정해주세요' : '리뷰를 남겨주세요'}
           </DialogDescription>
 
           <div className="mb-6 flex flex-col items-center space-y-3">
@@ -126,7 +140,11 @@ export function ReviewDialog({
             className="rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-200"
           >
             <PenLine className="mr-1.5 h-4 w-4" />
-            {isSubmitting ? '등록 중...' : '리뷰 등록하기'}
+            {isSubmitting
+              ? '등록 중...'
+              : isEditMode
+                ? '리뷰 수정하기'
+                : '리뷰 등록하기'}
           </Button>
         </DialogFooter>
       </DialogContent>

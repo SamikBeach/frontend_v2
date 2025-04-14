@@ -15,6 +15,7 @@ import {
   Review,
   ReviewComment as ReviewCommentType,
 } from '@/apis/review/types';
+import { ReviewDialog } from '@/components/ReviewDialog/ReviewDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,7 +40,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
-import { useBookReviews, useReviewDialog } from './hooks';
+import { useBookDetails, useBookReviews, useReviewDialog } from './hooks';
 import { useReviewComments } from './hooks/useReviewComments';
 
 // 날짜 포맷팅 함수
@@ -367,7 +368,19 @@ function ReviewsLoading() {
 // 메인 리뷰 목록 컴포넌트
 function ReviewsList() {
   const currentUser = useCurrentUser();
-  const { handleOpenReviewDialog } = useReviewDialog();
+  const { book } = useBookDetails();
+  const {
+    handleOpenReviewDialog,
+    handleOpenEditReviewDialog,
+    reviewDialogOpen,
+    setReviewDialogOpen,
+    userRating,
+    isEditMode,
+    initialContent,
+    handleReviewSubmit,
+    isSubmitting,
+  } = useReviewDialog();
+
   const {
     reviews,
     handleLike,
@@ -431,7 +444,7 @@ function ReviewsList() {
 
   // 리뷰 수정 핸들러
   const handleEditReview = (review: Review) => {
-    handleOpenReviewDialog(getReviewRating(review));
+    handleOpenEditReviewDialog(review);
   };
 
   // 리뷰 삭제 핸들러
@@ -659,6 +672,20 @@ function ReviewsList() {
             )}
           </Button>
         </div>
+      )}
+
+      {/* 리뷰 다이얼로그 추가 - 리뷰가 있는 경우에만 렌더링 */}
+      {reviewDialogOpen && (
+        <ReviewDialog
+          open={reviewDialogOpen}
+          onOpenChange={setReviewDialogOpen}
+          bookTitle={book?.title || ''}
+          initialRating={userRating}
+          initialContent={initialContent}
+          isEditMode={isEditMode}
+          onSubmit={handleReviewSubmit}
+          isSubmitting={isSubmitting}
+        />
       )}
     </div>
   );

@@ -1,5 +1,6 @@
 import { createOrUpdateRating } from '@/apis/rating/rating';
-import { createReview } from '@/apis/review/review';
+import { createReview, updateReview } from '@/apis/review/review';
+import { Review } from '@/apis/review/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -9,6 +10,11 @@ export function useReviewDialog() {
   const { book, isbn, userRating: userRatingData } = useBookDetails();
   const queryClient = useQueryClient();
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+
+  // 수정 모드 상태 추가
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editingReview, setEditingReview] = useState<Review | null>(null);
+  const [initialContent, setInitialContent] = useState('');
 
   // 리뷰 제출 뮤테이션
   const mutation = useMutation({
@@ -26,8 +32,16 @@ export function useReviewDialog() {
       // 항상 평점 등록 (comment 없이)
       const ratingResult = await createOrUpdateRating(book.id, { rating });
 
-      // content가 있는 경우 리뷰 생성
-      if (content.trim()) {
+      // 수정 모드인 경우 리뷰 업데이트
+      if (isEditMode && editingReview) {
+        await updateReview(editingReview.id, {
+          content: content.trim(),
+          type: 'review',
+          bookId: parseInt(String(book.id), 10),
+        });
+      }
+      // 새 리뷰 작성 (내용이 있는 경우)
+      else if (content.trim()) {
         await createReview({
           content: content.trim(),
           type: 'review',
@@ -68,7 +82,14 @@ export function useReviewDialog() {
       // 다이얼로그 닫기
       setReviewDialogOpen(false);
 
-      toast.success('리뷰가 성공적으로 저장되었습니다.');
+      // 수정 모드 초기화
+      resetEditMode();
+
+      toast.success(
+        isEditMode
+          ? '리뷰가 수정되었습니다.'
+          : '리뷰가 성공적으로 저장되었습니다.'
+      );
       return data?.rating;
     },
     onError: error => {
@@ -77,11 +98,27 @@ export function useReviewDialog() {
     },
   });
 
+  // 수정 모드 초기화
+  const resetEditMode = useCallback(() => {
+    setIsEditMode(false);
+    setEditingReview(null);
+    setInitialContent('');
+  }, []);
+
   // 현재 사용자의 별점 가져오기
   const userRating = userRatingData?.rating || 0;
 
-  // 리뷰 다이얼로그 열기 핸들러
+  // 리뷰 다이얼로그 열기 핸들러 (새 리뷰 작성)
   const handleOpenReviewDialog = useCallback(() => {
+    resetEditMode();
+    setReviewDialogOpen(true);
+  }, [resetEditMode]);
+
+  // 리뷰 수정 다이얼로그 열기 핸들러
+  const handleOpenEditReviewDialog = useCallback((review: Review) => {
+    setIsEditMode(true);
+    setEditingReview(review);
+    setInitialContent(review.content);
     setReviewDialogOpen(true);
   }, []);
 
@@ -102,7 +139,10 @@ export function useReviewDialog() {
     reviewDialogOpen,
     setReviewDialogOpen,
     userRating,
+    isEditMode,
+    initialContent,
     handleOpenReviewDialog,
+    handleOpenEditReviewDialog,
     handleReviewSubmit,
     isSubmitting: mutation.isPending,
     error: mutation.error,
