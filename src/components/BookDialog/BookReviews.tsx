@@ -434,7 +434,7 @@ function ReviewsList() {
 
   if (!reviews || reviews.length === 0) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 text-center">
+      <div className="px-1 py-6 text-center">
         <p className="text-sm text-gray-500">아직 리뷰가 없습니다</p>
         <Button
           variant="outline"
@@ -448,27 +448,29 @@ function ReviewsList() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-4">
-        {reviews.map((review: Review) => (
+    <div className="space-y-0">
+      <div>
+        {reviews.map((review: Review, index: number) => (
           <div
             key={review.id}
-            className="rounded-2xl border border-gray-200 bg-white p-4"
+            className={`py-5 ${
+              index !== reviews.length - 1 ? 'border-b border-gray-100' : ''
+            }`}
           >
             <div className="flex items-start gap-4">
-              <Avatar className="h-10 w-10 border">
+              <Avatar className="h-10 w-10">
                 <AvatarImage
                   src={review.author.profileImage || ''}
                   alt={review.author.username}
                 />
-                <AvatarFallback>
+                <AvatarFallback className="bg-gray-100">
                   {review.author.username.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <h3 className="text-base font-semibold text-gray-900">
+                    <h3 className="text-base font-medium text-gray-900">
                       {review.author.username}
                     </h3>
                     <span className="text-sm text-gray-500">
@@ -483,7 +485,7 @@ function ReviewsList() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                          className="h-8 w-8 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
                         >
                           <MoreHorizontal className="h-5 w-5" />
                         </Button>
@@ -581,7 +583,7 @@ function ReviewsList() {
                     className={`h-8 rounded-full p-0 px-2.5 ${
                       review.userLiked
                         ? 'text-pink-500 hover:bg-pink-50'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : 'text-gray-600 hover:bg-gray-50'
                     }`}
                     onClick={() =>
                       handleLikeWithState(review.id, review.userLiked || false)
@@ -599,7 +601,7 @@ function ReviewsList() {
                   </Button>
                   <Button
                     variant="ghost"
-                    className="h-8 rounded-full p-0 px-2.5 text-gray-600 hover:bg-gray-100"
+                    className="h-8 rounded-full p-0 px-2.5 text-gray-600 hover:bg-gray-50"
                     onClick={() => toggleComments(review.id)}
                   >
                     <MessageSquare className="h-4 w-4" />
