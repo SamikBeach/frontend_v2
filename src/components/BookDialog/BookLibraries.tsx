@@ -1,3 +1,4 @@
+import { LibraryDetail, LibraryTag } from '@/apis/library/types';
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Users } from 'lucide-react';
 import Link from 'next/link';
@@ -57,7 +58,7 @@ function LibrariesList() {
 
   return (
     <div className="flex flex-col gap-2">
-      {libraries.map(library => (
+      {(libraries as LibraryDetail[]).map(library => (
         <Link key={library.id} href={`/library/${library.id}`}>
           <div className="flex items-center rounded-xl border border-gray-100 bg-gray-50 p-3 transition-colors hover:bg-gray-100">
             <div className="flex flex-1 items-center gap-3">
@@ -69,7 +70,7 @@ function LibrariesList() {
                   <p className="font-medium text-gray-900">{library.name}</p>
                   <div className="flex flex-wrap gap-1">
                     {library.tags &&
-                      library.tags.map((tag, index) => (
+                      (library.tags as LibraryTag[]).map((tag, index) => (
                         <Badge
                           key={index}
                           className="rounded-full border-0 bg-gray-100 px-2 py-0.5 text-[10px] font-medium text-gray-900"
@@ -101,13 +102,16 @@ function LibrariesList() {
 
 export function BookLibraries() {
   const { book } = useBookDetails();
+  const { libraries, isEmpty } = useBookLibraries(book?.id);
 
   if (!book || !book.id) return null;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-gray-900">등록된 서재</p>
+        <p className="text-sm font-medium text-gray-900">
+          이 책이 등록된 서재({isEmpty ? 0 : libraries.length})
+        </p>
       </div>
 
       <ErrorBoundary FallbackComponent={LibrariesError}>

@@ -1,7 +1,6 @@
 import { getLibrariesByBookId } from '@/apis/library/library';
 import { LibrariesForBookResponse } from '@/apis/library/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 
 /**
  * 특정 책이 저장된 서재 목록을 조회하는 훅
@@ -24,25 +23,18 @@ export function useBookLibraries(
           };
         return await getLibrariesByBookId(bookId, 1, limit);
       },
-      enabled: !!bookId,
     });
 
-  // 디버깅용 로그
-  useEffect(() => {
-    if (data) {
-      console.log('Loaded libraries for book:', data);
-    }
-    if (isError) {
-      console.error('Error fetching libraries for book:', error);
-    }
-  }, [data, isError, error]);
+  const libraries = Array.isArray(data?.data) ? data.data : [];
+  const meta = data?.meta || { total: 0, page: 1, limit, totalPages: 0 };
+  const isEmpty = libraries.length === 0;
 
   return {
-    libraries: data?.data || [],
-    meta: data?.meta || { total: 0, page: 1, limit, totalPages: 0 },
+    libraries,
+    meta,
     isLoading,
     isError,
     refetch,
-    isEmpty: data?.data.length === 0,
+    isEmpty,
   };
 }

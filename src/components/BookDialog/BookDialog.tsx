@@ -85,7 +85,12 @@ export function BookDialog() {
   if (!isOpen) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && close()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={open => {
+        if (!open) close();
+      }}
+    >
       <DialogContent className="w-full max-w-none rounded-lg bg-white p-0 md:max-w-screen-xl">
         {/* DialogTitle 컴포넌트는 접근성 목적으로 필요합니다. 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
         <DialogTitle className="sr-only">도서 상세 정보</DialogTitle>

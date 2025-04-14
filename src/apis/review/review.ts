@@ -9,6 +9,7 @@ import {
   ReviewResponseDto,
   ReviewsResponse,
   ReviewType,
+  UpdateCommentDto,
   UpdateReviewDto,
 } from './types';
 
@@ -194,6 +195,20 @@ export const getReviewComments = async (
 ): Promise<CommentsResponse> => {
   const response = await api.get<CommentsResponse>(
     `/review/${reviewId}/comment`
+  );
+  return response.data;
+};
+
+/**
+ * 댓글 수정
+ */
+export const updateComment = async (
+  commentId: number,
+  data: UpdateCommentDto
+): Promise<Comment> => {
+  const response = await api.patch<Comment>(
+    `/review/comment/${commentId}`,
+    data
   );
   return response.data;
 };

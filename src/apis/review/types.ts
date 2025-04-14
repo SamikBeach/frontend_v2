@@ -64,6 +64,10 @@ export interface CreateCommentDto {
   content: string;
 }
 
+export interface UpdateCommentDto {
+  content: string;
+}
+
 export interface ReviewsResponse {
   data: Review[];
   meta: {
@@ -117,11 +121,21 @@ export interface Review {
   content: string;
   type: string;
   author: ReviewUser;
-  books: ReviewBook[];
+  book?: {
+    id: number;
+    title: string;
+    author: string;
+    coverImage: string;
+    isbn: string;
+  };
+  books?: ReviewBook[];
   images: ReviewImage[];
-  likeCount: number;
-  commentCount: number;
-  isLiked: boolean;
+  likeCount?: number;
+  likesCount?: number;
+  commentCount?: number;
+  commentsCount?: number;
+  isLiked?: boolean;
+  userLiked?: boolean;
   createdAt: string;
   updatedAt: string;
 }
