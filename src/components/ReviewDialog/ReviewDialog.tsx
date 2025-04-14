@@ -91,23 +91,25 @@ export function ReviewDialog({
           </DialogDescription>
 
           <div className="mb-6 flex flex-col items-center space-y-3">
-            <div className="flex items-center space-x-2">
-              {[1, 2, 3, 4, 5].map(star => (
-                <Star
-                  key={star}
-                  className={`h-9 w-9 cursor-pointer ${
-                    star <= rating
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-200 hover:text-gray-300'
-                  }`}
-                  onClick={() => !isSubmitting && setRating(star)}
-                />
-              ))}
+            <div className="relative flex w-full items-center justify-center">
+              <div className="flex space-x-2">
+                {[1, 2, 3, 4, 5].map(star => (
+                  <Star
+                    key={star}
+                    className={`h-9 w-9 cursor-pointer ${
+                      star <= rating
+                        ? 'fill-yellow-400 text-yellow-400'
+                        : 'text-gray-200 hover:text-gray-300'
+                    }`}
+                    onClick={() => !isSubmitting && setRating(star)}
+                  />
+                ))}
+              </div>
               {rating > 0 && (
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="ml-1 h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  className="absolute -right-10 h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                   onClick={handleResetRating}
                   disabled={isSubmitting}
                   title="별점 취소"

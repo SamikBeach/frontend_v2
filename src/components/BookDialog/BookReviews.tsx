@@ -55,8 +55,38 @@ export const formatDate = (dateStr: string) => {
 
 // 리뷰의 별점을 가져오는 헬퍼 함수
 const getReviewRating = (review: Review): number => {
-  // @ts-expect-error - rating 속성이 있을 수 있음
-  if (review.rating !== undefined) return review.rating;
+  // 새로운 API 응답 형식에서 userRating 확인
+  const anyReview = review as any;
+
+  // 1. userRating 객체에서 rating 확인 (새 API 응답 형식)
+  if (
+    anyReview.userRating?.rating !== undefined &&
+    typeof anyReview.userRating.rating === 'number'
+  ) {
+    return anyReview.userRating.rating;
+  }
+
+  // 2. userRatings 배열에서 첫 번째 항목의 rating 확인 (새 API 응답 형식)
+  if (
+    Array.isArray(anyReview.userRatings) &&
+    anyReview.userRatings.length > 0
+  ) {
+    const firstRating = anyReview.userRatings[0].rating;
+    if (typeof firstRating === 'number') {
+      return firstRating;
+    }
+  }
+
+  // 3. 기존 방식: review 객체에 직접 rating 속성이 있는지 확인
+  if (anyReview.rating !== undefined && typeof anyReview.rating === 'number') {
+    return anyReview.rating;
+  }
+
+  // 4. book 객체에 rating이 있는지 확인
+  if (anyReview.book?.rating && typeof anyReview.book.rating === 'number') {
+    return anyReview.book.rating;
+  }
+
   return 0;
 };
 
@@ -469,187 +499,198 @@ function ReviewsList() {
   return (
     <div className="space-y-0">
       <div>
-        {reviews.map((review: Review, index: number) => (
-          <div
-            key={review.id}
-            className={`py-5 ${
-              index !== reviews.length - 1 ? 'border-b border-gray-100' : ''
-            }`}
-          >
-            <div className="flex items-start gap-4">
-              <Avatar className="h-10 w-10">
-                <AvatarImage
-                  src={review.author.profileImage || ''}
-                  alt={review.author.username}
-                />
-                <AvatarFallback className="bg-gray-100">
-                  {review.author.username.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-medium text-gray-900">
-                      {review.author.username}
-                    </h3>
-                    <span className="text-sm text-gray-500">
-                      {formatDate(review.createdAt)}
-                    </span>
+        {reviews.map((review: Review, index: number) => {
+          // 리뷰 별점 확인
+          const rating = getReviewRating(review);
+
+          return (
+            <div
+              key={review.id}
+              className={`py-5 ${
+                index !== reviews.length - 1 ? 'border-b border-gray-100' : ''
+              }`}
+            >
+              <div className="flex items-start gap-4">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage
+                    src={review.author.profileImage || ''}
+                    alt={review.author.username}
+                  />
+                  <AvatarFallback className="bg-gray-100">
+                    {review.author.username.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-medium text-gray-900">
+                          {review.author.username}
+                        </h3>
+                        <span className="text-sm text-gray-500">
+                          {formatDate(review.createdAt)}
+                        </span>
+                      </div>
+
+                      {/* 별점 표시 UI */}
+                      <div className="mt-1 flex items-center">
+                        <div className="flex items-center">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-3.5 w-3.5 ${
+                                i < Math.floor(rating)
+                                  ? 'fill-yellow-400 text-yellow-400'
+                                  : 'fill-gray-200 text-gray-200'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        {rating > 0 && (
+                          <span className="ml-1 text-xs text-gray-500">
+                            ({rating})
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 내 리뷰일 경우 액션 버튼 */}
+                    {isMyReview(review) && (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                          >
+                            <MoreHorizontal className="h-5 w-5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-36">
+                          <DropdownMenuItem
+                            className="flex cursor-pointer items-center gap-2 text-sm"
+                            onClick={() => handleEditReview(review)}
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                            수정하기
+                          </DropdownMenuItem>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <DropdownMenuItem
+                                className="flex cursor-pointer items-center gap-2 text-sm text-red-500"
+                                onSelect={e => e.preventDefault()}
+                              >
+                                <Trash className="h-3.5 w-3.5 text-red-500" />
+                                삭제하기
+                              </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>리뷰 삭제</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  이 리뷰를 정말 삭제하시겠습니까? 이 작업은
+                                  되돌릴 수 없습니다.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>취소</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() =>
+                                    handleDeleteReviewClick(review.id)
+                                  }
+                                  className="bg-red-500 text-white hover:bg-red-600"
+                                >
+                                  {deleteReviewMutation.isPending &&
+                                  deleteReviewMutation.variables === review.id
+                                    ? '삭제 중...'
+                                    : '삭제'}
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </div>
 
-                  {/* 내 리뷰일 경우 액션 버튼 */}
-                  {isMyReview(review) && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                  <p className="mt-3 text-gray-700">{review.content}</p>
+
+                  {/* 이미지가 있는 경우 표시 */}
+                  {review.images && review.images.length > 0 && (
+                    <div className="mt-3 flex gap-2 overflow-x-auto">
+                      {review.images.map((image: any) => (
+                        <div
+                          key={image.id}
+                          className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md"
                         >
-                          <MoreHorizontal className="h-5 w-5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-36">
-                        <DropdownMenuItem
-                          className="flex cursor-pointer items-center gap-2 text-sm"
-                          onClick={() => handleEditReview(review)}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                          수정하기
-                        </DropdownMenuItem>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <DropdownMenuItem
-                              className="flex cursor-pointer items-center gap-2 text-sm text-red-500"
-                              onSelect={e => e.preventDefault()}
-                            >
-                              <Trash className="h-3.5 w-3.5 text-red-500" />
-                              삭제하기
-                            </DropdownMenuItem>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>리뷰 삭제</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                이 리뷰를 정말 삭제하시겠습니까? 이 작업은
-                                되돌릴 수 없습니다.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>취소</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() =>
-                                  handleDeleteReviewClick(review.id)
-                                }
-                                className="bg-red-500 text-white hover:bg-red-600"
-                              >
-                                {deleteReviewMutation.isPending &&
-                                deleteReviewMutation.variables === review.id
-                                  ? '삭제 중...'
-                                  : '삭제'}
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </div>
-                {/* 별점 표시 - 평점이 있는 경우에만 렌더링 */}
-                {getReviewRating(review) > 0 && (
-                  <div className="mt-1 flex items-center">
-                    <div className="flex items-center">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.floor(getReviewRating(review))
-                              ? 'fill-yellow-400 text-yellow-400'
-                              : 'fill-gray-200 text-gray-200'
-                          }`}
-                        />
+                          <img
+                            src={image.url}
+                            alt="리뷰 이미지"
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
                       ))}
                     </div>
-                    <span className="ml-1 text-sm text-gray-500">
-                      ({getReviewRating(review)})
-                    </span>
-                  </div>
-                )}
+                  )}
 
-                <p className="mt-3 text-gray-700">{review.content}</p>
-
-                {/* 이미지가 있는 경우 표시 */}
-                {review.images && review.images.length > 0 && (
-                  <div className="mt-3 flex gap-2 overflow-x-auto">
-                    {review.images.map((image: any) => (
-                      <div
-                        key={image.id}
-                        className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md"
-                      >
-                        <img
-                          src={image.url}
-                          alt="리뷰 이미지"
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div className="mt-3 flex items-center gap-0.5">
-                  <Button
-                    variant="ghost"
-                    className={`h-8 rounded-full p-0 px-2 ${
-                      review.userLiked
-                        ? 'text-pink-500 hover:bg-pink-50 hover:text-pink-500'
-                        : 'text-gray-600 hover:bg-gray-50'
-                    }`}
-                    onClick={() =>
-                      handleLikeWithState(review.id, review.userLiked || false)
-                    }
-                    disabled={likingReviewId === review.id && isLikeLoading}
-                  >
-                    {review.userLiked ? (
-                      <ThumbsUp className="h-4 w-4 fill-pink-500 text-pink-500" />
-                    ) : (
-                      <ThumbsUp className="h-4 w-4" />
-                    )}
-                    <span
-                      className={`font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
-                    >
-                      {review.likesCount || 0}
-                    </span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="h-8 rounded-full p-0 px-2 text-gray-600 hover:bg-gray-50"
-                    onClick={() => toggleComments(review.id)}
-                  >
-                    <MessageSquare className="h-4 w-4" />
-                    <span className="font-medium">
-                      {review.commentsCount || 0}
-                    </span>
-                  </Button>
-                </div>
-
-                {/* 댓글 영역 - 댓글이 있는 경우 */}
-                {expandedComments[review.id] && (
-                  <ErrorBoundary FallbackComponent={ErrorFallback}>
-                    <Suspense
-                      fallback={
-                        <div className="mt-4 h-20 animate-pulse rounded-lg bg-gray-100"></div>
+                  <div className="mt-3 flex items-center gap-0.5">
+                    <Button
+                      variant="ghost"
+                      className={`h-8 rounded-full p-0 px-2 ${
+                        review.userLiked
+                          ? 'text-pink-500 hover:bg-pink-50 hover:text-pink-500'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                      onClick={() =>
+                        handleLikeWithState(
+                          review.id,
+                          review.userLiked || false
+                        )
                       }
+                      disabled={likingReviewId === review.id && isLikeLoading}
                     >
-                      <div className="mt-4">
-                        <ReviewComments reviewId={review.id} />
-                      </div>
-                    </Suspense>
-                  </ErrorBoundary>
-                )}
+                      {review.userLiked ? (
+                        <ThumbsUp className="h-4 w-4 fill-pink-500 text-pink-500" />
+                      ) : (
+                        <ThumbsUp className="h-4 w-4" />
+                      )}
+                      <span
+                        className={`font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
+                      >
+                        {review.likesCount || 0}
+                      </span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      className="h-8 rounded-full p-0 px-2 text-gray-600 hover:bg-gray-50"
+                      onClick={() => toggleComments(review.id)}
+                    >
+                      <MessageSquare className="h-4 w-4" />
+                      <span className="font-medium">
+                        {review.commentsCount || 0}
+                      </span>
+                    </Button>
+                  </div>
+
+                  {/* 댓글 영역 - 댓글이 있는 경우 */}
+                  {expandedComments[review.id] && (
+                    <ErrorBoundary FallbackComponent={ErrorFallback}>
+                      <Suspense
+                        fallback={
+                          <div className="mt-4 h-20 animate-pulse rounded-lg bg-gray-100"></div>
+                        }
+                      >
+                        <div className="mt-4">
+                          <ReviewComments reviewId={review.id} />
+                        </div>
+                      </Suspense>
+                    </ErrorBoundary>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* 리뷰 더보기 버튼 */}

@@ -77,6 +77,47 @@ export function useReviewDialog() {
             userRating: data,
           };
         });
+
+        // book-reviews 쿼리 데이터 업데이트하여 별점 즉시 반영
+        queryClient.setQueryData(['book-reviews', book.id], (oldData: any) => {
+          if (!oldData || !oldData.pages) return oldData;
+
+          // 해당 책에 대한 모든 리뷰에 새로운 별점 정보 추가
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => {
+              if (!page || !page.data) return page;
+
+              return {
+                ...page,
+                data: page.data.map((review: any) => {
+                  // 리뷰 내부의 book ID가 현재 책 ID와 일치하는지 확인
+                  const isMatchingBook = review.book?.id === book.id;
+
+                  if (isMatchingBook) {
+                    return {
+                      ...review,
+                      userRating: {
+                        bookId: book.id,
+                        rating: data.rating,
+                        comment: data.comment || '',
+                      },
+                      // userRatings도 업데이트
+                      userRatings: [
+                        {
+                          bookId: book.id,
+                          rating: data.rating,
+                          comment: data.comment || '',
+                        },
+                      ],
+                    };
+                  }
+                  return review;
+                }),
+              };
+            }),
+          };
+        });
       }
 
       // 다이얼로그 닫기

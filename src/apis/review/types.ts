@@ -116,6 +116,12 @@ export interface ReviewComment {
   updatedAt: string;
 }
 
+export interface UserRating {
+  bookId: number;
+  rating: number;
+  comment?: string;
+}
+
 export interface Review {
   id: number;
   content: string;
@@ -130,6 +136,8 @@ export interface Review {
   };
   books?: ReviewBook[];
   images: ReviewImage[];
+  userRating?: UserRating;
+  userRatings?: UserRating[];
   likeCount?: number;
   likesCount?: number;
   commentCount?: number;
