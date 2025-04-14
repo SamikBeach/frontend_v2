@@ -39,11 +39,7 @@ export function useBookReviews() {
       }
 
       const page = pageParam as number;
-      console.log(
-        `Fetching reviews for bookId=${bookId}, page=${page}, sort=${sort}`
-      ); // 디버깅용 로그
       const reviewsData = await getBookReviews(bookId, page, limit, sort);
-      console.log('Fetched reviews:', reviewsData); // 디버깅용 로그
       return reviewsData;
     },
     getNextPageParam: (lastPage: ReviewsResponse) => {
@@ -67,7 +63,6 @@ export function useBookReviews() {
   const handleSortChange = useCallback(
     (newSort: ReviewSortType) => {
       if (newSort !== sort) {
-        console.log(`Changing sort from ${sort} to ${newSort}`); // 디버깅용 로그
         setSort(newSort);
         // 정렬이 변경되면 queryKey가 바뀌어 자동으로 refetch 발생
       }

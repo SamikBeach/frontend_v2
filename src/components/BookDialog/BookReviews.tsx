@@ -427,12 +427,6 @@ function ReviewsList({
   } = useBookReviews();
   const queryClient = useQueryClient();
 
-  // 디버깅용 로그
-  useEffect(() => {
-    console.log('Current sort in ReviewsList:', sort);
-    console.log('Reviews data:', reviews);
-  }, [sort, reviews]);
-
   // 리뷰 카운트를 부모에게 전달
   useEffect(() => {
     if (meta?.total !== undefined && onReviewCountChange) {

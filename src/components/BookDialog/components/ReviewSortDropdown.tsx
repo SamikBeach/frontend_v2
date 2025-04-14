@@ -9,15 +9,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAtom } from 'jotai';
 import { Clock, Heart, MessageSquare } from 'lucide-react';
-import { useEffect } from 'react';
 
 export function ReviewSortDropdown() {
   const [sort, setSort] = useAtom(bookReviewSortAtom);
-
-  // 디버깅용 로그
-  useEffect(() => {
-    console.log('Current sort in ReviewSortDropdown:', sort);
-  }, [sort]);
 
   // 정렬 옵션 배열 정의 (레이블, 값, 아이콘을 포함)
   const sortOptions = [
@@ -43,7 +37,6 @@ export function ReviewSortDropdown() {
     sortOptions.find(option => option.value === sort) || sortOptions[0];
 
   const handleSortChange = (newSort: ReviewSortType) => {
-    console.log(`Changing sort in dropdown from ${sort} to ${newSort}`); // 디버깅용 로그
     setSort(newSort);
   };
 
