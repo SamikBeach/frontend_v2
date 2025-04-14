@@ -5,22 +5,28 @@ import {
   getReviewComments,
 } from '@/apis/review';
 import { Review } from '@/apis/review/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
+import { useBookDetails } from './useBookDetails';
 
-export function useReviewComments(reviewId: number, commentCount = 0) {
+export function useReviewComments(reviewId: number) {
+  const { book } = useBookDetails();
+  const bookId = book?.id || 0;
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
 
-  // 댓글 목록 조회 - commentCount가 0이면 API 호출 스킵
-  const { data, isLoading } = useQuery({
+  // 댓글 목록 조회
+  const { data } = useSuspenseQuery({
     queryKey: ['review-comments', reviewId],
     queryFn: async () => {
       const response = await getReviewComments(reviewId);
       return response;
     },
-    enabled: commentCount > 0, // 댓글이 0개일 때는 API 호출 스킵
   });
 
   // 댓글 입력 변경 핸들러
@@ -34,7 +40,7 @@ export function useReviewComments(reviewId: number, commentCount = 0) {
       const commentData: CreateCommentDto = { content };
       return addReviewComment(reviewId, commentData);
     },
-    onMutate: async () => {
+    onMutate: async content => {
       // 낙관적 업데이트를 위해 기존 댓글 목록 저장
       await queryClient.cancelQueries({
         queryKey: ['review-comments', reviewId],
@@ -61,7 +67,7 @@ export function useReviewComments(reviewId: number, commentCount = 0) {
       setCommentText('');
       toast.success('댓글이 등록되었습니다');
     },
-    onError: () => {
+    onError: error => {
       // 오류 발생 시 사용자에게 알림
       toast.error('댓글 등록에 실패했습니다. 다시 시도해주세요.');
     },
@@ -104,7 +110,7 @@ export function useReviewComments(reviewId: number, commentCount = 0) {
 
       toast.success('댓글이 삭제되었습니다');
     },
-    onError: (_error, _commentId, context) => {
+    onError: (error, commentId, context) => {
       // 오류 발생 시 이전 상태로 복원
       if (context?.previousComments) {
         queryClient.setQueryData(
@@ -188,7 +194,6 @@ export function useReviewComments(reviewId: number, commentCount = 0) {
   return {
     comments,
     commentText,
-    isLoading,
     isSubmitting,
     isDeleting,
     handleCommentTextChange,

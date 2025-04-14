@@ -170,10 +170,11 @@ export const getPopularReviewsForHome = async (
 export const getBookReviews = async (
   bookId: number,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  sort: 'likes' | 'comments' | 'recent' = 'likes'
 ): Promise<ReviewsResponse> => {
   const response = await api.get<ReviewsResponse>(`/review/book/${bookId}`, {
-    params: { page, limit },
+    params: { page, limit, sort },
   });
   return response.data;
 };

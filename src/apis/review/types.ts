@@ -5,6 +5,9 @@ export type ReviewType =
   | 'question'
   | 'meetup';
 
+// 리뷰 정렬 타입 정의
+export type ReviewSortType = 'likes' | 'comments' | 'recent';
+
 export interface Author {
   id: number;
   username: string;

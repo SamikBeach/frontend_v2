@@ -3,23 +3,38 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { BookLibraries } from '../BookLibraries';
 import { BookQuotes } from '../BookQuotes';
 import { BookReviews } from '../BookReviews';
-import { useBookDetails, useBookReviews } from '../hooks';
+import { useBookDetails } from '../hooks';
+import { ReviewSortDropdown } from './ReviewSortDropdown';
 
 // 리뷰 제목 컴포넌트
 function ReviewTitle() {
-  const { meta } = useBookReviews();
-  const reviewCount = meta?.total || 0;
-
   return (
-    <p className="text-sm font-medium text-gray-900">
-      리뷰 <span className="text-gray-700">({reviewCount})</span>
-    </p>
+    <div className="flex w-full items-center justify-between">
+      <p className="text-sm font-medium text-gray-900">
+        리뷰 <span className="text-gray-700" id="review-count"></span>
+      </p>
+
+      <ErrorBoundary FallbackComponent={() => null}>
+        <Suspense
+          fallback={
+            <div className="h-8 w-24 animate-pulse rounded-full bg-gray-200"></div>
+          }
+        >
+          <ReviewSortDropdown />
+        </Suspense>
+      </ErrorBoundary>
+    </div>
   );
 }
 
 // 리뷰 제목 로딩 컴포넌트
 function ReviewTitleLoading() {
-  return <div className="h-5 w-28 animate-pulse rounded bg-gray-200"></div>;
+  return (
+    <div className="flex w-full items-center justify-between">
+      <div className="h-5 w-28 animate-pulse rounded bg-gray-200"></div>
+      <div className="h-8 w-24 animate-pulse rounded-full bg-gray-200"></div>
+    </div>
+  );
 }
 
 // 라이브러리 로딩 컴포넌트
@@ -59,6 +74,14 @@ function ErrorFallback({
   );
 }
 
+// 리뷰 수 업데이트를 위한 스크립트
+const updateReviewCount = (count: number) => {
+  const reviewCountElement = document.getElementById('review-count');
+  if (reviewCountElement) {
+    reviewCountElement.textContent = `(${count})`;
+  }
+};
+
 export function BookRightPanel() {
   const { book } = useBookDetails();
 
@@ -68,15 +91,13 @@ export function BookRightPanel() {
     <div className="space-y-7">
       {/* 리뷰 섹션 */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <Suspense fallback={<ReviewTitleLoading />}>
-              <ReviewTitle />
-            </Suspense>
-          </ErrorBoundary>
-        </div>
+        <ErrorBoundary FallbackComponent={ErrorFallback}>
+          <Suspense fallback={<ReviewTitleLoading />}>
+            <ReviewTitle />
+          </Suspense>
+        </ErrorBoundary>
 
-        <BookReviews />
+        <BookReviews onReviewCountChange={updateReviewCount} />
       </div>
 
       {/* 등록된 서재 섹션 */}

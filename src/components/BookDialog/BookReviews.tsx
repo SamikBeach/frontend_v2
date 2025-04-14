@@ -8,7 +8,7 @@ import {
   ThumbsUp,
   Trash,
 } from 'lucide-react';
-import { Suspense, useCallback, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 
 import { deleteReview, updateComment } from '@/apis/review';
 import {
@@ -48,7 +48,7 @@ export const formatDate = (dateStr: string) => {
   try {
     const date = new Date(dateStr);
     return format(date, 'PPP', { locale: ko });
-  } catch {
+  } catch (error) {
     return dateStr;
   }
 };
@@ -91,24 +91,17 @@ const getReviewRating = (review: Review): number => {
 };
 
 // 리뷰 댓글 컴포넌트
-function ReviewComments({
-  reviewId,
-  commentCount = 0,
-}: {
-  reviewId: number;
-  commentCount: number;
-}) {
+function ReviewComments({ reviewId }: { reviewId: number }) {
   const currentUser = useCurrentUser();
   const {
     comments,
     commentText,
-    isLoading,
     isSubmitting,
     isDeleting,
     handleCommentTextChange,
     handleSubmitComment,
     handleDeleteComment,
-  } = useReviewComments(reviewId, commentCount);
+  } = useReviewComments(reviewId);
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editCommentText, setEditCommentText] = useState('');
   const queryClient = useQueryClient();
@@ -207,12 +200,7 @@ function ReviewComments({
 
       {/* 댓글 목록 */}
       <div className="mt-2 space-y-2 pl-3">
-        {isLoading ? (
-          <div className="animate-pulse space-y-2">
-            <div className="h-10 rounded-md bg-gray-100"></div>
-            <div className="h-10 rounded-md bg-gray-100"></div>
-          </div>
-        ) : comments && comments.length > 0 ? (
+        {comments && comments.length > 0 ? (
           comments.map(comment => (
             <div key={comment.id} className="flex gap-2 pb-1">
               <Avatar className="mt-1 h-7 w-7 flex-shrink-0 border-0">
@@ -407,7 +395,11 @@ function ReviewsLoading() {
 }
 
 // 메인 리뷰 목록 컴포넌트
-function ReviewsList() {
+function ReviewsList({
+  onReviewCountChange,
+}: {
+  onReviewCountChange?: (count: number) => void;
+}) {
   const currentUser = useCurrentUser();
   const { book } = useBookDetails();
   const {
@@ -429,8 +421,24 @@ function ReviewsList() {
     hasNextPage,
     isFetchingNextPage,
     handleLoadMore,
+    isLoading,
+    meta,
+    sort,
   } = useBookReviews();
   const queryClient = useQueryClient();
+
+  // 디버깅용 로그
+  useEffect(() => {
+    console.log('Current sort in ReviewsList:', sort);
+    console.log('Reviews data:', reviews);
+  }, [sort, reviews]);
+
+  // 리뷰 카운트를 부모에게 전달
+  useEffect(() => {
+    if (meta?.total !== undefined && onReviewCountChange) {
+      onReviewCountChange(meta.total);
+    }
+  }, [meta?.total, onReviewCountChange]);
 
   // 좋아요 로딩 상태 추적
   const [likingReviewId, setLikingReviewId] = useState<number | null>(null);
@@ -514,7 +522,6 @@ function ReviewsList() {
         {reviews.map((review: Review, index: number) => {
           // 리뷰 별점 확인
           const rating = getReviewRating(review);
-          const commentCount = review.commentsCount || 0;
 
           return (
             <div
@@ -679,18 +686,25 @@ function ReviewsList() {
                       onClick={() => toggleComments(review.id)}
                     >
                       <MessageSquare className="h-4 w-4" />
-                      <span className="font-medium">{commentCount}</span>
+                      <span className="font-medium">
+                        {review.commentsCount || 0}
+                      </span>
                     </Button>
                   </div>
 
-                  {/* 댓글 영역 */}
+                  {/* 댓글 영역 - 댓글이 있는 경우 */}
                   {expandedComments[review.id] && (
-                    <div className="mt-4">
-                      <ReviewComments
-                        reviewId={review.id}
-                        commentCount={commentCount}
-                      />
-                    </div>
+                    <ErrorBoundary FallbackComponent={ErrorFallback}>
+                      <Suspense
+                        fallback={
+                          <div className="mt-4 h-20 animate-pulse rounded-lg bg-gray-100"></div>
+                        }
+                      >
+                        <div className="mt-4">
+                          <ReviewComments reviewId={review.id} />
+                        </div>
+                      </Suspense>
+                    </ErrorBoundary>
                   )}
                 </div>
               </div>
@@ -737,11 +751,15 @@ function ReviewsList() {
   );
 }
 
-export function BookReviews() {
+export function BookReviews({
+  onReviewCountChange,
+}: {
+  onReviewCountChange?: (count: number) => void;
+}) {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <Suspense fallback={<ReviewsLoading />}>
-        <ReviewsList />
+        <ReviewsList onReviewCountChange={onReviewCountChange} />
       </Suspense>
     </ErrorBoundary>
   );
