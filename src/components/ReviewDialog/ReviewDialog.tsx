@@ -61,6 +61,11 @@ export function ReviewDialog({
     onSubmit(rating, content);
   };
 
+  // 별점 취소 핸들러
+  const handleResetRating = () => {
+    setRating(0);
+  };
+
   return (
     <Dialog open={open} onOpenChange={isSubmitting ? undefined : onOpenChange}>
       <DialogContent className="fixed top-1/2 left-1/2 max-w-md -translate-x-1/2 -translate-y-1/2 transform rounded-2xl border-none p-0 shadow-lg">
@@ -98,6 +103,18 @@ export function ReviewDialog({
                   onClick={() => !isSubmitting && setRating(star)}
                 />
               ))}
+              {rating > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="ml-1 h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  onClick={handleResetRating}
+                  disabled={isSubmitting}
+                  title="별점 취소"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
             </div>
             <p className="text-sm font-medium text-gray-900">
               {rating === 0

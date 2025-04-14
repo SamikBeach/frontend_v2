@@ -1,7 +1,7 @@
 import { ReviewDialog } from '@/components/ReviewDialog/ReviewDialog';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { PenLine, Star } from 'lucide-react';
+import { PenLine, Star, X } from 'lucide-react';
 import { Suspense, useCallback } from 'react';
 import { useBookDetails, useBookRating, useReviewDialog } from '../hooks';
 
@@ -14,6 +14,7 @@ function RatingStars() {
     handleRatingClick,
     handleRatingHover,
     handleRatingLeave,
+    removeRating,
   } = useBookRating();
 
   // 별 클릭 핸들러
@@ -31,6 +32,13 @@ function RatingStars() {
     },
     [handleRatingHover]
   );
+
+  // 별점 취소 핸들러
+  const handleRemoveRating = useCallback(() => {
+    if (removeRating) {
+      removeRating();
+    }
+  }, [removeRating]);
 
   return (
     <div
@@ -50,6 +58,17 @@ function RatingStars() {
           onMouseEnter={() => handleStarHover(star)}
         />
       ))}
+      {userRating > 0 && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="ml-1 h-7 w-7 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          onClick={handleRemoveRating}
+          title="별점 취소"
+        >
+          <X className="h-3.5 w-3.5" />
+        </Button>
+      )}
     </div>
   );
 }
