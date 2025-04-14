@@ -139,13 +139,26 @@ export function BookActionButtons() {
                 key={status}
                 className={cn(
                   'flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2',
-                  readingStatus === status && 'bg-gray-100'
+                  readingStatus === status ? 'bg-gray-100' : '',
+                  status === ReadingStatusType.WANT_TO_READ &&
+                    'hover:bg-purple-50',
+                  status === ReadingStatusType.READING && 'hover:bg-blue-50',
+                  status === ReadingStatusType.READ && 'hover:bg-green-50'
                 )}
                 onClick={() => onReadingStatusChange(status)}
                 disabled={isPending}
               >
                 <span className="text-base">{statusIcons[status]}</span>
-                <span>{statusTexts[status]}</span>
+                <span
+                  className={cn(
+                    status === ReadingStatusType.WANT_TO_READ &&
+                      'text-purple-600',
+                    status === ReadingStatusType.READING && 'text-blue-600',
+                    status === ReadingStatusType.READ && 'text-green-600'
+                  )}
+                >
+                  {statusTexts[status]}
+                </span>
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -155,7 +168,7 @@ export function BookActionButtons() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="w-full rounded-full border-gray-300 bg-gray-50 text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+              className="w-full rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
               disabled={isBookshelfPending || !isLoggedIn}
             >
               <ListPlus className="mr-1.5 h-4 w-4" />
@@ -189,7 +202,7 @@ export function BookActionButtons() {
               </div>
             )}
             <DropdownMenuItem
-              className="cursor-pointer rounded-lg py-2 text-blue-600 hover:text-blue-700"
+              className="cursor-pointer rounded-lg py-2 text-black hover:bg-gray-100"
               onClick={() => setIsNewLibraryDialogOpen(true)}
             >
               <Plus className="mr-1.5 h-4 w-4" />새 서재 만들기

@@ -368,7 +368,14 @@ function ReviewsLoading() {
 function ReviewsList() {
   const currentUser = useCurrentUser();
   const { handleOpenReviewDialog } = useReviewDialog();
-  const { reviews, handleLike, isLikeLoading } = useBookReviews();
+  const {
+    reviews,
+    handleLike,
+    isLikeLoading,
+    hasNextPage,
+    isFetchingNextPage,
+    handleLoadMore,
+  } = useBookReviews();
   const queryClient = useQueryClient();
 
   // 좋아요 로딩 상태 추적
@@ -632,6 +639,27 @@ function ReviewsList() {
           </div>
         ))}
       </div>
+
+      {/* 리뷰 더보기 버튼 */}
+      {hasNextPage && (
+        <div className="mt-6 flex justify-center">
+          <Button
+            variant="outline"
+            className="rounded-full text-sm font-medium"
+            onClick={handleLoadMore}
+            disabled={isFetchingNextPage}
+          >
+            {isFetchingNextPage ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-800"></span>
+                로딩 중...
+              </span>
+            ) : (
+              '리뷰 더 보기'
+            )}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

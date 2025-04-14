@@ -49,6 +49,7 @@ export interface BookDetails extends Book {
     averageReadingTime: string;
     difficulty: 'easy' | 'medium' | 'hard';
     userReadingStatus?: ReadingStatusType;
+    readingStatusCounts?: Record<ReadingStatusType, number>;
   };
   similarBooks?: Array<{
     id: number;

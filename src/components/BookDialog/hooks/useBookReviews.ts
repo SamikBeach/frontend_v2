@@ -1,46 +1,62 @@
-import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 
 import { getBookReviews, likeReview, unlikeReview } from '@/apis/review';
-import { Review } from '@/apis/review/types';
+import { Review, ReviewsResponse } from '@/apis/review/types';
 import { useBookDetails } from './useBookDetails';
 
 export function useBookReviews() {
   const { book } = useBookDetails();
   const bookId = book?.id || 0;
-  const [page, setPage] = useState(1);
   const [isLikeLoading, setIsLikeLoading] = useState(false);
   const queryClient = useQueryClient();
+  const limit = 5; // 한 페이지에 보여줄 리뷰 수
 
-  // 리뷰 데이터 가져오기
-  const { data, refetch } = useSuspenseQuery({
-    queryKey: ['book-reviews', bookId, page],
-    queryFn: async () => {
-      if (!bookId)
+  // 리뷰 데이터 가져오기 (무한 스크롤/페이지네이션)
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    refetch,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ['book-reviews', bookId],
+    queryFn: async ({ pageParam }) => {
+      if (!bookId) {
         return {
           data: [],
-          meta: { total: 0, page: 1, limit: 5, totalPages: 0 },
-        };
+          meta: { total: 0, page: 1, limit, totalPages: 0 },
+        } as ReviewsResponse;
+      }
 
-      const reviewsData = await getBookReviews(bookId, page, 5);
-      console.log('리뷰 API 응답:', reviewsData);
+      const page = pageParam as number;
+      const reviewsData = await getBookReviews(bookId, page, limit);
+      console.log(`리뷰 API 응답 (페이지 ${page}):`, reviewsData);
       return reviewsData;
     },
+    getNextPageParam: (lastPage: ReviewsResponse) => {
+      const { meta } = lastPage;
+      // 다음 페이지가 있는지 확인, 없으면 undefined 반환 (hasNextPage가 false가 됨)
+      return meta.page < meta.totalPages ? meta.page + 1 : undefined;
+    },
+    initialPageParam: 1,
   });
 
-  // API 응답에 따라 reviews 데이터 추출
-  const reviews = Array.isArray(data)
-    ? data
-    : Array.isArray(data?.data)
-      ? data.data
-      : [];
+  // 모든 페이지의 리뷰를 하나의 배열로 병합
+  const reviews =
+    data?.pages.flatMap(page => (Array.isArray(page.data) ? page.data : [])) ||
+    [];
 
-  const meta = data?.meta || null;
+  // 메타데이터는 마지막 페이지의 것을 사용
+  const meta = data?.pages[data.pages.length - 1]?.meta || null;
 
-  // 페이지 변경 핸들러
-  const handlePageChange = useCallback((newPage: number) => {
-    setPage(newPage);
-  }, []);
+  // 더보기 버튼 핸들러
+  const handleLoadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   // 좋아요 핸들러
   const handleLike = useCallback(
@@ -48,30 +64,19 @@ export function useBookReviews() {
       try {
         setIsLikeLoading(true);
 
-        // 낙관적 업데이트
-        queryClient.setQueryData(
-          ['book-reviews', bookId, page],
-          (oldData: any) => {
-            // 배열 형태인 경우
-            if (Array.isArray(oldData)) {
-              return oldData.map((review: Review) =>
-                review.id === reviewId
-                  ? {
-                      ...review,
-                      userLiked: !isLiked,
-                      likesCount: isLiked
-                        ? Math.max(0, (review.likesCount || 0) - 1)
-                        : (review.likesCount || 0) + 1,
-                    }
-                  : review
-              );
-            }
+        // 낙관적 업데이트 - 무한 쿼리 구조에 맞게 수정
+        queryClient.setQueryData(['book-reviews', bookId], (oldData: any) => {
+          if (!oldData || !oldData.pages) return oldData;
 
-            // { data: [...], meta: {...} } 형태인 경우
-            if (oldData?.data && Array.isArray(oldData.data)) {
+          // 페이지들을 순회하면서 해당 리뷰 업데이트
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => {
+              if (!page || !page.data) return page;
+
               return {
-                ...oldData,
-                data: oldData.data.map((review: Review) =>
+                ...page,
+                data: page.data.map((review: Review) =>
                   review.id === reviewId
                     ? {
                         ...review,
@@ -83,11 +88,9 @@ export function useBookReviews() {
                     : review
                 ),
               };
-            }
-
-            return oldData;
-          }
-        );
+            }),
+          };
+        });
 
         // 실제 API 호출
         if (isLiked) {
@@ -95,25 +98,24 @@ export function useBookReviews() {
         } else {
           await likeReview(reviewId);
         }
-
-        // 성공 후 데이터 재조회 (불필요한 경우 주석 처리 가능)
-        // await refetch();
       } catch (error) {
         console.error('좋아요 처리 중 오류가 발생했습니다:', error);
-        // 오류 발생시 데이터 원상복구
+        // 오류 발생시 데이터 재조회
         await refetch();
       } finally {
         setIsLikeLoading(false);
       }
     },
-    [bookId, page, queryClient, refetch]
+    [bookId, queryClient, refetch]
   );
 
   return {
     reviews,
     meta,
-    currentPage: page,
-    handlePageChange,
+    status,
+    hasNextPage,
+    isFetchingNextPage,
+    handleLoadMore,
     handleLike,
     isLikeLoading,
   };

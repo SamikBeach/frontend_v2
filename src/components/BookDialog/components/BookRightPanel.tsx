@@ -3,7 +3,24 @@ import { ErrorBoundary } from 'react-error-boundary';
 import { BookLibraries } from '../BookLibraries';
 import { BookQuotes } from '../BookQuotes';
 import { BookReviews } from '../BookReviews';
-import { useBookDetails } from '../hooks';
+import { useBookDetails, useBookReviews } from '../hooks';
+
+// 리뷰 제목 컴포넌트
+function ReviewTitle() {
+  const { meta } = useBookReviews();
+  const reviewCount = meta?.total || 0;
+
+  return (
+    <p className="text-sm font-medium text-gray-900">
+      리뷰 <span className="text-gray-700">({reviewCount})</span>
+    </p>
+  );
+}
+
+// 리뷰 제목 로딩 컴포넌트
+function ReviewTitleLoading() {
+  return <div className="h-5 w-28 animate-pulse rounded bg-gray-200"></div>;
+}
 
 // 라이브러리 로딩 컴포넌트
 function LibrariesLoading() {
@@ -52,9 +69,11 @@ export function BookRightPanel() {
       {/* 리뷰 섹션 */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <p className="text-sm font-medium text-gray-900">
-            리뷰 ({book.reviews?.length || 0})
-          </p>
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <Suspense fallback={<ReviewTitleLoading />}>
+              <ReviewTitle />
+            </Suspense>
+          </ErrorBoundary>
         </div>
 
         <BookReviews />

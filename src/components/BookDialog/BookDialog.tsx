@@ -11,6 +11,7 @@ import {
   BookCoverSection,
   BookHeader,
   BookRatingSection,
+  BookReadingStats,
   BookRightPanel,
   BookSkeleton,
 } from './components';
@@ -51,7 +52,18 @@ function BookDialogContent() {
 
             {/* 별점 정보 */}
             <ErrorBoundary FallbackComponent={ErrorFallback}>
-              <BookRatingSection />
+              <Suspense
+                fallback={
+                  <div className="h-24 animate-pulse rounded-xl bg-gray-50 p-4"></div>
+                }
+              >
+                <BookRatingSection />
+              </Suspense>
+            </ErrorBoundary>
+
+            {/* 읽기 통계 */}
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <BookReadingStats />
             </ErrorBoundary>
 
             {/* 기능 버튼들 */}
@@ -80,7 +92,7 @@ function BookDialogContent() {
 }
 
 export function BookDialog() {
-  const { isOpen, close, isbn } = useDialogQuery({ type: 'book' });
+  const { isOpen, close } = useDialogQuery({ type: 'book' });
 
   if (!isOpen) return null;
 

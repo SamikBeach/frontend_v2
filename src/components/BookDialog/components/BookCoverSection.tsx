@@ -1,10 +1,20 @@
 import { Badge } from '@/components/ui/badge';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { useCallback } from 'react';
 import { useBookDetails } from '../hooks';
 
 export function BookCoverSection() {
-  const { book, handleOpenAladin } = useBookDetails();
+  const { book, isbn } = useBookDetails();
+
+  // 알라딘으로 이동하는 함수
+  const handleOpenAladin = useCallback(() => {
+    if (!isbn) return;
+    window.open(
+      `https://www.aladin.co.kr/shop/wproduct.aspx?isbn=${isbn}`,
+      '_blank'
+    );
+  }, [isbn]);
 
   if (!book) return null;
 

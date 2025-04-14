@@ -79,12 +79,11 @@ export function BookRatingSection() {
       : book.rating.toFixed(1)
     : '0.0';
 
-  // 리뷰 카운트 출력 수정
-  const reviewCount = book.reviews
-    ? typeof book.reviews === 'number'
-      ? book.reviews
-      : book.reviews.length || 0
-    : 0;
+  // book 객체의 원시 데이터에 접근 (Book 타입)
+  const rawBook = book as any;
+
+  // 별점 참여 인원 수 - totalRatings 사용
+  const ratingsCount = rawBook.totalRatings || 0;
 
   return (
     <div className="rounded-xl bg-gray-50 p-4">
@@ -92,7 +91,7 @@ export function BookRatingSection() {
         <div className="flex items-center gap-2">
           <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
           <span className="text-2xl font-semibold">{displayRating}</span>
-          <span className="text-sm text-gray-500">({reviewCount}명)</span>
+          <span className="text-sm text-gray-500">({ratingsCount}명)</span>
         </div>
       </div>
 
