@@ -48,7 +48,7 @@ export const formatDate = (dateStr: string) => {
   try {
     const date = new Date(dateStr);
     return format(date, 'PPP', { locale: ko });
-  } catch (error) {
+  } catch {
     return dateStr;
   }
 };
@@ -91,17 +91,24 @@ const getReviewRating = (review: Review): number => {
 };
 
 // 리뷰 댓글 컴포넌트
-function ReviewComments({ reviewId }: { reviewId: number }) {
+function ReviewComments({
+  reviewId,
+  commentCount = 0,
+}: {
+  reviewId: number;
+  commentCount: number;
+}) {
   const currentUser = useCurrentUser();
   const {
     comments,
     commentText,
+    isLoading,
     isSubmitting,
     isDeleting,
     handleCommentTextChange,
     handleSubmitComment,
     handleDeleteComment,
-  } = useReviewComments(reviewId);
+  } = useReviewComments(reviewId, commentCount);
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editCommentText, setEditCommentText] = useState('');
   const queryClient = useQueryClient();
@@ -200,7 +207,12 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
 
       {/* 댓글 목록 */}
       <div className="mt-2 space-y-2 pl-3">
-        {comments && comments.length > 0 ? (
+        {isLoading ? (
+          <div className="animate-pulse space-y-2">
+            <div className="h-10 rounded-md bg-gray-100"></div>
+            <div className="h-10 rounded-md bg-gray-100"></div>
+          </div>
+        ) : comments && comments.length > 0 ? (
           comments.map(comment => (
             <div key={comment.id} className="flex gap-2 pb-1">
               <Avatar className="mt-1 h-7 w-7 flex-shrink-0 border-0">
@@ -332,7 +344,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
           ))
         ) : (
           <p className="py-3 text-center text-sm text-gray-500">
-            아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
+            아직 댓글이 없습니다. 첫번째 댓글을 남겨보세요.
           </p>
         )}
       </div>
@@ -502,6 +514,7 @@ function ReviewsList() {
         {reviews.map((review: Review, index: number) => {
           // 리뷰 별점 확인
           const rating = getReviewRating(review);
+          const commentCount = review.commentsCount || 0;
 
           return (
             <div
@@ -666,25 +679,18 @@ function ReviewsList() {
                       onClick={() => toggleComments(review.id)}
                     >
                       <MessageSquare className="h-4 w-4" />
-                      <span className="font-medium">
-                        {review.commentsCount || 0}
-                      </span>
+                      <span className="font-medium">{commentCount}</span>
                     </Button>
                   </div>
 
-                  {/* 댓글 영역 - 댓글이 있는 경우 */}
+                  {/* 댓글 영역 */}
                   {expandedComments[review.id] && (
-                    <ErrorBoundary FallbackComponent={ErrorFallback}>
-                      <Suspense
-                        fallback={
-                          <div className="mt-4 h-20 animate-pulse rounded-lg bg-gray-100"></div>
-                        }
-                      >
-                        <div className="mt-4">
-                          <ReviewComments reviewId={review.id} />
-                        </div>
-                      </Suspense>
-                    </ErrorBoundary>
+                    <div className="mt-4">
+                      <ReviewComments
+                        reviewId={review.id}
+                        commentCount={commentCount}
+                      />
+                    </div>
                   )}
                 </div>
               </div>
