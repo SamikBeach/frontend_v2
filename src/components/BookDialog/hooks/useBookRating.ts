@@ -1,6 +1,5 @@
 import {
   RatingDto,
-  RatingResponseDto,
   UpdateRatingDto,
   createOrUpdateRating,
   deleteRating,
@@ -14,20 +13,15 @@ import { useBookDetails } from './useBookDetails';
 // 별점 호버 및 표시를 위한 UI 관련 상태와 핸들러를 관리하는 훅
 export function useBookRating() {
   const queryClient = useQueryClient();
-  const { book, userRating: initialUserRating } = useBookDetails();
+  const { book, isbn, userRating: userRatingData } = useBookDetails();
 
-  // 별점 상태 관리 - book.userRating에서 초기화
-  const [userRatingData, setUserRatingData] =
-    useState<RatingResponseDto | null>(book?.userRating || null);
-  const [userRating, setUserRating] = useState<number>(
-    book?.userRating?.rating || 0
-  );
+  // UI 관련 상태만 로컬로 유지 (호버 효과 등)
   const [isRatingHovered, setIsRatingHovered] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [rating, setRating] = useState<number>(book?.userRating?.rating || 0);
-  const [comment, setComment] = useState<string>(
-    book?.userRating?.comment || ''
-  );
+
+  // 서버에서 가져온 userRating 사용
+  const userRating = userRatingData?.rating || 0;
+  const comment = userRatingData?.comment || '';
 
   // 별점 추가 뮤테이션
   const { mutate: addRating, isPending: isUpdating } = useMutation({
@@ -40,13 +34,19 @@ export function useBookRating() {
     }) => {
       return createOrUpdateRating(bookId, ratingData);
     },
-    onSuccess: data => {
-      // 로컬 상태 업데이트
-      setUserRatingData(data);
-      setUserRating(data.rating);
+    onSuccess: () => {
+      // 관련된 쿼리 무효화
+      if (book?.id) {
+        queryClient.invalidateQueries({
+          queryKey: ['user-book-rating', book.id],
+        });
+      }
 
-      // 캐시 업데이트
-      queryClient.invalidateQueries({ queryKey: ['book-detail'] });
+      // 책 상세 정보 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['book-detail', isbn],
+      });
+
       toast.success('평점이 등록되었습니다.');
     },
     onError: () => {
@@ -65,12 +65,19 @@ export function useBookRating() {
     }) => {
       return updateRatingApi(ratingId, ratingData);
     },
-    onSuccess: data => {
-      // 로컬 상태 업데이트
-      setUserRatingData(data);
-      setUserRating(data.rating);
+    onSuccess: () => {
+      // 관련된 쿼리 무효화
+      if (book?.id) {
+        queryClient.invalidateQueries({
+          queryKey: ['user-book-rating', book.id],
+        });
+      }
 
-      queryClient.invalidateQueries({ queryKey: ['book-detail'] });
+      // 책 상세 정보 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['book-detail', isbn],
+      });
+
       toast.success('평점이 수정되었습니다.');
     },
     onError: () => {
@@ -84,14 +91,17 @@ export function useBookRating() {
       return deleteRating(ratingId);
     },
     onSuccess: () => {
-      // 캐시 업데이트
-      queryClient.invalidateQueries({ queryKey: ['book-detail'] });
+      // 관련된 쿼리 무효화
+      if (book?.id) {
+        queryClient.invalidateQueries({
+          queryKey: ['user-book-rating', book.id],
+        });
+      }
 
-      // 상태 초기화
-      setUserRatingData(null);
-      setRating(0);
-      setUserRating(0);
-      setComment('');
+      // 책 상세 정보 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['book-detail', isbn],
+      });
 
       toast.success('평점이 삭제되었습니다.');
     },
@@ -102,24 +112,21 @@ export function useBookRating() {
 
   // 별점 추가 핸들러
   const handleRatingClick = useCallback(
-    (rating: number) => {
-      setUserRating(rating);
-      setRating(rating);
-
+    (starRating: number) => {
       if (!book?.id) return;
 
       // API 호출로 별점 저장
       addRating({
         bookId: book.id,
-        ratingData: { rating },
+        ratingData: { rating: starRating },
       });
     },
     [addRating, book]
   );
 
   // 별점 호버 핸들러
-  const handleRatingHover = useCallback((rating: number) => {
-    setHoveredRating(rating);
+  const handleRatingHover = useCallback((starRating: number) => {
+    setHoveredRating(starRating);
     setIsRatingHovered(true);
   }, []);
 
@@ -129,35 +136,34 @@ export function useBookRating() {
   }, []);
 
   // 평점 제출 핸들러 (리뷰 다이얼로그에서 사용)
-  const handleSubmitRating = useCallback(() => {
-    if (!book?.id) return;
+  const handleSubmitRating = useCallback(
+    (newRating: number, newComment: string = '') => {
+      if (!book?.id) return;
 
-    if (rating === 0) {
-      toast.error('별점을 선택해주세요.');
-      return;
-    }
+      if (newRating === 0) {
+        toast.error('별점을 선택해주세요.');
+        return;
+      }
 
-    const ratingData: RatingDto = {
-      rating,
-      comment,
-    };
+      const ratingData: RatingDto = {
+        rating: newRating,
+        comment: newComment,
+      };
 
-    addRating({
-      bookId: book.id,
-      ratingData,
-    });
-  }, [book, rating, comment, addRating]);
+      addRating({
+        bookId: book.id,
+        ratingData,
+      });
+    },
+    [book, addRating]
+  );
 
   return {
     userRating,
     userRatingData,
-    setUserRating,
     isRatingHovered,
     hoveredRating,
-    rating,
-    setRating,
     comment,
-    setComment,
     isUpdating,
     isDeleting,
     handleRatingClick,

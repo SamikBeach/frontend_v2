@@ -1,3 +1,4 @@
+import { ReviewDialog } from '@/components/ReviewDialog/ReviewDialog';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { PenLine, Star } from 'lucide-react';
@@ -68,7 +69,14 @@ function RatingStarsFallback() {
 export function BookRatingSection() {
   const { book } = useBookDetails();
   const { userRating } = useBookRating();
-  const { handleOpenReviewDialog } = useReviewDialog();
+  const {
+    handleOpenReviewDialog,
+    reviewDialogOpen,
+    setReviewDialogOpen,
+    userRating: dialogUserRating,
+    handleReviewSubmit,
+    isSubmitting,
+  } = useReviewDialog();
 
   if (!book) return null;
 
@@ -86,32 +94,42 @@ export function BookRatingSection() {
   const ratingsCount = rawBook.totalRatings || 0;
 
   return (
-    <div className="rounded-xl bg-gray-50 p-4">
-      <div className="flex items-center">
-        <div className="flex items-center gap-2">
-          <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-          <span className="text-2xl font-semibold">{displayRating}</span>
-          <span className="text-sm text-gray-500">({ratingsCount}명)</span>
+    <>
+      <div className="rounded-xl bg-gray-50 p-4">
+        <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+            <span className="text-2xl font-semibold">{displayRating}</span>
+            <span className="text-sm text-gray-500">({ratingsCount}명)</span>
+          </div>
+        </div>
+
+        {/* 사용자 별점 선택 UI */}
+        <div className="mt-3 border-t border-gray-200 pt-3">
+          <div className="flex items-center justify-between">
+            <Suspense fallback={<RatingStarsFallback />}>
+              <RatingStars />
+            </Suspense>
+
+            {/* 리뷰 작성하기 버튼 - 별점 옆으로 이동 */}
+            <Button
+              className="h-8 rounded-full bg-gray-100 px-3 text-xs text-gray-700 hover:bg-gray-200"
+              onClick={() => handleOpenReviewDialog()}
+            >
+              <PenLine className="mr-1 h-3 w-3" />
+              리뷰 쓰기
+            </Button>
+          </div>
         </div>
       </div>
-
-      {/* 사용자 별점 선택 UI */}
-      <div className="mt-3 border-t border-gray-200 pt-3">
-        <div className="flex items-center justify-between">
-          <Suspense fallback={<RatingStarsFallback />}>
-            <RatingStars />
-          </Suspense>
-
-          {/* 리뷰 작성하기 버튼 - 별점 옆으로 이동 */}
-          <Button
-            className="h-8 rounded-full bg-gray-100 px-3 text-xs text-gray-700 hover:bg-gray-200"
-            onClick={() => handleOpenReviewDialog(userRating)}
-          >
-            <PenLine className="mr-1 h-3 w-3" />
-            리뷰 쓰기
-          </Button>
-        </div>
-      </div>
-    </div>
+      <ReviewDialog
+        open={reviewDialogOpen}
+        onOpenChange={setReviewDialogOpen}
+        bookTitle={book?.title || ''}
+        initialRating={userRating}
+        onSubmit={handleReviewSubmit}
+        isSubmitting={isSubmitting}
+      />
+    </>
   );
 }

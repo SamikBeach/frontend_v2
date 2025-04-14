@@ -48,17 +48,20 @@ export const getReviewById = async (id: number): Promise<ReviewResponseDto> => {
 export const createReview = async (
   data: CreateReviewDto
 ): Promise<ReviewResponseDto> => {
-  const formData = new FormData();
-  formData.append('content', data.content);
-  formData.append('type', data.type);
+  const payload: {
+    content: string;
+    type: ReviewType;
+    bookId?: number;
+  } = {
+    content: data.content,
+    type: data.type,
+  };
 
-  if (data.bookIds && data.bookIds.length > 0) {
-    data.bookIds.forEach(bookId => {
-      formData.append('bookIds', bookId.toString());
-    });
+  if (data.bookId) {
+    payload.bookId = parseInt(String(data.bookId), 10);
   }
 
-  const response = await api.post<ReviewResponseDto>('/review', formData);
+  const response = await api.post<ReviewResponseDto>('/review', payload);
   return response.data;
 };
 
@@ -73,10 +76,9 @@ export const createReviewWithImages = async (
   formData.append('content', data.content);
   formData.append('type', data.type);
 
-  if (data.bookIds && data.bookIds.length > 0) {
-    data.bookIds.forEach(bookId => {
-      formData.append('bookIds', bookId.toString());
-    });
+  if (data.bookId) {
+    const bookIdNumber = parseInt(String(data.bookId), 10);
+    formData.append('bookId', bookIdNumber.toString());
   }
 
   images.forEach(image => {

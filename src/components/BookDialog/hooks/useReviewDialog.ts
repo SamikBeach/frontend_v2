@@ -1,17 +1,17 @@
 import { createOrUpdateRating } from '@/apis/rating/rating';
+import { createReview } from '@/apis/review/review';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
 
-export function useReviewDialog(initialReviewRating: number = 0) {
-  const { book, isbn } = useBookDetails();
+export function useReviewDialog() {
+  const { book, isbn, userRating: userRatingData } = useBookDetails();
   const queryClient = useQueryClient();
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  const [reviewRating, setReviewRating] = useState(initialReviewRating);
 
   // 리뷰 제출 뮤테이션
-  const { mutate: submitReview } = useMutation({
+  const mutation = useMutation({
     mutationFn: async ({
       rating,
       content,
@@ -19,56 +19,96 @@ export function useReviewDialog(initialReviewRating: number = 0) {
       rating: number;
       content: string;
     }) => {
-      if (!book?.id) return null;
-      return await createOrUpdateRating(book.id, {
-        rating,
-        comment: content,
-      });
+      if (!book?.id) {
+        throw new Error('책 정보를 찾을 수 없습니다.');
+      }
+
+      // 항상 평점 등록 (comment 없이)
+      const ratingResult = await createOrUpdateRating(book.id, { rating });
+
+      // content가 있는 경우 리뷰 생성
+      if (content.trim()) {
+        await createReview({
+          content: content.trim(),
+          type: 'review',
+          bookId: parseInt(String(book.id), 10),
+        });
+      }
+
+      return ratingResult;
     },
     onSuccess: data => {
-      // 캐시 업데이트
+      // 관련된 모든 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: ['user-book-rating', book?.id],
       });
 
-      // 책 상세 정보도 업데이트 (평점 평균이 바뀔 수 있으므로)
+      // book-detail 쿼리 무효화 (별점 정보가 포함된 책 정보 갱신)
       queryClient.invalidateQueries({
         queryKey: ['book-detail', isbn],
       });
 
-      setReviewDialogOpen(false);
-      toast.success('리뷰가 저장되었습니다.');
+      // 리뷰 목록 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['book-reviews', book?.id],
+      });
 
+      // 직접 book-detail 캐시 업데이트 (별점 즉시 반영)
+      if (book && isbn) {
+        queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            userRating: data,
+          };
+        });
+      }
+
+      // 다이얼로그 닫기
+      setReviewDialogOpen(false);
+
+      toast.success('리뷰가 성공적으로 저장되었습니다.');
       return data?.rating;
     },
-    onError: () => {
-      toast.error('리뷰 저장 중 오류가 발생했습니다.');
+    onError: error => {
+      console.error('리뷰 저장 오류:', error);
+      toast.error('리뷰 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
     },
   });
 
+  // 현재 사용자의 별점 가져오기
+  const userRating = userRatingData?.rating || 0;
+
   // 리뷰 다이얼로그 열기 핸들러
-  const handleOpenReviewDialog = useCallback((currentRating: number = 0) => {
-    // 현재 별점이 있으면 리뷰 별점으로 설정
-    if (currentRating > 0) {
-      setReviewRating(currentRating);
-    }
+  const handleOpenReviewDialog = useCallback(() => {
     setReviewDialogOpen(true);
   }, []);
 
   // 리뷰 제출 처리
   const handleReviewSubmit = useCallback(
     (rating: number, content: string) => {
-      submitReview({ rating, content });
+      if (rating === 0) {
+        toast.error('별점을 선택해주세요.');
+        return;
+      }
+
+      mutation.mutate({ rating, content });
     },
-    [submitReview]
+    [mutation]
   );
 
   return {
     reviewDialogOpen,
     setReviewDialogOpen,
-    reviewRating,
-    setReviewRating,
+    userRating,
     handleOpenReviewDialog,
     handleReviewSubmit,
+    isSubmitting: mutation.isPending,
+    error: mutation.error,
+    isSuccess: mutation.isSuccess,
+    isError: mutation.isError,
+    status: mutation.status,
+    data: mutation.data,
   };
 }

@@ -51,13 +51,13 @@ export interface Comment {
 export interface CreateReviewDto {
   content: string;
   type: ReviewType;
-  bookIds?: number[];
+  bookId?: number;
 }
 
 export interface UpdateReviewDto {
   content?: string;
   type?: ReviewType;
-  bookIds?: number[];
+  bookId?: number;
 }
 
 export interface CreateCommentDto {
