@@ -156,10 +156,10 @@ function LibrariesList() {
   }
 
   return (
-    <div className="space-y-3 p-1">
+    <div className="space-y-5 p-1">
       {libraries.map(library => (
         <Link key={library.id} href={`/library/${library.id}`}>
-          <div className="group h-full rounded-xl bg-[#F9FAFB] p-4 transition-all duration-200 hover:bg-[#F2F4F6]">
+          <div className="group mb-2 h-full rounded-xl bg-[#F9FAFB] p-4 transition-all duration-200 hover:bg-[#F2F4F6]">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50 text-indigo-500">
                 <BookOpen className="h-4 w-4" />
@@ -233,11 +233,11 @@ function LibrariesList() {
 // 로딩 컴포넌트
 function LibrariesLoading() {
   return (
-    <div className="space-y-3">
+    <div className="space-y-5">
       {[1, 2, 3].map(i => (
         <div
           key={i}
-          className="group h-full animate-pulse rounded-xl bg-[#F9FAFB] p-4"
+          className="group mb-2 h-full animate-pulse rounded-xl bg-[#F9FAFB] p-4"
         >
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-full bg-gray-200"></div>
@@ -267,9 +267,9 @@ function LibrariesLoading() {
 // LibrariesSkeleton 컴포넌트
 export function LibrariesSkeleton() {
   return (
-    <div className="space-y-3 p-1">
+    <div className="space-y-5 p-1">
       {[1, 2, 3].map(i => (
-        <div key={i} className="group h-full rounded-xl bg-[#F9FAFB] p-4">
+        <div key={i} className="group mb-2 h-full rounded-xl bg-[#F9FAFB] p-4">
           <div className="flex items-center gap-3">
             <Skeleton className="h-9 w-9 rounded-full" />
             <div className="flex-1 space-y-1.5">

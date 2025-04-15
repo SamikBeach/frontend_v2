@@ -150,10 +150,10 @@ export function LibrariesList() {
   }
 
   return (
-    <div className="space-y-3 p-1">
+    <div className="space-y-5 p-1">
       {libraries.map(library => (
         <Link key={library.id} href={`/library/${library.id}`}>
-          <div className="group h-full rounded-xl bg-[#F9FAFB] p-4 transition-all duration-200 hover:bg-[#F2F4F6]">
+          <div className="group mb-2 h-full rounded-xl bg-[#F9FAFB] p-4 transition-all duration-200 hover:bg-[#F2F4F6]">
             <div className="flex items-center gap-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-50 text-indigo-500">
                 <BookOpen className="h-4 w-4" />
