@@ -3,6 +3,7 @@ import {
   ReadingStatusResponseDto,
   ReadingStatusType,
   createOrUpdateReadingStatus,
+  deleteReadingStatusByBookId,
 } from '@/apis/reading-status';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { josa } from 'josa';
@@ -34,74 +35,104 @@ export function useReadingStatus() {
   );
 
   // 읽기 상태 변경 뮤테이션
-  const { mutate: updateReadingStatus, isPending } = useMutation({
-    mutationFn: async ({
-      bookId,
-      status,
-    }: {
-      bookId: number;
-      status: ReadingStatusType;
-    }) => {
-      if (!book || !book.id) {
-        throw new Error('책 정보가 없습니다.');
-      }
-
-      const readingStatusData: ReadingStatusDto = {
+  const { mutate: updateReadingStatusMutation, isPending: isUpdatePending } =
+    useMutation({
+      mutationFn: async ({
+        bookId,
         status,
-      };
-      return createOrUpdateReadingStatus(bookId, readingStatusData);
-    },
-    onSuccess: (data: ReadingStatusResponseDto) => {
-      // 캐시 업데이트
-      queryClient.invalidateQueries({ queryKey: ['book-detail'] });
-
-      // 상태 업데이트
-      if (data.status) {
-        const status = data.status as keyof typeof ReadingStatusType;
-        const statusEnum =
-          ReadingStatusType[status as keyof typeof ReadingStatusType];
-
-        if (statusEnum) {
-          setReadingStatus(statusEnum);
-
-          // josa 라이브러리를 사용하여 적절한 조사 적용
-          const statusText = statusTexts[statusEnum];
-          const message = josa(
-            `읽기 상태가 '${statusText}'#{로} 변경되었습니다.`
-          );
-          toast.success(message);
-        } else {
-          // 알 수 없는 상태인 경우
-          console.error('Unknown reading status:', data.status);
-          toast.success('읽기 상태가 변경되었습니다.');
+      }: {
+        bookId: number;
+        status: ReadingStatusType;
+      }) => {
+        if (!book || !book.id) {
+          throw new Error('책 정보가 없습니다.');
         }
-      }
-    },
-    onError: error => {
-      console.error('Reading status update error:', error);
-      toast.error('읽기 상태 변경에 실패했습니다.');
-    },
-  });
+
+        const readingStatusData: ReadingStatusDto = {
+          status,
+        };
+        return createOrUpdateReadingStatus(bookId, readingStatusData);
+      },
+      onSuccess: (data: ReadingStatusResponseDto) => {
+        // 캐시 업데이트
+        queryClient.invalidateQueries({ queryKey: ['book-detail'] });
+
+        // 상태 업데이트
+        if (data.status) {
+          const status = data.status as keyof typeof ReadingStatusType;
+          const statusEnum =
+            ReadingStatusType[status as keyof typeof ReadingStatusType];
+
+          if (statusEnum) {
+            setReadingStatus(statusEnum);
+
+            // josa 라이브러리를 사용하여 적절한 조사 적용
+            const statusText = statusTexts[statusEnum];
+            const message = josa(
+              `읽기 상태가 '${statusText}'#{로} 변경되었습니다.`
+            );
+            toast.success(message);
+          } else {
+            // 알 수 없는 상태인 경우
+            console.error('Unknown reading status:', data.status);
+            toast.success('읽기 상태가 변경되었습니다.');
+          }
+        }
+      },
+      onError: error => {
+        console.error('Reading status update error:', error);
+        toast.error('읽기 상태 변경에 실패했습니다.');
+      },
+    });
+
+  // 읽기 상태 삭제 뮤테이션
+  const { mutate: deleteReadingStatusMutation, isPending: isDeletePending } =
+    useMutation({
+      mutationFn: (bookId: number) => deleteReadingStatusByBookId(bookId),
+      onSuccess: () => {
+        // 캐시 업데이트
+        queryClient.invalidateQueries({ queryKey: ['book-detail'] });
+        setReadingStatus(null);
+        toast.success('읽기 상태가 초기화되었습니다.');
+      },
+      onError: error => {
+        console.error('Reading status delete error:', error);
+        toast.error('읽기 상태 초기화에 실패했습니다.');
+      },
+    });
 
   // 읽기 상태 변경 핸들러
   const handleReadingStatusChange = useCallback(
-    (status: ReadingStatusType) => {
+    (status: ReadingStatusType | null) => {
       if (!book?.id) {
         toast.error('책 정보가 없습니다.');
         return;
       }
 
-      if (readingStatus === status) {
-        // 이미 같은 상태면 변경하지 않음
+      // 현재 상태와 같은 경우 토글 동작 (선택 해제)
+      if (status === readingStatus) {
+        deleteReadingStatusMutation(book.id);
         return;
       }
 
-      updateReadingStatus({
+      // null인 경우 삭제
+      if (status === null) {
+        deleteReadingStatusMutation(book.id);
+        return;
+      }
+
+      // 상태 변경
+      updateReadingStatusMutation({
         bookId: book.id,
         status,
       });
     },
-    [book, readingStatus, updateReadingStatus]
+    [
+      book,
+      readingStatus,
+      updateReadingStatusMutation,
+      deleteReadingStatusMutation,
+    ]
   );
 
   // 읽기 상태에 따른 스타일 결정
@@ -120,6 +151,9 @@ export function useReadingStatus() {
     },
     []
   );
+
+  // isPending 상태 통합
+  const isPending = isUpdatePending || isDeletePending;
 
   return {
     readingStatus,

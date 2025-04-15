@@ -76,13 +76,13 @@ export function BookActionButtons() {
   // 상태 텍스트 표시
   const displayStatusText = readingStatus
     ? statusTexts[readingStatus]
-    : '책 상태 설정';
+    : '읽기 상태 설정';
 
   // 상태 아이콘 표시
   const displayStatusIcon = readingStatus ? statusIcons[readingStatus] : null;
 
   // 읽기 상태 변경 핸들러 래퍼 함수
-  const onReadingStatusChange = (status: ReadingStatusType) => {
+  const onReadingStatusChange = (status: ReadingStatusType | null) => {
     if (!currentUser) {
       setAuthDialogOpen(true);
       return;
@@ -165,6 +165,16 @@ export function BookActionButtons() {
                 </span>
               </DropdownMenuItem>
             ))}
+            <DropdownMenuItem
+              className={cn(
+                'flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2',
+                !readingStatus ? 'bg-gray-100' : ''
+              )}
+              onClick={() => onReadingStatusChange(null)}
+              disabled={isPending}
+            >
+              <span>선택 안함</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
