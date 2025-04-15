@@ -301,7 +301,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <DropdownMenuItem
-                                  className="flex cursor-pointer items-center gap-2 text-sm text-red-500"
+                                  className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
                                   onSelect={e => e.preventDefault()}
                                 >
                                   <Trash className="h-3.5 w-3.5 text-red-500" />
@@ -630,7 +630,7 @@ function ReviewsList({
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <DropdownMenuItem
-                                className="flex cursor-pointer items-center gap-2 text-sm text-red-500"
+                                className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
                                 onSelect={e => e.preventDefault()}
                               >
                                 <Trash className="h-3.5 w-3.5 text-red-500" />
