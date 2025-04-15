@@ -1,6 +1,6 @@
 import { likeReview, unlikeReview } from '@/apis/review/review';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 
 export function useReviewLike() {
@@ -43,6 +43,9 @@ export function useReviewLike() {
     onSettled: () => {
       // 뮤테이션 완료 후 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
+      setTimeout(() => {
+        setIsLikeLoading(false);
+      }, 300);
     },
   });
 
@@ -82,28 +85,25 @@ export function useReviewLike() {
     onSettled: () => {
       // 뮤테이션 완료 후 쿼리 무효화
       queryClient.invalidateQueries({ queryKey: ['reviews'] });
+      setTimeout(() => {
+        setIsLikeLoading(false);
+      }, 300);
     },
   });
 
   // 리뷰 좋아요 처리 함수
-  const handleLike = (reviewId: number, isLiked: boolean) => {
-    setIsLikeLoading(true);
+  const handleLike = useCallback(
+    (reviewId: number, isLiked: boolean) => {
+      setIsLikeLoading(true);
 
-    try {
       if (isLiked) {
         unlikeMutation.mutate(reviewId);
       } else {
         likeMutation.mutate(reviewId);
       }
-    } catch (error) {
-      toast.error('좋아요 처리 중 문제가 발생했습니다.');
-    } finally {
-      // 일정 시간 후 로딩 상태 해제 (UI 깜빡임 방지)
-      setTimeout(() => {
-        setIsLikeLoading(false);
-      }, 300);
-    }
-  };
+    },
+    [likeMutation, unlikeMutation]
+  );
 
   return {
     handleLike,

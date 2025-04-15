@@ -84,8 +84,6 @@ export function BookActionButtons() {
     try {
       const newLibrary = await createLibrary(libraryData);
       if (newLibrary && book) {
-        // 새로 생성된 서재에 책 추가
-        // 서재 생성 후 즉시 책 추가하는 대신, 성공 메시지만 표시
         toast.success(`'${newLibrary.name}' 서재가 생성되었습니다.`);
       }
       // 다이얼로그 닫기 및 상태 초기화

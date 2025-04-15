@@ -5,7 +5,7 @@ import {
   LibrarySummary,
 } from '@/apis/library/types';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 
@@ -38,14 +38,35 @@ export function useUserLibraries() {
       try {
         const librariesData = await getLibrariesByUser(currentUser.id);
         return librariesData;
-      } catch (error) {
+      } catch {
         return [];
       }
     },
-    enabled: !!currentUser?.id,
   });
 
-  // 새 서재 생성 함수
+  // 새 서재 생성 뮤테이션
+  const { mutateAsync: createLibraryMutation } = useMutation({
+    mutationFn: async (
+      libraryData: CreateLibraryDto
+    ): Promise<LibrarySummary | null> => {
+      if (!currentUser) {
+        throw new Error('로그인이 필요합니다.');
+      }
+
+      // API는 Library 타입을 반환하므로 LibrarySummary로 변환
+      const newLibrary = await createLibrary(libraryData);
+      return convertToLibrarySummary(newLibrary);
+    },
+    onSuccess: () => {
+      // 서재 목록 리프레시
+      refetch();
+    },
+    onError: error => {
+      console.error('서재 생성 오류:', error);
+    },
+  });
+
+  // 새 서재 생성 함수 (외부에서 사용하기 위한 래퍼)
   const handleCreateLibrary = useCallback(
     async (libraryData: CreateLibraryDto): Promise<LibrarySummary | null> => {
       if (!currentUser) {
@@ -54,20 +75,15 @@ export function useUserLibraries() {
       }
 
       try {
-        // API는 Library 타입을 반환하므로 LibrarySummary로 변환
-        const newLibrary = await createLibrary(libraryData);
-        const newLibrarySummary = convertToLibrarySummary(newLibrary);
-
+        const newLibrarySummary = await createLibraryMutation(libraryData);
         toast.success('새 서재가 생성되었습니다.');
-        // 서재 목록 리프레시
-        await refetch();
         return newLibrarySummary;
       } catch (error) {
         toast.error('서재 생성에 실패했습니다.');
         return null;
       }
     },
-    [currentUser, refetch]
+    [currentUser, createLibraryMutation]
   );
 
   return {

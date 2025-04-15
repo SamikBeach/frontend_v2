@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useMutation } from '@tanstack/react-query';
 import { BookOpen, ListPlus, Plus, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -45,6 +46,25 @@ export function LibrariesList() {
   // 새 서재 생성 다이얼로그 상태
   const [isNewLibraryDialogOpen, setIsNewLibraryDialogOpen] = useState(false);
 
+  // 새 서재 생성 뮤테이션
+  const { mutate: createLibraryMutation, isPending: isCreating } = useMutation({
+    mutationFn: async (libraryData: CreateLibraryDto) => {
+      if (!currentUser) {
+        throw new Error('로그인이 필요합니다.');
+      }
+      return await createLibrary(libraryData);
+    },
+    onSuccess: newLibrary => {
+      if (newLibrary && book) {
+        toast.success(`'${newLibrary.name}' 서재가 생성되었습니다.`);
+      }
+    },
+    onError: error => {
+      toast.error('서재 생성 중 오류가 발생했습니다');
+      console.error('서재 생성 오류:', error);
+    },
+  });
+
   // 새 서재 생성 및 책 추가 핸들러
   const handleCreateLibraryWithBook = async (libraryData: CreateLibraryDto) => {
     if (!currentUser) {
@@ -52,15 +72,7 @@ export function LibrariesList() {
       return;
     }
 
-    try {
-      const newLibrary = await createLibrary(libraryData);
-      if (newLibrary && book) {
-        // 새로 생성된 서재에 책 추가 - 책 데이터는 필요한 경우에만 추가
-        toast.success(`'${newLibrary.name}' 서재가 생성되었습니다.`);
-      }
-    } catch (error) {
-      toast.error('서재 생성 중 오류가 발생했습니다');
-    }
+    createLibraryMutation(libraryData);
   };
 
   // 서재에 담기 핸들러 래퍼 함수
