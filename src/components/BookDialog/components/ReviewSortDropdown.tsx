@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useAtom } from 'jotai';
-import { Clock, Heart, MessageSquare } from 'lucide-react';
+import { Clock, Flame, MessageSquare } from 'lucide-react';
 
 export function ReviewSortDropdown() {
   const [sort, setSort] = useAtom(bookReviewSortAtom);
@@ -18,7 +18,7 @@ export function ReviewSortDropdown() {
     {
       label: '인기순',
       value: 'likes' as ReviewSortType,
-      icon: <Heart className="h-3.5 w-3.5" />,
+      icon: <Flame className="h-3.5 w-3.5" />,
     },
     {
       label: '댓글 많은 순',
@@ -44,12 +44,13 @@ export function ReviewSortDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
-          className="flex h-8 items-center gap-1.5 rounded-full border-gray-200 px-3 text-xs text-gray-600"
+          className="flex h-7 items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100"
         >
-          {/* 선택된 정렬 옵션의 아이콘 렌더링 */}
-          {selectedOption.icon}
+          <span className="mr-1 flex h-3 w-3 items-center justify-center">
+            {selectedOption.icon}
+          </span>
           {selectedOption.label}
         </Button>
       </DropdownMenuTrigger>

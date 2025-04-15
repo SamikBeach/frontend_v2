@@ -382,24 +382,44 @@ function ErrorFallback({
 // 리뷰 로딩 컴포넌트
 function ReviewsLoading() {
   return (
-    <div className="space-y-4">
-      {[1, 2].map(i => (
+    <div className="space-y-0">
+      {[1, 2, 3].map((i, index) => (
         <div
           key={i}
-          className="rounded-2xl border border-gray-200 bg-white p-4"
+          className={`${index === 0 ? 'pt-2 pb-6' : 'py-6'} ${
+            i !== 3 ? 'border-b border-gray-100' : ''
+          }`}
         >
-          <div className="flex animate-pulse items-start gap-4">
-            <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+          <div className="flex items-start gap-3.5">
+            <div className="mt-0.5 h-9 w-9 flex-shrink-0 rounded-full bg-gray-200"></div>
             <div className="flex-1 space-y-2">
-              <div className="h-4 w-24 rounded bg-gray-200"></div>
-              <div className="flex gap-1">
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-20 rounded-full bg-gray-200"></div>
+                <div className="h-3 w-16 rounded-full bg-gray-200"></div>
               </div>
-              <div className="h-16 rounded-lg bg-gray-200"></div>
+
+              {/* 별점 스켈레톤 */}
+              <div className="flex gap-1">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div
+                    key={index}
+                    className="h-3 w-3 rounded-full bg-gray-200"
+                  ></div>
+                ))}
+              </div>
+
+              {/* 본문 스켈레톤 */}
+              <div className="space-y-1.5">
+                <div className="h-4 w-full rounded-full bg-gray-200"></div>
+                <div className="h-4 w-full rounded-full bg-gray-200"></div>
+                <div className="h-4 w-2/3 rounded-full bg-gray-200"></div>
+              </div>
+
+              {/* 버튼 스켈레톤 */}
+              <div className="mt-2.5 flex items-center gap-2 pt-1">
+                <div className="h-7 w-16 rounded-full bg-gray-200"></div>
+                <div className="h-7 w-16 rounded-full bg-gray-200"></div>
+              </div>
             </div>
           </div>
         </div>
@@ -531,6 +551,12 @@ function ReviewsList({
     deleteReviewMutation.mutate(reviewId);
   };
 
+  // 로딩 중일 때는 리뷰 없음 메시지를 표시하지 않습니다
+  if (isLoading) {
+    return <ReviewsLoading />;
+  }
+
+  // 로딩이 완료된 후 리뷰가 없는 경우에만 표시
   if (!reviews || reviews.length === 0) {
     return (
       <div className="px-1 py-6 text-center">
@@ -559,7 +585,7 @@ function ReviewsList({
           return (
             <div
               key={review.id}
-              className={`py-6 ${
+              className={`${index === 0 ? 'pt-2 pb-6' : 'py-6'} ${
                 index !== reviews.length - 1 ? 'border-b border-gray-100' : ''
               }`}
             >

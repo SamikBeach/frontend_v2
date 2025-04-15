@@ -3,18 +3,29 @@ import { Suspense } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 import { useDialogQuery } from '@/hooks/useDialogQuery';
-import { BookInfo } from './BookInfo';
+import { BookInfo, BookInfoSkeleton } from './BookInfo';
 
 import { ErrorBoundary } from 'react-error-boundary';
 import {
   BookActionButtons,
   BookCoverSection,
   BookHeader,
+  BookHeaderSkeleton,
   BookRatingSection,
   BookReadingStats,
   BookRightPanel,
   BookSkeleton,
 } from './components';
+
+// 스켈레톤 래퍼 컴포넌트
+function BookFullSkeleton() {
+  return (
+    <>
+      <BookHeaderSkeleton />
+      <BookSkeleton />
+    </>
+  );
+}
 
 // Error fallback component
 function ErrorFallback({
@@ -74,7 +85,11 @@ function BookDialogContent() {
 
             {/* 책 설명, 저자 소개 */}
             <div className="space-y-1">
-              <BookInfo />
+              <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <Suspense fallback={<BookInfoSkeleton />}>
+                  <BookInfo />
+                </Suspense>
+              </ErrorBoundary>
               <p className="mt-2 text-right text-xs text-gray-400">
                 정보제공: 알라딘
               </p>
@@ -107,7 +122,7 @@ export function BookDialog() {
         {/* DialogTitle 컴포넌트는 접근성 목적으로 필요합니다. 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
         <DialogTitle className="sr-only">도서 상세 정보</DialogTitle>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <Suspense fallback={<BookSkeleton />}>
+          <Suspense fallback={<BookFullSkeleton />}>
             <BookHeader />
             <BookDialogContent />
           </Suspense>

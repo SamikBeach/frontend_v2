@@ -14,7 +14,6 @@ export function BookQuotes() {
 
   return (
     <div className="space-y-3">
-      <p className="text-sm font-medium text-gray-900">인상적인 구절</p>
       <div className="space-y-3">
         {quotes.map(quote => (
           <div key={quote.id} className="rounded-2xl bg-gray-50 p-4">

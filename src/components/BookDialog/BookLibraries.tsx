@@ -1,44 +1,19 @@
-import { LibraryDetail, LibraryTag } from '@/apis/library/types';
+import { LibraryTag } from '@/apis/library/types';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { BookOpen, Users } from 'lucide-react';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useBookDetails, useBookLibraries } from './hooks';
 
-// 로딩 컴포넌트
-function LibrariesLoading() {
+// 에러 폴백 컴포넌트
+function LibrariesError() {
   return (
-    <div className="animate-pulse space-y-4">
-      <div className="h-6 w-48 rounded bg-gray-200"></div>
-      <div className="space-y-2">
-        {[1, 2, 3].map(i => (
-          <div key={i} className="h-20 rounded-xl bg-gray-100"></div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// 에러 컴포넌트
-function LibrariesError({
-  error,
-  resetErrorBoundary,
-}: {
-  error: Error;
-  resetErrorBoundary: () => void;
-}) {
-  return (
-    <div className="p-4 text-center">
-      <p className="text-red-500">
-        서재 정보를 불러오는 중 오류가 발생했습니다
+    <div className="rounded-xl bg-red-50 p-4 text-center">
+      <p className="text-sm text-red-600">
+        서재 정보를 불러오는데 실패했습니다
       </p>
-      <button
-        onClick={resetErrorBoundary}
-        className="mt-2 cursor-pointer text-sm text-blue-500 hover:underline"
-      >
-        다시 시도
-      </button>
     </div>
   );
 }
@@ -58,7 +33,7 @@ function LibrariesList() {
 
   return (
     <div className="flex flex-col gap-2">
-      {(libraries as LibraryDetail[]).map(library => (
+      {libraries.map(library => (
         <Link key={library.id} href={`/library/${library.id}`}>
           <div className="flex items-center rounded-xl border border-gray-100 bg-gray-50 p-3 transition-colors hover:bg-gray-100">
             <div className="flex flex-1 items-center gap-3">
@@ -100,22 +75,57 @@ function LibrariesList() {
   );
 }
 
+// 로딩 컴포넌트
+function LibrariesLoading() {
+  return (
+    <div className="space-y-2">
+      {[1, 2, 3].map(i => (
+        <div
+          key={i}
+          className="flex animate-pulse items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3"
+        >
+          <div className="h-10 w-10 rounded-lg bg-gray-200"></div>
+          <div className="flex-1">
+            <div className="mb-1 h-4 w-24 rounded bg-gray-200"></div>
+            <div className="h-3 w-16 rounded bg-gray-200"></div>
+          </div>
+          <div className="h-6 w-12 rounded-lg bg-gray-200"></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// LibrariesSkeleton 컴포넌트
+export function LibrariesSkeleton() {
+  return (
+    <div className="space-y-3">
+      {[1, 2, 3].map(i => (
+        <div
+          key={i}
+          className="flex items-center gap-3 rounded-xl border border-gray-100 p-3"
+        >
+          <Skeleton className="h-11 w-11 rounded-lg" />
+          <div className="flex-1 space-y-1.5">
+            <Skeleton className="h-4 w-32 rounded-full" />
+            <Skeleton className="h-3 w-24 rounded-full" />
+          </div>
+          <Skeleton className="h-8 w-20 rounded-lg" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function BookLibraries() {
   const { book } = useBookDetails();
-  const { libraries, isEmpty } = useBookLibraries(book?.id);
 
   if (!book || !book.id) return null;
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-gray-900">
-          이 책이 등록된 서재({isEmpty ? 0 : libraries.length})
-        </p>
-      </div>
-
+    <div>
       <ErrorBoundary FallbackComponent={LibrariesError}>
-        <Suspense fallback={<LibrariesLoading />}>
+        <Suspense fallback={<LibrariesSkeleton />}>
           <LibrariesList />
         </Suspense>
       </ErrorBoundary>
