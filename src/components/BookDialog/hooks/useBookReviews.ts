@@ -25,7 +25,6 @@ export function useBookReviews() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    refetch,
     status,
     isLoading,
   } = useInfiniteQuery({
@@ -138,7 +137,7 @@ export function useBookReviews() {
 
       return { queryKey: ['book-reviews', bookId, sort, isbn] };
     },
-    onError: (error, variables, context) => {
+    onError: (_, __, context) => {
       // 에러 발생시 쿼리 무효화하여 데이터 재조회
       if (context?.queryKey) {
         queryClient.invalidateQueries({ queryKey: context.queryKey });

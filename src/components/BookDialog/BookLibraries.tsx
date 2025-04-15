@@ -26,7 +26,7 @@ import { useLibrary } from './hooks/useLibrary';
 import { useUserLibraries } from './hooks/useUserLibraries';
 
 // 에러 폴백 컴포넌트
-function LibrariesError({ error, resetErrorBoundary }: any) {
+function LibrariesError({ resetErrorBoundary }: any) {
   return (
     <div className="p-4 text-center">
       <h3 className="mb-2 text-base font-medium text-red-500">오류 발생</h3>
@@ -46,15 +46,9 @@ function LibrariesList() {
   const { libraries, isEmpty } = useBookLibraries(book?.id);
   const currentUser = useCurrentUser();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const {
-    isLoggedIn,
-    createLibrary,
-    libraries: userLibraries,
-  } = useUserLibraries();
+  const { createLibrary, libraries: userLibraries } = useUserLibraries();
   const {
     handleAddToLibrary,
-    isPending: isLibraryPending,
-    error: libraryError,
     conflictDialogOpen,
     conflictLibraryName,
     closeConflictDialog,
@@ -76,7 +70,7 @@ function LibrariesList() {
         // 새로 생성된 서재에 책 추가 - 책 데이터는 필요한 경우에만 추가
         toast.success(`'${newLibrary.name}' 서재가 생성되었습니다.`);
       }
-    } catch (error) {
+    } catch {
       toast.error('서재 생성 중 오류가 발생했습니다');
     }
   };
@@ -226,40 +220,6 @@ function LibrariesList() {
         onOpenChange={setAuthDialogOpen}
         initialMode="login"
       />
-    </div>
-  );
-}
-
-// 로딩 컴포넌트
-function LibrariesLoading() {
-  return (
-    <div className="space-y-5">
-      {[1, 2, 3].map(i => (
-        <div
-          key={i}
-          className="group mb-2 h-full animate-pulse rounded-xl bg-[#F9FAFB] p-4"
-        >
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-gray-200"></div>
-            <div className="flex-1">
-              <div className="mb-1 h-4 w-32 rounded bg-gray-200"></div>
-              <div className="h-3 w-24 rounded bg-gray-200"></div>
-            </div>
-          </div>
-          <div className="mt-2 space-y-1">
-            <Skeleton className="h-4 w-full rounded" />
-            <Skeleton className="h-4 w-4/5 rounded" />
-          </div>
-          <div className="mt-3 flex gap-1">
-            <Skeleton className="h-5 w-12 rounded-full" />
-            <Skeleton className="h-5 w-12 rounded-full" />
-          </div>
-          <div className="mt-3 flex gap-4">
-            <Skeleton className="h-3 w-16 rounded" />
-            <Skeleton className="h-3 w-16 rounded" />
-          </div>
-        </div>
-      ))}
     </div>
   );
 }

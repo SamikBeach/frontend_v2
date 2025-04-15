@@ -1,10 +1,4 @@
-import {
-  RatingDto,
-  UpdateRatingDto,
-  createOrUpdateRating,
-  deleteRating,
-  updateRating as updateRatingApi,
-} from '@/apis/rating';
+import { RatingDto, createOrUpdateRating, deleteRating } from '@/apis/rating';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -44,14 +38,9 @@ export function useBookRating() {
         // user-book-rating 캐시 업데이트
         queryClient.setQueryData(['user-book-rating', book.id], newRating);
 
-        // book-detail 캐시 직접 업데이트
-        queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            userRating: newRating,
-          };
+        // 캐시 무효화 - 평균 평점과 평점 참여 인원수를 업데이트하기 위함
+        queryClient.invalidateQueries({
+          queryKey: ['book-detail', isbn],
         });
       }
 
@@ -59,41 +48,6 @@ export function useBookRating() {
     },
     onError: () => {
       toast.error('평점 등록에 실패했습니다.');
-    },
-  });
-
-  // 평점 수정 뮤테이션
-  const { mutate: modifyRating } = useMutation({
-    mutationFn: async ({
-      ratingId,
-      ratingData,
-    }: {
-      ratingId: number;
-      ratingData: UpdateRatingDto;
-    }) => {
-      return updateRatingApi(ratingId, ratingData);
-    },
-    onSuccess: updatedRating => {
-      // 캐시 직접 업데이트
-      if (book?.id) {
-        // user-book-rating 캐시 업데이트
-        queryClient.setQueryData(['user-book-rating', book.id], updatedRating);
-
-        // book-detail 캐시 직접 업데이트
-        queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            userRating: updatedRating,
-          };
-        });
-      }
-
-      toast.success('평점이 수정되었습니다.');
-    },
-    onError: () => {
-      toast.error('평점 수정에 실패했습니다.');
     },
   });
 
@@ -116,6 +70,11 @@ export function useBookRating() {
             ...oldData,
             userRating: null,
           };
+        });
+
+        // 캐시 무효화 - 평균 평점과 평점 참여 인원수를 업데이트하기 위함
+        queryClient.invalidateQueries({
+          queryKey: ['book-detail', isbn],
         });
       }
 

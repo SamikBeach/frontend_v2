@@ -15,7 +15,7 @@ export function useBookLibraries(
 ) {
   const { isbn } = useBookDetails();
 
-  const { data, isLoading, isError, error, refetch } =
+  const { data, isLoading, isError, refetch } =
     useSuspenseQuery<LibrariesForBookResponse>({
       queryKey: ['book-libraries', bookId, limit, isbn],
       queryFn: async () => {

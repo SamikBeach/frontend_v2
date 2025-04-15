@@ -35,7 +35,7 @@ export function useReviewLike() {
 
       return { previousReviews };
     },
-    onError: (err, reviewId, context) => {
+    onError: (_, __, context) => {
       // 에러 발생 시 이전 상태로 롤백
       queryClient.setQueryData(['reviews'], context?.previousReviews);
       toast.error('좋아요 처리 중 문제가 발생했습니다.');
@@ -77,7 +77,7 @@ export function useReviewLike() {
 
       return { previousReviews };
     },
-    onError: (err, reviewId, context) => {
+    onError: (_, __, context) => {
       // 에러 발생 시 이전 상태로 롤백
       queryClient.setQueryData(['reviews'], context?.previousReviews);
       toast.error('좋아요 취소 중 문제가 발생했습니다.');

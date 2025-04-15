@@ -53,7 +53,7 @@ export function useReadingStatus() {
         };
 
         // bookId가 음수일 때 ISBN으로 책 등록 처리 지원
-        const isbn = book.isbn || book.isbn13;
+        const isbn = book.isbn13 || book.isbn;
         return createOrUpdateReadingStatus(
           bookId,
           readingStatusData,
@@ -77,6 +77,12 @@ export function useReadingStatus() {
         // 상태 업데이트
         setReadingStatus(data.status as ReadingStatusType);
 
+        // book-detail 쿼리 무효화하여 읽기 상태 통계 업데이트
+        const isbn = book?.isbn13 || book?.isbn;
+        queryClient.invalidateQueries({
+          queryKey: ['book-detail', isbn],
+        });
+
         // josa 라이브러리를 사용하여 적절한 조사 적용
         const statusText = statusTexts[data.status as ReadingStatusType];
         const message = josa(
@@ -95,12 +101,17 @@ export function useReadingStatus() {
       mutationFn: (bookId: number) => deleteReadingStatusByBookId(bookId),
       onSuccess: () => {
         // 쿼리 무효화
-        queryClient.invalidateQueries({
-          queryKey: ['user-reading-status', book?.id],
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['book-detail', book?.isbn],
-        });
+        if (book?.id) {
+          queryClient.invalidateQueries({
+            queryKey: ['user-reading-status', book.id],
+          });
+        }
+
+        if (book?.isbn) {
+          queryClient.invalidateQueries({
+            queryKey: ['book-detail', book.isbn],
+          });
+        }
 
         // UI 상태 업데이트
         setReadingStatus(null);

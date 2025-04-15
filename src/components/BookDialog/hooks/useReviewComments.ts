@@ -22,7 +22,7 @@ export function useReviewComments(reviewId: number) {
       try {
         const response = await getReviewComments(reviewId);
         return response;
-      } catch (error) {
+      } catch {
         // 에러 발생 시 기본 형식에 맞는 빈 데이터 반환
         return { comments: [] };
       }
@@ -40,7 +40,7 @@ export function useReviewComments(reviewId: number) {
       const commentData: CreateCommentDto = { content };
       return addReviewComment(reviewId, commentData);
     },
-    onMutate: async content => {
+    onMutate: async () => {
       // 낙관적 업데이트를 위해 기존 댓글 목록 저장
       await queryClient.cancelQueries({
         queryKey: ['review-comments', reviewId],
@@ -67,7 +67,7 @@ export function useReviewComments(reviewId: number) {
       setCommentText('');
       toast.success('댓글이 등록되었습니다');
     },
-    onError: error => {
+    onError: () => {
       // 오류 발생 시 사용자에게 알림
       toast.error('댓글 등록에 실패했습니다. 다시 시도해주세요.');
     },
@@ -110,7 +110,7 @@ export function useReviewComments(reviewId: number) {
 
       toast.success('댓글이 삭제되었습니다');
     },
-    onError: (error, commentId, context) => {
+    onError: (_, __, context) => {
       // 오류 발생 시 이전 상태로 복원
       if (context?.previousComments) {
         queryClient.setQueryData(

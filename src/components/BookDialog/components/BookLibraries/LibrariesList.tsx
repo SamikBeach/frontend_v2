@@ -1,8 +1,4 @@
-import {
-  CreateLibraryDto,
-  LibrarySummary,
-  LibraryTag,
-} from '@/apis/library/types';
+import { LibrarySummary, LibraryTag } from '@/apis/library/types';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,11 +9,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useMutation } from '@tanstack/react-query';
 import { BookOpen, ListPlus, Plus, Users } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { ConflictAlertDialog } from '../../components/ConflictAlertDialog';
 import { useBookDetails, useBookLibraries } from '../../hooks';
 import { useLibrary } from '../../hooks/useLibrary';
@@ -29,51 +23,13 @@ export function LibrariesList() {
   const { libraries, isEmpty } = useBookLibraries(book?.id);
   const currentUser = useCurrentUser();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const {
-    isLoggedIn,
-    createLibrary,
-    libraries: userLibraries,
-  } = useUserLibraries();
+  const { libraries: userLibraries } = useUserLibraries();
   const {
     handleAddToLibrary,
-    isPending: isLibraryPending,
-    error: libraryError,
     conflictDialogOpen,
     conflictLibraryName,
     closeConflictDialog,
   } = useLibrary(book, book?.isbn || '', userLibraries);
-
-  // 새 서재 생성 다이얼로그 상태
-  const [isNewLibraryDialogOpen, setIsNewLibraryDialogOpen] = useState(false);
-
-  // 새 서재 생성 뮤테이션
-  const { mutate: createLibraryMutation, isPending: isCreating } = useMutation({
-    mutationFn: async (libraryData: CreateLibraryDto) => {
-      if (!currentUser) {
-        throw new Error('로그인이 필요합니다.');
-      }
-      return await createLibrary(libraryData);
-    },
-    onSuccess: newLibrary => {
-      if (newLibrary && book) {
-        toast.success(`'${newLibrary.name}' 서재가 생성되었습니다.`);
-      }
-    },
-    onError: error => {
-      toast.error('서재 생성 중 오류가 발생했습니다');
-      console.error('서재 생성 오류:', error);
-    },
-  });
-
-  // 새 서재 생성 및 책 추가 핸들러
-  const handleCreateLibraryWithBook = async (libraryData: CreateLibraryDto) => {
-    if (!currentUser) {
-      setAuthDialogOpen(true);
-      return;
-    }
-
-    createLibraryMutation(libraryData);
-  };
 
   // 서재에 담기 핸들러 래퍼 함수
   const handleAddToLibraryWithAuth = (libraryId: number) => {
@@ -91,8 +47,6 @@ export function LibrariesList() {
       setAuthDialogOpen(true);
       return;
     }
-
-    setIsNewLibraryDialogOpen(true);
   };
 
   if (isEmpty) {

@@ -45,14 +45,13 @@ export function BookActionButtons() {
   } = useReadingStatus();
   const {
     handleAddToLibrary,
-    isPending: isLibraryPending,
     error,
     resetError,
     conflictDialogOpen,
     conflictLibraryName,
     closeConflictDialog,
   } = useLibrary(book, isbn, userLibraries);
-  const { isLoggedIn, createLibrary } = useUserLibraries();
+  const { createLibrary } = useUserLibraries();
 
   // 새 서재 생성 다이얼로그 상태
   const [isNewLibraryDialogOpen, setIsNewLibraryDialogOpen] = useState(false);

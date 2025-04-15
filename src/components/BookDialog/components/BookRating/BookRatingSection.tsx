@@ -9,14 +9,13 @@ import { RatingStars, RatingStarsFallback } from './BookRatingStars';
 
 export function BookRatingSection() {
   const { book } = useBookDetails();
-  const { userRating } = useBookDetails();
   const currentUser = useCurrentUser();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const {
     handleOpenReviewDialog,
     reviewDialogOpen,
     setReviewDialogOpen,
-    userRating: dialogUserRating,
+    userRating,
     handleReviewSubmit,
     isSubmitting,
     isEditMode,

@@ -33,7 +33,7 @@ export function useReviewDialog() {
       }
 
       // ISBN 정보 확인
-      const bookIsbn = book.isbn || book.isbn13;
+      const bookIsbn = book.isbn13 || book.isbn;
       const isNegativeBookId = book.id < 0;
 
       // 항상 평점 등록 (comment 없이)
@@ -67,16 +67,6 @@ export function useReviewDialog() {
     onSuccess: data => {
       // 직접 book-detail 캐시 업데이트 (별점 즉시 반영)
       if (book && isbn) {
-        // book-detail 쿼리 데이터 직접 업데이트
-        queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            userRating: data,
-          };
-        });
-
         // user-book-rating 캐시 직접 업데이트
         if (book?.id) {
           queryClient.setQueryData(['user-book-rating', book.id], data);
@@ -136,6 +126,13 @@ export function useReviewDialog() {
           : '리뷰가 성공적으로 저장되었습니다.'
       );
 
+      // book-detail 쿼리 무효화하여 평균 평점과 참여 인원수 업데이트
+      if (isbn) {
+        queryClient.invalidateQueries({
+          queryKey: ['book-detail', isbn],
+        });
+      }
+
       // 필요한 데이터만 선택적으로 무효화
       if (book?.id) {
         // 정확한 쿼리 키로 무효화하고 refetchType을 active로 변경
@@ -160,7 +157,7 @@ export function useReviewDialog() {
 
       return data?.rating;
     },
-    onError: error => {
+    onError: () => {
       toast.error('리뷰 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
     },
   });

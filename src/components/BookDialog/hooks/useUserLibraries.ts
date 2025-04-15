@@ -78,7 +78,7 @@ export function useUserLibraries() {
         const newLibrarySummary = await createLibraryMutation(libraryData);
         toast.success('새 서재가 생성되었습니다.');
         return newLibrarySummary;
-      } catch (error) {
+      } catch {
         toast.error('서재 생성에 실패했습니다.');
         return null;
       }
