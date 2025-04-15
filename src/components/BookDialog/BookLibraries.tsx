@@ -20,29 +20,21 @@ import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
-import {
-  useBookDetails,
-  useBookLibraries,
-  useBookshelf,
-  useUserLibraries,
-} from './hooks';
+import { useBookDetails, useBookLibraries } from './hooks';
+import { useLibrary } from './hooks/useLibrary';
+import { useUserLibraries } from './hooks/useUserLibraries';
 
 // 에러 폴백 컴포넌트
-function LibrariesError() {
+function LibrariesError({ error, resetErrorBoundary }: any) {
   return (
-    <div className="flex h-32 items-center justify-center">
-      <div className="text-center">
-        <p className="text-sm text-gray-600">
-          서재 목록을 가져오는 데 실패했습니다.
-        </p>
-        <Button
-          variant="outline"
-          className="mt-2"
-          onClick={() => window.location.reload()}
-        >
-          다시 시도
-        </Button>
-      </div>
+    <div className="p-4 text-center">
+      <h3 className="mb-2 text-base font-medium text-red-500">오류 발생</h3>
+      <p className="mb-4 text-sm text-gray-600">
+        서재 정보를 불러오는 중 오류가 발생했습니다.
+      </p>
+      <Button size="sm" onClick={resetErrorBoundary}>
+        다시 시도
+      </Button>
     </div>
   );
 }
@@ -59,10 +51,10 @@ function LibrariesList() {
     libraries: userLibraries,
   } = useUserLibraries();
   const {
-    handleAddToBookshelf,
-    isPending: isBookshelfPending,
-    error: bookshelfError,
-  } = useBookshelf(book, book?.isbn || '', userLibraries);
+    handleAddToLibrary,
+    isPending: isLibraryPending,
+    error: libraryError,
+  } = useLibrary(book, book?.isbn || '', userLibraries);
 
   // 새 서재 생성 다이얼로그 상태
   const [isNewLibraryDialogOpen, setIsNewLibraryDialogOpen] = useState(false);
@@ -78,7 +70,7 @@ function LibrariesList() {
       const newLibrary = await createLibrary(libraryData);
       if (newLibrary && book) {
         // 새로 생성된 서재에 책 추가
-        handleAddToBookshelf(newLibrary.id);
+        handleAddToLibrary(newLibrary.id);
       }
       toast.success('새 서재를 만들고 책을 추가했습니다');
     } catch (error) {
@@ -88,13 +80,13 @@ function LibrariesList() {
   };
 
   // 서재에 담기 핸들러 래퍼 함수
-  const handleAddToBookshelfWithAuth = (libraryId: number) => {
+  const handleAddToLibraryWithAuth = (libraryId: number) => {
     if (!currentUser) {
       setAuthDialogOpen(true);
       return;
     }
 
-    handleAddToBookshelf(libraryId);
+    handleAddToLibrary(libraryId);
   };
 
   // 새 서재 생성 다이얼로그 표시 핸들러
@@ -118,11 +110,11 @@ function LibrariesList() {
             <Button
               variant="outline"
               className="mt-3 w-44 max-w-xs rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
-              disabled={isBookshelfPending}
+              disabled={isLibraryPending}
             >
               <ListPlus className="mr-1.5 h-4 w-4" />
               <span className="text-sm">
-                {isBookshelfPending ? '처리 중...' : '내 서재에 담기'}
+                {isLibraryPending ? '처리 중...' : '내 서재에 담기'}
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -132,8 +124,8 @@ function LibrariesList() {
                 <DropdownMenuItem
                   key={library.id}
                   className="cursor-pointer rounded-lg py-2"
-                  onClick={() => handleAddToBookshelfWithAuth(library.id)}
-                  disabled={isBookshelfPending}
+                  onClick={() => handleAddToLibraryWithAuth(library.id)}
+                  disabled={isLibraryPending}
                 >
                   {library.name}
                   <span className="ml-2 text-xs text-gray-500">

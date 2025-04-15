@@ -192,21 +192,21 @@ export const getPopularLibrariesForHome = async (
 };
 
 /**
- * 서재에 책 추가 (BookshelfId, BookId, ISBN 사용)
+ * 서재에 책 추가 (ISBN 사용)
  */
-export const addBookToBookshelf = async ({
-  bookshelfId,
+export const addBookToLibraryWithIsbn = async ({
+  libraryId,
   bookId,
   isbn,
 }: {
-  bookshelfId: number;
+  libraryId: number;
   bookId: number;
   isbn: string;
 }): Promise<LibraryBook> => {
-  const response = await api.post<LibraryBook>(
-    `/library/${bookshelfId}/books`,
-    { bookId, note: `ISBN: ${isbn}` }
-  );
+  const response = await api.post<LibraryBook>(`/library/${libraryId}/books`, {
+    bookId,
+    note: `ISBN: ${isbn}`,
+  });
   return response.data;
 };
 

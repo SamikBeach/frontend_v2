@@ -1,14 +1,24 @@
 import { CreateLibraryDto } from '@/apis/library/types';
 import { ReadingStatusType } from '@/apis/reading-status';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
-import { CreateLibraryDialog } from '@/components/Library';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { ChevronDown, ListPlus, Plus } from 'lucide-react';
@@ -16,7 +26,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import {
   useBookDetails,
-  useBookshelf,
+  useLibrary,
   useReadingStatus,
   useUserLibraries,
 } from '../hooks';
@@ -34,33 +44,53 @@ export function BookActionButtons() {
     getReadingStatusStyle,
   } = useReadingStatus();
   const {
-    handleAddToBookshelf,
-    isPending: isBookshelfPending,
+    handleAddToLibrary,
+    isPending: isLibraryPending,
     error,
     resetError,
-  } = useBookshelf(book, isbn, userLibraries);
+  } = useLibrary(book, isbn, userLibraries);
   const { isLoggedIn, createLibrary } = useUserLibraries();
 
   // 새 서재 생성 다이얼로그 상태
   const [isNewLibraryDialogOpen, setIsNewLibraryDialogOpen] = useState(false);
+  const [newLibraryName, setNewLibraryName] = useState('');
+  const [newLibraryDesc, setNewLibraryDesc] = useState('');
+  const [isPublic, setIsPublic] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
 
-  // 새 서재 생성 및 책 추가 핸들러
-  const handleCreateLibraryWithBook = async (libraryData: CreateLibraryDto) => {
+  // 새 서재 생성 핸들러
+  const handleCreateNewLibrary = async () => {
     if (!currentUser) {
       setAuthDialogOpen(true);
       return;
     }
 
+    if (!newLibraryName.trim()) {
+      toast.error('서재 이름을 입력해주세요.');
+      return;
+    }
+
+    setIsCreating(true);
+
+    const libraryData: CreateLibraryDto = {
+      name: newLibraryName.trim(),
+      description: newLibraryDesc.trim() || undefined,
+      isPublic,
+    };
+
     try {
       const newLibrary = await createLibrary(libraryData);
       if (newLibrary && book) {
         // 새로 생성된 서재에 책 추가
-        handleAddToBookshelf(newLibrary.id);
+        handleAddToLibrary(newLibrary.id);
       }
-      toast.success('새 서재를 만들고 책을 추가했습니다');
-    } catch (error) {
-      toast.error('서재 생성 중 오류가 발생했습니다');
-      console.error('서재 생성 오류:', error);
+      // 다이얼로그 닫기 및 상태 초기화
+      setIsNewLibraryDialogOpen(false);
+      setNewLibraryName('');
+      setNewLibraryDesc('');
+      setIsPublic(true);
+    } finally {
+      setIsCreating(false);
     }
   };
 
@@ -76,13 +106,13 @@ export function BookActionButtons() {
   // 상태 텍스트 표시
   const displayStatusText = readingStatus
     ? statusTexts[readingStatus]
-    : '읽기 상태 설정';
+    : '책 상태 설정';
 
   // 상태 아이콘 표시
   const displayStatusIcon = readingStatus ? statusIcons[readingStatus] : null;
 
   // 읽기 상태 변경 핸들러 래퍼 함수
-  const onReadingStatusChange = (status: ReadingStatusType | null) => {
+  const onReadingStatusChange = (status: ReadingStatusType) => {
     if (!currentUser) {
       setAuthDialogOpen(true);
       return;
@@ -96,13 +126,13 @@ export function BookActionButtons() {
   };
 
   // 서재에 담기 핸들러 래퍼 함수
-  const handleAddToBookshelfWithAuth = (libraryId: number) => {
+  const handleAddToLibraryWithAuth = (libraryId: number) => {
     if (!currentUser) {
       setAuthDialogOpen(true);
       return;
     }
 
-    handleAddToBookshelf(libraryId);
+    handleAddToLibrary(libraryId);
   };
 
   // 새 서재 생성 다이얼로그 표시 핸들러
@@ -137,7 +167,7 @@ export function BookActionButtons() {
               <ChevronDown className="ml-auto h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-40 rounded-xl">
+          <DropdownMenuContent className="w-48 rounded-xl">
             {Object.values(ReadingStatusType).map(status => (
               <DropdownMenuItem
                 key={status}
@@ -165,16 +195,6 @@ export function BookActionButtons() {
                 </span>
               </DropdownMenuItem>
             ))}
-            <DropdownMenuItem
-              className={cn(
-                'flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2',
-                !readingStatus ? 'bg-gray-100' : ''
-              )}
-              onClick={() => onReadingStatusChange(null)}
-              disabled={isPending}
-            >
-              <span>선택 안함</span>
-            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -183,22 +203,22 @@ export function BookActionButtons() {
             <Button
               variant="outline"
               className="w-full rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
-              disabled={isBookshelfPending}
+              disabled={isLibraryPending}
             >
               <ListPlus className="mr-1.5 h-4 w-4" />
               <span className="text-sm">
-                {isBookshelfPending ? '처리 중...' : '내 서재에 담기'}
+                {isLibraryPending ? '처리 중...' : '서재에 담기'}
               </span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48 rounded-xl">
+          <DropdownMenuContent className="w-60 rounded-xl">
             {userLibraries && userLibraries.length > 0 ? (
               userLibraries.map(library => (
                 <DropdownMenuItem
                   key={library.id}
                   className="cursor-pointer rounded-lg py-2"
-                  onClick={() => handleAddToBookshelfWithAuth(library.id)}
-                  disabled={isBookshelfPending}
+                  onClick={() => handleAddToLibraryWithAuth(library.id)}
+                  disabled={isLibraryPending}
                 >
                   {library.name}
                   <span className="ml-2 text-xs text-gray-500">
@@ -222,18 +242,65 @@ export function BookActionButtons() {
       </div>
 
       {/* 새 서재 생성 다이얼로그 */}
-      <CreateLibraryDialog
+      <Dialog
         open={isNewLibraryDialogOpen}
         onOpenChange={setIsNewLibraryDialogOpen}
-        onCreateLibrary={handleCreateLibraryWithBook}
-      />
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl">새 서재 만들기</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid gap-2">
+              <Label htmlFor="name">서재 이름</Label>
+              <Input
+                id="name"
+                value={newLibraryName}
+                onChange={e => setNewLibraryName(e.target.value)}
+                placeholder="서재 이름을 입력하세요"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="description">설명 (선택사항)</Label>
+              <Textarea
+                id="description"
+                value={newLibraryDesc}
+                onChange={e => setNewLibraryDesc(e.target.value)}
+                placeholder="서재에 대한 설명을 입력하세요"
+                className="resize-none"
+                rows={3}
+              />
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="public"
+                checked={isPublic}
+                onCheckedChange={setIsPublic}
+              />
+              <Label htmlFor="public">공개 서재로 설정</Label>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsNewLibraryDialogOpen(false)}
+            >
+              취소
+            </Button>
+            <Button
+              type="button"
+              onClick={handleCreateNewLibrary}
+              disabled={isCreating}
+            >
+              {isCreating ? '생성 중...' : '생성하기'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* 로그인 다이얼로그 */}
-      <AuthDialog
-        open={authDialogOpen}
-        onOpenChange={setAuthDialogOpen}
-        initialMode="login"
-      />
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </>
   );
 }
