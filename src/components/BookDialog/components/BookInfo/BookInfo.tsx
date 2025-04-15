@@ -1,33 +1,7 @@
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import { useBookDetails } from './hooks';
-
-// BookInfo 스켈레톤 컴포넌트
-export function BookInfoSkeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="space-y-1.5">
-        <Skeleton className="h-5 w-24 rounded" />
-        <div className="space-y-1.5">
-          <Skeleton className="h-4 w-full rounded" />
-          <Skeleton className="h-4 w-full rounded" />
-          <Skeleton className="h-4 w-full rounded" />
-          <Skeleton className="h-4 w-3/4 rounded" />
-        </div>
-      </div>
-
-      <div className="space-y-1.5">
-        <Skeleton className="h-5 w-24 rounded" />
-        <div className="space-y-1.5">
-          <Skeleton className="h-4 w-full rounded" />
-          <Skeleton className="h-4 w-2/3 rounded" />
-        </div>
-      </div>
-    </div>
-  );
-}
+import { useBookDetails } from '../../hooks';
 
 export function BookInfo() {
   const { book } = useBookDetails();

@@ -3,53 +3,19 @@ import { Suspense } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 import { useDialogQuery } from '@/hooks/useDialogQuery';
-import { BookInfo, BookInfoSkeleton } from './BookInfo';
+import { BookInfo, BookInfoSkeleton } from './components/BookInfo';
 
 import { ErrorBoundary } from 'react-error-boundary';
 import {
   BookActionButtons,
   BookCoverSection,
   BookHeader,
-  BookHeaderSkeleton,
   BookRatingSection,
   BookReadingStats,
   BookRightPanel,
-  BookSkeleton,
 } from './components';
 
-// 스켈레톤 래퍼 컴포넌트
-function BookFullSkeleton() {
-  return (
-    <>
-      <BookHeaderSkeleton />
-      <BookSkeleton />
-    </>
-  );
-}
-
-// Error fallback component
-function ErrorFallback({
-  error,
-  resetErrorBoundary,
-}: {
-  error: Error;
-  resetErrorBoundary: () => void;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center p-6 text-center">
-      <p className="text-lg font-medium text-red-600">
-        데이터를 불러오는 중 오류가 발생했습니다
-      </p>
-      <p className="mt-1 text-sm text-gray-600">{error.message}</p>
-      <button
-        onClick={resetErrorBoundary}
-        className="mt-4 cursor-pointer rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-      >
-        다시 시도
-      </button>
-    </div>
-  );
-}
+import { BookFullSkeleton, ErrorFallback } from './components/common';
 
 function BookDialogContent() {
   return (

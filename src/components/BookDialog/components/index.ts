@@ -1,7 +1,9 @@
 export * from './BookActionButtons';
 export * from './BookCoverSection';
-export { BookHeader, BookHeaderSkeleton } from './BookHeader';
-export * from './BookRatingSection';
+export * from './BookHeader';
+export * from './BookInfo';
+export * from './BookLibraries';
+export * from './BookRating';
 export * from './BookReadingStats';
 export * from './BookRightPanel';
-export * from './BookSkeleton';
+export * from './common';
