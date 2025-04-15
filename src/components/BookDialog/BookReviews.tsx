@@ -568,6 +568,18 @@ function ReviewsList({
           첫 리뷰를 작성해보세요
         </Button>
 
+        {/* 리뷰 다이얼로그 추가 */}
+        <ReviewDialog
+          open={reviewDialogOpen}
+          onOpenChange={setReviewDialogOpen}
+          bookTitle={book?.title || ''}
+          initialRating={userRating}
+          initialContent={initialContent}
+          isEditMode={isEditMode}
+          onSubmit={handleReviewSubmit}
+          isSubmitting={isSubmitting}
+        />
+
         {/* 로그인 다이얼로그 */}
         <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
       </div>
@@ -792,18 +804,16 @@ function ReviewsList({
       )}
 
       {/* 리뷰 다이얼로그 추가 */}
-      {reviewDialogOpen && (
-        <ReviewDialog
-          open={reviewDialogOpen}
-          onOpenChange={setReviewDialogOpen}
-          bookTitle={book?.title || ''}
-          initialRating={userRating}
-          initialContent={initialContent}
-          isEditMode={isEditMode}
-          onSubmit={handleReviewSubmit}
-          isSubmitting={isSubmitting}
-        />
-      )}
+      <ReviewDialog
+        open={reviewDialogOpen}
+        onOpenChange={setReviewDialogOpen}
+        bookTitle={book?.title || ''}
+        initialRating={userRating}
+        initialContent={initialContent}
+        isEditMode={isEditMode}
+        onSubmit={handleReviewSubmit}
+        isSubmitting={isSubmitting}
+      />
 
       {/* 로그인 다이얼로그 */}
       <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
