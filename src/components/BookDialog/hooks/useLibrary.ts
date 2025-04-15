@@ -45,8 +45,6 @@ export function useLibrary(
         const selectedLibrary = userLibraries.find(lib => lib.id === libraryId);
         const libraryName = selectedLibrary?.name || '서재';
 
-        console.log('충돌 발생한 서재:', selectedLibrary);
-
         setConflictLibraryName(libraryName);
         setConflictDialogOpen(true);
       } else {

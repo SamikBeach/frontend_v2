@@ -487,7 +487,6 @@ function ReviewsList({
     },
     onError: error => {
       toast.error('리뷰 삭제 중 오류가 발생했습니다');
-      console.error('리뷰 삭제 오류:', error);
     },
   });
 

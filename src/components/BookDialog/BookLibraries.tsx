@@ -78,7 +78,6 @@ function LibrariesList() {
       }
     } catch (error) {
       toast.error('서재 생성 중 오류가 발생했습니다');
-      console.error('서재 생성 오류:', error);
     }
   };
 

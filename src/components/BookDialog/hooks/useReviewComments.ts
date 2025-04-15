@@ -23,7 +23,7 @@ export function useReviewComments(reviewId: number) {
         const response = await getReviewComments(reviewId);
         return response;
       } catch (error) {
-        console.error('Failed to fetch comments:', error);
+        // 에러 발생 시 기본 형식에 맞는 빈 데이터 반환
         return { comments: [] };
       }
     },

@@ -54,33 +54,30 @@ export function useReadingStatus() {
         return createOrUpdateReadingStatus(bookId, readingStatusData);
       },
       onSuccess: (data: ReadingStatusResponseDto) => {
-        // 캐시 업데이트
-        queryClient.invalidateQueries({ queryKey: ['book-detail'] });
+        if (!data || !data.status) {
+          return;
+        }
+
+        // 알 수 없는 상태인 경우
+        if (
+          !Object.values(ReadingStatusType).includes(
+            data.status as ReadingStatusType
+          )
+        ) {
+          return;
+        }
 
         // 상태 업데이트
-        if (data.status) {
-          const status = data.status as keyof typeof ReadingStatusType;
-          const statusEnum =
-            ReadingStatusType[status as keyof typeof ReadingStatusType];
+        setReadingStatus(data.status as ReadingStatusType);
 
-          if (statusEnum) {
-            setReadingStatus(statusEnum);
-
-            // josa 라이브러리를 사용하여 적절한 조사 적용
-            const statusText = statusTexts[statusEnum];
-            const message = josa(
-              `읽기 상태가 '${statusText}'#{로} 변경되었습니다.`
-            );
-            toast.success(message);
-          } else {
-            // 알 수 없는 상태인 경우
-            console.error('Unknown reading status:', data.status);
-            toast.success('읽기 상태가 변경되었습니다.');
-          }
-        }
+        // josa 라이브러리를 사용하여 적절한 조사 적용
+        const statusText = statusTexts[data.status as ReadingStatusType];
+        const message = josa(
+          `읽기 상태가 '${statusText}'#{로} 변경되었습니다.`
+        );
+        toast.success(message);
       },
-      onError: error => {
-        console.error('Reading status update error:', error);
+      onError: () => {
         toast.error('읽기 상태 변경에 실패했습니다.');
       },
     });
@@ -90,13 +87,19 @@ export function useReadingStatus() {
     useMutation({
       mutationFn: (bookId: number) => deleteReadingStatusByBookId(bookId),
       onSuccess: () => {
-        // 캐시 업데이트
-        queryClient.invalidateQueries({ queryKey: ['book-detail'] });
+        // 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['user-reading-status', book?.id],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['book-detail', book?.isbn],
+        });
+
+        // UI 상태 업데이트
         setReadingStatus(null);
         toast.success('읽기 상태가 초기화되었습니다.');
       },
-      onError: error => {
-        console.error('Reading status delete error:', error);
+      onError: () => {
         toast.error('읽기 상태 초기화에 실패했습니다.');
       },
     });

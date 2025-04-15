@@ -39,7 +39,6 @@ export function useUserLibraries() {
         const librariesData = await getLibrariesByUser(currentUser.id);
         return librariesData;
       } catch (error) {
-        console.error('Failed to fetch user libraries:', error);
         return [];
       }
     },
@@ -64,7 +63,6 @@ export function useUserLibraries() {
         await refetch();
         return newLibrarySummary;
       } catch (error) {
-        console.error('서재 생성 실패:', error);
         toast.error('서재 생성에 실패했습니다.');
         return null;
       }

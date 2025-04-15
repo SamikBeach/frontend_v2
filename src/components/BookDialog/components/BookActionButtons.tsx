@@ -101,8 +101,7 @@ export function BookActionButtons() {
   // 에러 상태 처리
   useEffect(() => {
     if (error) {
-      console.error('서재에 책 추가 중 오류:', error);
-      // 오류가 UI에 이미 표시되었으므로 여기서는 로깅만
+      // 오류가 UI에 이미 표시되었으므로 여기서는 로깅만 제거
       return () => resetError();
     }
   }, [error, resetError]);
