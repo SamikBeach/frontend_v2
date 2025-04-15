@@ -2,6 +2,8 @@ import { createOrUpdateRating } from '@/apis/rating/rating';
 import { createReview, updateReview } from '@/apis/review/review';
 import { Review } from '@/apis/review/types';
 import { bookReviewSortAtom } from '@/atoms/book';
+import { updateBookRating } from '@/utils/rating';
+import { BookWithRating } from '@/utils/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { useCallback, useState } from 'react';
@@ -67,6 +69,11 @@ export function useReviewDialog() {
     onSuccess: data => {
       // 직접 book-detail 캐시 업데이트 (별점 즉시 반영)
       if (book && isbn) {
+        // book-detail 쿼리 데이터 직접 업데이트
+        queryClient.setQueryData(['book-detail', isbn], (oldData: unknown) => {
+          return updateBookRating(oldData as BookWithRating, data);
+        });
+
         // user-book-rating 캐시 직접 업데이트
         if (book?.id) {
           queryClient.setQueryData(['user-book-rating', book.id], data);
@@ -125,13 +132,6 @@ export function useReviewDialog() {
           ? '리뷰가 수정되었습니다.'
           : '리뷰가 성공적으로 저장되었습니다.'
       );
-
-      // book-detail 쿼리 무효화하여 평균 평점과 참여 인원수 업데이트
-      if (isbn) {
-        queryClient.invalidateQueries({
-          queryKey: ['book-detail', isbn],
-        });
-      }
 
       // 필요한 데이터만 선택적으로 무효화
       if (book?.id) {

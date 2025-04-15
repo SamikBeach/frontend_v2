@@ -6,10 +6,10 @@ export function BookReadingStats() {
   const { book } = useBookDetails();
 
   // 리딩 스탯이 없으면 컴포넌트를 렌더링하지 않음
-  if (!book?.readingStatus) return null;
+  if (!book?.readingStats) return null;
 
   // 서버 응답 데이터에서 값 가져오기
-  const { readingStatusCounts = {} } = book.readingStatus;
+  const { readingStatusCounts = {} } = book.readingStats;
 
   // 읽기 상태별 카운트 - 서버 응답 데이터와 연동
   const wantToReadCount =

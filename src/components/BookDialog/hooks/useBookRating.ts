@@ -1,4 +1,6 @@
 import { RatingDto, createOrUpdateRating, deleteRating } from '@/apis/rating';
+import { removeBookRating, updateBookRating } from '@/utils/rating';
+import { BookWithRating } from '@/utils/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -38,9 +40,9 @@ export function useBookRating() {
         // user-book-rating 캐시 업데이트
         queryClient.setQueryData(['user-book-rating', book.id], newRating);
 
-        // 캐시 무효화 - 평균 평점과 평점 참여 인원수를 업데이트하기 위함
-        queryClient.invalidateQueries({
-          queryKey: ['book-detail', isbn],
+        // book-detail 캐시 직접 업데이트
+        queryClient.setQueryData(['book-detail', isbn], (oldData: unknown) => {
+          return updateBookRating(oldData as BookWithRating, newRating);
         });
       }
 
@@ -62,19 +64,9 @@ export function useBookRating() {
         // user-book-rating 캐시 업데이트 (null로 설정)
         queryClient.setQueryData(['user-book-rating', book.id], null);
 
-        // book-detail 캐시 직접 업데이트 (userRating을 null로 설정)
-        queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            userRating: null,
-          };
-        });
-
-        // 캐시 무효화 - 평균 평점과 평점 참여 인원수를 업데이트하기 위함
-        queryClient.invalidateQueries({
-          queryKey: ['book-detail', isbn],
+        // book-detail 캐시 직접 업데이트 (userRating을 null로 설정하고 평균 평점 및 totalRatings 업데이트)
+        queryClient.setQueryData(['book-detail', isbn], (oldData: unknown) => {
+          return removeBookRating(oldData as BookWithRating);
         });
       }
 

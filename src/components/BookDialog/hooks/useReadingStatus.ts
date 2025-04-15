@@ -77,11 +77,75 @@ export function useReadingStatus() {
         // 상태 업데이트
         setReadingStatus(data.status as ReadingStatusType);
 
-        // book-detail 쿼리 무효화하여 읽기 상태 통계 업데이트
+        // book-detail 캐시 직접 업데이트하여 읽기 상태 통계 반영
         const isbn = book?.isbn13 || book?.isbn;
-        queryClient.invalidateQueries({
-          queryKey: ['book-detail', isbn],
-        });
+        if (isbn) {
+          queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
+            if (!oldData) return oldData;
+
+            // 기존 읽기 상태와 새 읽기 상태를 비교하여 카운트 업데이트
+            const newStatus = data.status as ReadingStatusType;
+            const oldStatus = oldData.userReadingStatus as
+              | ReadingStatusType
+              | undefined;
+
+            // 읽기 상태 카운트 복사
+            const readingStatusCounts = oldData.readingStats
+              ?.readingStatusCounts
+              ? { ...oldData.readingStats.readingStatusCounts }
+              : {
+                  [ReadingStatusType.WANT_TO_READ]: 0,
+                  [ReadingStatusType.READING]: 0,
+                  [ReadingStatusType.READ]: 0,
+                };
+
+            // 이전 상태가 있으면 카운트 감소
+            if (oldStatus) {
+              readingStatusCounts[oldStatus] = Math.max(
+                0,
+                (readingStatusCounts[oldStatus] || 0) - 1
+              );
+            }
+
+            // 새 상태 카운트 증가
+            readingStatusCounts[newStatus] =
+              (readingStatusCounts[newStatus] || 0) + 1;
+
+            // 현재 읽는 중인 사용자와 완료한 사용자 수 업데이트
+            let currentReaders = oldData.readingStats?.currentReaders || 0;
+            let completedReaders = oldData.readingStats?.completedReaders || 0;
+
+            // 이전 상태에 따른 조정
+            if (oldStatus === ReadingStatusType.READING) {
+              currentReaders = Math.max(0, currentReaders - 1);
+            } else if (oldStatus === ReadingStatusType.READ) {
+              completedReaders = Math.max(0, completedReaders - 1);
+            }
+
+            // 새 상태에 따른 조정
+            if (newStatus === ReadingStatusType.READING) {
+              currentReaders += 1;
+            } else if (newStatus === ReadingStatusType.READ) {
+              completedReaders += 1;
+            }
+
+            return {
+              ...oldData,
+              userReadingStatus: newStatus,
+              readingStats: {
+                ...oldData.readingStats,
+                readingStatusCounts,
+                currentReaders,
+                completedReaders,
+              },
+            };
+          });
+        }
+
+        // 읽기 상태 쿼리 업데이트
+        if (book?.id) {
+          queryClient.setQueryData(['user-reading-status', book.id], data);
+        }
 
         // josa 라이브러리를 사용하여 적절한 조사 적용
         const statusText = statusTexts[data.status as ReadingStatusType];
@@ -100,17 +164,62 @@ export function useReadingStatus() {
     useMutation({
       mutationFn: (bookId: number) => deleteReadingStatusByBookId(bookId),
       onSuccess: () => {
-        // 쿼리 무효화
-        if (book?.id) {
-          queryClient.invalidateQueries({
-            queryKey: ['user-reading-status', book.id],
+        // book-detail 캐시 직접 업데이트하여 읽기 상태 통계 반영
+        const isbn = book?.isbn13 || book?.isbn;
+        if (isbn) {
+          queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
+            if (!oldData) return oldData;
+
+            // 기존 읽기 상태가 있으면 해당 카운트 감소
+            const oldStatus = oldData.userReadingStatus as
+              | ReadingStatusType
+              | undefined;
+
+            if (!oldStatus) return oldData; // 이전 상태가 없으면 그대로 반환
+
+            // 읽기 상태 카운트 복사
+            const readingStatusCounts = oldData.readingStats
+              ?.readingStatusCounts
+              ? { ...oldData.readingStats.readingStatusCounts }
+              : {
+                  [ReadingStatusType.WANT_TO_READ]: 0,
+                  [ReadingStatusType.READING]: 0,
+                  [ReadingStatusType.READ]: 0,
+                };
+
+            // 이전 상태 카운트 감소
+            readingStatusCounts[oldStatus] = Math.max(
+              0,
+              (readingStatusCounts[oldStatus] || 0) - 1
+            );
+
+            // 현재 읽는 중인 사용자와 완료한 사용자 수 업데이트
+            let currentReaders = oldData.readingStats?.currentReaders || 0;
+            let completedReaders = oldData.readingStats?.completedReaders || 0;
+
+            // 이전 상태에 따른 조정
+            if (oldStatus === ReadingStatusType.READING) {
+              currentReaders = Math.max(0, currentReaders - 1);
+            } else if (oldStatus === ReadingStatusType.READ) {
+              completedReaders = Math.max(0, completedReaders - 1);
+            }
+
+            return {
+              ...oldData,
+              userReadingStatus: null,
+              readingStats: {
+                ...oldData.readingStats,
+                readingStatusCounts,
+                currentReaders,
+                completedReaders,
+              },
+            };
           });
         }
 
-        if (book?.isbn) {
-          queryClient.invalidateQueries({
-            queryKey: ['book-detail', book.isbn],
-          });
+        // 읽기 상태 쿼리 업데이트
+        if (book?.id) {
+          queryClient.setQueryData(['user-reading-status', book.id], null);
         }
 
         // UI 상태 업데이트
