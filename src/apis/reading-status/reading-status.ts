@@ -7,14 +7,22 @@ import {
 
 /**
  * 독서 상태 생성 또는 업데이트
+ * @param bookId 책 ID (음수인 경우 isbn과 함께 제공 필요)
+ * @param readingStatus 독서 상태 정보
+ * @param isbn 책 ISBN (bookId가 -1인 경우 사용)
  */
 export const createOrUpdateReadingStatus = async (
   bookId: number,
-  readingStatus: ReadingStatusDto
+  readingStatus: ReadingStatusDto,
+  isbn?: string
 ): Promise<ReadingStatusResponseDto> => {
+  // bookId가 음수이고 isbn이 제공된 경우 isbn 포함
+  const payload =
+    isbn && bookId < 0 ? { ...readingStatus, isbn } : readingStatus;
+
   const response = await api.post<ReadingStatusResponseDto>(
     `/reading-status/book/${bookId}`,
-    readingStatus
+    payload
   );
   return response.data;
 };

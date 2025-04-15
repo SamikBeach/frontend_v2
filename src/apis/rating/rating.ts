@@ -3,14 +3,21 @@ import { RatingDto, RatingResponseDto, UpdateRatingDto } from './types';
 
 /**
  * 책에 대한 평점 생성 또는 업데이트
+ * @param bookId 책 ID (음수인 경우 isbn과 함께 제공 필요)
+ * @param ratingData 평점 정보
+ * @param isbn 책 ISBN (bookId가 -1인 경우 사용)
  */
 export const createOrUpdateRating = async (
   bookId: number,
-  ratingData: RatingDto
+  ratingData: RatingDto,
+  isbn?: string
 ): Promise<RatingResponseDto> => {
+  // bookId가 음수이고 isbn이 제공된 경우 isbn 포함
+  const payload = isbn && bookId < 0 ? { ...ratingData, isbn } : ratingData;
+
   const response = await api.post<RatingResponseDto>(
     `/rating/book/${bookId}`,
-    ratingData
+    payload
   );
   return response.data;
 };

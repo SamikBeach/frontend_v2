@@ -32,20 +32,28 @@ export function useBookRating() {
       bookId: number;
       ratingData: RatingDto;
     }) => {
-      return createOrUpdateRating(bookId, ratingData);
+      return createOrUpdateRating(
+        bookId,
+        ratingData,
+        bookId < 0 ? isbn : undefined
+      );
     },
-    onSuccess: () => {
-      // 관련된 쿼리 무효화
+    onSuccess: newRating => {
+      // 캐시 직접 업데이트 - 다시 로드하지 않고 UI만 업데이트
       if (book?.id) {
-        queryClient.invalidateQueries({
-          queryKey: ['user-book-rating', book.id],
+        // user-book-rating 캐시 업데이트
+        queryClient.setQueryData(['user-book-rating', book.id], newRating);
+
+        // book-detail 캐시 직접 업데이트
+        queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            userRating: newRating,
+          };
         });
       }
-
-      // 책 상세 정보 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['book-detail', isbn],
-      });
 
       toast.success('평점이 등록되었습니다.');
     },
@@ -65,18 +73,22 @@ export function useBookRating() {
     }) => {
       return updateRatingApi(ratingId, ratingData);
     },
-    onSuccess: () => {
-      // 관련된 쿼리 무효화
+    onSuccess: updatedRating => {
+      // 캐시 직접 업데이트
       if (book?.id) {
-        queryClient.invalidateQueries({
-          queryKey: ['user-book-rating', book.id],
+        // user-book-rating 캐시 업데이트
+        queryClient.setQueryData(['user-book-rating', book.id], updatedRating);
+
+        // book-detail 캐시 직접 업데이트
+        queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            userRating: updatedRating,
+          };
         });
       }
-
-      // 책 상세 정보 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['book-detail', isbn],
-      });
 
       toast.success('평점이 수정되었습니다.');
     },
@@ -91,17 +103,21 @@ export function useBookRating() {
       return deleteRating(ratingId);
     },
     onSuccess: () => {
-      // 관련된 쿼리 무효화
+      // 캐시 직접 업데이트
       if (book?.id) {
-        queryClient.invalidateQueries({
-          queryKey: ['user-book-rating', book.id],
+        // user-book-rating 캐시 업데이트 (null로 설정)
+        queryClient.setQueryData(['user-book-rating', book.id], null);
+
+        // book-detail 캐시 직접 업데이트 (userRating을 null로 설정)
+        queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
+          if (!oldData) return oldData;
+
+          return {
+            ...oldData,
+            userRating: null,
+          };
         });
       }
-
-      // 책 상세 정보 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['book-detail', isbn],
-      });
 
       toast.success('평점이 삭제되었습니다.');
     },

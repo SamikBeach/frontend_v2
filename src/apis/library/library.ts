@@ -206,6 +206,7 @@ export const addBookToLibraryWithIsbn = async ({
   const response = await api.post<LibraryBook>(`/library/${libraryId}/books`, {
     bookId,
     note: `ISBN: ${isbn}`,
+    isbn,
   });
   return response.data;
 };

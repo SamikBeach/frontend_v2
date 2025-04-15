@@ -55,12 +55,14 @@ export interface CreateReviewDto {
   content: string;
   type: ReviewType;
   bookId?: number;
+  isbn?: string;
 }
 
 export interface UpdateReviewDto {
   content?: string;
   type?: ReviewType;
   bookId?: number;
+  isbn?: string;
 }
 
 export interface CreateCommentDto {

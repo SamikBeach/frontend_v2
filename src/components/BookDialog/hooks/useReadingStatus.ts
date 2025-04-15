@@ -51,7 +51,14 @@ export function useReadingStatus() {
         const readingStatusData: ReadingStatusDto = {
           status,
         };
-        return createOrUpdateReadingStatus(bookId, readingStatusData);
+
+        // bookId가 음수일 때 ISBN으로 책 등록 처리 지원
+        const isbn = book.isbn || book.isbn13;
+        return createOrUpdateReadingStatus(
+          bookId,
+          readingStatusData,
+          bookId < 0 ? isbn : undefined
+        );
       },
       onSuccess: (data: ReadingStatusResponseDto) => {
         if (!data || !data.status) {
