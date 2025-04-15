@@ -1,5 +1,6 @@
 import { CreateLibraryDto } from '@/apis/library/types';
 import { ReadingStatusType } from '@/apis/reading-status';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -18,6 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { ChevronDown, ListPlus, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -31,6 +33,8 @@ import {
 
 export function BookActionButtons() {
   const { book, isbn, userLibraries } = useBookDetails();
+  const currentUser = useCurrentUser();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const {
     readingStatus,
     isPending,
@@ -56,6 +60,11 @@ export function BookActionButtons() {
 
   // 새 서재 생성 핸들러
   const handleCreateNewLibrary = async () => {
+    if (!currentUser) {
+      setAuthDialogOpen(true);
+      return;
+    }
+
     if (!newLibraryName.trim()) {
       toast.error('서재 이름을 입력해주세요.');
       return;
@@ -104,11 +113,36 @@ export function BookActionButtons() {
 
   // 읽기 상태 변경 핸들러 래퍼 함수
   const onReadingStatusChange = (status: ReadingStatusType) => {
+    if (!currentUser) {
+      setAuthDialogOpen(true);
+      return;
+    }
+
     if (book?.id) {
       handleReadingStatusChange(status);
     } else {
       toast.error('책 정보를 불러오는 중 오류가 발생했습니다.');
     }
+  };
+
+  // 서재에 담기 핸들러 래퍼 함수
+  const handleAddToBookshelfWithAuth = (libraryId: number) => {
+    if (!currentUser) {
+      setAuthDialogOpen(true);
+      return;
+    }
+
+    handleAddToBookshelf(libraryId);
+  };
+
+  // 새 서재 생성 다이얼로그 표시 핸들러
+  const handleShowNewLibraryDialog = () => {
+    if (!currentUser) {
+      setAuthDialogOpen(true);
+      return;
+    }
+
+    setIsNewLibraryDialogOpen(true);
   };
 
   return (
@@ -169,15 +203,11 @@ export function BookActionButtons() {
             <Button
               variant="outline"
               className="w-full rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
-              disabled={isBookshelfPending || !isLoggedIn}
+              disabled={isBookshelfPending}
             >
               <ListPlus className="mr-1.5 h-4 w-4" />
               <span className="text-sm">
-                {isBookshelfPending
-                  ? '처리 중...'
-                  : !isLoggedIn
-                    ? '로그인 필요'
-                    : '서재에 담기'}
+                {isBookshelfPending ? '처리 중...' : '서재에 담기'}
               </span>
             </Button>
           </DropdownMenuTrigger>
@@ -187,7 +217,7 @@ export function BookActionButtons() {
                 <DropdownMenuItem
                   key={library.id}
                   className="cursor-pointer rounded-lg py-2"
-                  onClick={() => handleAddToBookshelf(library.id)}
+                  onClick={() => handleAddToBookshelfWithAuth(library.id)}
                   disabled={isBookshelfPending}
                 >
                   {library.name}
@@ -203,7 +233,7 @@ export function BookActionButtons() {
             )}
             <DropdownMenuItem
               className="cursor-pointer rounded-lg py-2 text-black hover:bg-gray-100"
-              onClick={() => setIsNewLibraryDialogOpen(true)}
+              onClick={handleShowNewLibraryDialog}
             >
               <Plus className="mr-1.5 h-4 w-4" />새 서재 만들기
             </DropdownMenuItem>
@@ -252,21 +282,25 @@ export function BookActionButtons() {
           </div>
           <DialogFooter>
             <Button
+              type="button"
               variant="outline"
               onClick={() => setIsNewLibraryDialogOpen(false)}
-              disabled={isCreating}
             >
               취소
             </Button>
             <Button
+              type="button"
               onClick={handleCreateNewLibrary}
-              disabled={!newLibraryName.trim() || isCreating}
+              disabled={isCreating}
             >
-              {isCreating ? '생성 중...' : '만들기'}
+              {isCreating ? '생성 중...' : '생성하기'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* 로그인 다이얼로그 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </>
   );
 }

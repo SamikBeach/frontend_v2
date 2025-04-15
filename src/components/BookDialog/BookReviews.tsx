@@ -15,6 +15,7 @@ import {
   Review,
   ReviewComment as ReviewCommentType,
 } from '@/apis/review/types';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { ReviewDialog } from '@/components/ReviewDialog/ReviewDialog';
 import {
   AlertDialog,
@@ -93,6 +94,7 @@ const getReviewRating = (review: Review): number => {
 // 리뷰 댓글 컴포넌트
 function ReviewComments({ reviewId }: { reviewId: number }) {
   const currentUser = useCurrentUser();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const {
     comments,
     commentText,
@@ -156,6 +158,15 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
     return currentUser?.id === comment.author.id;
   };
 
+  // 로그인 체크 후 댓글 작성 처리
+  const handleCommentSubmitWithAuth = () => {
+    if (!currentUser) {
+      setAuthDialogOpen(true);
+      return;
+    }
+    handleSubmitComment();
+  };
+
   return (
     <div className="space-y-4">
       {/* 댓글 입력 */}
@@ -175,7 +186,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
               onKeyDown={e => {
                 if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                   e.preventDefault();
-                  handleSubmitComment();
+                  handleCommentSubmitWithAuth();
                 }
               }}
               disabled={isSubmitting}
@@ -188,7 +199,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
               }}
             />
             <Button
-              onClick={handleSubmitComment}
+              onClick={handleCommentSubmitWithAuth}
               className="h-9 rounded-lg bg-gray-900 px-3 text-white hover:bg-gray-800"
               disabled={!commentText.trim() || isSubmitting}
             >
@@ -336,6 +347,9 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
           </p>
         )}
       </div>
+
+      {/* 로그인 다이얼로그 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 }
@@ -402,6 +416,7 @@ function ReviewsList({
 }) {
   const currentUser = useCurrentUser();
   const { book } = useBookDetails();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const {
     handleOpenReviewDialog,
     handleOpenEditReviewDialog,
@@ -464,21 +479,42 @@ function ReviewsList({
     }));
   }, []);
 
-  // 좋아요 핸들러 (로딩 상태 추적)
-  const handleLikeWithState = useCallback(
+  // 사용자가 로그인했는지 확인하고 좋아요 처리 또는 로그인 다이얼로그 표시
+  const handleLikeWithAuth = useCallback(
     (reviewId: number, isLiked: boolean) => {
-      setLikingReviewId(reviewId);
+      if (!currentUser) {
+        setAuthDialogOpen(true);
+        return;
+      }
 
-      // API 요청
+      setLikingReviewId(reviewId);
       handleLike(reviewId, isLiked);
 
-      // 일정 시간 후 로딩 상태 해제 (UI 깜빡임 방지)
       setTimeout(() => {
         setLikingReviewId(null);
       }, 500);
     },
-    [handleLike]
+    [currentUser, handleLike]
   );
+
+  // 댓글 토글 전 로그인 체크
+  const handleCommentsToggleWithAuth = useCallback(
+    (reviewId: number) => {
+      // 로그인 체크 로직 제거하고 바로 토글 기능 실행
+      toggleComments(reviewId);
+    },
+    [toggleComments]
+  );
+
+  // 리뷰 작성 또는 수정 전 로그인 체크
+  const handleReviewDialogWithAuth = useCallback(() => {
+    if (!currentUser) {
+      setAuthDialogOpen(true);
+      return;
+    }
+
+    handleOpenReviewDialog();
+  }, [currentUser, handleOpenReviewDialog]);
 
   // 작성자 확인
   const isMyReview = (review: Review) => {
@@ -502,10 +538,13 @@ function ReviewsList({
         <Button
           variant="outline"
           className="mt-3 rounded-full text-sm font-medium"
-          onClick={() => handleOpenReviewDialog()}
+          onClick={handleReviewDialogWithAuth}
         >
           첫 리뷰를 작성해보세요
         </Button>
+
+        {/* 로그인 다이얼로그 */}
+        <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
       </div>
     );
   }
@@ -656,10 +695,7 @@ function ReviewsList({
                           : 'text-gray-600 hover:bg-gray-50'
                       }`}
                       onClick={() =>
-                        handleLikeWithState(
-                          review.id,
-                          review.userLiked || false
-                        )
+                        handleLikeWithAuth(review.id, review.userLiked || false)
                       }
                       disabled={likingReviewId === review.id && isLikeLoading}
                     >
@@ -677,7 +713,7 @@ function ReviewsList({
                     <Button
                       variant="ghost"
                       className="h-8 rounded-full p-0 px-2 text-gray-600 hover:bg-gray-50"
-                      onClick={() => toggleComments(review.id)}
+                      onClick={() => handleCommentsToggleWithAuth(review.id)}
                     >
                       <MessageSquare className="h-4 w-4" />
                       <span className="font-medium">
@@ -728,7 +764,7 @@ function ReviewsList({
         </div>
       )}
 
-      {/* 리뷰 다이얼로그 추가 - 리뷰가 있는 경우에만 렌더링 */}
+      {/* 리뷰 다이얼로그 추가 */}
       {reviewDialogOpen && (
         <ReviewDialog
           open={reviewDialogOpen}
@@ -741,6 +777,9 @@ function ReviewsList({
           isSubmitting={isSubmitting}
         />
       )}
+
+      {/* 로그인 다이얼로그 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 }

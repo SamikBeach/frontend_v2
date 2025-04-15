@@ -4,28 +4,28 @@ import {
   deleteComment,
   getReviewComments,
 } from '@/apis/review';
-import { Review } from '@/apis/review/types';
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query';
+import { CommentsResponse, Review } from '@/apis/review/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
 
 export function useReviewComments(reviewId: number) {
   const { book } = useBookDetails();
-  const bookId = book?.id || 0;
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
 
   // 댓글 목록 조회
-  const { data } = useSuspenseQuery({
+  const { data, isLoading } = useQuery<CommentsResponse>({
     queryKey: ['review-comments', reviewId],
     queryFn: async () => {
-      const response = await getReviewComments(reviewId);
-      return response;
+      try {
+        const response = await getReviewComments(reviewId);
+        return response;
+      } catch (error) {
+        console.error('Failed to fetch comments:', error);
+        return { comments: [] };
+      }
     },
   });
 
@@ -194,6 +194,7 @@ export function useReviewComments(reviewId: number) {
   return {
     comments,
     commentText,
+    isLoading,
     isSubmitting,
     isDeleting,
     handleCommentTextChange,
