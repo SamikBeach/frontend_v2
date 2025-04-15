@@ -666,7 +666,7 @@ function ReviewsList({
                     )}
                   </div>
 
-                  <p className="mt-2 text-[15px] leading-relaxed whitespace-pre-line text-gray-700">
+                  <p className="mt-2 text-[15px] leading-relaxed whitespace-pre-line text-gray-800">
                     {review.content}
                   </p>
 
@@ -688,13 +688,13 @@ function ReviewsList({
                     </div>
                   )}
 
-                  <div className="mt-3 flex items-center gap-3">
+                  <div className="mt-2.5 flex items-center gap-2 pt-1">
                     <Button
-                      variant="ghost"
-                      className={`flex h-8 items-center gap-1.5 rounded-full px-3 ${
+                      variant="outline"
+                      className={`flex h-7 items-center gap-1 rounded-full border px-2.5 ${
                         review.userLiked
-                          ? 'text-pink-500 hover:bg-pink-50 hover:text-pink-500'
-                          : 'text-gray-600 hover:bg-gray-50'
+                          ? 'border-pink-200 bg-pink-50 text-pink-500 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-600'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-700'
                       }`}
                       onClick={() =>
                         handleLikeWithAuth(review.id, review.userLiked || false)
@@ -702,23 +702,23 @@ function ReviewsList({
                       disabled={likingReviewId === review.id && isLikeLoading}
                     >
                       {review.userLiked ? (
-                        <ThumbsUp className="h-[14px] w-[14px] fill-pink-500 text-pink-500" />
+                        <ThumbsUp className="h-3.5 w-3.5 fill-pink-500 text-pink-500" />
                       ) : (
-                        <ThumbsUp className="h-[14px] w-[14px]" />
+                        <ThumbsUp className="h-3.5 w-3.5" />
                       )}
                       <span
-                        className={`text-sm font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
+                        className={`text-xs font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
                       >
                         {review.likesCount || 0}
                       </span>
                     </Button>
                     <Button
-                      variant="ghost"
-                      className="flex h-8 items-center gap-1.5 rounded-full px-3 text-gray-600 hover:bg-gray-50"
+                      variant="outline"
+                      className="flex h-7 items-center gap-1 rounded-full border border-gray-200 px-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-700"
                       onClick={() => handleCommentsToggleWithAuth(review.id)}
                     >
-                      <MessageSquare className="h-[14px] w-[14px]" />
-                      <span className="text-sm font-medium">
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      <span className="text-xs font-medium">
                         {review.commentsCount || 0}
                       </span>
                     </Button>
