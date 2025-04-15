@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
+import { ConflictAlertDialog } from './components/ConflictAlertDialog';
 import { useBookDetails, useBookLibraries } from './hooks';
 import { useLibrary } from './hooks/useLibrary';
 import { useUserLibraries } from './hooks/useUserLibraries';
@@ -54,6 +55,9 @@ function LibrariesList() {
     handleAddToLibrary,
     isPending: isLibraryPending,
     error: libraryError,
+    conflictDialogOpen,
+    conflictLibraryName,
+    closeConflictDialog,
   } = useLibrary(book, book?.isbn || '', userLibraries);
 
   // 새 서재 생성 다이얼로그 상태
@@ -69,10 +73,9 @@ function LibrariesList() {
     try {
       const newLibrary = await createLibrary(libraryData);
       if (newLibrary && book) {
-        // 새로 생성된 서재에 책 추가
-        handleAddToLibrary(newLibrary.id);
+        // 새로 생성된 서재에 책 추가 - 책 데이터는 필요한 경우에만 추가
+        toast.success(`'${newLibrary.name}' 서재가 생성되었습니다.`);
       }
-      toast.success('새 서재를 만들고 책을 추가했습니다');
     } catch (error) {
       toast.error('서재 생성 중 오류가 발생했습니다');
       console.error('서재 생성 오류:', error);
@@ -110,12 +113,9 @@ function LibrariesList() {
             <Button
               variant="outline"
               className="mt-3 w-44 max-w-xs rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
-              disabled={isLibraryPending}
             >
               <ListPlus className="mr-1.5 h-4 w-4" />
-              <span className="text-sm">
-                {isLibraryPending ? '처리 중...' : '내 서재에 담기'}
-              </span>
+              <span className="text-sm">내 서재에 담기</span>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-44 rounded-xl">
@@ -125,11 +125,10 @@ function LibrariesList() {
                   key={library.id}
                   className="cursor-pointer rounded-lg py-2"
                   onClick={() => handleAddToLibraryWithAuth(library.id)}
-                  disabled={isLibraryPending}
                 >
                   {library.name}
-                  <span className="ml-2 text-xs text-gray-500">
-                    ({library.bookCount || 0}권)
+                  <span className="ml-1 text-xs text-gray-500">
+                    {library.bookCount || 0}
                   </span>
                 </DropdownMenuItem>
               ))
@@ -146,6 +145,13 @@ function LibrariesList() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* 충돌 알림 다이얼로그 */}
+        <ConflictAlertDialog
+          open={conflictDialogOpen}
+          onOpenChange={closeConflictDialog}
+          libraryName={conflictLibraryName}
+        />
       </div>
     );
   }
@@ -194,7 +200,7 @@ function LibrariesList() {
               </div>
               <div className="flex items-center gap-1.5">
                 <BookOpen className="h-3.5 w-3.5 text-gray-400" />
-                <span>{library.booksCount || 0}권</span>
+                <span>{library.booksCount || 0}</span>
               </div>
             </div>
           </div>
@@ -206,6 +212,13 @@ function LibrariesList() {
         open={isNewLibraryDialogOpen}
         onOpenChange={setIsNewLibraryDialogOpen}
         onCreateLibrary={handleCreateLibraryWithBook}
+      />
+
+      {/* 충돌 알림 다이얼로그 */}
+      <ConflictAlertDialog
+        open={conflictDialogOpen}
+        onOpenChange={closeConflictDialog}
+        libraryName={conflictLibraryName}
       />
 
       {/* 로그인 다이얼로그 */}

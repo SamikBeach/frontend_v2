@@ -15,6 +15,8 @@ export function useLibrary(
   const queryClient = useQueryClient();
   // 에러 상태 관리
   const [error, setError] = useState<Error | null>(null);
+  const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+  const [conflictLibraryName, setConflictLibraryName] = useState('');
 
   // 책을 서재에 추가하는 뮤테이션
   const { mutate, isPending } = useMutation({
@@ -35,9 +37,22 @@ export function useLibrary(
         isbn,
       });
     },
-    onError: (err: Error) => {
-      setError(err);
-      toast.error('서재에 책을 추가하는 데 실패했습니다.');
+    onError: (err: any, variables) => {
+      // 409 Conflict 에러 감지
+      if (err.response && err.response.status === 409) {
+        // 에러가 발생한 라이브러리 ID는 mutate에 전달된 variables에서 가져옵니다
+        const { libraryId } = variables;
+        const selectedLibrary = userLibraries.find(lib => lib.id === libraryId);
+        const libraryName = selectedLibrary?.name || '서재';
+
+        console.log('충돌 발생한 서재:', selectedLibrary);
+
+        setConflictLibraryName(libraryName);
+        setConflictDialogOpen(true);
+      } else {
+        setError(err);
+        toast.error('서재에 책을 추가하는 데 실패했습니다.');
+      }
     },
   });
 
@@ -51,6 +66,7 @@ export function useLibrary(
     // 선택한 서재의 이름 가져오기
     const selectedLibrary = userLibraries.find(lib => lib.id === libraryId);
     const libraryName = selectedLibrary?.name || '서재';
+    const bookTitle = book.title || '책';
 
     mutate(
       {
@@ -59,12 +75,20 @@ export function useLibrary(
       },
       {
         onSuccess: () => {
-          // 직접 텍스트로 메시지 작성
-          const message = `책이 '${libraryName}'에 추가되었습니다.`;
-          toast.success(message);
+          // 성공 메시지 표시 - 수정된 포맷
+          toast.success(
+            `"${bookTitle}"이 서재 "${libraryName}"에 추가되었습니다.`
+          );
 
-          // 서재 데이터 갱신
+          // 사용자 서재 목록 갱신
           queryClient.invalidateQueries({ queryKey: ['user-libraries'] });
+
+          // 책에 대한 서재 목록 갱신
+          if (book.id) {
+            queryClient.invalidateQueries({
+              queryKey: ['book-libraries', book.id],
+            });
+          }
         },
       }
     );
@@ -75,10 +99,18 @@ export function useLibrary(
     setError(null);
   }, []);
 
+  // 충돌 다이얼로그 닫기 함수
+  const closeConflictDialog = useCallback(() => {
+    setConflictDialogOpen(false);
+  }, []);
+
   return {
     handleAddToLibrary,
     isPending,
     error,
     resetError,
+    conflictDialogOpen,
+    conflictLibraryName,
+    closeConflictDialog,
   };
 }
