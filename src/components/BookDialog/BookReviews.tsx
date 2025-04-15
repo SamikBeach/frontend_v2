@@ -559,12 +559,12 @@ function ReviewsList({
           return (
             <div
               key={review.id}
-              className={`py-5 ${
+              className={`py-6 ${
                 index !== reviews.length - 1 ? 'border-b border-gray-100' : ''
               }`}
             >
-              <div className="flex items-start gap-4">
-                <Avatar className="h-10 w-10">
+              <div className="flex items-start gap-3.5">
+                <Avatar className="mt-0.5 h-9 w-9 flex-shrink-0">
                   <AvatarImage
                     src={review.author.profileImage || ''}
                     alt={review.author.username}
@@ -574,13 +574,13 @@ function ReviewsList({
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-medium text-gray-900">
+                        <h3 className="text-sm font-medium text-gray-800">
                           {review.author.username}
                         </h3>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-xs text-gray-500">
                           {formatDate(review.createdAt)}
                         </span>
                       </div>
@@ -591,7 +591,7 @@ function ReviewsList({
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-3.5 w-3.5 ${
+                              className={`h-3 w-3 ${
                                 i < Math.floor(rating)
                                   ? 'fill-yellow-400 text-yellow-400'
                                   : 'fill-gray-200 text-gray-200'
@@ -614,9 +614,9 @@ function ReviewsList({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                            className="h-7 w-7 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
                           >
-                            <MoreHorizontal className="h-5 w-5" />
+                            <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-36">
@@ -666,7 +666,9 @@ function ReviewsList({
                     )}
                   </div>
 
-                  <p className="mt-3 text-gray-700">{review.content}</p>
+                  <p className="mt-2 text-[15px] leading-relaxed whitespace-pre-line text-gray-700">
+                    {review.content}
+                  </p>
 
                   {/* 이미지가 있는 경우 표시 */}
                   {review.images && review.images.length > 0 && (
@@ -686,10 +688,10 @@ function ReviewsList({
                     </div>
                   )}
 
-                  <div className="mt-3 flex items-center gap-0.5">
+                  <div className="mt-3 flex items-center gap-3">
                     <Button
                       variant="ghost"
-                      className={`h-8 rounded-full p-0 px-2 ${
+                      className={`flex h-8 items-center gap-1.5 rounded-full px-3 ${
                         review.userLiked
                           ? 'text-pink-500 hover:bg-pink-50 hover:text-pink-500'
                           : 'text-gray-600 hover:bg-gray-50'
@@ -700,23 +702,23 @@ function ReviewsList({
                       disabled={likingReviewId === review.id && isLikeLoading}
                     >
                       {review.userLiked ? (
-                        <ThumbsUp className="h-4 w-4 fill-pink-500 text-pink-500" />
+                        <ThumbsUp className="h-[14px] w-[14px] fill-pink-500 text-pink-500" />
                       ) : (
-                        <ThumbsUp className="h-4 w-4" />
+                        <ThumbsUp className="h-[14px] w-[14px]" />
                       )}
                       <span
-                        className={`font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
+                        className={`text-sm font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
                       >
                         {review.likesCount || 0}
                       </span>
                     </Button>
                     <Button
                       variant="ghost"
-                      className="h-8 rounded-full p-0 px-2 text-gray-600 hover:bg-gray-50"
+                      className="flex h-8 items-center gap-1.5 rounded-full px-3 text-gray-600 hover:bg-gray-50"
                       onClick={() => handleCommentsToggleWithAuth(review.id)}
                     >
-                      <MessageSquare className="h-4 w-4" />
-                      <span className="font-medium">
+                      <MessageSquare className="h-[14px] w-[14px]" />
+                      <span className="text-sm font-medium">
                         {review.commentsCount || 0}
                       </span>
                     </Button>
