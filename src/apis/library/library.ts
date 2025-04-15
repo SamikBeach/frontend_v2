@@ -217,12 +217,13 @@ export const addBookToLibraryWithIsbn = async ({
 export const getLibrariesByBookId = async (
   bookId: number,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  isbn?: string
 ): Promise<LibrariesForBookResponse> => {
   const response = await api.get<LibrariesForBookResponse>(
     `/library/book/${bookId}`,
     {
-      params: { page, limit },
+      params: { page, limit, isbn },
     }
   );
   return response.data;

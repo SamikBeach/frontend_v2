@@ -192,10 +192,11 @@ export const getBookReviews = async (
   bookId: number,
   page: number = 1,
   limit: number = 10,
-  sort: 'likes' | 'comments' | 'recent' = 'likes'
+  sort: 'likes' | 'comments' | 'recent' = 'likes',
+  isbn?: string
 ): Promise<ReviewsResponse> => {
   const response = await api.get<ReviewsResponse>(`/review/book/${bookId}`, {
-    params: { page, limit, sort },
+    params: { page, limit, sort, isbn },
   });
   return response.data;
 };

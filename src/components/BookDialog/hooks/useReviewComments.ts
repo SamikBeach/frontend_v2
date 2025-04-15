@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
 
 export function useReviewComments(reviewId: number) {
-  const { book } = useBookDetails();
+  const { book, isbn } = useBookDetails();
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
 
@@ -131,6 +131,7 @@ export function useReviewComments(reviewId: number) {
 
     // 각 쿼리 키에 대해 댓글 수 업데이트
     queryKeys.forEach(query => {
+      // 모든 book-reviews 쿼리를 업데이트
       queryClient.setQueryData(query.queryKey, (oldData: any) => {
         // 배열 형태인 경우
         if (Array.isArray(oldData)) {
@@ -165,9 +166,52 @@ export function useReviewComments(reviewId: number) {
           };
         }
 
+        // 무한 쿼리 형태인 경우 ({ pages: [{...}] })
+        if (oldData?.pages && Array.isArray(oldData.pages)) {
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => {
+              if (!page || !page.data || !Array.isArray(page.data)) return page;
+
+              return {
+                ...page,
+                data: page.data.map((review: Review) =>
+                  review.id === reviewId
+                    ? {
+                        ...review,
+                        commentsCount: Math.max(
+                          0,
+                          (review.commentsCount || 0) + changeAmount
+                        ),
+                      }
+                    : review
+                ),
+              };
+            }),
+          };
+        }
+
         return oldData;
       });
     });
+
+    // 리뷰 목록 전체 갱신을 위해 추가로 무효화
+    if (book?.id) {
+      queryClient.invalidateQueries({
+        queryKey: ['book-reviews', book.id],
+        exact: false,
+        refetchType: 'none',
+      });
+    }
+
+    // ISBN을 사용하는 경우도 처리
+    if (isbn) {
+      queryClient.invalidateQueries({
+        queryKey: ['book-reviews', -1],
+        exact: false,
+        refetchType: 'none',
+      });
+    }
   };
 
   // 댓글 제출 핸들러

@@ -1,7 +1,9 @@
 import { createOrUpdateRating } from '@/apis/rating/rating';
 import { createReview, updateReview } from '@/apis/review/review';
 import { Review } from '@/apis/review/types';
+import { bookReviewSortAtom } from '@/atoms/book';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
@@ -10,6 +12,7 @@ export function useReviewDialog() {
   const { book, isbn, userRating: userRatingData } = useBookDetails();
   const queryClient = useQueryClient();
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const sort = useAtomValue(bookReviewSortAtom);
 
   // 수정 모드 상태 추가
   const [isEditMode, setIsEditMode] = useState(false);
@@ -135,10 +138,23 @@ export function useReviewDialog() {
 
       // 필요한 데이터만 선택적으로 무효화
       if (book?.id) {
+        // 정확한 쿼리 키로 무효화하고 refetchType을 active로 변경
         queryClient.invalidateQueries({
-          queryKey: ['book-reviews', book.id],
-          exact: false,
-          refetchType: 'none',
+          queryKey: ['book-reviews', book.id, sort, isbn],
+          refetchType: 'active',
+        });
+      }
+
+      // ISBN이 있고 북ID가 -1 또는 음수인 경우에도 무효화
+      if (isbn && (!book?.id || book.id <= 0)) {
+        queryClient.invalidateQueries({
+          queryKey: ['book-reviews', -1],
+          refetchType: 'active',
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ['book-reviews', 0],
+          refetchType: 'active',
         });
       }
 

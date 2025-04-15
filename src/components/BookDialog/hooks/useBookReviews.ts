@@ -13,7 +13,7 @@ import { bookReviewSortAtom } from '@/atoms/book';
 import { useBookDetails } from './useBookDetails';
 
 export function useBookReviews() {
-  const { book } = useBookDetails();
+  const { book, isbn } = useBookDetails();
   const bookId = book?.id || 0;
   const [sort, setSort] = useAtom(bookReviewSortAtom); // Jotai atom 사용
   const queryClient = useQueryClient();
@@ -29,9 +29,9 @@ export function useBookReviews() {
     status,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ['book-reviews', bookId, sort], // sort 변경 시 자동으로 refetch
+    queryKey: ['book-reviews', bookId, sort, isbn], // sort 변경 시 자동으로 refetch
     queryFn: async ({ pageParam }) => {
-      if (!bookId) {
+      if (!bookId && !isbn) {
         return {
           data: [],
           meta: { total: 0, page: 1, limit, totalPages: 0, sort },
@@ -39,7 +39,15 @@ export function useBookReviews() {
       }
 
       const page = pageParam as number;
-      const reviewsData = await getBookReviews(bookId, page, limit, sort);
+      // bookId가 -1 또는 0이고, isbn이 있는 경우 isbn을 함께 전달
+      const shouldUseIsbn = (bookId <= 0 || bookId === -1) && isbn;
+      const reviewsData = await getBookReviews(
+        bookId,
+        page,
+        limit,
+        sort,
+        shouldUseIsbn ? isbn : undefined
+      );
       return reviewsData;
     },
     getNextPageParam: (lastPage: ReviewsResponse) => {
@@ -95,11 +103,11 @@ export function useBookReviews() {
     onMutate: async ({ reviewId, isLiked }) => {
       // 낙관적 업데이트 - 무한 쿼리 구조에 맞게 수정
       await queryClient.cancelQueries({
-        queryKey: ['book-reviews', bookId, sort],
+        queryKey: ['book-reviews', bookId, sort, isbn],
       });
 
       queryClient.setQueryData(
-        ['book-reviews', bookId, sort],
+        ['book-reviews', bookId, sort, isbn],
         (oldData: any) => {
           if (!oldData || !oldData.pages) return oldData;
 
@@ -128,7 +136,7 @@ export function useBookReviews() {
         }
       );
 
-      return { queryKey: ['book-reviews', bookId, sort] };
+      return { queryKey: ['book-reviews', bookId, sort, isbn] };
     },
     onError: (error, variables, context) => {
       // 에러 발생시 쿼리 무효화하여 데이터 재조회

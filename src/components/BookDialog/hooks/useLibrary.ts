@@ -87,6 +87,24 @@ export function useLibrary(
               queryKey: ['book-libraries', book.id],
             });
           }
+
+          // isbn이 존재하는 경우에도 book-libraries 캐시 무효화
+          if (isbn) {
+            // bookId가 -1인 경우를 위한 캐시 무효화
+            queryClient.invalidateQueries({
+              queryKey: ['book-libraries', -1],
+            });
+
+            // ISBN을 사용하는 다른 쿼리도 무효화
+            queryClient.invalidateQueries({
+              queryKey: ['book-libraries'],
+              predicate: query => {
+                const queryKey = query.queryKey as any[];
+                // 쿼리 키에 isbn이 포함되어 있는지 확인
+                return queryKey.length > 3 && queryKey[3] === isbn;
+              },
+            });
+          }
         },
       }
     );
