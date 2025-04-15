@@ -36,7 +36,7 @@ export function BookInfo() {
   if (!book) return null;
 
   const bookDescription = book.description || '책 설명이 없습니다.';
-  const authorDescription = book.authorDescription || '저자 정보가 없습니다.';
+  const authorDescription = book.authorInfo || '저자 정보가 없습니다.';
 
   const toggleExpand = () => {
     setExpanded(!expanded);
