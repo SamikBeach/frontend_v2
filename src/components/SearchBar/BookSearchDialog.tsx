@@ -78,8 +78,9 @@ export function BookSearchDialog({
   // Dialog가 닫힐 때 검색어 초기화
   const handleOpenChange = (isOpen: boolean) => {
     setIsOpen(isOpen);
+
     if (!isOpen) {
-      setQuery(''); // 검색어 초기화
+      setQuery('');
     }
   };
 
@@ -94,7 +95,6 @@ export function BookSearchDialog({
   // 검색 결과 또는 최근 검색 표시 여부
   const view = query ? 'results' : 'recent';
 
-  // 다이얼로그가 열릴 때 최근 검색어 데이터를 다시 가져오도록 수정
   useEffect(() => {
     if (isOpen) {
       queryClient.invalidateQueries({ queryKey: ['search', 'recent'] });

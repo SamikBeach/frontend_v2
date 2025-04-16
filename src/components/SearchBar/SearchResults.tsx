@@ -212,10 +212,7 @@ export function SearchResults({
           };
 
           // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
-          const bookKey =
-            book.isbn13 ||
-            book.isbn ||
-            `book-index-${index}-${book.title?.slice(0, 10)}`;
+          const bookKey = (book.isbn13 ?? '') + (book.isbn ?? '') + book.title;
 
           return (
             <SearchItem
