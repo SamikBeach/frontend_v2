@@ -15,6 +15,7 @@ import {
   Review,
   ReviewComment as ReviewCommentType,
 } from '@/apis/review/types';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { ReviewDialog } from '@/components/ReviewDialog/ReviewDialog';
 import {
   AlertDialog,
@@ -40,6 +41,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
+import { BookReviewsSkeleton } from './components/common';
 import { useBookDetails, useBookReviews, useReviewDialog } from './hooks';
 import { useReviewComments } from './hooks/useReviewComments';
 
@@ -93,6 +95,7 @@ const getReviewRating = (review: Review): number => {
 // 리뷰 댓글 컴포넌트
 function ReviewComments({ reviewId }: { reviewId: number }) {
   const currentUser = useCurrentUser();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const {
     comments,
     commentText,
@@ -156,6 +159,15 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
     return currentUser?.id === comment.author.id;
   };
 
+  // 로그인 체크 후 댓글 작성 처리
+  const handleCommentSubmitWithAuth = () => {
+    if (!currentUser) {
+      setAuthDialogOpen(true);
+      return;
+    }
+    handleSubmitComment();
+  };
+
   return (
     <div className="space-y-4">
       {/* 댓글 입력 */}
@@ -175,7 +187,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
               onKeyDown={e => {
                 if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                   e.preventDefault();
-                  handleSubmitComment();
+                  handleCommentSubmitWithAuth();
                 }
               }}
               disabled={isSubmitting}
@@ -188,7 +200,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
               }}
             />
             <Button
-              onClick={handleSubmitComment}
+              onClick={handleCommentSubmitWithAuth}
               className="h-9 rounded-lg bg-gray-900 px-3 text-white hover:bg-gray-800"
               disabled={!commentText.trim() || isSubmitting}
             >
@@ -290,7 +302,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
                                 <DropdownMenuItem
-                                  className="flex cursor-pointer items-center gap-2 text-sm text-red-500"
+                                  className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
                                   onSelect={e => e.preventDefault()}
                                 >
                                   <Trash className="h-3.5 w-3.5 text-red-500" />
@@ -336,6 +348,9 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
           </p>
         )}
       </div>
+
+      {/* 로그인 다이얼로그 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 }
@@ -365,35 +380,6 @@ function ErrorFallback({
   );
 }
 
-// 리뷰 로딩 컴포넌트
-function ReviewsLoading() {
-  return (
-    <div className="space-y-4">
-      {[1, 2].map(i => (
-        <div
-          key={i}
-          className="rounded-2xl border border-gray-200 bg-white p-4"
-        >
-          <div className="flex animate-pulse items-start gap-4">
-            <div className="h-10 w-10 rounded-full bg-gray-200"></div>
-            <div className="flex-1 space-y-2">
-              <div className="h-4 w-24 rounded bg-gray-200"></div>
-              <div className="flex gap-1">
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
-                <div className="h-4 w-4 rounded bg-gray-200"></div>
-              </div>
-              <div className="h-16 rounded-lg bg-gray-200"></div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // 메인 리뷰 목록 컴포넌트
 function ReviewsList({
   onReviewCountChange,
@@ -402,6 +388,7 @@ function ReviewsList({
 }) {
   const currentUser = useCurrentUser();
   const { book } = useBookDetails();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const {
     handleOpenReviewDialog,
     handleOpenEditReviewDialog,
@@ -452,7 +439,6 @@ function ReviewsList({
     },
     onError: error => {
       toast.error('리뷰 삭제 중 오류가 발생했습니다');
-      console.error('리뷰 삭제 오류:', error);
     },
   });
 
@@ -464,21 +450,42 @@ function ReviewsList({
     }));
   }, []);
 
-  // 좋아요 핸들러 (로딩 상태 추적)
-  const handleLikeWithState = useCallback(
+  // 사용자가 로그인했는지 확인하고 좋아요 처리 또는 로그인 다이얼로그 표시
+  const handleLikeWithAuth = useCallback(
     (reviewId: number, isLiked: boolean) => {
-      setLikingReviewId(reviewId);
+      if (!currentUser) {
+        setAuthDialogOpen(true);
+        return;
+      }
 
-      // API 요청
+      setLikingReviewId(reviewId);
       handleLike(reviewId, isLiked);
 
-      // 일정 시간 후 로딩 상태 해제 (UI 깜빡임 방지)
       setTimeout(() => {
         setLikingReviewId(null);
       }, 500);
     },
-    [handleLike]
+    [currentUser, handleLike]
   );
+
+  // 댓글 토글 전 로그인 체크
+  const handleCommentsToggleWithAuth = useCallback(
+    (reviewId: number) => {
+      // 로그인 체크 로직 제거하고 바로 토글 기능 실행
+      toggleComments(reviewId);
+    },
+    [toggleComments]
+  );
+
+  // 리뷰 작성 또는 수정 전 로그인 체크
+  const handleReviewDialogWithAuth = useCallback(() => {
+    if (!currentUser) {
+      setAuthDialogOpen(true);
+      return;
+    }
+
+    handleOpenReviewDialog();
+  }, [currentUser, handleOpenReviewDialog]);
 
   // 작성자 확인
   const isMyReview = (review: Review) => {
@@ -495,6 +502,12 @@ function ReviewsList({
     deleteReviewMutation.mutate(reviewId);
   };
 
+  // 로딩 중일 때는 리뷰 없음 메시지를 표시하지 않습니다
+  if (isLoading) {
+    return <BookReviewsSkeleton />;
+  }
+
+  // 로딩이 완료된 후 리뷰가 없는 경우에만 표시
   if (!reviews || reviews.length === 0) {
     return (
       <div className="px-1 py-6 text-center">
@@ -502,10 +515,25 @@ function ReviewsList({
         <Button
           variant="outline"
           className="mt-3 rounded-full text-sm font-medium"
-          onClick={() => handleOpenReviewDialog()}
+          onClick={handleReviewDialogWithAuth}
         >
           첫 리뷰를 작성해보세요
         </Button>
+
+        {/* 리뷰 다이얼로그 추가 */}
+        <ReviewDialog
+          open={reviewDialogOpen}
+          onOpenChange={setReviewDialogOpen}
+          bookTitle={book?.title || ''}
+          initialRating={userRating}
+          initialContent={initialContent}
+          isEditMode={isEditMode}
+          onSubmit={handleReviewSubmit}
+          isSubmitting={isSubmitting}
+        />
+
+        {/* 로그인 다이얼로그 */}
+        <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
       </div>
     );
   }
@@ -520,12 +548,12 @@ function ReviewsList({
           return (
             <div
               key={review.id}
-              className={`py-5 ${
+              className={`${index === 0 ? 'pt-2 pb-6' : 'py-6'} ${
                 index !== reviews.length - 1 ? 'border-b border-gray-100' : ''
               }`}
             >
-              <div className="flex items-start gap-4">
-                <Avatar className="h-10 w-10">
+              <div className="flex items-start gap-3.5">
+                <Avatar className="mt-0.5 h-9 w-9 flex-shrink-0">
                   <AvatarImage
                     src={review.author.profileImage || ''}
                     alt={review.author.username}
@@ -535,13 +563,13 @@ function ReviewsList({
                   </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex flex-wrap items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-base font-medium text-gray-900">
+                        <h3 className="text-sm font-medium text-gray-800">
                           {review.author.username}
                         </h3>
-                        <span className="text-sm text-gray-500">
+                        <span className="text-xs text-gray-500">
                           {formatDate(review.createdAt)}
                         </span>
                       </div>
@@ -552,7 +580,7 @@ function ReviewsList({
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-3.5 w-3.5 ${
+                              className={`h-3 w-3 ${
                                 i < Math.floor(rating)
                                   ? 'fill-yellow-400 text-yellow-400'
                                   : 'fill-gray-200 text-gray-200'
@@ -575,9 +603,9 @@ function ReviewsList({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                            className="h-7 w-7 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
                           >
-                            <MoreHorizontal className="h-5 w-5" />
+                            <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-36">
@@ -591,7 +619,7 @@ function ReviewsList({
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <DropdownMenuItem
-                                className="flex cursor-pointer items-center gap-2 text-sm text-red-500"
+                                className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
                                 onSelect={e => e.preventDefault()}
                               >
                                 <Trash className="h-3.5 w-3.5 text-red-500" />
@@ -627,7 +655,9 @@ function ReviewsList({
                     )}
                   </div>
 
-                  <p className="mt-3 text-gray-700">{review.content}</p>
+                  <p className="mt-2 text-[15px] leading-relaxed whitespace-pre-line text-gray-800">
+                    {review.content}
+                  </p>
 
                   {/* 이미지가 있는 경우 표시 */}
                   {review.images && review.images.length > 0 && (
@@ -647,40 +677,37 @@ function ReviewsList({
                     </div>
                   )}
 
-                  <div className="mt-3 flex items-center gap-0.5">
+                  <div className="mt-2.5 flex items-center gap-2 pt-1">
                     <Button
-                      variant="ghost"
-                      className={`h-8 rounded-full p-0 px-2 ${
+                      variant="outline"
+                      className={`flex h-7 items-center gap-1 rounded-full border px-2.5 ${
                         review.userLiked
-                          ? 'text-pink-500 hover:bg-pink-50 hover:text-pink-500'
-                          : 'text-gray-600 hover:bg-gray-50'
+                          ? 'border-pink-200 bg-pink-50 text-pink-500 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-600'
+                          : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-700'
                       }`}
                       onClick={() =>
-                        handleLikeWithState(
-                          review.id,
-                          review.userLiked || false
-                        )
+                        handleLikeWithAuth(review.id, review.userLiked || false)
                       }
                       disabled={likingReviewId === review.id && isLikeLoading}
                     >
                       {review.userLiked ? (
-                        <ThumbsUp className="h-4 w-4 fill-pink-500 text-pink-500" />
+                        <ThumbsUp className="h-3.5 w-3.5 fill-pink-500 text-pink-500" />
                       ) : (
-                        <ThumbsUp className="h-4 w-4" />
+                        <ThumbsUp className="h-3.5 w-3.5" />
                       )}
                       <span
-                        className={`font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
+                        className={`text-xs font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
                       >
                         {review.likesCount || 0}
                       </span>
                     </Button>
                     <Button
-                      variant="ghost"
-                      className="h-8 rounded-full p-0 px-2 text-gray-600 hover:bg-gray-50"
-                      onClick={() => toggleComments(review.id)}
+                      variant="outline"
+                      className="flex h-7 items-center gap-1 rounded-full border border-gray-200 px-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-700"
+                      onClick={() => handleCommentsToggleWithAuth(review.id)}
                     >
-                      <MessageSquare className="h-4 w-4" />
-                      <span className="font-medium">
+                      <MessageSquare className="h-3.5 w-3.5" />
+                      <span className="text-xs font-medium">
                         {review.commentsCount || 0}
                       </span>
                     </Button>
@@ -728,19 +755,20 @@ function ReviewsList({
         </div>
       )}
 
-      {/* 리뷰 다이얼로그 추가 - 리뷰가 있는 경우에만 렌더링 */}
-      {reviewDialogOpen && (
-        <ReviewDialog
-          open={reviewDialogOpen}
-          onOpenChange={setReviewDialogOpen}
-          bookTitle={book?.title || ''}
-          initialRating={userRating}
-          initialContent={initialContent}
-          isEditMode={isEditMode}
-          onSubmit={handleReviewSubmit}
-          isSubmitting={isSubmitting}
-        />
-      )}
+      {/* 리뷰 다이얼로그 추가 */}
+      <ReviewDialog
+        open={reviewDialogOpen}
+        onOpenChange={setReviewDialogOpen}
+        bookTitle={book?.title || ''}
+        initialRating={userRating}
+        initialContent={initialContent}
+        isEditMode={isEditMode}
+        onSubmit={handleReviewSubmit}
+        isSubmitting={isSubmitting}
+      />
+
+      {/* 로그인 다이얼로그 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 }
@@ -750,9 +778,10 @@ export function BookReviews({
 }: {
   onReviewCountChange?: (count: number) => void;
 }) {
+  // 최상위 Suspense를 그대로 유지하되 여러 번 스켈레톤이 전환되는 깜빡임 현상을 방지
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <Suspense fallback={<ReviewsLoading />}>
+      <Suspense fallback={<BookReviewsSkeleton />}>
         <ReviewsList onReviewCountChange={onReviewCountChange} />
       </Suspense>
     </ErrorBoundary>

@@ -1,10 +1,6 @@
-import {
-  RatingDto,
-  UpdateRatingDto,
-  createOrUpdateRating,
-  deleteRating,
-  updateRating as updateRatingApi,
-} from '@/apis/rating';
+import { RatingDto, createOrUpdateRating, deleteRating } from '@/apis/rating';
+import { removeBookRating, updateBookRating } from '@/utils/rating';
+import { BookWithRating } from '@/utils/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -32,56 +28,28 @@ export function useBookRating() {
       bookId: number;
       ratingData: RatingDto;
     }) => {
-      return createOrUpdateRating(bookId, ratingData);
+      return createOrUpdateRating(
+        bookId,
+        ratingData,
+        bookId < 0 ? isbn : undefined
+      );
     },
-    onSuccess: () => {
-      // 관련된 쿼리 무효화
+    onSuccess: newRating => {
+      // 캐시 직접 업데이트 - 다시 로드하지 않고 UI만 업데이트
       if (book?.id) {
-        queryClient.invalidateQueries({
-          queryKey: ['user-book-rating', book.id],
+        // user-book-rating 캐시 업데이트
+        queryClient.setQueryData(['user-book-rating', book.id], newRating);
+
+        // book-detail 캐시 직접 업데이트
+        queryClient.setQueryData(['book-detail', isbn], (oldData: unknown) => {
+          return updateBookRating(oldData as BookWithRating, newRating);
         });
       }
-
-      // 책 상세 정보 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['book-detail', isbn],
-      });
 
       toast.success('평점이 등록되었습니다.');
     },
     onError: () => {
       toast.error('평점 등록에 실패했습니다.');
-    },
-  });
-
-  // 평점 수정 뮤테이션
-  const { mutate: modifyRating } = useMutation({
-    mutationFn: async ({
-      ratingId,
-      ratingData,
-    }: {
-      ratingId: number;
-      ratingData: UpdateRatingDto;
-    }) => {
-      return updateRatingApi(ratingId, ratingData);
-    },
-    onSuccess: () => {
-      // 관련된 쿼리 무효화
-      if (book?.id) {
-        queryClient.invalidateQueries({
-          queryKey: ['user-book-rating', book.id],
-        });
-      }
-
-      // 책 상세 정보 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['book-detail', isbn],
-      });
-
-      toast.success('평점이 수정되었습니다.');
-    },
-    onError: () => {
-      toast.error('평점 수정에 실패했습니다.');
     },
   });
 
@@ -91,17 +59,16 @@ export function useBookRating() {
       return deleteRating(ratingId);
     },
     onSuccess: () => {
-      // 관련된 쿼리 무효화
+      // 캐시 직접 업데이트
       if (book?.id) {
-        queryClient.invalidateQueries({
-          queryKey: ['user-book-rating', book.id],
+        // user-book-rating 캐시 업데이트 (null로 설정)
+        queryClient.setQueryData(['user-book-rating', book.id], null);
+
+        // book-detail 캐시 직접 업데이트 (userRating을 null로 설정하고 평균 평점 및 totalRatings 업데이트)
+        queryClient.setQueryData(['book-detail', isbn], (oldData: unknown) => {
+          return removeBookRating(oldData as BookWithRating);
         });
       }
-
-      // 책 상세 정보 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['book-detail', isbn],
-      });
 
       toast.success('평점이 삭제되었습니다.');
     },

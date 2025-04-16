@@ -119,6 +119,7 @@ export interface UpdateLibraryDto {
 export interface AddBookToLibraryDto {
   bookId: number;
   note?: string;
+  isbn?: string;
 }
 
 // 서재에 태그 추가 DTO

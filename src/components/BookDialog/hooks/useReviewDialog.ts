@@ -1,7 +1,11 @@
 import { createOrUpdateRating } from '@/apis/rating/rating';
 import { createReview, updateReview } from '@/apis/review/review';
 import { Review } from '@/apis/review/types';
+import { bookReviewSortAtom } from '@/atoms/book';
+import { updateBookRating } from '@/utils/rating';
+import { BookWithRating } from '@/utils/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
@@ -10,6 +14,7 @@ export function useReviewDialog() {
   const { book, isbn, userRating: userRatingData } = useBookDetails();
   const queryClient = useQueryClient();
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  const sort = useAtomValue(bookReviewSortAtom);
 
   // 수정 모드 상태 추가
   const [isEditMode, setIsEditMode] = useState(false);
@@ -29,8 +34,16 @@ export function useReviewDialog() {
         throw new Error('책 정보를 찾을 수 없습니다.');
       }
 
+      // ISBN 정보 확인
+      const bookIsbn = book.isbn13 || book.isbn;
+      const isNegativeBookId = book.id < 0;
+
       // 항상 평점 등록 (comment 없이)
-      const ratingResult = await createOrUpdateRating(book.id, { rating });
+      const ratingResult = await createOrUpdateRating(
+        book.id,
+        { rating },
+        isNegativeBookId ? bookIsbn : undefined
+      );
 
       // 수정 모드인 경우 리뷰 업데이트
       if (isEditMode && editingReview) {
@@ -38,6 +51,7 @@ export function useReviewDialog() {
           content: content.trim(),
           type: 'review',
           bookId: parseInt(String(book.id), 10),
+          isbn: isNegativeBookId ? bookIsbn : undefined,
         });
       }
       // 새 리뷰 작성 (내용이 있는 경우)
@@ -46,37 +60,24 @@ export function useReviewDialog() {
           content: content.trim(),
           type: 'review',
           bookId: parseInt(String(book.id), 10),
+          isbn: isNegativeBookId ? bookIsbn : undefined,
         });
       }
 
       return ratingResult;
     },
     onSuccess: data => {
-      // 관련된 모든 쿼리 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['user-book-rating', book?.id],
-      });
-
-      // book-detail 쿼리 무효화 (별점 정보가 포함된 책 정보 갱신)
-      queryClient.invalidateQueries({
-        queryKey: ['book-detail', isbn],
-      });
-
-      // 리뷰 목록 쿼리 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['book-reviews', book?.id],
-      });
-
       // 직접 book-detail 캐시 업데이트 (별점 즉시 반영)
       if (book && isbn) {
-        queryClient.setQueryData(['book-detail', isbn], (oldData: any) => {
-          if (!oldData) return oldData;
-
-          return {
-            ...oldData,
-            userRating: data,
-          };
+        // book-detail 쿼리 데이터 직접 업데이트
+        queryClient.setQueryData(['book-detail', isbn], (oldData: unknown) => {
+          return updateBookRating(oldData as BookWithRating, data);
         });
+
+        // user-book-rating 캐시 직접 업데이트
+        if (book?.id) {
+          queryClient.setQueryData(['user-book-rating', book.id], data);
+        }
 
         // book-reviews 쿼리 데이터 업데이트하여 별점 즉시 반영
         queryClient.setQueryData(['book-reviews', book.id], (oldData: any) => {
@@ -131,9 +132,32 @@ export function useReviewDialog() {
           ? '리뷰가 수정되었습니다.'
           : '리뷰가 성공적으로 저장되었습니다.'
       );
+
+      // 필요한 데이터만 선택적으로 무효화
+      if (book?.id) {
+        // 정확한 쿼리 키로 무효화하고 refetchType을 active로 변경
+        queryClient.invalidateQueries({
+          queryKey: ['book-reviews', book.id, sort, isbn],
+          refetchType: 'active',
+        });
+      }
+
+      // ISBN이 있고 북ID가 -1 또는 음수인 경우에도 무효화
+      if (isbn && (!book?.id || book.id <= 0)) {
+        queryClient.invalidateQueries({
+          queryKey: ['book-reviews', -1],
+          refetchType: 'active',
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ['book-reviews', 0],
+          refetchType: 'active',
+        });
+      }
+
       return data?.rating;
     },
-    onError: error => {
+    onError: () => {
       toast.error('리뷰 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
     },
   });

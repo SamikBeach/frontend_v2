@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 import { useDialogQuery } from '@/hooks/useDialogQuery';
-import { BookInfo } from './BookInfo';
+import { BookInfo, BookInfoSkeleton } from './components/BookInfo';
 
 import { ErrorBoundary } from 'react-error-boundary';
 import {
@@ -13,32 +13,9 @@ import {
   BookRatingSection,
   BookReadingStats,
   BookRightPanel,
-  BookSkeleton,
 } from './components';
 
-// Error fallback component
-function ErrorFallback({
-  error,
-  resetErrorBoundary,
-}: {
-  error: Error;
-  resetErrorBoundary: () => void;
-}) {
-  return (
-    <div className="flex flex-col items-center justify-center p-6 text-center">
-      <p className="text-lg font-medium text-red-600">
-        데이터를 불러오는 중 오류가 발생했습니다
-      </p>
-      <p className="mt-1 text-sm text-gray-600">{error.message}</p>
-      <button
-        onClick={resetErrorBoundary}
-        className="mt-4 cursor-pointer rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-      >
-        다시 시도
-      </button>
-    </div>
-  );
-}
+import { BookFullSkeleton, ErrorFallback } from './components/common';
 
 function BookDialogContent() {
   return (
@@ -74,7 +51,11 @@ function BookDialogContent() {
 
             {/* 책 설명, 저자 소개 */}
             <div className="space-y-1">
-              <BookInfo />
+              <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <Suspense fallback={<BookInfoSkeleton />}>
+                  <BookInfo />
+                </Suspense>
+              </ErrorBoundary>
               <p className="mt-2 text-right text-xs text-gray-400">
                 정보제공: 알라딘
               </p>
@@ -103,11 +84,14 @@ export function BookDialog() {
         if (!open) close();
       }}
     >
-      <DialogContent className="w-full max-w-none rounded-lg bg-white p-0 md:max-w-screen-xl">
+      <DialogContent
+        className="w-full max-w-none rounded-lg bg-white p-0 md:max-w-screen-xl"
+        aria-describedby={undefined}
+      >
         {/* DialogTitle 컴포넌트는 접근성 목적으로 필요합니다. 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
         <DialogTitle className="sr-only">도서 상세 정보</DialogTitle>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <Suspense fallback={<BookSkeleton />}>
+          <Suspense fallback={<BookFullSkeleton />}>
             <BookHeader />
             <BookDialogContent />
           </Suspense>

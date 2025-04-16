@@ -5,16 +5,22 @@ import { useBookDetails } from '../hooks';
 export function BookReadingStats() {
   const { book } = useBookDetails();
 
-  // 리딩 스탯이 없으면 컴포넌트를 렌더링하지 않음
-  if (!book?.readingStatus) return null;
-
-  // 서버 응답 데이터에서 값 가져오기
-  const { readingStatusCounts = {} } = book.readingStatus;
+  // 서버 응답 데이터에서 값 가져오기 - readingStats가 없어도 기본값 사용
+  const readingStatusCounts = book?.readingStats?.readingStatusCounts || {};
 
   // 읽기 상태별 카운트 - 서버 응답 데이터와 연동
-  const wantToReadCount = readingStatusCounts.WANT_TO_READ || 0;
-  const readingCount = readingStatusCounts.READING || 0;
-  const readCount = readingStatusCounts.READ || 0;
+  const wantToReadCount =
+    (readingStatusCounts as Record<ReadingStatusType, number>)[
+      ReadingStatusType.WANT_TO_READ
+    ] || 0;
+  const readingCount =
+    (readingStatusCounts as Record<ReadingStatusType, number>)[
+      ReadingStatusType.READING
+    ] || 0;
+  const readCount =
+    (readingStatusCounts as Record<ReadingStatusType, number>)[
+      ReadingStatusType.READ
+    ] || 0;
 
   // 읽기 상태 라벨
   const readingStatusLabels = {

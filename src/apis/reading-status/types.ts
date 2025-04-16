@@ -10,6 +10,7 @@ export interface ReadingStatusDto {
   startDate?: Date;
   finishDate?: Date;
   readingMemo?: string;
+  isbn?: string;
 }
 
 export interface BookReadingStatsDto {

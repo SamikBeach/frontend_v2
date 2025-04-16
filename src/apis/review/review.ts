@@ -52,6 +52,7 @@ export const createReview = async (
     content: string;
     type: ReviewType;
     bookId?: number;
+    isbn?: string;
   } = {
     content: data.content,
     type: data.type,
@@ -59,6 +60,11 @@ export const createReview = async (
 
   if (data.bookId) {
     payload.bookId = parseInt(String(data.bookId), 10);
+  }
+
+  // ISBN이 제공된 경우(특히 bookId가 -1인 경우) 포함
+  if (data.isbn) {
+    payload.isbn = data.isbn;
   }
 
   const response = await api.post<ReviewResponseDto>('/review', payload);
@@ -81,6 +87,11 @@ export const createReviewWithImages = async (
     formData.append('bookId', bookIdNumber.toString());
   }
 
+  // ISBN이 제공된 경우(특히 bookId가 -1인 경우) 포함
+  if (data.isbn) {
+    formData.append('isbn', data.isbn);
+  }
+
   images.forEach(image => {
     formData.append('images', image);
   });
@@ -96,7 +107,17 @@ export const updateReview = async (
   id: number,
   data: UpdateReviewDto
 ): Promise<ReviewResponseDto> => {
-  const response = await api.put<ReviewResponseDto>(`/review/${id}`, data);
+  // 요청 본문 준비
+  const payload = { ...data };
+
+  // bookId가 음수이고 isbn이 제공된 경우를 처리
+  if (data.bookId && data.bookId < 0 && data.isbn) {
+    // ISBN을 포함하여 전송
+    payload.bookId = data.bookId;
+    payload.isbn = data.isbn;
+  }
+
+  const response = await api.put<ReviewResponseDto>(`/review/${id}`, payload);
   return response.data;
 };
 
@@ -171,10 +192,11 @@ export const getBookReviews = async (
   bookId: number,
   page: number = 1,
   limit: number = 10,
-  sort: 'likes' | 'comments' | 'recent' = 'likes'
+  sort: 'likes' | 'comments' | 'recent' = 'likes',
+  isbn?: string
 ): Promise<ReviewsResponse> => {
   const response = await api.get<ReviewsResponse>(`/review/book/${bookId}`, {
-    params: { page, limit, sort },
+    params: { page, limit, sort, isbn },
   });
   return response.data;
 };

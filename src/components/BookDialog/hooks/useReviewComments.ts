@@ -4,28 +4,28 @@ import {
   deleteComment,
   getReviewComments,
 } from '@/apis/review';
-import { Review } from '@/apis/review/types';
-import {
-  useMutation,
-  useQueryClient,
-  useSuspenseQuery,
-} from '@tanstack/react-query';
+import { CommentsResponse, Review } from '@/apis/review/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
 
 export function useReviewComments(reviewId: number) {
-  const { book } = useBookDetails();
-  const bookId = book?.id || 0;
+  const { book, isbn } = useBookDetails();
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
 
   // 댓글 목록 조회
-  const { data } = useSuspenseQuery({
+  const { data, isLoading } = useQuery<CommentsResponse>({
     queryKey: ['review-comments', reviewId],
     queryFn: async () => {
-      const response = await getReviewComments(reviewId);
-      return response;
+      try {
+        const response = await getReviewComments(reviewId);
+        return response;
+      } catch {
+        // 에러 발생 시 기본 형식에 맞는 빈 데이터 반환
+        return { comments: [] };
+      }
     },
   });
 
@@ -40,7 +40,7 @@ export function useReviewComments(reviewId: number) {
       const commentData: CreateCommentDto = { content };
       return addReviewComment(reviewId, commentData);
     },
-    onMutate: async content => {
+    onMutate: async () => {
       // 낙관적 업데이트를 위해 기존 댓글 목록 저장
       await queryClient.cancelQueries({
         queryKey: ['review-comments', reviewId],
@@ -67,7 +67,7 @@ export function useReviewComments(reviewId: number) {
       setCommentText('');
       toast.success('댓글이 등록되었습니다');
     },
-    onError: error => {
+    onError: () => {
       // 오류 발생 시 사용자에게 알림
       toast.error('댓글 등록에 실패했습니다. 다시 시도해주세요.');
     },
@@ -110,7 +110,7 @@ export function useReviewComments(reviewId: number) {
 
       toast.success('댓글이 삭제되었습니다');
     },
-    onError: (error, commentId, context) => {
+    onError: (_, __, context) => {
       // 오류 발생 시 이전 상태로 복원
       if (context?.previousComments) {
         queryClient.setQueryData(
@@ -131,6 +131,7 @@ export function useReviewComments(reviewId: number) {
 
     // 각 쿼리 키에 대해 댓글 수 업데이트
     queryKeys.forEach(query => {
+      // 모든 book-reviews 쿼리를 업데이트
       queryClient.setQueryData(query.queryKey, (oldData: any) => {
         // 배열 형태인 경우
         if (Array.isArray(oldData)) {
@@ -165,9 +166,52 @@ export function useReviewComments(reviewId: number) {
           };
         }
 
+        // 무한 쿼리 형태인 경우 ({ pages: [{...}] })
+        if (oldData?.pages && Array.isArray(oldData.pages)) {
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => {
+              if (!page || !page.data || !Array.isArray(page.data)) return page;
+
+              return {
+                ...page,
+                data: page.data.map((review: Review) =>
+                  review.id === reviewId
+                    ? {
+                        ...review,
+                        commentsCount: Math.max(
+                          0,
+                          (review.commentsCount || 0) + changeAmount
+                        ),
+                      }
+                    : review
+                ),
+              };
+            }),
+          };
+        }
+
         return oldData;
       });
     });
+
+    // 리뷰 목록 전체 갱신을 위해 추가로 무효화
+    if (book?.id) {
+      queryClient.invalidateQueries({
+        queryKey: ['book-reviews', book.id],
+        exact: false,
+        refetchType: 'none',
+      });
+    }
+
+    // ISBN을 사용하는 경우도 처리
+    if (isbn) {
+      queryClient.invalidateQueries({
+        queryKey: ['book-reviews', -1],
+        exact: false,
+        refetchType: 'none',
+      });
+    }
   };
 
   // 댓글 제출 핸들러
@@ -194,6 +238,7 @@ export function useReviewComments(reviewId: number) {
   return {
     comments,
     commentText,
+    isLoading,
     isSubmitting,
     isDeleting,
     handleCommentTextChange,

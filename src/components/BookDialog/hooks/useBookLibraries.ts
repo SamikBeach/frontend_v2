@@ -1,6 +1,7 @@
 import { getLibrariesByBookId } from '@/apis/library/library';
 import { LibrariesForBookResponse } from '@/apis/library/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { useBookDetails } from './useBookDetails';
 
 /**
  * 특정 책이 저장된 서재 목록을 조회하는 훅
@@ -12,16 +13,24 @@ export function useBookLibraries(
   bookId: number | undefined,
   limit: number = 10
 ) {
-  const { data, isLoading, isError, error, refetch } =
+  const { isbn } = useBookDetails();
+
+  const { data, isLoading, isError, refetch } =
     useSuspenseQuery<LibrariesForBookResponse>({
-      queryKey: ['book-libraries', bookId, limit],
+      queryKey: ['book-libraries', bookId, limit, isbn],
       queryFn: async () => {
         if (!bookId)
           return {
             data: [],
             meta: { total: 0, page: 1, limit, totalPages: 0 },
           };
-        return await getLibrariesByBookId(bookId, 1, limit);
+        // bookId가 -1이고 ISBN이 있는 경우, ISBN을 함께 전달
+        return await getLibrariesByBookId(
+          bookId,
+          1,
+          limit,
+          bookId === -1 ? isbn : undefined
+        );
       },
     });
 

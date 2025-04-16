@@ -28,7 +28,7 @@ export interface BookDetails extends Book {
     page: number;
     likes: number;
   }>;
-  reviews?: Array<{
+  reviewDetails?: Array<{
     id: number;
     user: {
       name: string;

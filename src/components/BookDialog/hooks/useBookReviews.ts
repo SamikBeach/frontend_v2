@@ -1,10 +1,11 @@
 import {
   keepPreviousData,
   useInfiniteQuery,
+  useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 import { getBookReviews, likeReview, unlikeReview } from '@/apis/review';
 import { Review, ReviewSortType, ReviewsResponse } from '@/apis/review/types';
@@ -12,9 +13,8 @@ import { bookReviewSortAtom } from '@/atoms/book';
 import { useBookDetails } from './useBookDetails';
 
 export function useBookReviews() {
-  const { book } = useBookDetails();
+  const { book, isbn } = useBookDetails();
   const bookId = book?.id || 0;
-  const [isLikeLoading, setIsLikeLoading] = useState(false);
   const [sort, setSort] = useAtom(bookReviewSortAtom); // Jotai atom 사용
   const queryClient = useQueryClient();
   const limit = 5; // 한 페이지에 보여줄 리뷰 수
@@ -25,13 +25,12 @@ export function useBookReviews() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    refetch,
     status,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ['book-reviews', bookId, sort], // sort 변경 시 자동으로 refetch
+    queryKey: ['book-reviews', bookId, sort, isbn], // sort 변경 시 자동으로 refetch
     queryFn: async ({ pageParam }) => {
-      if (!bookId) {
+      if (!bookId && !isbn) {
         return {
           data: [],
           meta: { total: 0, page: 1, limit, totalPages: 0, sort },
@@ -39,7 +38,15 @@ export function useBookReviews() {
       }
 
       const page = pageParam as number;
-      const reviewsData = await getBookReviews(bookId, page, limit, sort);
+      // bookId가 -1 또는 0이고, isbn이 있는 경우 isbn을 함께 전달
+      const shouldUseIsbn = (bookId <= 0 || bookId === -1) && isbn;
+      const reviewsData = await getBookReviews(
+        bookId,
+        page,
+        limit,
+        sort,
+        shouldUseIsbn ? isbn : undefined
+      );
       return reviewsData;
     },
     getNextPageParam: (lastPage: ReviewsResponse) => {
@@ -77,57 +84,73 @@ export function useBookReviews() {
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-  // 좋아요 핸들러
-  const handleLike = useCallback(
-    async (reviewId: number, isLiked: boolean) => {
-      try {
-        setIsLikeLoading(true);
-
-        // 낙관적 업데이트 - 무한 쿼리 구조에 맞게 수정
-        queryClient.setQueryData(
-          ['book-reviews', bookId, sort],
-          (oldData: any) => {
-            if (!oldData || !oldData.pages) return oldData;
-
-            // 페이지들을 순회하면서 해당 리뷰 업데이트
-            return {
-              ...oldData,
-              pages: oldData.pages.map((page: any) => {
-                if (!page || !page.data) return page;
-
-                return {
-                  ...page,
-                  data: page.data.map((review: Review) =>
-                    review.id === reviewId
-                      ? {
-                          ...review,
-                          userLiked: !isLiked,
-                          likesCount: isLiked
-                            ? Math.max(0, (review.likesCount || 0) - 1)
-                            : (review.likesCount || 0) + 1,
-                        }
-                      : review
-                  ),
-                };
-              }),
-            };
-          }
-        );
-
-        // 실제 API 호출
-        if (isLiked) {
-          await unlikeReview(reviewId);
-        } else {
-          await likeReview(reviewId);
-        }
-      } catch (error) {
-        // 오류 발생시 데이터 재조회
-        await refetch();
-      } finally {
-        setIsLikeLoading(false);
+  // 리뷰 좋아요 뮤테이션
+  const { mutate: likeMutate, isPending: isLikePending } = useMutation({
+    mutationFn: async ({
+      reviewId,
+      isLiked,
+    }: {
+      reviewId: number;
+      isLiked: boolean;
+    }) => {
+      if (isLiked) {
+        return await unlikeReview(reviewId);
+      } else {
+        return await likeReview(reviewId);
       }
     },
-    [bookId, queryClient, refetch, sort]
+    onMutate: async ({ reviewId, isLiked }) => {
+      // 낙관적 업데이트 - 무한 쿼리 구조에 맞게 수정
+      await queryClient.cancelQueries({
+        queryKey: ['book-reviews', bookId, sort, isbn],
+      });
+
+      queryClient.setQueryData(
+        ['book-reviews', bookId, sort, isbn],
+        (oldData: any) => {
+          if (!oldData || !oldData.pages) return oldData;
+
+          // 페이지들을 순회하면서 해당 리뷰 업데이트
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: any) => {
+              if (!page || !page.data) return page;
+
+              return {
+                ...page,
+                data: page.data.map((review: Review) =>
+                  review.id === reviewId
+                    ? {
+                        ...review,
+                        userLiked: !isLiked,
+                        likesCount: isLiked
+                          ? Math.max(0, (review.likesCount || 0) - 1)
+                          : (review.likesCount || 0) + 1,
+                      }
+                    : review
+                ),
+              };
+            }),
+          };
+        }
+      );
+
+      return { queryKey: ['book-reviews', bookId, sort, isbn] };
+    },
+    onError: (_, __, context) => {
+      // 에러 발생시 쿼리 무효화하여 데이터 재조회
+      if (context?.queryKey) {
+        queryClient.invalidateQueries({ queryKey: context.queryKey });
+      }
+    },
+  });
+
+  // 좋아요 핸들러 - 뮤테이션 사용
+  const handleLike = useCallback(
+    (reviewId: number, isLiked: boolean) => {
+      likeMutate({ reviewId, isLiked });
+    },
+    [likeMutate]
   );
 
   return {
@@ -139,7 +162,7 @@ export function useBookReviews() {
     isFetchingNextPage,
     handleLoadMore,
     handleLike,
-    isLikeLoading,
+    isLikeLoading: isLikePending,
     sort,
     handleSortChange,
   };

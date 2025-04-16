@@ -11,6 +11,7 @@ import {
 import { useDialogQuery } from '@/hooks';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useQueryClient } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 import { MutableRefObject, Suspense, useEffect, useRef, useState } from 'react';
 import { SearchResults } from './SearchResults';
 import { useSearchQuery } from './hooks';
@@ -36,9 +37,27 @@ function SearchResultsLoader({
   onOpenChange: (open: boolean) => void;
   setQuery: (query: string) => void;
 }) {
-  // query가 공백이고 최근 검색어 보기 모드일 때는 API 호출을 하지 않음
-  const { data } = useSearchQuery(query);
-  const isLoading = !data && !!query.trim();
+  // 디바운스된 쿼리를 사용하여 API 호출
+  const debouncedQuery = useDebounce(query, 300);
+  const { data, isFetching, fetchNextPage, hasNextPage } =
+    useSearchQuery(debouncedQuery);
+
+  // 디바운싱 중인지 확인 (현재 입력 중인 쿼리와 디바운스된 쿼리가 다르면 디바운싱 중)
+  const isDebouncing =
+    query.trim() !== debouncedQuery.trim() && query.trim() !== '';
+
+  // 검색 결과를 하나의 배열로 변환
+  const searchResults = data?.pages.flatMap(page => page.books) || [];
+
+  // 총 검색 결과 수 (첫 번째 페이지의 total 값)
+  const totalResults = data?.pages[0]?.total || 0;
+
+  // 스크롤 핸들러
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetching) {
+      fetchNextPage();
+    }
+  };
 
   return (
     <SearchResults
@@ -47,8 +66,11 @@ function SearchResultsLoader({
       onItemClick={onItemClick}
       onOpenChange={onOpenChange}
       setQuery={setQuery}
-      searchResults={data?.books || []}
-      isLoading={isLoading}
+      searchResults={searchResults}
+      isLoading={isFetching || isDebouncing}
+      onLoadMore={handleLoadMore}
+      hasNextPage={hasNextPage}
+      totalResults={totalResults}
     />
   );
 }
@@ -56,7 +78,6 @@ function SearchResultsLoader({
 export function BookSearchDialog({
   isOpen,
   setIsOpen,
-  searchBarRef,
   overlayClassName = 'bg-transparent',
 }: BookSearchDialogProps) {
   const [query, setQuery] = useState('');
@@ -74,8 +95,9 @@ export function BookSearchDialog({
   // Dialog가 닫힐 때 검색어 초기화
   const handleOpenChange = (isOpen: boolean) => {
     setIsOpen(isOpen);
+
     if (!isOpen) {
-      setQuery(''); // 검색어 초기화
+      setQuery('');
     }
   };
 
@@ -88,9 +110,8 @@ export function BookSearchDialog({
   };
 
   // 검색 결과 또는 최근 검색 표시 여부
-  const view = debouncedQuery ? 'results' : 'recent';
+  const view = query ? 'results' : 'recent';
 
-  // 다이얼로그가 열릴 때 최근 검색어 데이터를 다시 가져오도록 수정
   useEffect(() => {
     if (isOpen) {
       queryClient.invalidateQueries({ queryKey: ['search', 'recent'] });
@@ -105,9 +126,12 @@ export function BookSearchDialog({
           onClick={handleClose}
         />
         <DialogContent
-          className="fixed top-[6px] left-1/2 z-50 w-[600px] max-w-[600px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-0 max-md:h-full max-md:w-full"
+          className={`fixed top-[6px] left-1/2 z-50 w-[800px] max-w-[calc(100vw-32px)] ${
+            query ? 'h-[calc(100vh-32px)]' : 'max-h-[800px]'
+          } -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full`}
           overlayClassName={overlayClassName}
           closeClassName="hidden"
+          aria-describedby={undefined}
           onOpenAutoFocus={e => {
             e.preventDefault();
             setTimeout(() => {
@@ -117,31 +141,42 @@ export function BookSearchDialog({
         >
           <DialogTitle className="sr-only">도서 검색</DialogTitle>
           <div
-            className="animate-expandDown overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-black/5 transition-all"
+            className={`animate-expandDown flex ${
+              query ? 'h-full max-h-full' : 'auto'
+            } flex-col overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all`}
             style={{
               width: '100%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
-            <Command className="border-0 shadow-none">
-              <div className="sticky top-0 z-10 border-b border-gray-200 bg-white">
+            <Command
+              className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
+              shouldFilter={false}
+              loop={true}
+            >
+              <div className="sticky top-0 z-10 flex-shrink-0 border-b border-gray-200 bg-white">
                 <CommandInput
                   ref={inputRef}
                   value={query}
                   onValueChange={setQuery}
-                  className="h-14 rounded-none border-0 text-sm shadow-none focus:ring-0"
+                  className="h-16 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
                   placeholder="도서 제목을 검색해보세요"
                 />
               </div>
-              <div className="max-h-[80vh] overflow-y-auto py-2">
+              <div className="flex-1 overflow-y-auto">
                 <Suspense
                   fallback={
-                    <div className="flex h-[300px] items-center justify-center">
-                      로딩 중...
+                    <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                      </div>
                     </div>
                   }
                 >
                   <SearchResultsLoader
-                    query={debouncedQuery}
+                    query={query}
                     view={view}
                     onItemClick={handleItemClick}
                     onOpenChange={handleOpenChange}

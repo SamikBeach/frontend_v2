@@ -13,7 +13,6 @@ function enrichBookDetails(book: Book): BookDetails {
   // TypeScript 타입 호환을 위한 중간 타입 생성
   const baseBook = {
     ...book,
-    readingStatus: book.readingStats,
   };
 
   // unknown으로 캐스팅 후 BookDetails로 변환
