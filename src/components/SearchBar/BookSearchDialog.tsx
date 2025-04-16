@@ -56,7 +56,6 @@ function SearchResultsLoader({
 export function BookSearchDialog({
   isOpen,
   setIsOpen,
-  searchBarRef,
   overlayClassName = 'bg-transparent',
 }: BookSearchDialogProps) {
   const [query, setQuery] = useState('');
@@ -88,7 +87,7 @@ export function BookSearchDialog({
   };
 
   // 검색 결과 또는 최근 검색 표시 여부
-  const view = debouncedQuery ? 'results' : 'recent';
+  const view = query ? 'results' : 'recent';
 
   // 다이얼로그가 열릴 때 최근 검색어 데이터를 다시 가져오도록 수정
   useEffect(() => {
@@ -105,7 +104,7 @@ export function BookSearchDialog({
           onClick={handleClose}
         />
         <DialogContent
-          className="fixed top-[6px] left-1/2 z-50 w-[600px] max-w-[600px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-0 max-md:h-full max-md:w-full"
+          className="fixed top-[6px] left-1/2 z-50 w-[800px] max-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-0 max-md:h-full max-md:w-full"
           overlayClassName={overlayClassName}
           closeClassName="hidden"
           onOpenAutoFocus={e => {
@@ -117,31 +116,31 @@ export function BookSearchDialog({
         >
           <DialogTitle className="sr-only">도서 검색</DialogTitle>
           <div
-            className="animate-expandDown overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-black/5 transition-all"
+            className="animate-expandDown overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all"
             style={{
               width: '100%',
             }}
           >
-            <Command className="border-0 shadow-none">
+            <Command className="rounded-none border-0 shadow-none">
               <div className="sticky top-0 z-10 border-b border-gray-200 bg-white">
                 <CommandInput
                   ref={inputRef}
                   value={query}
                   onValueChange={setQuery}
-                  className="h-14 rounded-none border-0 text-sm shadow-none focus:ring-0"
+                  className="h-16 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
                   placeholder="도서 제목을 검색해보세요"
                 />
               </div>
-              <div className="max-h-[80vh] overflow-y-auto py-2">
+              <div className="scrollbar-gutter-stable max-h-[75vh] overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
                 <Suspense
                   fallback={
-                    <div className="flex h-[300px] items-center justify-center">
+                    <div className="flex h-[600px] items-center justify-center">
                       로딩 중...
                     </div>
                   }
                 >
                   <SearchResultsLoader
-                    query={debouncedQuery}
+                    query={query}
                     view={view}
                     onItemClick={handleItemClick}
                     onOpenChange={handleOpenChange}

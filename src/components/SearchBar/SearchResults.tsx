@@ -38,14 +38,14 @@ function RecentSearches({
   const recentSearches = recentSearchData?.recentSearches || [];
 
   return (
-    <div className="pb-4">
+    <div>
       {/* 최근 검색 목록 */}
       {recentSearches.length > 0 && (
         <div>
           <div className="mb-2 flex items-center justify-between px-4">
             <h3 className="flex items-center text-sm font-medium text-gray-700">
               <Clock className="mr-2 h-4 w-4 text-gray-500" />
-              최근 도서 검색
+              최근 검색 기록
             </h3>
             <button
               className="cursor-pointer text-xs text-gray-600 hover:text-gray-900 hover:underline"
@@ -202,7 +202,7 @@ export function SearchResults({
             type: 'book',
             title: book.title,
             author: book.author,
-            image: book.coverImage,
+            image: book.coverImage || '/images/no-image.png',
             highlight: query,
             rating: book.rating,
             reviews: book.reviews || book.reviewCount,

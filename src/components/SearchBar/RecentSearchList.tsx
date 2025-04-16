@@ -18,7 +18,7 @@ export function RecentSearchList({
   onDeleteSearch,
 }: RecentSearchListProps) {
   return (
-    <CommandGroup heading="최근 검색">
+    <CommandGroup heading="">
       {searches.map((search, index) => {
         // Map the API search model to the UI search item model
         const searchItem = {
@@ -26,7 +26,7 @@ export function RecentSearchList({
           type: 'book',
           title: search.title || search.term,
           author: search.author,
-          image: search.coverImage,
+          image: search.coverImage || '/images/no-image.png',
           subtitle: search.author,
           isbn: search.isbn || '',
           isbn13: search.isbn13 || '',
