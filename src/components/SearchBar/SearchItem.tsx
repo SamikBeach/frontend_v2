@@ -89,7 +89,8 @@ export function SearchItem({
 
   // 주어진 평점에 따라 채워진 별과 빈 별을 렌더링하는 함수
   const renderStarRating = (rating?: number) => {
-    if (!rating) return null;
+    // rating이 undefined거나 null이면 0으로 처리
+    const ratingValue = rating === undefined || rating === null ? 0 : rating;
 
     // 전체 5개 별 기준, 색상이 있는 별 이미지처럼 렌더링
     return (
@@ -98,9 +99,9 @@ export function SearchItem({
           <Star
             key={i}
             className={`${isSmall ? 'h-3.5 w-3.5' : 'h-4 w-4'} ${
-              i < Math.floor(rating)
+              i < Math.floor(ratingValue)
                 ? 'fill-yellow-400 text-yellow-400'
-                : i + 0.5 <= rating
+                : i + 0.5 <= ratingValue
                   ? 'fill-yellow-400 text-yellow-400'
                   : 'text-gray-300'
             }`}
@@ -148,6 +149,8 @@ export function SearchItem({
     };
 
     const status = statusConfig[item.userReadingStatus];
+    const count =
+      item.readingStats?.readingStatusCounts?.[item.userReadingStatus] || 0;
 
     return (
       <div className={`${isSmall ? 'mt-1.5' : 'mt-2.5'}`}>
@@ -160,7 +163,9 @@ export function SearchItem({
         >
           <span className="flex items-center">
             {status.icon}
-            <span className="ml-1">{status.text}</span>
+            <span className="ml-1">
+              {status.text} {count > 0 ? count : ''}
+            </span>
           </span>
         </div>
       </div>
@@ -266,10 +271,9 @@ export function SearchItem({
 
   // 평점과 리뷰 정보 렌더링
   const renderRatingAndReviews = () => {
-    const hasRating = !!item.rating;
-    const hasReviews = item.reviews !== undefined && item.reviews > 0;
-    const hasTotalRatings =
-      item.totalRatings !== undefined && item.totalRatings > 0;
+    const hasRating = item.rating !== undefined;
+    const hasReviews = item.reviews !== undefined;
+    const hasTotalRatings = item.totalRatings !== undefined;
 
     if (!hasRating && !hasReviews) return null;
 
@@ -280,17 +284,17 @@ export function SearchItem({
         {/* 별점 */}
         {hasRating && (
           <div className="flex items-center">
-            {renderStarRating(item.rating)}
+            {renderStarRating(item.rating || 0)}
             <span
               className={`${isSmall ? 'text-xs' : 'text-sm'} mx-1.5 font-medium text-gray-800`}
             >
-              {formatRating(item.rating)}
+              {formatRating(item.rating || 0)}
             </span>
             {hasTotalRatings && (
               <span
                 className={`${isSmall ? 'text-xs' : 'text-sm'} text-gray-500`}
               >
-                ({item.totalRatings})
+                ({item.totalRatings || 0})
               </span>
             )}
           </div>
@@ -305,9 +309,9 @@ export function SearchItem({
             <span
               className={`${isSmall ? 'text-[10px]' : 'text-sm'} ml-1.5 text-gray-500`}
             >
-              {item.reviews && item.reviews > 999
+              {item.reviews !== undefined && item.reviews > 999
                 ? `${Math.floor(item.reviews / 1000)}k`
-                : item.reviews}
+                : item.reviews || 0}
             </span>
           </div>
         )}
