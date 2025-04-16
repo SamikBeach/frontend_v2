@@ -157,8 +157,10 @@ export function SearchResults({
   // 검색 결과 로딩 중
   if (isLoading) {
     return (
-      <div className="flex h-[400px] w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-gray-600" />
+      <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
+        <div className="flex flex-col items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+        </div>
       </div>
     );
   }
@@ -169,12 +171,12 @@ export function SearchResults({
   // 검색 결과 없음
   if (hasNoResults) {
     return (
-      <div className="flex h-[400px] w-full items-center justify-center">
-        <div className="flex flex-col items-center justify-center text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-            <span className="text-3xl">📚</span>
+      <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
+        <div className="flex flex-col items-center justify-center py-6 text-center">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+            <span className="text-4xl">📚</span>
           </div>
-          <p className="mb-2 text-lg font-medium text-gray-800">
+          <p className="mb-3 text-xl font-medium text-gray-800">
             검색 결과가 없습니다
           </p>
           <p className="text-sm text-gray-500">다른 검색어로 시도해보세요</p>

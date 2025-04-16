@@ -11,6 +11,7 @@ import {
 import { useDialogQuery } from '@/hooks';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useQueryClient } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
 import { MutableRefObject, Suspense, useEffect, useRef, useState } from 'react';
 import { SearchResults } from './SearchResults';
 import { useSearchQuery } from './hooks';
@@ -108,7 +109,9 @@ export function BookSearchDialog({
           onClick={handleClose}
         />
         <DialogContent
-          className={`fixed top-[6px] left-1/2 z-50 w-[800px] max-w-[800px] ${query ? 'h-[800px] max-h-[800px]' : 'max-h-[800px]'} -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-0 max-md:h-full max-md:w-full`}
+          className={`fixed top-[6px] left-1/2 z-50 w-[800px] max-w-[calc(100vw-32px)] ${
+            query ? 'h-[calc(100vh-32px)]' : 'max-h-[800px]'
+          } -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full`}
           overlayClassName={overlayClassName}
           closeClassName="hidden"
           onOpenAutoFocus={e => {
@@ -120,7 +123,9 @@ export function BookSearchDialog({
         >
           <DialogTitle className="sr-only">도서 검색</DialogTitle>
           <div
-            className={`animate-expandDown flex ${query ? 'h-full' : 'auto'} flex-col overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all`}
+            className={`animate-expandDown flex ${
+              query ? 'h-full max-h-full' : 'auto'
+            } flex-col overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all`}
             style={{
               width: '100%',
             }}
@@ -142,8 +147,10 @@ export function BookSearchDialog({
               >
                 <Suspense
                   fallback={
-                    <div className="flex h-[600px] items-center justify-center">
-                      로딩 중...
+                    <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                      </div>
                     </div>
                   }
                 >
