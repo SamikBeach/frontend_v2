@@ -1,5 +1,3 @@
-'use client';
-
 import { PopularSearch } from '@/apis/search/types';
 import { CommandGroup, CommandItem } from '@/components/ui/command';
 import { TrendingUp } from 'lucide-react';
@@ -14,7 +12,7 @@ export function PopularSearchList({
   onSearchClick,
 }: PopularSearchListProps) {
   return (
-    <CommandGroup heading="실시간 인기 검색어">
+    <CommandGroup>
       <div className="mb-2 px-2">
         <h3 className="flex items-center text-sm font-medium text-gray-700">
           <TrendingUp className="mr-2 h-4 w-4 text-gray-500" />

@@ -1,11 +1,8 @@
 'use client';
 
 import { SearchResult } from '@/apis/search/types';
-import {
-  CommandEmpty,
-  CommandGroup,
-  CommandList,
-} from '@/components/ui/command';
+import { CommandEmpty, CommandGroup } from '@/components/ui/command';
+import { Command as CommandPrimitive } from 'cmdk';
 import { Clock, Loader2 } from 'lucide-react';
 import { Suspense } from 'react';
 import { PopularSearchList } from './PopularSearchList';
@@ -42,11 +39,11 @@ function RecentSearches({
   const recentSearches = recentSearchData?.recentSearches || [];
 
   return (
-    <CommandList className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+    <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
       {/* 최근 검색 목록 */}
       {recentSearches.length > 0 && (
-        <CommandGroup heading="최근 검색 기록">
-          <div className="mb-2 flex items-center justify-between px-2">
+        <div>
+          <div className="mb-2 flex items-center justify-between px-4">
             <h3 className="flex items-center text-sm font-medium text-gray-700">
               <Clock className="mr-2 h-4 w-4 text-gray-500" />
               최근 검색 기록
@@ -67,7 +64,7 @@ function RecentSearches({
               deleteRecentSearch(searchId);
             }}
           />
-        </CommandGroup>
+        </div>
       )}
 
       {/* 인기 검색어 */}
@@ -78,14 +75,14 @@ function RecentSearches({
           }}
         />
       </Suspense>
-    </CommandList>
+    </CommandPrimitive.List>
   );
 }
 
 // 인기 검색어 스켈레톤
 function PopularSearchesSkeleton() {
   return (
-    <CommandGroup heading="인기 검색어">
+    <CommandGroup className="pt-4">
       <div className="mb-2 px-4">
         <h3 className="flex items-center text-sm font-medium text-gray-700">
           인기 검색어 로딩 중...
@@ -161,13 +158,13 @@ export function SearchResults({
   // 검색 결과 로딩 중
   if (isLoading) {
     return (
-      <CommandList className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+      <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
         <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
           <div className="flex flex-col items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
           </div>
         </div>
-      </CommandList>
+      </CommandPrimitive.List>
     );
   }
 
@@ -177,7 +174,7 @@ export function SearchResults({
   // 검색 결과 없음
   if (hasNoResults) {
     return (
-      <CommandList className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+      <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
         <CommandEmpty className="py-6 text-center">
           <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
             <div className="flex flex-col items-center justify-center py-6 text-center">
@@ -193,13 +190,13 @@ export function SearchResults({
             </div>
           </div>
         </CommandEmpty>
-      </CommandList>
+      </CommandPrimitive.List>
     );
   }
 
   // 검색 결과 목록
   return (
-    <CommandList className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+    <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
       <CommandGroup heading={`"${query}" 검색 결과`}>
         {searchResults.map((book, index) => {
           // API 검색 결과를 UI 표시 모델로 변환
@@ -219,7 +216,10 @@ export function SearchResults({
           };
 
           // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
-          const bookKey = `book-${index}-${book.id || ''}-${book.isbn13 || ''}-${book.isbn || ''}`;
+          const bookKey =
+            book.isbn13 ||
+            book.isbn ||
+            `book-index-${index}-${book.title?.slice(0, 10)}`;
 
           return (
             <SearchItem
@@ -230,6 +230,6 @@ export function SearchResults({
           );
         })}
       </CommandGroup>
-    </CommandList>
+    </CommandPrimitive.List>
   );
 }
