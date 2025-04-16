@@ -11,7 +11,7 @@ import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
 export function useSearchQuery(
   query: string,
   page: number = 1,
-  limit: number = 10
+  limit: number = 5
 ) {
   return useQuery<{
     books: SearchBook[];

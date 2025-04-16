@@ -199,22 +199,6 @@ export function SearchResults({
     <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
       <CommandGroup heading={`"${query}" 검색 결과`}>
         {searchResults.map((book, index) => {
-          // API 검색 결과를 UI 표시 모델로 변환
-          const searchItem = {
-            id: book.id,
-            type: 'book',
-            title: book.title,
-            author: book.author,
-            image: book.coverImage
-              ? book.coverImage.replace(/^https?:\/\//, '//')
-              : '/images/no-image.png',
-            highlight: query,
-            rating: book.rating,
-            reviews: book.reviews || book.reviewCount,
-            isbn: book.isbn || '',
-            isbn13: book.isbn13 || '',
-          };
-
           // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
           const bookKey =
             book.isbn13 ||
@@ -224,8 +208,32 @@ export function SearchResults({
           return (
             <SearchItem
               key={bookKey}
-              item={searchItem}
-              onClick={() => handleItemClick(searchItem)}
+              item={{
+                id: book.id,
+                type: 'book',
+                title: book.title,
+                author: book.author,
+                image: book.coverImage
+                  ? book.coverImage.replace(/^https?:\/\//, '//')
+                  : '/images/no-image.png',
+                highlight: query,
+                rating: book.rating,
+                reviews: book.reviews,
+                totalRatings: book.totalRatings,
+                isbn: book.isbn || '',
+                isbn13: book.isbn13 || '',
+                readingStats: book.readingStats,
+              }}
+              onClick={() =>
+                handleItemClick({
+                  id: book.id,
+                  title: book.title,
+                  author: book.author,
+                  image: book.coverImage,
+                  isbn: book.isbn,
+                  isbn13: book.isbn13,
+                })
+              }
             />
           );
         })}
