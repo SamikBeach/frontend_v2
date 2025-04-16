@@ -13,7 +13,7 @@ import {
 /**
  * 최근 검색어 조회 훅
  */
-export function useRecentSearches(limit: number = 5) {
+export function useRecentSearches(limit: number = 3) {
   return useSuspenseQuery<{
     recentSearches: RecentSearch[];
     count: number;
