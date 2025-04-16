@@ -7,14 +7,6 @@ import { SimpleErrorFallback } from '../common/ErrorFallback';
 import { LibrariesSkeleton } from '../common/Skeletons';
 import { TabNavigation, TabType } from './TabNavigation';
 
-// 리뷰 수 업데이트를 위한 스크립트
-const updateReviewCount = (count: number) => {
-  const reviewCountElement = document.getElementById('review-count');
-  if (reviewCountElement) {
-    reviewCountElement.textContent = count > 0 ? `(${count})` : '';
-  }
-};
-
 export function BookRightPanel() {
   const { book } = useBookDetails();
   const [activeTab, setActiveTab] = useState<TabType>('reviews');
@@ -34,7 +26,6 @@ export function BookRightPanel() {
 
   const handleReviewCountChange = (count: number) => {
     setReviewCount(count);
-    updateReviewCount(count);
   };
 
   return (

@@ -53,7 +53,7 @@ export const getPopularSearchTerms = async (
 export const getRecentSearchTerms = async (
   limit: number = 5
 ): Promise<{
-  recentSearches: RecentSearch[];
+  books: RecentSearch[];
   count: number;
 }> => {
   const { data } = await api.get('/search/recent', {

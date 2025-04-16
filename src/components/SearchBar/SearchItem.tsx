@@ -16,6 +16,7 @@ import { useState } from 'react';
 interface SearchItemProps {
   item: {
     id: number;
+    bookId?: number;
     type: string;
     title: string;
     subtitle?: string;
@@ -307,7 +308,7 @@ export function SearchItem({
               className={`${isSmall ? 'h-3 w-3' : 'h-4 w-4'} text-gray-400`}
             />
             <span
-              className={`${isSmall ? 'text-[10px]' : 'text-sm'} ml-1.5 text-gray-500`}
+              className={`${isSmall ? 'text-xs' : 'text-md'} ml-1.5 text-gray-500`}
             >
               {item.reviews !== undefined && item.reviews > 999
                 ? `${Math.floor(item.reviews / 1000)}k`

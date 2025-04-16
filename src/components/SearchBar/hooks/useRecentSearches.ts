@@ -15,7 +15,7 @@ import {
  */
 export function useRecentSearches(limit: number = 3) {
   return useSuspenseQuery<{
-    recentSearches: RecentSearch[];
+    books: RecentSearch[];
     count: number;
   }>({
     queryKey: ['search', 'recent', limit],

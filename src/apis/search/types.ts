@@ -23,6 +23,7 @@ export interface SubCategory {
 
 export interface SearchResult {
   id: number;
+  bookId?: number;
   type: string;
   title: string;
   subtitle?: string;

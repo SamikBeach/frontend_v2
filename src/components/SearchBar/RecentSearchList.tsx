@@ -18,12 +18,14 @@ export function RecentSearchList({
   onItemClick,
   onDeleteSearch,
 }: RecentSearchListProps) {
+  console.log('searches', searches);
   return (
     <CommandGroup heading="">
       {searches.map((search, index) => {
         // RecentSearch 모델을 SearchItem 모델로 매핑
         const searchItem = {
-          id: search.bookId || index,
+          id: search.id,
+          bookId: search.bookId, // 백엔드에서 추가된 bookId 필드
           type: 'book',
           title: search.title || search.term,
           author: search.author,
@@ -44,6 +46,8 @@ export function RecentSearchList({
           readingStats: search.readingStats,
           userReadingStatus: search.userReadingStatus as ReadingStatusType,
         };
+
+        console.log('searchItem', searchItem);
 
         return (
           <SearchItem

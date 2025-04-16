@@ -31,8 +31,7 @@ export function TabNavigation({
           )}
           onClick={() => onTabChange('reviews')}
         >
-          리뷰{' '}
-          {reviewCount !== undefined && reviewCount > 0 && `(${reviewCount})`}
+          리뷰 {reviewCount !== undefined && `(${reviewCount})`}
         </button>
         <button
           className={cn(
@@ -44,9 +43,7 @@ export function TabNavigation({
           onClick={() => onTabChange('libraries')}
         >
           이 책이 등록된 서재{' '}
-          {libraryCount !== undefined &&
-            libraryCount > 0 &&
-            `(${libraryCount})`}
+          {libraryCount !== undefined && `(${libraryCount})`}
         </button>
       </div>
 

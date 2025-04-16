@@ -39,7 +39,7 @@ function RecentSearches({
   const { mutate: deleteAllRecentSearches } = useDeleteAllRecentSearches();
   const { mutate: deleteRecentSearch } = useDeleteRecentSearch();
 
-  const recentSearches = recentSearchData?.recentSearches || [];
+  const recentSearches = recentSearchData?.books || [];
 
   return (
     <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
@@ -136,7 +136,7 @@ export function SearchResults({
     if (query) {
       logSelection({
         term: query,
-        bookId: item.id,
+        bookId: item.bookId,
         title: item.title,
         author: item.author || '',
         coverImage: item.image || '',
@@ -245,15 +245,14 @@ export function SearchResults({
         {searchResults.map((book, index) => {
           // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
           const bookKey =
-            book.isbn13 ||
-            book.isbn ||
-            `book-index-${index}-${book.title?.slice(0, 10)}`;
+            (book?.isbn13 ?? '') + (book?.isbn ?? '') + book.title;
 
           return (
             <SearchItem
               key={bookKey}
               item={{
                 id: book.id,
+                bookId: book.bookId,
                 type: 'book',
                 title: book.title,
                 author: book.author,
@@ -276,6 +275,7 @@ export function SearchResults({
               onClick={() =>
                 handleItemClick({
                   id: book.id,
+                  bookId: book.bookId,
                   title: book.title,
                   author: book.author,
                   image: book.coverImage,
