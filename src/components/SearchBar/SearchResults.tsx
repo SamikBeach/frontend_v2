@@ -4,7 +4,7 @@ import { SearchResult } from '@/apis/search/types';
 import { CommandEmpty, CommandGroup } from '@/components/ui/command';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Clock, Loader2 } from 'lucide-react';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { PopularSearchList } from './PopularSearchList';
 import { RecentSearchList } from './RecentSearchList';
 import { SearchItem } from './SearchItem';
@@ -24,6 +24,8 @@ interface SearchResultsProps {
   setQuery: (query: string) => void;
   searchResults: SearchResult[];
   isLoading: boolean;
+  onLoadMore?: () => void;
+  hasNextPage?: boolean;
 }
 
 // 최근 검색어 컴포넌트
@@ -120,8 +122,11 @@ export function SearchResults({
   setQuery,
   searchResults,
   isLoading,
+  onLoadMore,
+  hasNextPage,
 }: SearchResultsProps) {
   const { mutate: logSelection } = useLogBookSelection();
+  const listRef = useRef<HTMLDivElement>(null);
 
   // 검색 아이템 클릭 시 검색어 저장
   const handleItemClick = (item: any) => {
@@ -144,6 +149,32 @@ export function SearchResults({
     onItemClick(item);
   };
 
+  // 스크롤 이벤트 처리
+  useEffect(() => {
+    if (view !== 'results' || !onLoadMore || !hasNextPage) return;
+
+    const listElement = listRef.current;
+    if (!listElement) return;
+
+    const handleScroll = () => {
+      if (!listElement) return;
+
+      // 스크롤이 바닥에 도달했는지 확인 (바닥에서 50px 위까지 스크롤되면 로드)
+      const scrollBottom =
+        listElement.scrollHeight -
+        listElement.scrollTop -
+        listElement.clientHeight;
+      if (scrollBottom < 100 && hasNextPage && !isLoading) {
+        onLoadMore();
+      }
+    };
+
+    listElement.addEventListener('scroll', handleScroll);
+    return () => {
+      listElement.removeEventListener('scroll', handleScroll);
+    };
+  }, [view, onLoadMore, hasNextPage, isLoading]);
+
   // 최근 검색 화면
   if (view === 'recent') {
     return (
@@ -155,10 +186,13 @@ export function SearchResults({
     );
   }
 
-  // 검색 결과 로딩 중
-  if (isLoading) {
+  // 검색 결과 로딩 중 (첫 로딩만 전체 화면 로딩 표시)
+  if (isLoading && searchResults.length === 0) {
     return (
-      <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+      <CommandPrimitive.List
+        ref={listRef}
+        className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+      >
         <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
           <div className="flex flex-col items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
@@ -174,7 +208,10 @@ export function SearchResults({
   // 검색 결과 없음
   if (hasNoResults) {
     return (
-      <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+      <CommandPrimitive.List
+        ref={listRef}
+        className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+      >
         <CommandEmpty className="py-6 text-center">
           <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
             <div className="flex flex-col items-center justify-center py-6 text-center">
@@ -196,7 +233,10 @@ export function SearchResults({
 
   // 검색 결과 목록
   return (
-    <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+    <CommandPrimitive.List
+      ref={listRef}
+      className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+    >
       <CommandGroup heading={`"${query}" 검색 결과`}>
         {searchResults.map((book, index) => {
           // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
@@ -249,6 +289,20 @@ export function SearchResults({
           );
         })}
       </CommandGroup>
+
+      {/* 더 로드하는 중 표시 */}
+      {isLoading && searchResults.length > 0 && (
+        <div className="flex items-center justify-center py-4">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        </div>
+      )}
+
+      {/* 더 이상 결과가 없음 표시 */}
+      {!hasNextPage && searchResults.length > 0 && (
+        <div className="py-4 text-center text-sm text-gray-500">
+          모든 검색 결과를 불러왔습니다
+        </div>
+      )}
     </CommandPrimitive.List>
   );
 }

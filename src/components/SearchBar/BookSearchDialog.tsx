@@ -39,11 +39,22 @@ function SearchResultsLoader({
 }) {
   // 디바운스된 쿼리를 사용하여 API 호출
   const debouncedQuery = useDebounce(query, 300);
-  const { data, isFetching } = useSearchQuery(debouncedQuery);
+  const { data, isFetching, fetchNextPage, hasNextPage } =
+    useSearchQuery(debouncedQuery);
 
   // 디바운싱 중인지 확인 (현재 입력 중인 쿼리와 디바운스된 쿼리가 다르면 디바운싱 중)
   const isDebouncing =
     query.trim() !== debouncedQuery.trim() && query.trim() !== '';
+
+  // 검색 결과를 하나의 배열로 변환
+  const searchResults = data?.pages.flatMap(page => page.books) || [];
+
+  // 스크롤 핸들러
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetching) {
+      fetchNextPage();
+    }
+  };
 
   return (
     <SearchResults
@@ -52,8 +63,10 @@ function SearchResultsLoader({
       onItemClick={onItemClick}
       onOpenChange={onOpenChange}
       setQuery={setQuery}
-      searchResults={data?.books || []}
+      searchResults={searchResults}
       isLoading={isFetching || isDebouncing}
+      onLoadMore={handleLoadMore}
+      hasNextPage={hasNextPage}
     />
   );
 }
