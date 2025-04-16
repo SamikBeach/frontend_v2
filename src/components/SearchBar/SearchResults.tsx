@@ -202,7 +202,9 @@ export function SearchResults({
             type: 'book',
             title: book.title,
             author: book.author,
-            image: book.coverImage || '/images/no-image.png',
+            image: book.coverImage
+              ? book.coverImage.replace(/^https?:\/\//, '//')
+              : '/images/no-image.png',
             highlight: query,
             rating: book.rating,
             reviews: book.reviews || book.reviewCount,

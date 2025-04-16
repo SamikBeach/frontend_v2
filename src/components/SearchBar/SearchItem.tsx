@@ -66,23 +66,25 @@ export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
       onSelect={onClick}
     >
       {/* 이미지 섬네일 */}
-      {item.image && (
+      {item.image ? (
         <div className="relative w-[140px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white">
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-50">
-            <span className="text-xl text-gray-300">📖</span>
-          </div>
           {!imageError ? (
             <img
               src={item.image}
               alt={item.title}
               className="h-auto w-full object-contain"
               onError={() => setImageError(true)}
+              loading="lazy"
             />
           ) : (
-            <div className="flex w-full items-center justify-center py-20">
-              <span className="text-2xl">📚</span>
+            <div className="flex h-[190px] w-full items-center justify-center bg-gray-50">
+              <span className="text-3xl">📚</span>
             </div>
           )}
+        </div>
+      ) : (
+        <div className="relative flex h-[190px] w-[140px] flex-shrink-0 items-center justify-center overflow-hidden rounded-md border border-gray-200 bg-gray-50">
+          <span className="text-3xl">📚</span>
         </div>
       )}
 

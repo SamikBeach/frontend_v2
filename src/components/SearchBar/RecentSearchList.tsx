@@ -26,7 +26,9 @@ export function RecentSearchList({
           type: 'book',
           title: search.title || search.term,
           author: search.author,
-          image: search.coverImage || '/images/no-image.png',
+          image: search.coverImage
+            ? search.coverImage.replace(/^https?:\/\//, '//')
+            : '/images/no-image.png',
           subtitle: search.author,
           isbn: search.isbn || '',
           isbn13: search.isbn13 || '',

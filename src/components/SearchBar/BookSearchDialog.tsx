@@ -104,7 +104,7 @@ export function BookSearchDialog({
           onClick={handleClose}
         />
         <DialogContent
-          className="fixed top-[6px] left-1/2 z-50 w-[800px] max-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-0 max-md:h-full max-md:w-full"
+          className={`fixed top-[6px] left-1/2 z-50 w-[800px] max-w-[800px] ${query ? 'h-[800px] max-h-[800px]' : 'max-h-[800px]'} -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-0 max-md:h-full max-md:w-full`}
           overlayClassName={overlayClassName}
           closeClassName="hidden"
           onOpenAutoFocus={e => {
@@ -116,13 +116,15 @@ export function BookSearchDialog({
         >
           <DialogTitle className="sr-only">도서 검색</DialogTitle>
           <div
-            className="animate-expandDown overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all"
+            className={`animate-expandDown flex ${query ? 'h-full' : 'auto'} flex-col overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all`}
             style={{
               width: '100%',
             }}
           >
-            <Command className="rounded-none border-0 shadow-none">
-              <div className="sticky top-0 z-10 border-b border-gray-200 bg-white">
+            <Command
+              className={`flex ${query ? 'flex-1' : ''} flex-col border-0 shadow-none`}
+            >
+              <div className="sticky top-0 z-10 flex-shrink-0 border-b border-gray-200 bg-white">
                 <CommandInput
                   ref={inputRef}
                   value={query}
@@ -131,7 +133,9 @@ export function BookSearchDialog({
                   placeholder="도서 제목을 검색해보세요"
                 />
               </div>
-              <div className="scrollbar-gutter-stable max-h-[75vh] overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+              <div
+                className={`scrollbar-gutter-stable ${query ? 'flex-1' : ''} overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent`}
+              >
                 <Suspense
                   fallback={
                     <div className="flex h-[600px] items-center justify-center">
