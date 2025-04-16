@@ -47,6 +47,54 @@ export function BookInfoSkeleton() {
   );
 }
 
+// 리뷰 스켈레톤 - 독립 컴포넌트로 분리
+export function BookReviewsSkeleton() {
+  return (
+    <div className="space-y-0">
+      {Array(3)
+        .fill(0)
+        .map((_, index) => (
+          <div
+            key={index}
+            className={`${index === 0 ? 'pt-2 pb-6' : 'py-6'} ${
+              index !== 2 ? 'border-b border-gray-100' : ''
+            }`}
+          >
+            <div className="flex items-start gap-3.5">
+              <Skeleton className="mt-0.5 h-9 w-9 flex-shrink-0 rounded-full" />
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-3 w-16 rounded" />
+                </div>
+
+                {/* 별점 스켈레톤 */}
+                <div className="mt-1 flex gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Skeleton key={i} className="h-3 w-3 rounded-full" />
+                  ))}
+                </div>
+
+                {/* 본문 스켈레톤 */}
+                <div className="mt-2 space-y-1.5">
+                  <Skeleton className="h-4 w-full rounded" />
+                  <Skeleton className="h-4 w-full rounded" />
+                  <Skeleton className="h-4 w-2/3 rounded" />
+                </div>
+
+                {/* 버튼 스켈레톤 */}
+                <div className="mt-2.5 flex items-center gap-2 pt-1">
+                  <Skeleton className="h-7 w-16 rounded-full" />
+                  <Skeleton className="h-7 w-16 rounded-full" />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+    </div>
+  );
+}
+
 // 책 본문 스켈레톤
 export function BookSkeleton() {
   return (
@@ -96,26 +144,7 @@ export function BookSkeleton() {
           </div>
 
           {/* 컨텐츠 영역 스켈레톤 */}
-          <div className="space-y-4">
-            {Array(3)
-              .fill(0)
-              .map((_, i) => (
-                <div key={i} className="rounded-xl border border-gray-100 p-4">
-                  <div className="mb-3 flex items-center space-x-3">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                    <div className="space-y-1">
-                      <Skeleton className="h-4 w-24 rounded" />
-                      <Skeleton className="h-3 w-16 rounded" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-full rounded" />
-                    <Skeleton className="h-4 w-full rounded" />
-                    <Skeleton className="h-4 w-3/4 rounded" />
-                  </div>
-                </div>
-              ))}
-          </div>
+          <BookReviewsSkeleton />
         </div>
       </div>
     </div>

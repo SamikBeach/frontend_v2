@@ -41,6 +41,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
+import { BookReviewsSkeleton } from './components/common';
 import { useBookDetails, useBookReviews, useReviewDialog } from './hooks';
 import { useReviewComments } from './hooks/useReviewComments';
 
@@ -379,55 +380,6 @@ function ErrorFallback({
   );
 }
 
-// 리뷰 로딩 컴포넌트
-function ReviewsLoading() {
-  return (
-    <div className="space-y-0">
-      {[1, 2, 3].map((i, index) => (
-        <div
-          key={i}
-          className={`${index === 0 ? 'pt-2 pb-6' : 'py-6'} ${
-            i !== 3 ? 'border-b border-gray-100' : ''
-          }`}
-        >
-          <div className="flex items-start gap-3.5">
-            <div className="mt-0.5 h-9 w-9 flex-shrink-0 rounded-full bg-gray-200"></div>
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-20 rounded-full bg-gray-200"></div>
-                <div className="h-3 w-16 rounded-full bg-gray-200"></div>
-              </div>
-
-              {/* 별점 스켈레톤 */}
-              <div className="flex gap-1">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <div
-                    key={index}
-                    className="h-3 w-3 rounded-full bg-gray-200"
-                  ></div>
-                ))}
-              </div>
-
-              {/* 본문 스켈레톤 */}
-              <div className="space-y-1.5">
-                <div className="h-4 w-full rounded-full bg-gray-200"></div>
-                <div className="h-4 w-full rounded-full bg-gray-200"></div>
-                <div className="h-4 w-2/3 rounded-full bg-gray-200"></div>
-              </div>
-
-              {/* 버튼 스켈레톤 */}
-              <div className="mt-2.5 flex items-center gap-2 pt-1">
-                <div className="h-7 w-16 rounded-full bg-gray-200"></div>
-                <div className="h-7 w-16 rounded-full bg-gray-200"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 // 메인 리뷰 목록 컴포넌트
 function ReviewsList({
   onReviewCountChange,
@@ -552,7 +504,7 @@ function ReviewsList({
 
   // 로딩 중일 때는 리뷰 없음 메시지를 표시하지 않습니다
   if (isLoading) {
-    return <ReviewsLoading />;
+    return <BookReviewsSkeleton />;
   }
 
   // 로딩이 완료된 후 리뷰가 없는 경우에만 표시
@@ -826,9 +778,10 @@ export function BookReviews({
 }: {
   onReviewCountChange?: (count: number) => void;
 }) {
+  // 최상위 Suspense를 그대로 유지하되 여러 번 스켈레톤이 전환되는 깜빡임 현상을 방지
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <Suspense fallback={<ReviewsLoading />}>
+      <Suspense fallback={<BookReviewsSkeleton />}>
         <ReviewsList onReviewCountChange={onReviewCountChange} />
       </Suspense>
     </ErrorBoundary>
