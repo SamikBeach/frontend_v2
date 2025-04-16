@@ -86,6 +86,18 @@ export interface RecentSearch {
   isbn?: string;
   isbn13?: string;
   createdAt: string;
+  rating?: number;
+  reviews?: number;
+  totalRatings?: number;
+  readingStats?: {
+    currentReaders: number;
+    completedReaders: number;
+    averageReadingTime: string;
+    difficulty: 'easy' | 'medium' | 'hard';
+    readingStatusCounts?: Record<ReadingStatusType, number>;
+  };
+  userReadingStatus?: ReadingStatusType | null;
+  userRating?: UserRating | null;
 }
 
 export interface PopularSearch {

@@ -215,7 +215,10 @@ export function SearchResults({
                 author: book.author,
                 image: book.coverImage
                   ? book.coverImage.replace(/^https?:\/\//, '//')
-                  : '/images/no-image.png',
+                  : undefined,
+                coverImage: book.coverImage
+                  ? book.coverImage.replace(/^https?:\/\//, '//')
+                  : undefined,
                 highlight: query,
                 rating: book.rating,
                 reviews: book.reviews,
@@ -223,6 +226,8 @@ export function SearchResults({
                 isbn: book.isbn || '',
                 isbn13: book.isbn13 || '',
                 readingStats: book.readingStats,
+                userReadingStatus: book.userReadingStatus,
+                userRating: book.userRating,
               }}
               onClick={() =>
                 handleItemClick({
@@ -230,8 +235,14 @@ export function SearchResults({
                   title: book.title,
                   author: book.author,
                   image: book.coverImage,
+                  coverImage: book.coverImage,
                   isbn: book.isbn,
                   isbn13: book.isbn13,
+                  rating: book.rating,
+                  reviews: book.reviews,
+                  totalRatings: book.totalRatings,
+                  readingStats: book.readingStats,
+                  userReadingStatus: book.userReadingStatus,
                 })
               }
             />

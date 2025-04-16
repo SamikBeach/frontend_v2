@@ -1,5 +1,6 @@
 'use client';
 
+import { ReadingStatusType } from '@/apis/reading-status/types';
 import { RecentSearch } from '@/apis/search/types';
 import { CommandGroup } from '@/components/ui/command';
 import { SearchItem } from './SearchItem';
@@ -20,7 +21,7 @@ export function RecentSearchList({
   return (
     <CommandGroup heading="">
       {searches.map((search, index) => {
-        // Map the API search model to the UI search item model
+        // RecentSearch 모델을 SearchItem 모델로 매핑
         const searchItem = {
           id: search.bookId || index,
           type: 'book',
@@ -28,11 +29,20 @@ export function RecentSearchList({
           author: search.author,
           image: search.coverImage
             ? search.coverImage.replace(/^https?:\/\//, '//')
-            : '/images/no-image.png',
+            : undefined,
+          coverImage: search.coverImage
+            ? search.coverImage.replace(/^https?:\/\//, '//')
+            : undefined,
           subtitle: search.author,
           isbn: search.isbn || '',
           isbn13: search.isbn13 || '',
           searchId: search.id,
+          rating: search.rating,
+          reviews: search.reviews,
+          totalRatings: search.totalRatings,
+          // 읽기 상태 정보가 있는 경우 전달
+          readingStats: search.readingStats,
+          userReadingStatus: search.userReadingStatus as ReadingStatusType,
         };
 
         return (
