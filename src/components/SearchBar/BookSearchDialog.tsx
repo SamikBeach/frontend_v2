@@ -134,7 +134,7 @@ export function BookSearchDialog({
             }}
           >
             <Command
-              className="flex h-full w-full flex-col overflow-hidden border-0 shadow-none"
+              className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
               shouldFilter={false}
               loop={true}
             >
