@@ -131,6 +131,7 @@ export function BookSearchDialog({
           } -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full`}
           overlayClassName={overlayClassName}
           closeClassName="hidden"
+          aria-describedby={undefined}
           onOpenAutoFocus={e => {
             e.preventDefault();
             setTimeout(() => {

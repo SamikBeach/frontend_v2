@@ -113,6 +113,7 @@ export function AuthDialog({
       <DialogContent
         className="absolute top-1/2 left-1/2 w-[400px] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border-0 p-0 shadow-xl"
         onPointerDownOutside={handlePointerDownOutside}
+        aria-describedby={undefined}
       >
         {/* 헤더 - 로고와 뒤로가기 버튼 */}
         <DialogHeader className="relative flex h-14 items-center justify-center border-b border-gray-100 px-6">
