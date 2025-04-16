@@ -1,5 +1,6 @@
-import { ReviewSortType } from '@/apis/review/types';
-import { bookReviewSortAtom } from '@/atoms/book';
+'use client';
+
+import { LibrarySortOption } from '@/apis/library/types';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -7,39 +8,47 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAtom } from 'jotai';
-import { Clock, Flame, MessageSquare } from 'lucide-react';
+import { Clock, Flame, Library } from 'lucide-react';
 import { useState } from 'react';
 
-export function ReviewSortDropdown() {
-  const [sort, setSort] = useAtom(bookReviewSortAtom);
+interface LibrarySortDropdownProps {
+  onChange: (sort: LibrarySortOption) => void;
+  value: LibrarySortOption;
+}
+
+/**
+ * 서재 정렬 드롭다운 컴포넌트
+ */
+export function LibrarySortDropdown({
+  onChange,
+  value,
+}: LibrarySortDropdownProps) {
   const [open, setOpen] = useState(false);
 
-  // 정렬 옵션 배열 정의 (레이블, 값, 아이콘을 포함)
   const sortOptions = [
     {
       label: '인기순',
-      value: 'likes' as ReviewSortType,
+      value: LibrarySortOption.SUBSCRIBERS,
       icon: <Flame className="h-3.5 w-3.5" />,
     },
     {
-      label: '댓글 많은 순',
-      value: 'comments' as ReviewSortType,
-      icon: <MessageSquare className="h-3.5 w-3.5" />,
+      label: '담긴 책 많은 순',
+      value: LibrarySortOption.BOOKS,
+      icon: <Library className="h-3.5 w-3.5" />,
     },
     {
       label: '최신순',
-      value: 'recent' as ReviewSortType,
+      value: LibrarySortOption.RECENT,
       icon: <Clock className="h-3.5 w-3.5" />,
     },
   ];
 
   // 현재 선택된 정렬 옵션 찾기
   const selectedOption =
-    sortOptions.find(option => option.value === sort) || sortOptions[0];
+    sortOptions.find(option => option.value === value) || sortOptions[0];
 
-  const handleSortChange = (newSort: ReviewSortType) => {
-    setSort(newSort);
+  const handleSortChange = (newSort: LibrarySortOption) => {
+    onChange(newSort);
     setOpen(false);
   };
 
@@ -62,7 +71,7 @@ export function ReviewSortDropdown() {
           <DropdownMenuItem
             key={option.value}
             className={`cursor-pointer text-sm ${
-              sort === option.value ? 'text-primary font-medium' : ''
+              value === option.value ? 'text-primary font-medium' : ''
             }`}
             onClick={() => handleSortChange(option.value)}
           >

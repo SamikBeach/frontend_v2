@@ -1,6 +1,8 @@
+import { LibrarySortOption } from '@/apis/library/types';
 import { cn } from '@/lib/utils';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { LibrarySortDropdown } from '../BookLibraries';
 import { ReviewSortDropdown } from '../BookReviews';
 
 // 탭 타입 정의
@@ -11,6 +13,8 @@ interface TabNavigationProps {
   onTabChange: (tab: TabType) => void;
   reviewCount?: number;
   libraryCount?: number;
+  onLibrarySortChange?: (sort: LibrarySortOption) => void;
+  librarySortValue?: LibrarySortOption;
 }
 
 export function TabNavigation({
@@ -18,6 +22,8 @@ export function TabNavigation({
   onTabChange,
   reviewCount,
   libraryCount,
+  onLibrarySortChange,
+  librarySortValue = LibrarySortOption.RECENT,
 }: TabNavigationProps) {
   return (
     <div className="relative flex items-center justify-between border-b border-gray-200">
@@ -58,6 +64,15 @@ export function TabNavigation({
               <ReviewSortDropdown />
             </Suspense>
           </ErrorBoundary>
+        </div>
+      )}
+
+      {activeTab === 'libraries' && onLibrarySortChange && (
+        <div className="absolute -top-1 right-0">
+          <LibrarySortDropdown
+            onChange={onLibrarySortChange}
+            value={librarySortValue}
+          />
         </div>
       )}
     </div>

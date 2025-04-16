@@ -1,5 +1,12 @@
 import { Book } from '../book/types';
 
+// 서재 정렬 옵션 (백엔드 enum과 일치)
+export enum LibrarySortOption {
+  SUBSCRIBERS = 'subscribers', // 구독자 많은 순
+  BOOKS = 'books', // 담긴 책 많은 순
+  RECENT = 'recent', // 최신순
+}
+
 // 서재 책 정보 타입
 export interface LibraryBook {
   id: number;

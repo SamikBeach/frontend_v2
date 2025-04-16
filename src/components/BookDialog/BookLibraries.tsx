@@ -1,5 +1,6 @@
 import {
   CreateLibraryDto,
+  LibrarySortOption,
   LibrarySummary,
   LibraryTag,
 } from '@/apis/library/types';
@@ -41,9 +42,18 @@ function LibrariesError({ resetErrorBoundary }: any) {
 }
 
 // 서재 목록 컴포넌트
-function LibrariesList() {
+function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
   const { book } = useBookDetails();
-  const { libraries, isEmpty } = useBookLibraries(book?.id);
+  const effectiveSortOption = sortOption || LibrarySortOption.SUBSCRIBERS;
+
+  // sortOption이 변경될 때마다 쿼리 다시 실행하도록 설정
+  const {
+    libraries,
+    isEmpty,
+    hasNextPage,
+    isFetchingNextPage,
+    handleLoadMore,
+  } = useBookLibraries(book?.id, 5, effectiveSortOption);
   const currentUser = useCurrentUser();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const { createLibrary, libraries: userLibraries } = useUserLibraries();
@@ -200,6 +210,27 @@ function LibrariesList() {
         </Link>
       ))}
 
+      {/* 서재 더보기 버튼 */}
+      {hasNextPage && (
+        <div className="mt-6 flex justify-center">
+          <Button
+            variant="outline"
+            className="rounded-full text-sm font-medium"
+            onClick={handleLoadMore}
+            disabled={isFetchingNextPage}
+          >
+            {isFetchingNextPage ? (
+              <span className="flex items-center gap-2">
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-gray-800"></span>
+                로딩 중...
+              </span>
+            ) : (
+              '서재 더 보기'
+            )}
+          </Button>
+        </div>
+      )}
+
       {/* 새 서재 생성 다이얼로그 - 공통 컴포넌트 사용 */}
       <CreateLibraryDialog
         open={isNewLibraryDialogOpen}
@@ -255,18 +286,16 @@ export function LibrariesSkeleton() {
   );
 }
 
-export function BookLibraries() {
-  const { book } = useBookDetails();
-
-  if (!book || !book.id) return null;
-
+export function BookLibraries({
+  sortOption,
+}: {
+  sortOption?: LibrarySortOption;
+}) {
   return (
-    <div>
-      <ErrorBoundary FallbackComponent={LibrariesError}>
-        <Suspense fallback={<LibrariesSkeleton />}>
-          <LibrariesList />
-        </Suspense>
-      </ErrorBoundary>
-    </div>
+    <ErrorBoundary FallbackComponent={LibrariesError}>
+      <Suspense fallback={<LibrariesSkeleton />}>
+        <LibrariesList sortOption={sortOption} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

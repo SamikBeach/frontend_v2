@@ -7,6 +7,7 @@ import {
   LibrariesForBookResponse,
   Library,
   LibraryBook,
+  LibrarySortOption,
   LibrarySummary,
   LibraryTag,
   SubscriberInfo,
@@ -218,12 +219,13 @@ export const getLibrariesByBookId = async (
   bookId: number,
   page: number = 1,
   limit: number = 10,
-  isbn?: string
+  isbn?: string,
+  sort?: LibrarySortOption
 ): Promise<LibrariesForBookResponse> => {
   const response = await api.get<LibrariesForBookResponse>(
     `/library/book/${bookId}`,
     {
-      params: { page, limit, isbn },
+      params: { page, limit, isbn, sort },
     }
   );
   return response.data;

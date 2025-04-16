@@ -5,3 +5,4 @@ export {
   LibrariesLoading,
   LibrariesSkeleton,
 } from './LibrariesLoading';
+export { LibrarySortDropdown } from './LibrarySortDropdown';
