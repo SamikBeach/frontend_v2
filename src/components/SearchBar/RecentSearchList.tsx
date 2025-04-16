@@ -18,7 +18,6 @@ export function RecentSearchList({
   onItemClick,
   onDeleteSearch,
 }: RecentSearchListProps) {
-  console.log('searches', searches);
   return (
     <CommandGroup heading="">
       {searches.map((search, index) => {
@@ -47,8 +46,6 @@ export function RecentSearchList({
           userReadingStatus: search.userReadingStatus as ReadingStatusType,
         };
 
-        console.log('searchItem', searchItem);
-
         return (
           <SearchItem
             key={`${search.term}-${index}`}
@@ -62,8 +59,6 @@ export function RecentSearchList({
               // search.id가 존재할 때만 삭제 요청
               if (typeof search.id === 'number') {
                 onDeleteSearch(search.id);
-              } else {
-                console.error('검색어 ID가 정의되지 않았습니다.');
               }
             }}
           />
