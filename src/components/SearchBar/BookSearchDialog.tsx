@@ -49,6 +49,9 @@ function SearchResultsLoader({
   // 검색 결과를 하나의 배열로 변환
   const searchResults = data?.pages.flatMap(page => page.books) || [];
 
+  // 총 검색 결과 수 (첫 번째 페이지의 total 값)
+  const totalResults = data?.pages[0]?.total || 0;
+
   // 스크롤 핸들러
   const handleLoadMore = () => {
     if (hasNextPage && !isFetching) {
@@ -67,6 +70,7 @@ function SearchResultsLoader({
       isLoading={isFetching || isDebouncing}
       onLoadMore={handleLoadMore}
       hasNextPage={hasNextPage}
+      totalResults={totalResults}
     />
   );
 }

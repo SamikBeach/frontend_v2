@@ -26,6 +26,7 @@ interface SearchResultsProps {
   isLoading: boolean;
   onLoadMore?: () => void;
   hasNextPage?: boolean;
+  totalResults?: number;
 }
 
 // 최근 검색어 컴포넌트
@@ -124,6 +125,7 @@ export function SearchResults({
   isLoading,
   onLoadMore,
   hasNextPage,
+  totalResults,
 }: SearchResultsProps) {
   const { mutate: logSelection } = useLogBookSelection();
   const listRef = useRef<HTMLDivElement>(null);
@@ -164,7 +166,7 @@ export function SearchResults({
         listElement.scrollHeight -
         listElement.scrollTop -
         listElement.clientHeight;
-      if (scrollBottom < 100 && hasNextPage && !isLoading) {
+      if (scrollBottom < 200 && hasNextPage && !isLoading) {
         onLoadMore();
       }
     };
@@ -237,7 +239,9 @@ export function SearchResults({
       ref={listRef}
       className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
     >
-      <CommandGroup heading={`"${query}" 검색 결과`}>
+      <CommandGroup
+        heading={`"${query}" 검색 결과${totalResults ? ` (${totalResults})` : ''}`}
+      >
         {searchResults.map((book, index) => {
           // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
           const bookKey =
