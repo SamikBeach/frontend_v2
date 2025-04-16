@@ -1,9 +1,9 @@
 'use client';
 
 import { SearchResult } from '@/apis/search/types';
-import { CommandEmpty, CommandGroup } from '@/components/ui/command';
+import { CommandGroup } from '@/components/ui/command';
 import { Clock, Loader2 } from 'lucide-react';
-import { Suspense, useRef } from 'react';
+import { Suspense } from 'react';
 import { PopularSearchList } from './PopularSearchList';
 import { RecentSearchList } from './RecentSearchList';
 import { SearchItem } from './SearchItem';
@@ -121,12 +121,6 @@ export function SearchResults({
   isLoading,
 }: SearchResultsProps) {
   const { mutate: logSelection } = useLogBookSelection();
-  const searchResultsRef = useRef<SearchResult[]>([]);
-
-  // 검색 결과 캐싱
-  if (searchResults && searchResults.length > 0) {
-    searchResultsRef.current = searchResults;
-  }
 
   // 검색 아이템 클릭 시 검색어 저장
   const handleItemClick = (item: any) => {
@@ -163,26 +157,29 @@ export function SearchResults({
   // 검색 결과 로딩 중
   if (isLoading) {
     return (
-      <div className="flex h-[300px] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-600" />
+      <div className="flex h-[400px] w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-600" />
       </div>
     );
   }
 
-  const hasResults = searchResultsRef.current.length > 0;
+  // 검색어 입력 후 결과가 없는 경우에만 없음 메시지 표시
+  const hasNoResults = searchResults.length === 0 && query.trim() !== '';
 
   // 검색 결과 없음
-  if (!hasResults) {
+  if (hasNoResults) {
     return (
-      <CommandEmpty className="flex flex-col items-center justify-center py-14">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
-          <span className="text-2xl">📚</span>
+      <div className="flex h-[400px] w-full items-center justify-center">
+        <div className="flex flex-col items-center justify-center text-center">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+            <span className="text-3xl">📚</span>
+          </div>
+          <p className="mb-2 text-lg font-medium text-gray-800">
+            검색 결과가 없습니다
+          </p>
+          <p className="text-sm text-gray-500">다른 검색어로 시도해보세요</p>
         </div>
-        <p className="mt-4 mb-1 text-base font-medium text-gray-800">
-          검색 결과가 없습니다
-        </p>
-        <p className="text-sm text-gray-500">다른 검색어로 시도해보세요</p>
-      </CommandEmpty>
+      </div>
     );
   }
 
@@ -195,7 +192,7 @@ export function SearchResults({
             &ldquo;{query}&rdquo; 검색 결과
           </h3>
         </div>
-        {searchResultsRef.current.map(book => {
+        {searchResults.map((book, index) => {
           // API 검색 결과를 UI 표시 모델로 변환
           const searchItem = {
             id: book.id,
@@ -212,9 +209,15 @@ export function SearchResults({
             isbn13: book.isbn13 || '',
           };
 
+          // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
+          const bookKey =
+            book.isbn13 ||
+            book.isbn ||
+            `book-index-${index}-${book.title?.slice(0, 10)}`;
+
           return (
             <SearchItem
-              key={`book-${book.title}`}
+              key={bookKey}
               item={searchItem}
               onClick={() => handleItemClick(searchItem)}
             />

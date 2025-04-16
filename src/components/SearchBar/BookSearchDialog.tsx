@@ -36,9 +36,13 @@ function SearchResultsLoader({
   onOpenChange: (open: boolean) => void;
   setQuery: (query: string) => void;
 }) {
-  // query가 공백이고 최근 검색어 보기 모드일 때는 API 호출을 하지 않음
-  const { data } = useSearchQuery(query);
-  const isLoading = !data && !!query.trim();
+  // 디바운스된 쿼리를 사용하여 API 호출
+  const debouncedQuery = useDebounce(query, 300);
+  const { data, isFetching } = useSearchQuery(debouncedQuery);
+
+  // 디바운싱 중인지 확인 (현재 입력 중인 쿼리와 디바운스된 쿼리가 다르면 디바운싱 중)
+  const isDebouncing =
+    query.trim() !== debouncedQuery.trim() && query.trim() !== '';
 
   return (
     <SearchResults
@@ -48,7 +52,7 @@ function SearchResultsLoader({
       onOpenChange={onOpenChange}
       setQuery={setQuery}
       searchResults={data?.books || []}
-      isLoading={isLoading}
+      isLoading={isFetching || isDebouncing}
     />
   );
 }
