@@ -1,7 +1,11 @@
 'use client';
 
 import { SearchResult } from '@/apis/search/types';
-import { CommandGroup } from '@/components/ui/command';
+import {
+  CommandEmpty,
+  CommandGroup,
+  CommandList,
+} from '@/components/ui/command';
 import { Clock, Loader2 } from 'lucide-react';
 import { Suspense } from 'react';
 import { PopularSearchList } from './PopularSearchList';
@@ -38,11 +42,11 @@ function RecentSearches({
   const recentSearches = recentSearchData?.recentSearches || [];
 
   return (
-    <div>
+    <CommandList className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
       {/* 최근 검색 목록 */}
       {recentSearches.length > 0 && (
-        <div>
-          <div className="mb-2 flex items-center justify-between px-4">
+        <CommandGroup heading="최근 검색 기록">
+          <div className="mb-2 flex items-center justify-between px-2">
             <h3 className="flex items-center text-sm font-medium text-gray-700">
               <Clock className="mr-2 h-4 w-4 text-gray-500" />
               최근 검색 기록
@@ -63,7 +67,7 @@ function RecentSearches({
               deleteRecentSearch(searchId);
             }}
           />
-        </div>
+        </CommandGroup>
       )}
 
       {/* 인기 검색어 */}
@@ -74,14 +78,14 @@ function RecentSearches({
           }}
         />
       </Suspense>
-    </div>
+    </CommandList>
   );
 }
 
 // 인기 검색어 스켈레톤
 function PopularSearchesSkeleton() {
   return (
-    <CommandGroup className="pt-4">
+    <CommandGroup heading="인기 검색어">
       <div className="mb-2 px-4">
         <h3 className="flex items-center text-sm font-medium text-gray-700">
           인기 검색어 로딩 중...
@@ -157,11 +161,13 @@ export function SearchResults({
   // 검색 결과 로딩 중
   if (isLoading) {
     return (
-      <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
-        <div className="flex flex-col items-center justify-center">
-          <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+      <CommandList className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+        <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
+          <div className="flex flex-col items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+          </div>
         </div>
-      </div>
+      </CommandList>
     );
   }
 
@@ -171,29 +177,30 @@ export function SearchResults({
   // 검색 결과 없음
   if (hasNoResults) {
     return (
-      <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
-        <div className="flex flex-col items-center justify-center py-6 text-center">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-            <span className="text-4xl">📚</span>
+      <CommandList className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+        <CommandEmpty className="py-6 text-center">
+          <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                <span className="text-4xl">📚</span>
+              </div>
+              <p className="mb-3 text-xl font-medium text-gray-800">
+                검색 결과가 없습니다
+              </p>
+              <p className="text-sm text-gray-500">
+                다른 검색어로 시도해보세요
+              </p>
+            </div>
           </div>
-          <p className="mb-3 text-xl font-medium text-gray-800">
-            검색 결과가 없습니다
-          </p>
-          <p className="text-sm text-gray-500">다른 검색어로 시도해보세요</p>
-        </div>
-      </div>
+        </CommandEmpty>
+      </CommandList>
     );
   }
 
   // 검색 결과 목록
   return (
-    <>
-      <CommandGroup className="pb-2">
-        <div className="mb-2 px-4">
-          <h3 className="flex items-center text-sm font-medium text-gray-700">
-            &ldquo;{query}&rdquo; 검색 결과
-          </h3>
-        </div>
+    <CommandList className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+      <CommandGroup heading={`"${query}" 검색 결과`}>
         {searchResults.map((book, index) => {
           // API 검색 결과를 UI 표시 모델로 변환
           const searchItem = {
@@ -212,7 +219,7 @@ export function SearchResults({
           };
 
           // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
-          const bookKey = (book.isbn13 ?? '') + (book.isbn ?? '') + book.title;
+          const bookKey = `book-${index}-${book.id || ''}-${book.isbn13 || ''}-${book.isbn || ''}`;
 
           return (
             <SearchItem
@@ -223,6 +230,6 @@ export function SearchResults({
           );
         })}
       </CommandGroup>
-    </>
+    </CommandList>
   );
 }

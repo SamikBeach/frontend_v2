@@ -128,10 +128,15 @@ export function BookSearchDialog({
             } flex-col overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all`}
             style={{
               width: '100%',
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
             <Command
-              className={`flex ${query ? 'flex-1' : ''} flex-col border-0 shadow-none`}
+              className="flex h-full w-full flex-col overflow-hidden border-0 shadow-none"
+              shouldFilter={false}
+              loop={true}
             >
               <div className="sticky top-0 z-10 flex-shrink-0 border-b border-gray-200 bg-white">
                 <CommandInput
@@ -142,9 +147,7 @@ export function BookSearchDialog({
                   placeholder="도서 제목을 검색해보세요"
                 />
               </div>
-              <div
-                className={`scrollbar-gutter-stable ${query ? 'flex-1' : ''} overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent`}
-              >
+              <div className="flex-1 overflow-y-auto">
                 <Suspense
                   fallback={
                     <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
