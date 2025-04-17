@@ -74,7 +74,7 @@ export function useLibraries(): UseLibrariesResult {
         return await getAllLibraries(
           user?.id,
           pageParam,
-          12, // 한 페이지당 12개 항목
+          9, // 한 페이지당 9개 항목
           apiSortOption,
           searchQuery
         );

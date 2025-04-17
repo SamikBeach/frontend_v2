@@ -99,7 +99,7 @@ export function CompactLibraryCard({
           )}
 
           {library.books && library.books.length === 0 && (
-            <div className="mb-3 flex w-full flex-1 items-center justify-center rounded-lg border border-gray-100 bg-gray-50">
+            <div className="mb-3 flex min-h-[100px] w-full flex-1 items-center justify-center rounded-lg border border-gray-100 bg-gray-50">
               <p className="text-sm text-gray-400">아직 등록된 책이 없어요.</p>
             </div>
           )}

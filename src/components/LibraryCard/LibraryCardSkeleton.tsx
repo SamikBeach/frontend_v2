@@ -18,9 +18,9 @@ export function LibraryCardSkeleton() {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="flex-1 px-5 pt-0 pb-3">
+      <CardContent className="flex flex-1 flex-col px-5 pt-0 pb-3">
         <Skeleton className="mb-4 h-5 w-3/4" />
-        <div className="grid w-full grid-cols-3 gap-2">
+        <div className="grid min-h-[160px] w-full grid-cols-3 gap-2">
           {[1, 2, 3].map(i => (
             <Skeleton key={i} className="aspect-[5/7] w-full rounded-lg" />
           ))}
