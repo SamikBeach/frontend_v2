@@ -10,9 +10,10 @@ import {
   notificationsEnabledAtom,
   subscriptionStatusAtom,
 } from '@/atoms/library';
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import { useCallback, useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface UseLibraryDetailResult {
   library: Library;
@@ -20,6 +21,8 @@ interface UseLibraryDetailResult {
   notificationsEnabled: boolean;
   handleSubscriptionToggle: () => Promise<void>;
   handleNotificationToggle: () => void;
+  isSubscribing: boolean;
+  isUnsubscribing: boolean;
 }
 
 export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
@@ -58,24 +61,65 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
     }
   }, [library, recentUpdates]);
 
+  // 구독하기 mutation
+  const { mutateAsync: subscribeMutation, isPending: isSubscribing } =
+    useMutation({
+      mutationFn: (id: number) => subscribeToLibrary(id),
+      onSuccess: () => {
+        toast.success(`${library?.name} 서재를 구독했습니다.`);
+      },
+      onError: (error: any) => {
+        let errorMessage = '서재 구독 중 오류가 발생했습니다';
+
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        toast.error(errorMessage);
+      },
+    });
+
+  // 구독취소 mutation
+  const { mutateAsync: unsubscribeMutation, isPending: isUnsubscribing } =
+    useMutation({
+      mutationFn: (id: number) => unsubscribeFromLibrary(id),
+      onSuccess: () => {
+        toast.success(`${library?.name} 서재 구독을 취소했습니다.`);
+      },
+      onError: (error: any) => {
+        let errorMessage = '서재 구독 취소 중 오류가 발생했습니다';
+
+        if (error.response?.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        toast.error(errorMessage);
+      },
+    });
+
   // 구독 토글 핸들러
   const handleSubscriptionToggle = useCallback(async () => {
     if (!library) return;
 
     try {
       if (isSubscribed) {
-        await unsubscribeFromLibrary(library.id);
+        await unsubscribeMutation(library.id);
         setIsSubscribed(false);
         setNotificationsEnabled(false);
       } else {
-        await subscribeToLibrary(library.id);
+        await subscribeMutation(library.id);
         setIsSubscribed(true);
       }
 
       // 구독 상태 변경 후 서재 정보 다시 가져오기
-      refetch();
+      await refetch();
     } catch (error) {
       console.error('구독 상태 변경 중 오류 발생:', error);
+      // 에러 핸들링은 mutation 내부에서 처리
     }
   }, [
     library,
@@ -83,12 +127,19 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
     refetch,
     setIsSubscribed,
     setNotificationsEnabled,
+    subscribeMutation,
+    unsubscribeMutation,
   ]);
 
   // 알림 설정 토글 핸들러
   const handleNotificationToggle = useCallback(() => {
     setNotificationsEnabled(prev => !prev);
-  }, [setNotificationsEnabled]);
+    if (notificationsEnabled) {
+      toast.info(`${library?.name} 서재의 알림을 끕니다.`);
+    } else {
+      toast.success(`${library?.name} 서재의 알림을 받습니다.`);
+    }
+  }, [notificationsEnabled, setNotificationsEnabled, library?.name]);
 
   return {
     library,
@@ -96,5 +147,7 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
     notificationsEnabled,
     handleSubscriptionToggle,
     handleNotificationToggle,
+    isSubscribing,
+    isUnsubscribing,
   };
 }

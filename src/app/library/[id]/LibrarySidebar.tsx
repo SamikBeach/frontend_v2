@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Bell, BookOpen, Calendar, Users } from 'lucide-react';
+import { BookOpen, Calendar, Clock, Users } from 'lucide-react';
 import { useParams } from 'next/navigation';
 
 export function LibrarySidebar() {
@@ -14,9 +14,9 @@ export function LibrarySidebar() {
   const {
     library,
     isSubscribed,
-    notificationsEnabled,
     handleSubscriptionToggle,
-    handleNotificationToggle,
+    isSubscribing,
+    isUnsubscribing,
   } = useLibraryDetail(libraryId);
 
   if (!library) {
@@ -30,6 +30,43 @@ export function LibrarySidebar() {
 
   // 구독자 정보 (최대 3명)
   const previewSubscribers = library.subscribers?.slice(0, 3) || [];
+
+  // 업데이트 메시지에서 책 제목을 강조 처리하는 함수
+  const formatUpdateMessage = (message: string) => {
+    // 책 제목 추출 및 강조 처리
+    if (!message) return '';
+
+    // 예: "라이브러리에 새로운 책이 추가되었습니다: 네 인생 우습지 않다 - 인생 일타강사 전한길의 50가지 행복론"
+    // 책 제목은 ":" 이후의 텍스트로 간주
+    if (message.includes('추가되었습니다:')) {
+      const parts = message.split('추가되었습니다:');
+      if (parts.length > 1) {
+        const bookTitle = parts[1].trim();
+        return `📚 <span class="font-medium text-gray-800">${bookTitle}</span>이 서재에 추가되었습니다.`;
+      }
+    }
+
+    // 서재 생성 메시지 포맷팅
+    if (message.includes('서재 "') && message.includes('"가 생성되었습니다')) {
+      const regex = /서재 "(.+)"가 생성되었습니다/;
+      const match = message.match(regex);
+      if (match && match[1]) {
+        const libraryName = match[1];
+        return `🏛️ <span class="font-medium text-gray-800">${libraryName}</span>이 생성되었습니다.`;
+      }
+    }
+
+    return message;
+  };
+
+  // 메시지 내용으로 업데이트 유형 추정
+  const isAddBookUpdate = (message: string): boolean => {
+    if (!message) return false;
+    return (
+      (message.includes('추가') || message.includes('📚')) &&
+      (message.includes('책') || message.includes('도서'))
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -53,29 +90,15 @@ export function LibrarySidebar() {
           </div>
         </div>
 
-        <div className="mt-4 space-y-2">
+        <div className="mt-4">
           <Button
-            className="w-full rounded-full"
-            variant={isSubscribed ? 'outline' : 'default'}
-            onClick={handleSubscriptionToggle}
+            className="flex h-10 w-full items-center justify-center rounded-full"
+            variant="default"
+            // TODO: 유저 팔로우 기능 - 추후 구현 예정
           >
-            {isSubscribed ? '팔로우 중' : '팔로우'}
+            <Users className="mr-2 h-4 w-4 text-white" />
+            <span>팔로우</span>
           </Button>
-
-          {isSubscribed && (
-            <Button
-              className="w-full rounded-full"
-              variant="outline"
-              onClick={handleNotificationToggle}
-            >
-              <Bell
-                className={`mr-2 h-4 w-4 ${
-                  notificationsEnabled ? 'text-blue-500' : 'text-gray-500'
-                }`}
-              />
-              {notificationsEnabled ? '알림 켜짐' : '알림 켜기'}
-            </Button>
-          )}
         </div>
       </div>
 
@@ -158,6 +181,7 @@ export function LibrarySidebar() {
                     variant="ghost"
                     size="sm"
                     className="h-7 rounded-full text-xs"
+                    // TODO: 유저 팔로우 기능 - 추후 구현 예정
                   >
                     팔로우
                   </Button>
@@ -175,21 +199,33 @@ export function LibrarySidebar() {
       {/* 업데이트 알림 섹션 */}
       {library.recentUpdates && library.recentUpdates.length > 0 && (
         <div className="rounded-xl bg-gray-50 p-4">
-          <h3 className="mb-3 font-medium text-gray-900">최근 업데이트</h3>
-          <div className="space-y-3 text-sm">
+          <div className="mb-3 flex items-center">
+            <Clock className="mr-2 h-4 w-4 text-gray-500" />
+            <h3 className="font-medium text-gray-900">최근 활동</h3>
+          </div>
+          <div className="space-y-3">
             {library.recentUpdates.map((update, index) => (
-              <div key={index} className="rounded-lg bg-white p-3">
-                <span className="text-xs text-gray-500">
-                  {formatRelativeTime(update.date)}
-                </span>
-                <p className="mt-1 text-gray-700">{update.message}</p>
+              <div
+                key={index}
+                className="relative rounded-lg bg-white p-3 text-sm"
+              >
+                <div className="flex flex-col">
+                  <p
+                    className="text-gray-700"
+                    dangerouslySetInnerHTML={{
+                      __html: formatUpdateMessage(update.message),
+                    }}
+                  />
+                  <span className="mt-1 text-xs text-gray-500">
+                    {formatRelativeTime(update.date)}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="mt-3 text-xs text-gray-500">
-            구독하고 알림을 켜면 이 서재의 모든 업데이트 소식을 받아볼 수
-            있습니다.
+          <div className="mt-4 flex items-center justify-center rounded-lg bg-gray-100 p-2.5 text-xs text-gray-600">
+            구독하면 이 서재의 모든 활동 소식을 볼 수 있습니다
           </div>
         </div>
       )}
