@@ -53,7 +53,7 @@ export function LibraryCard({ library, categories = [] }: LibraryCardProps) {
 
   return (
     <Link href={`/library/${library.id}`} className="block w-full">
-      <Card className="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-none transition-all duration-200 hover:border-gray-200">
+      <Card className="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none transition-all duration-200 hover:border-gray-300">
         <CardHeader className="p-5 pb-3">
           <div className="flex items-center gap-3">
             <Avatar className="h-10 w-10 border border-gray-50">

@@ -5,10 +5,12 @@ import {
 } from '@/atoms/library';
 import { useQueryParams } from '@/hooks';
 import { useAtom } from 'jotai';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { Suspense } from 'react';
 
-export function LibraryBreadcrumb() {
+// 실제 브레드크럼 컨텐츠 컴포넌트
+function LibraryBreadcrumbContent() {
   const { clearQueryParams, updateQueryParams } = useQueryParams();
   const [selectedCategory, setSelectedCategory] = useAtom(
     libraryCategoryFilterAtom
@@ -68,5 +70,28 @@ export function LibraryBreadcrumb() {
         </>
       )}
     </div>
+  );
+}
+
+// 로딩 중 표시 컴포넌트
+function BreadcrumbSkeleton() {
+  return (
+    <div className="flex items-center text-[14px] text-gray-500">
+      <span className="font-medium text-gray-900">서재</span>
+      <ChevronRight className="mx-1 h-4 w-4" />
+      <div className="flex items-center">
+        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+        <span>로딩 중...</span>
+      </div>
+    </div>
+  );
+}
+
+// 외부로 노출되는 컴포넌트
+export function LibraryBreadcrumb() {
+  return (
+    <Suspense fallback={<BreadcrumbSkeleton />}>
+      <LibraryBreadcrumbContent />
+    </Suspense>
   );
 }

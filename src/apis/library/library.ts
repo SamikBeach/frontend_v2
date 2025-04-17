@@ -9,17 +9,33 @@ import {
   LibraryBook,
   LibrarySortOption,
   LibraryTag,
+  PaginatedLibraryResponse,
   SubscriberInfo,
   UpdateHistoryItem,
   UpdateLibraryDto,
 } from './types';
 
 /**
- * 모든 서재 목록 조회 (공개된 서재만)
+ * 모든 서재 목록 조회 (공개된 서재만) - 페이지네이션, 검색, 정렬 지원
  */
-export const getAllLibraries = async (userId?: number): Promise<Library[]> => {
-  const params = userId ? { userId: userId.toString() } : undefined;
-  const response = await api.get<Library[]>('/library', { params });
+export const getAllLibraries = async (
+  userId?: number,
+  page: number = 1,
+  limit: number = 10,
+  sort?: LibrarySortOption,
+  query?: string
+): Promise<PaginatedLibraryResponse> => {
+  const params: Record<string, string> = {};
+
+  if (userId) params.userId = userId.toString();
+  if (page) params.page = page.toString();
+  if (limit) params.limit = limit.toString();
+  if (sort) params.sort = sort;
+  if (query && query.trim() !== '') params.query = query;
+
+  const response = await api.get<PaginatedLibraryResponse>('/library', {
+    params,
+  });
   return response.data;
 };
 
@@ -28,11 +44,14 @@ export const getAllLibraries = async (userId?: number): Promise<Library[]> => {
  */
 export const getLibrariesByUser = async (
   userId: number,
-  requestingUserId?: number
+  requestingUserId?: number,
+  sort?: LibrarySortOption
 ): Promise<Library[]> => {
-  const params = requestingUserId
-    ? { requestingUserId: requestingUserId.toString() }
-    : undefined;
+  const params: Record<string, string> = {};
+
+  if (requestingUserId) params.requestingUserId = requestingUserId.toString();
+  if (sort) params.sort = sort;
+
   const response = await api.get<Library[]>(`/library/user/${userId}`, {
     params,
   });
@@ -42,8 +61,16 @@ export const getLibrariesByUser = async (
 /**
  * 사용자가 구독한 서재 목록 조회
  */
-export const getSubscribedLibraries = async (): Promise<Library[]> => {
-  const response = await api.get<Library[]>('/library/subscribed');
+export const getSubscribedLibraries = async (
+  sort?: LibrarySortOption
+): Promise<Library[]> => {
+  const params: Record<string, string> = {};
+
+  if (sort) params.sort = sort;
+
+  const response = await api.get<Library[]>('/library/subscribed', {
+    params,
+  });
   return response.data;
 };
 

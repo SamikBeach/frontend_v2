@@ -1,5 +1,6 @@
 import { TimeRange } from '@/apis/book/types';
-import { getAllLibraries, Library } from '@/apis/library';
+import { getAllLibraries } from '@/apis/library';
+import { Library, LibrarySortOption } from '@/apis/library/types';
 import {
   libraryCategoryFilterAtom,
   librarySearchQueryAtom,
@@ -8,18 +9,20 @@ import {
 } from '@/atoms/library';
 import { useQueryParams } from '@/hooks';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 interface UseLibrariesResult {
   libraries: Library[];
+  isLoading: boolean;
+  isFetchingNextPage: boolean;
+  hasNextPage: boolean | undefined;
+  fetchNextPage: () => void;
   categoryFilter: string;
   sortOption: string;
   timeRange: TimeRange;
   searchQuery: string;
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
   handleSortChange: (sortId: string) => void;
   handleTimeRangeChange: (timeRange: TimeRange) => void;
   handleSearchChange: (value: string) => void;
@@ -31,64 +34,98 @@ export function useLibraries(): UseLibrariesResult {
   const [sortOption, setSortOption] = useAtom(librarySortOptionAtom);
   const [timeRange, setTimeRange] = useAtom(libraryTimeRangeAtom);
   const [searchQuery, setSearchQuery] = useAtom(librarySearchQueryAtom);
-  const [currentPage, setCurrentPage] = useState(1);
   const { updateQueryParams } = useQueryParams();
 
-  // URL 쿼리 파라미터 업데이트
-  useEffect(() => {
+  // URL 쿼리 파라미터 업데이트 - useCallback으로 메모이제이션
+  const updateUrlParams = useCallback(() => {
     updateQueryParams({
       category: categoryFilter,
       sort: sortOption,
       timeRange,
       q: searchQuery || undefined,
-      page: currentPage > 1 ? currentPage.toString() : undefined,
     });
-  }, [
-    categoryFilter,
-    sortOption,
-    timeRange,
-    searchQuery,
-    currentPage,
-    updateQueryParams,
-  ]);
+  }, [categoryFilter, sortOption, timeRange, searchQuery, updateQueryParams]);
 
-  // 데이터 가져오기 - 서버 컨트롤러와 동일하게 userId 파라미터 전달
-  const { data: libraries = [] } = useSuspenseQuery({
-    queryKey: ['libraries', user?.id],
-    queryFn: async () => {
-      // getAllLibraries 함수에 userId를 전달 (내부에서 문자열 변환 처리)
-      return await getAllLibraries(user?.id);
+  // 컴포넌트 마운트 시에만 URL 파라미터 업데이트
+  useEffect(() => {
+    updateUrlParams();
+  }, [updateUrlParams]);
+
+  // 정렬 옵션을 API 정렬 옵션으로 변환
+  const getApiSortOption = (): LibrarySortOption | undefined => {
+    switch (sortOption) {
+      case 'popular':
+        return LibrarySortOption.SUBSCRIBERS;
+      case 'books':
+        return LibrarySortOption.BOOKS;
+      case 'latest':
+        return LibrarySortOption.RECENT;
+      default:
+        return undefined;
+    }
+  };
+
+  // 데이터 가져오기 - 무한 스크롤 지원
+  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
+    useInfiniteQuery({
+      queryKey: ['libraries', user?.id, sortOption, searchQuery],
+      queryFn: async ({ pageParam = 1 }) => {
+        const apiSortOption = getApiSortOption();
+        return await getAllLibraries(
+          user?.id,
+          pageParam,
+          12, // 한 페이지당 12개 항목
+          apiSortOption,
+          searchQuery
+        );
+      },
+      initialPageParam: 1,
+      getNextPageParam: lastPage => {
+        if (lastPage.meta.page < lastPage.meta.totalPages) {
+          return lastPage.meta.page + 1;
+        }
+        return undefined;
+      },
+      placeholderData: keepPreviousData,
+      retry: 1, // 실패 시 1번 재시도
+    });
+
+  // 모든 페이지의 서재 데이터 병합
+  const libraries = useMemo(() => {
+    if (!data) return [];
+    return data.pages.flatMap(page => page.data);
+  }, [data]);
+
+  // 핸들러 함수들 - useCallback으로 메모이제이션
+  const handleSortChange = useCallback(
+    (sortId: string) => {
+      setSortOption(sortId);
     },
-    staleTime: 5 * 60 * 1000, // 5분 동안 데이터 유지
-    retry: 1, // 실패 시 1번 재시도
-  });
+    [setSortOption]
+  );
 
-  // 핸들러 함수들
-  const handleSortChange = (sortId: string) => {
-    setSortOption(sortId);
-    setCurrentPage(1); // 정렬 변경시 첫 페이지로 이동
-  };
+  const handleTimeRangeChange = useCallback(
+    (newTimeRange: TimeRange) => {
+      setTimeRange(newTimeRange);
+    },
+    [setTimeRange]
+  );
 
-  const handleTimeRangeChange = (newTimeRange: TimeRange) => {
-    setTimeRange(newTimeRange);
-    setCurrentPage(1); // 기간 필터 변경시 첫 페이지로 이동
-  };
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      setSearchQuery(value);
+    },
+    [setSearchQuery]
+  );
 
-  const handleSearchChange = (value: string) => {
-    setSearchQuery(value);
-    setCurrentPage(1); // 검색어 변경시 첫 페이지로 이동
-  };
-
-  // 필터링 및 정렬된 서재 목록
-  const filteredAndSortedLibraries = useMemo(() => {
+  // 카테고리로 필터링된 서재 목록
+  const filteredLibraries = useMemo(() => {
     if (!libraries || libraries.length === 0) return [];
 
     // 카테고리 필터링
-    let filtered = libraries;
     if (categoryFilter !== 'all') {
-      filtered = filtered.filter(library => {
+      return libraries.filter(library => {
         // 태그 목록에서 카테고리와 일치하는 태그가 있는지 확인
-        // 태그가 없거나 빈 배열인 경우에도 안전하게 처리
         return (
           library.tags &&
           Array.isArray(library.tags) &&
@@ -98,69 +135,19 @@ export function useLibraries(): UseLibrariesResult {
       });
     }
 
-    // 검색어 필터링
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(library => {
-        const nameMatch = library.name.toLowerCase().includes(query);
-        const descMatch =
-          library.description &&
-          library.description.toLowerCase().includes(query);
-
-        // 태그 매칭 검사 - 안전하게 처리
-        const tagMatch =
-          library.tags &&
-          Array.isArray(library.tags) &&
-          library.tags.length > 0 &&
-          library.tags.some(
-            tag => tag && tag.name && tag.name.toLowerCase().includes(query)
-          );
-
-        return nameMatch || descMatch || tagMatch;
-      });
-    }
-
-    // 정렬
-    const sorted = [...filtered];
-    switch (sortOption) {
-      case 'popular':
-        sorted.sort((a, b) => b.subscriberCount - a.subscriberCount);
-        break;
-      case 'latest':
-        sorted.sort(
-          (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        break;
-      case 'title':
-        sorted.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      default:
-        break;
-    }
-
-    // 기간 필터링 (인기순 정렬일 때만)
-    if (sortOption === 'popular' && timeRange !== 'all') {
-      const cutoffDate = getDateFromTimeRange(timeRange);
-      if (cutoffDate) {
-        return sorted.filter(library => {
-          const libraryDate = new Date(library.createdAt);
-          return libraryDate >= cutoffDate;
-        });
-      }
-    }
-
-    return sorted;
-  }, [libraries, categoryFilter, sortOption, timeRange, searchQuery]);
+    return libraries;
+  }, [libraries, categoryFilter]);
 
   return {
-    libraries: filteredAndSortedLibraries || [],
+    libraries: filteredLibraries,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
     categoryFilter,
     sortOption,
     timeRange,
     searchQuery,
-    currentPage,
-    setCurrentPage,
     handleSortChange,
     handleTimeRangeChange,
     handleSearchChange,

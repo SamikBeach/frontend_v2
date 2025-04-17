@@ -1,48 +1,26 @@
-import { Library as ApiLibrary } from '@/apis/library/types';
-import { LibraryCard } from '@/components/LibraryCard';
-import { useEffect } from 'react';
-import { usePagination } from '../hooks/usePagination';
+import { Library } from '@/apis/library/types';
+import { LibraryCard, LibraryCardSkeleton } from '@/components/LibraryCard';
+import { Loader2 } from 'lucide-react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { EmptyState } from './EmptyState';
-import { Pagination } from './Pagination';
 
-interface LibraryListWithPaginationProps {
-  libraries: ApiLibrary[];
+interface LibraryListProps {
+  libraries: Library[];
   searchQuery: string;
   categoryFilter: string;
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
+  hasNextPage: boolean | undefined;
+  isFetchingNextPage: boolean;
+  fetchNextPage: () => void;
 }
 
-export function LibraryListWithPagination({
+export function LibraryList({
   libraries,
   searchQuery,
   categoryFilter,
-  currentPage,
-  setCurrentPage,
-}: LibraryListWithPaginationProps) {
-  // 페이지네이션 설정
-  const ITEMS_PER_PAGE = 12;
-  const pagination = usePagination({
-    initialPage: currentPage,
-    pageSize: ITEMS_PER_PAGE,
-    totalItems: libraries.length,
-  });
-
-  // 현재 페이지 아이템만 가져오기
-  const pagedLibraries = pagination.getItemsForPage(libraries);
-
-  // currentPage가 외부에서 변경되면 pagination 상태도 업데이트
-  useEffect(() => {
-    pagination.setPage(currentPage);
-  }, [currentPage, pagination]);
-
-  // 페이지 변경 핸들러
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    pagination.setPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
+  hasNextPage,
+  isFetchingNextPage,
+  fetchNextPage,
+}: LibraryListProps) {
   if (libraries.length === 0) {
     return (
       <EmptyState searchQuery={searchQuery} selectedCategory={categoryFilter} />
@@ -50,23 +28,37 @@ export function LibraryListWithPagination({
   }
 
   return (
-    <>
+    <InfiniteScroll
+      dataLength={libraries.length}
+      next={fetchNextPage}
+      hasMore={!!hasNextPage}
+      loader={
+        <div className="mt-8 flex w-full justify-center py-4">
+          <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+        </div>
+      }
+      endMessage={
+        <div className="mt-8 text-center text-sm text-gray-500">
+          모든 서재를 불러왔습니다
+        </div>
+      }
+    >
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {pagedLibraries.map(library => (
+        {libraries.map(library => (
           <LibraryCard key={library.id} library={library} />
         ))}
       </div>
+    </InfiniteScroll>
+  );
+}
 
-      {/* 페이지네이션 */}
-      {pagination.totalPages > 1 && (
-        <div className="mt-8 flex justify-center">
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            onPageChange={handlePageChange}
-          />
-        </div>
-      )}
-    </>
+// 로딩 스켈레톤
+export function LibraryListSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <LibraryCardSkeleton key={index} />
+      ))}
+    </div>
   );
 }

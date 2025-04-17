@@ -89,6 +89,22 @@ export interface Library {
   category?: string; // 카테고리 ID
 }
 
+// 페이지네이션 메타데이터
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  sort?: LibrarySortOption;
+  query?: string;
+}
+
+// 페이지네이션된 서재 목록 응답 타입
+export interface PaginatedLibraryResponse {
+  data: Library[];
+  meta: PaginationMeta;
+}
+
 // 서재 구독자 응답 타입
 export interface Subscriber {
   id: number;

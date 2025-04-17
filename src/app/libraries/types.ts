@@ -1,8 +1,6 @@
 import { Library as ApiLibrary, BookPreview } from '@/apis/library/types';
-import {
-  SortOption as BaseSortOption,
-  TimeRange,
-} from '@/components/SortDropdown';
+import { TimeRange } from '@/components/SortDropdown';
+import { ReactNode } from 'react';
 
 // 서재 카테고리 타입
 export interface Category {
@@ -33,7 +31,12 @@ export interface Library {
 }
 
 // 정렬 옵션 타입 (라이브러리 용)
-export type SortOption = BaseSortOption<ApiLibrary>;
+export interface SortOption {
+  id: string;
+  label: string;
+  icon: ReactNode;
+  sortFn?: (a: ApiLibrary, b: ApiLibrary) => number;
+}
 
 // 카테고리 버튼 속성
 export interface CategoryButtonProps {
