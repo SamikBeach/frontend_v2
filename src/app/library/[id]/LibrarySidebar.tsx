@@ -1,6 +1,7 @@
 import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { BookOpen, Calendar, Clock, Users } from 'lucide-react';
@@ -9,6 +10,7 @@ import { useParams } from 'next/navigation';
 export function LibrarySidebar() {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
+  const currentUser = useCurrentUser();
 
   // useLibraryDetail 훅으로 상태와 핸들러 함수 가져오기
   const {
@@ -68,36 +70,41 @@ export function LibrarySidebar() {
     );
   };
 
+  // 현재 사용자가 구독자인지 확인하는 함수
+  const isCurrentUserSubscriber = (subscriberId: number) => {
+    return currentUser?.id === subscriberId;
+  };
+
   return (
     <div className="space-y-6">
       {/* 서재 소유자 정보 */}
       <div className="rounded-xl bg-gray-50 p-4">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12 border border-gray-200">
-            <AvatarImage
-              src={`https://i.pravatar.cc/150?u=${library.owner.id}`}
-              alt={library.owner.username}
-            />
-            <AvatarFallback className="bg-blue-100 text-blue-600">
-              {library.owner.username[0]}
-            </AvatarFallback>
-          </Avatar>
-          <div>
-            <h3 className="font-medium text-gray-900">
-              {library.owner.username}
-            </h3>
-            <p className="text-sm text-gray-500">@{library.owner.username}</p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <Avatar className="h-12 w-12 border border-gray-200">
+              <AvatarImage
+                src={`https://i.pravatar.cc/150?u=${library.owner.id}`}
+                alt={library.owner.username}
+              />
+              <AvatarFallback className="bg-blue-100 text-blue-600">
+                {library.owner.username[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <h3 className="font-medium text-gray-900">
+                {library.owner.username}
+              </h3>
+              <p className="text-sm text-gray-500">@{library.owner.username}</p>
+            </div>
           </div>
-        </div>
 
-        <div className="mt-4">
           <Button
-            className="flex h-10 w-full items-center justify-center rounded-full"
-            variant="default"
+            variant="ghost"
+            size="sm"
+            className="h-7 rounded-full bg-gray-200 text-xs hover:bg-gray-300"
             // TODO: 유저 팔로우 기능 - 추후 구현 예정
           >
-            <Users className="mr-2 h-4 w-4 text-white" />
-            <span>팔로우</span>
+            팔로우
           </Button>
         </div>
       </div>
@@ -141,17 +148,7 @@ export function LibrarySidebar() {
       {/* 구독자 미리보기 */}
       {library.subscribers && library.subscribers.length > 0 && (
         <div className="rounded-xl bg-gray-50 p-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-medium text-gray-900">구독자</h3>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-sm text-gray-500 hover:text-gray-900"
-              onClick={() => {}}
-            >
-              모두 보기
-            </Button>
-          </div>
+          <h3 className="font-medium text-gray-900">구독자</h3>
 
           <div className="mt-3 space-y-3">
             {previewSubscribers.length > 0 ? (
@@ -173,18 +170,17 @@ export function LibrarySidebar() {
                     <p className="text-sm font-medium text-gray-900">
                       {subscriber.username}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      @{subscriber.username}
-                    </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-7 rounded-full text-xs"
-                    // TODO: 유저 팔로우 기능 - 추후 구현 예정
-                  >
-                    팔로우
-                  </Button>
+                  {!isCurrentUserSubscriber(subscriber.id) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 rounded-full text-xs"
+                      // TODO: 유저 팔로우 기능 - 추후 구현 예정
+                    >
+                      팔로우
+                    </Button>
+                  )}
                 </div>
               ))
             ) : (
