@@ -3,7 +3,6 @@ export * from './CategoryButton';
 export * from './EmptyState';
 export * from './FilterBar';
 export * from './LibraryBreadcrumb';
-export * from './LibraryCard';
 export * from './LibraryContent';
 export * from './LibrarySidebar';
 export * from './Pagination';

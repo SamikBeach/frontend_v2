@@ -69,7 +69,7 @@ export interface TagListResponseDto {
   totalCount: number;
 }
 
-// 서재 상세 응답 타입
+// 서재 응답 타입
 export interface Library {
   id: number;
   name: string;
@@ -84,21 +84,9 @@ export interface Library {
   recentUpdates?: UpdateHistoryItem[];
   createdAt: Date;
   updatedAt?: Date;
-}
-
-// 서재 목록 응답 타입
-export interface LibrarySummary {
-  id: number;
-  name: string;
-  description?: string;
-  isPublic: boolean;
-  subscriberCount: number;
-  bookCount: number;
-  owner: LibraryOwner;
-  tags?: LibraryTag[];
+  bookCount?: number;
   previewBooks?: BookPreview[];
-  isSubscribed?: boolean;
-  createdAt: Date;
+  category?: string; // 카테고리 ID
 }
 
 // 서재 구독자 응답 타입

@@ -1,10 +1,15 @@
 import { getLibrariesByBookId } from '@/apis/library/library';
 import {
   LibrariesForBookResponse,
+  LibraryDetail,
   LibrarySortOption,
 } from '@/apis/library/types';
-import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useSuspenseInfiniteQuery,
+} from '@tanstack/react-query';
+import { useCallback, useMemo } from 'react';
 import { useBookDetails } from './useBookDetails';
 
 /**
@@ -18,7 +23,22 @@ export function useBookLibraries(
   bookId: number | undefined,
   limit: number = 5,
   sort: LibrarySortOption = LibrarySortOption.SUBSCRIBERS
-) {
+): {
+  libraries: LibraryDetail[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+  isLoading: boolean;
+  isError: boolean;
+  refetch: () => Promise<unknown>;
+  isEmpty: boolean;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+  handleLoadMore: () => void;
+} {
   const { isbn } = useBookDetails();
 
   const {
@@ -86,6 +106,52 @@ export function useBookLibraries(
     isLoading,
     isError,
     refetch,
+    isEmpty,
+    hasNextPage,
+    isFetchingNextPage,
+    handleLoadMore,
+  };
+}
+
+export function useBookLibrariesSuspense(
+  bookId?: string,
+  limit = 10,
+  sortOption = LibrarySortOption.SUBSCRIBERS
+) {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useSuspenseInfiniteQuery({
+      queryKey: ['bookLibraries', bookId, sortOption],
+      queryFn: ({ pageParam = 1 }) =>
+        getLibrariesByBookId(
+          Number(bookId) || 0,
+          pageParam,
+          limit,
+          undefined,
+          sortOption
+        ),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage, _, lastPageParam) => {
+        if (lastPage.meta.page < lastPage.meta.totalPages) {
+          return lastPageParam + 1;
+        }
+        return undefined;
+      },
+    });
+
+  const libraries = useMemo(() => {
+    return data?.pages.flatMap(page => page.data) || [];
+  }, [data]);
+
+  const isEmpty = libraries.length === 0;
+
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
+  return {
+    libraries,
     isEmpty,
     hasNextPage,
     isFetchingNextPage,

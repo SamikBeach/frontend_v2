@@ -1,4 +1,4 @@
-import { LibrarySummary, LibraryTag } from '@/apis/library/types';
+import { Library, LibraryDetail } from '@/apis/library/types';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -67,7 +67,7 @@ export function LibrariesList() {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-44 rounded-xl">
             {userLibraries && userLibraries.length > 0 ? (
-              userLibraries.map((library: LibrarySummary) => (
+              userLibraries.map((library: Library) => (
                 <DropdownMenuItem
                   key={library.id}
                   className="cursor-pointer rounded-lg py-2"
@@ -105,7 +105,7 @@ export function LibrariesList() {
 
   return (
     <div className="space-y-5 p-1">
-      {libraries.map(library => (
+      {libraries.map((library: LibraryDetail) => (
         <Link key={library.id} href={`/library/${library.id}`}>
           <div className="group mb-2 h-full rounded-xl bg-[#F9FAFB] p-4 transition-all duration-200 hover:bg-[#F2F4F6]">
             <div className="flex items-center gap-3">
@@ -130,7 +130,7 @@ export function LibrariesList() {
 
             <div className="mt-3 flex flex-wrap gap-1">
               {library.tags &&
-                (library.tags as LibraryTag[]).slice(0, 3).map((tag, index) => (
+                library.tags.slice(0, 3).map((tag, index) => (
                   <Badge
                     key={index}
                     className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-700 group-hover:bg-gray-200"

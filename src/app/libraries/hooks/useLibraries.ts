@@ -1,5 +1,5 @@
 import { TimeRange } from '@/apis/book/types';
-import { getAllLibraries, LibrarySummary } from '@/apis/library';
+import { getAllLibraries, Library } from '@/apis/library';
 import {
   libraryCategoryFilterAtom,
   librarySearchQueryAtom,
@@ -13,7 +13,7 @@ import { useAtom } from 'jotai';
 import { useEffect, useMemo, useState } from 'react';
 
 interface UseLibrariesResult {
-  libraries: LibrarySummary[];
+  libraries: Library[];
   categoryFilter: string;
   sortOption: string;
   timeRange: TimeRange;
@@ -93,7 +93,7 @@ export function useLibraries(): UseLibrariesResult {
           library.tags &&
           Array.isArray(library.tags) &&
           library.tags.length > 0 &&
-          library.tags.some(tag => tag && tag.tagName === categoryFilter)
+          library.tags.some(tag => tag && tag.name === categoryFilter)
         );
       });
     }
@@ -113,8 +113,7 @@ export function useLibraries(): UseLibrariesResult {
           Array.isArray(library.tags) &&
           library.tags.length > 0 &&
           library.tags.some(
-            tag =>
-              tag && tag.tagName && tag.tagName.toLowerCase().includes(query)
+            tag => tag && tag.name && tag.name.toLowerCase().includes(query)
           );
 
         return nameMatch || descMatch || tagMatch;

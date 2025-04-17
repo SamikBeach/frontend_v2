@@ -8,7 +8,6 @@ import {
   Library,
   LibraryBook,
   LibrarySortOption,
-  LibrarySummary,
   LibraryTag,
   SubscriberInfo,
   UpdateHistoryItem,
@@ -18,11 +17,9 @@ import {
 /**
  * 모든 서재 목록 조회 (공개된 서재만)
  */
-export const getAllLibraries = async (
-  userId?: number
-): Promise<LibrarySummary[]> => {
+export const getAllLibraries = async (userId?: number): Promise<Library[]> => {
   const params = userId ? { userId: userId.toString() } : undefined;
-  const response = await api.get<LibrarySummary[]>('/library', { params });
+  const response = await api.get<Library[]>('/library', { params });
   return response.data;
 };
 
@@ -32,11 +29,11 @@ export const getAllLibraries = async (
 export const getLibrariesByUser = async (
   userId: number,
   requestingUserId?: number
-): Promise<LibrarySummary[]> => {
+): Promise<Library[]> => {
   const params = requestingUserId
     ? { requestingUserId: requestingUserId.toString() }
     : undefined;
-  const response = await api.get<LibrarySummary[]>(`/library/user/${userId}`, {
+  const response = await api.get<Library[]>(`/library/user/${userId}`, {
     params,
   });
   return response.data;
@@ -45,8 +42,8 @@ export const getLibrariesByUser = async (
 /**
  * 사용자가 구독한 서재 목록 조회
  */
-export const getSubscribedLibraries = async (): Promise<LibrarySummary[]> => {
-  const response = await api.get<LibrarySummary[]>('/library/subscribed');
+export const getSubscribedLibraries = async (): Promise<Library[]> => {
+  const response = await api.get<Library[]>('/library/subscribed');
   return response.data;
 };
 

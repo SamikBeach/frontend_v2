@@ -1,7 +1,8 @@
 import {
   CreateLibraryDto,
+  Library,
+  LibraryDetail,
   LibrarySortOption,
-  LibrarySummary,
   LibraryTag,
 } from '@/apis/library/types';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
@@ -123,7 +124,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-44 rounded-xl">
             {userLibraries && userLibraries.length > 0 ? (
-              userLibraries.map((library: LibrarySummary) => (
+              userLibraries.map((library: Library) => (
                 <DropdownMenuItem
                   key={library.id}
                   className="cursor-pointer rounded-lg py-2"
@@ -161,7 +162,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
 
   return (
     <div className="space-y-5 p-1">
-      {libraries.map(library => (
+      {libraries.map((library: LibraryDetail) => (
         <Link key={library.id} href={`/library/${library.id}`}>
           <div className="group mb-2 h-full rounded-xl bg-[#F9FAFB] p-4 transition-all duration-200 hover:bg-[#F2F4F6]">
             <div className="flex items-center gap-3">
@@ -246,11 +247,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
       />
 
       {/* 로그인 다이얼로그 */}
-      <AuthDialog
-        open={authDialogOpen}
-        onOpenChange={setAuthDialogOpen}
-        initialMode="login"
-      />
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 }

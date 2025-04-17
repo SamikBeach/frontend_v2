@@ -1,6 +1,6 @@
 import { Book } from '@/apis/book/types';
 import { addBookToLibraryWithIsbn } from '@/apis/library/library';
-import { LibrarySummary } from '@/apis/library/types';
+import { Library } from '@/apis/library/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
@@ -10,7 +10,7 @@ import { BookDetails } from '../types';
 export function useLibrary(
   book: Book | BookDetails | null,
   isbn: string | null,
-  userLibraries: LibrarySummary[] = []
+  userLibraries: Library[] = []
 ) {
   const queryClient = useQueryClient();
   // 에러 상태 관리

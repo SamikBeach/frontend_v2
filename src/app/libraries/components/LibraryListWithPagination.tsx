@@ -1,12 +1,12 @@
-import { LibrarySummary } from '@/apis/library/types';
+import { Library as ApiLibrary } from '@/apis/library/types';
+import { LibraryCard } from '@/components/LibraryCard';
 import { useEffect } from 'react';
 import { usePagination } from '../hooks/usePagination';
 import { EmptyState } from './EmptyState';
-import { LibraryCard } from './LibraryCard';
 import { Pagination } from './Pagination';
 
 interface LibraryListWithPaginationProps {
-  libraries: LibrarySummary[];
+  libraries: ApiLibrary[];
   searchQuery: string;
   categoryFilter: string;
   currentPage: number;

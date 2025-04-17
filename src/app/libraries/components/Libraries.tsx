@@ -1,13 +1,13 @@
 'use client';
 
-import { LibrarySummary } from '@/apis/library/types';
+import { Library } from '@/apis/library/types';
+import { LibraryCardSkeleton } from '@/components/LibraryCard';
 import { BookOpen, Clock, Users } from 'lucide-react';
 import { Suspense } from 'react';
 import { useLibraries } from '../hooks/useLibraries';
 import { SortOption } from '../types';
 import { FilterBar } from './FilterBar';
 import { LibraryBreadcrumb } from './LibraryBreadcrumb';
-import { LibraryCardSkeleton } from './LibraryCardSkeleton';
 import { LibraryListWithPagination } from './LibraryListWithPagination';
 import { SearchBar } from './SearchBar';
 import { SortDropdown } from './SortDropdown';
@@ -18,20 +18,19 @@ const sortOptions: SortOption[] = [
     id: 'popular',
     label: '구독자순',
     icon: <Users className="h-4 w-4" />,
-    sortFn: (a: LibrarySummary, b: LibrarySummary) =>
-      b.subscriberCount - a.subscriberCount,
+    sortFn: (a: Library, b: Library) => b.subscriberCount - a.subscriberCount,
   },
   {
     id: 'books',
     label: '도서순',
     icon: <BookOpen className="h-4 w-4" />,
-    sortFn: (a: LibrarySummary, b: LibrarySummary) => b.bookCount - a.bookCount,
+    sortFn: (a: Library, b: Library) => (b.bookCount || 0) - (a.bookCount || 0),
   },
   {
     id: 'latest',
     label: '최신순',
     icon: <Clock className="h-4 w-4" />,
-    sortFn: (a: LibrarySummary, b: LibrarySummary) =>
+    sortFn: (a: Library, b: Library) =>
       new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   },
 ];
