@@ -42,7 +42,7 @@ export function LibraryHeader() {
   const hasTags = library.tags && library.tags.length > 0;
 
   return (
-    <div className="flex items-center justify-between bg-white px-6 py-6">
+    <div className="flex items-center justify-between bg-white pt-3">
       <div className="flex-1">
         <div className="mb-2 flex items-center gap-3">
           <h1 className="text-2xl font-bold text-gray-900">{library.name}</h1>

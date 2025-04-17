@@ -8,14 +8,14 @@ import { LibrarySidebar } from './LibrarySidebar';
 
 function LibraryDetailContent() {
   return (
-    <div className="mx-auto max-w-[1600px]">
+    <div className="mx-auto w-full max-w-[1920px] px-4">
       <LibraryHeader />
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px]">
+      <div className="mt-3 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_300px]">
         <div>
           <LibraryContent />
         </div>
-        <div className="w-full min-w-[360px]">
+        <div className="w-full min-w-[300px]">
           <LibrarySidebar />
         </div>
       </div>
