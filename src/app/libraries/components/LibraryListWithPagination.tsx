@@ -37,11 +37,7 @@ export function LibraryList({
           <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
         </div>
       }
-      endMessage={
-        <div className="mt-8 text-center text-sm text-gray-500">
-          모든 서재를 불러왔습니다
-        </div>
-      }
+      endMessage={null}
     >
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {libraries.map(library => (

@@ -300,13 +300,6 @@ export function SearchResults({
           <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </div>
       )}
-
-      {/* 더 이상 결과가 없음 표시 */}
-      {!hasNextPage && searchResults.length > 0 && (
-        <div className="py-4 text-center text-sm text-gray-500">
-          모든 검색 결과를 불러왔습니다
-        </div>
-      )}
     </CommandPrimitive.List>
   );
 }

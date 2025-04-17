@@ -94,7 +94,7 @@ export function LibraryCard({ library, categories = [] }: LibraryCardProps) {
           )}
           <div className="flex flex-1 gap-2">
             {displayBooks && displayBooks.length > 0 ? (
-              <div className="grid w-full grid-cols-3 gap-2">
+              <div className="grid w-full grid-cols-3 items-end gap-2">
                 {displayBooks.map(book => (
                   <div
                     key={book.id}
