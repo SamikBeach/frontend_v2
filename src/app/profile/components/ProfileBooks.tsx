@@ -1,11 +1,11 @@
-import { Library, LibraryCard } from '@/components/LibraryCard';
+import { LibraryCard } from '@/components/LibraryCard';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useIsMyProfile } from '../hooks';
 
 // 샘플 서재 데이터 (LibraryCard에 맞게 수정)
-const userLibraries: Library[] = [
+const userLibraries: any[] = [
   {
     id: 1,
     title: '철학 고전',
@@ -173,7 +173,7 @@ export default function ProfileBooks() {
         )}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {userLibraries.map(library => (
           <LibraryCard key={library.id} library={library} />
         ))}

@@ -19,6 +19,12 @@ export interface CompactLibraryProps {
   subscriberCount: number;
   bookCount: number;
   isSubscribed?: boolean;
+  books?: {
+    id: number;
+    title: string;
+    author: string;
+    coverImage: string;
+  }[];
 }
 
 export interface CompactLibraryCardProps {
@@ -31,13 +37,13 @@ export function CompactLibraryCard({
   className = '',
 }: CompactLibraryCardProps) {
   return (
-    <Link href={`/library/${library.id}`}>
+    <Link href={`/library/${library.id}`} className="block w-full">
       <div
-        className={`cursor-pointer rounded-xl border border-gray-100 bg-gray-50 p-4 transition-all duration-200 hover:bg-gray-100 ${className}`}
+        className={`flex h-full cursor-pointer flex-col rounded-xl border border-gray-100 bg-white p-4 shadow-none transition-all duration-200 hover:border-gray-200 ${className}`}
       >
         <div className="mb-2.5 flex items-start gap-3">
           {library.thumbnail ? (
-            <div className="h-12 w-12 overflow-hidden rounded-lg">
+            <div className="h-14 w-14 overflow-hidden rounded-lg border border-gray-100">
               <img
                 src={library.thumbnail}
                 alt={library.name}
@@ -45,7 +51,7 @@ export function CompactLibraryCard({
               />
             </div>
           ) : (
-            <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-200 text-gray-500">
+            <div className="flex h-14 w-14 items-center justify-center rounded-lg border border-gray-100 bg-gray-50 text-gray-400">
               <BookOpen className="h-6 w-6" />
             </div>
           )}
@@ -61,7 +67,7 @@ export function CompactLibraryCard({
                   <Badge
                     key={index}
                     variant="secondary"
-                    className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-700"
+                    className="rounded-full bg-gray-50 px-2 py-0.5 text-xs font-normal text-gray-700"
                   >
                     {tag}
                   </Badge>
@@ -70,13 +76,13 @@ export function CompactLibraryCard({
             )}
 
             <div className="mt-1.5 flex items-center gap-2">
-              <Avatar className="h-5 w-5 border-0">
+              <Avatar className="h-5 w-5 border border-gray-50">
                 <AvatarImage
                   src={library.owner.avatar}
                   alt={library.owner.name}
                   className="object-cover"
                 />
-                <AvatarFallback className="text-[9px]">
+                <AvatarFallback className="bg-gray-50 text-[10px] text-gray-700">
                   {library.owner.name[0]}
                 </AvatarFallback>
               </Avatar>
@@ -85,27 +91,35 @@ export function CompactLibraryCard({
           </div>
         </div>
 
-        {library.description && (
-          <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-gray-600">
-            {library.description}
-          </p>
-        )}
+        <div className="flex flex-1 flex-col">
+          {library.description && (
+            <p className="mb-3 line-clamp-1 text-sm text-gray-600">
+              {library.description}
+            </p>
+          )}
 
-        <div className="flex items-center justify-between text-sm text-gray-500">
+          {library.books && library.books.length === 0 && (
+            <div className="mb-3 flex w-full flex-1 items-center justify-center rounded-lg border border-gray-100 bg-gray-50">
+              <p className="text-sm text-gray-400">아직 등록된 책이 없어요.</p>
+            </div>
+          )}
+        </div>
+
+        <div className="mt-0 flex items-center justify-between text-sm text-gray-500">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <Users className="h-4 w-4 text-gray-400" />
-              <span>{library.subscriberCount}</span>
+              <BookOpen className="h-4 w-4 text-gray-400" />
+              <span>{library.bookCount.toLocaleString()}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <BookOpen className="h-4 w-4 text-gray-400" />
-              <span>{library.bookCount}</span>
+              <Users className="h-4 w-4 text-gray-400" />
+              <span>{library.subscriberCount.toLocaleString()}</span>
             </div>
           </div>
           {library.isSubscribed && (
             <Badge
               variant="outline"
-              className="rounded-full border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-normal text-blue-600"
+              className="rounded-full border-blue-200 bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600"
             >
               구독 중
             </Badge>

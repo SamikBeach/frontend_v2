@@ -51,7 +51,7 @@ export function LibraryListWithPagination({
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {pagedLibraries.map(library => (
           <LibraryCard key={library.id} library={library} />
         ))}

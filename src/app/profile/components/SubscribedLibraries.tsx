@@ -1,8 +1,8 @@
-import { Library, LibraryCard } from '@/components/LibraryCard';
+import { LibraryCard } from '@/components/LibraryCard';
 import { useIsMyProfile } from '../hooks';
 
 // 구독한 서재 샘플 데이터
-const subscribedLibraries: Library[] = [
+const subscribedLibraries: any[] = [
   {
     id: 101,
     title: '세계 고전 문학',
@@ -137,7 +137,7 @@ export default function SubscribedLibraries() {
         <h2 className="text-lg font-semibold text-gray-900">구독한 서재</h2>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {subscribedLibraries.map(library => (
           <LibraryCard key={library.id} library={library} />
         ))}

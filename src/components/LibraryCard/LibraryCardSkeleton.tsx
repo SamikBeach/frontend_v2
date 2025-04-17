@@ -8,28 +8,28 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function LibraryCardSkeleton() {
   return (
-    <Card className="h-full rounded-xl border-none bg-[#F9FAFB] shadow-none">
+    <Card className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-none">
       <CardHeader className="p-5 pb-3">
         <div className="flex items-center gap-3">
-          <Skeleton className="h-9 w-9 rounded-full" />
+          <Skeleton className="h-10 w-10 rounded-full" />
           <div>
-            <Skeleton className="mb-1 h-4 w-40" />
-            <Skeleton className="h-3 w-20" />
+            <Skeleton className="mb-1 h-5 w-40" />
+            <Skeleton className="h-4 w-24" />
           </div>
         </div>
       </CardHeader>
-      <CardContent className="px-5 pt-0 pb-3">
-        <Skeleton className="mb-4 h-10 w-full" />
+      <CardContent className="flex-1 px-5 pt-0 pb-3">
+        <Skeleton className="mb-4 h-5 w-3/4" />
         <div className="grid w-full grid-cols-3 gap-2">
           {[1, 2, 3].map(i => (
             <Skeleton key={i} className="aspect-[5/7] w-full rounded-lg" />
           ))}
         </div>
       </CardContent>
-      <CardFooter className="flex items-center justify-between px-5 py-3">
+      <CardFooter className="mt-auto flex items-center justify-between border-t border-gray-50 px-5 py-3">
         <div className="flex items-center gap-4">
-          <Skeleton className="h-3 w-14" />
-          <Skeleton className="h-3 w-10" />
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 w-12" />
         </div>
       </CardFooter>
     </Card>
