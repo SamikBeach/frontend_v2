@@ -1,3 +1,5 @@
+'use client';
+
 import { LibraryTag } from '@/apis/library/types';
 import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { Badge } from '@/components/ui/badge';
@@ -68,6 +70,7 @@ export function LibraryHeader() {
       {/* 구독 버튼 영역 */}
       <div className="flex items-center">
         <Button
+          suppressHydrationWarning
           variant={isSubscribed ? 'outline' : 'default'}
           size="lg"
           onClick={handleSubscriptionToggle}
@@ -77,12 +80,15 @@ export function LibraryHeader() {
               : 'bg-gray-900 text-white hover:bg-gray-800'
           }`}
         >
-          <span className="absolute left-5">
+          <span className="absolute left-5" suppressHydrationWarning>
             <Bell
+              suppressHydrationWarning
               className={`h-5 w-5 ${isSubscribed ? 'text-gray-800' : 'text-white'}`}
             />
           </span>
-          <span className="ml-7">{isSubscribed ? '구독중' : '구독하기'}</span>
+          <span className="ml-7" suppressHydrationWarning>
+            {isSubscribed ? '구독중' : '구독하기'}
+          </span>
         </Button>
       </div>
     </div>

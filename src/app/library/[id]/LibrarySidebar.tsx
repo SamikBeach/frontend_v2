@@ -13,13 +13,7 @@ export function LibrarySidebar() {
   const currentUser = useCurrentUser();
 
   // useLibraryDetail 훅으로 상태와 핸들러 함수 가져오기
-  const {
-    library,
-    isSubscribed,
-    handleSubscriptionToggle,
-    isSubscribing,
-    isUnsubscribing,
-  } = useLibraryDetail(libraryId);
+  const { library } = useLibraryDetail(libraryId);
 
   if (!library) {
     return null;
