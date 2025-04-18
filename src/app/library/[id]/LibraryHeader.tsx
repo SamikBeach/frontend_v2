@@ -14,7 +14,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useQueryClient } from '@tanstack/react-query';
-import { Bell, Edit, Eye, EyeOff, MoreHorizontal, Trash } from 'lucide-react';
+import {
+  Bell,
+  Edit,
+  Eye,
+  EyeOff,
+  MoreHorizontal,
+  Plus,
+  Trash,
+} from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -164,6 +172,12 @@ export function LibraryHeader() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onSelect={() => setShowAddBookDialog(true)}
+                    className="cursor-pointer"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />책 추가하기
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setShowEditDialog(true)}
                     className="cursor-pointer"

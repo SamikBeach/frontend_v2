@@ -1,4 +1,7 @@
-import { getAllTags, getPopularTags } from '@/apis/library/tag';
+import {
+  getAllLibraryTags,
+  getPopularLibraryTags,
+} from '@/apis/library/library-tag';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
@@ -28,7 +31,7 @@ export function TagSelector({
     queryKey: ['popularTags'],
     queryFn: async () => {
       try {
-        return await getPopularTags(10);
+        return await getPopularLibraryTags(10);
       } catch (error) {
         console.error('인기 태그를 가져오는데 실패했습니다:', error);
         return [];
@@ -45,7 +48,7 @@ export function TagSelector({
       }
 
       try {
-        return await getAllTags(1, 10, debouncedSearchTerm);
+        return await getAllLibraryTags(1, 10, debouncedSearchTerm);
       } catch (error) {
         console.error('태그 검색 중 오류 발생:', error);
         return { tags: [] };
@@ -81,18 +84,18 @@ export function TagSelector({
   };
 
   // 검색 결과에 표시할 태그 목록
-  const filteredTags = tags.filter(tag => !selectedTags.includes(tag.name));
+  const filteredTags = tags.filter(tag => !selectedTags.includes(tag.tagName));
 
   // 옵션 아이템 형식으로 변환
   const tagOptions = filteredTags.map(tag => ({
-    label: tag.name,
-    value: tag.name,
+    label: tag.tagName,
+    value: tag.tagName,
     description: `사용 ${tag.usageCount}회`,
   }));
 
   // 새 태그 추가 옵션
   const newTagOption =
-    searchQuery.trim() && !tags.some(tag => tag.name === searchQuery.trim())
+    searchQuery.trim() && !tags.some(tag => tag.tagName === searchQuery.trim())
       ? [
           {
             label: `"${searchQuery.trim()}" 태그 추가`,
@@ -155,15 +158,15 @@ export function TagSelector({
           <h4 className="mb-2 text-sm font-medium text-gray-700">인기 태그</h4>
           <div className="flex flex-wrap gap-2">
             {popularTags
-              .filter(tag => !selectedTags.includes(tag.name))
+              .filter(tag => !selectedTags.includes(tag.tagName))
               .map(tag => (
                 <Badge
                   key={tag.id}
                   variant="outline"
                   className="cursor-pointer bg-gray-50 px-2 py-1 text-sm hover:bg-gray-100"
-                  onClick={() => handleTagSelect(tag.name)}
+                  onClick={() => handleTagSelect(tag.tagName)}
                 >
-                  {tag.name}
+                  {tag.tagName}
                 </Badge>
               ))}
           </div>

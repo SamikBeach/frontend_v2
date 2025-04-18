@@ -149,6 +149,7 @@ export interface CreateLibraryDto {
   name: string;
   description?: string;
   isPublic?: boolean;
+  tags?: string[];
 }
 
 // 서재 업데이트 DTO
@@ -156,6 +157,7 @@ export interface UpdateLibraryDto {
   name?: string;
   description?: string;
   isPublic?: boolean;
+  tags?: string[];
 }
 
 // 서재에 책 추가 DTO

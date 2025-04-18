@@ -5,6 +5,7 @@ import {
   Library,
   UpdateLibraryDto,
 } from '@/apis/library/types';
+import { TagSelector } from '@/app/libraries/components/TagSelector';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,7 +20,8 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { BookOpen, Edit, X } from 'lucide-react';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
 
 interface LibraryDialogProps {
@@ -56,6 +58,23 @@ export function LibraryDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
+  // 태그 상태 추가
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    mode === 'edit' && library?.tags
+      ? library.tags.map(tag => (tag.tagName || '').toString())
+      : []
+  );
+
+  // 태그 추가 핸들러
+  const handleTagSelect = (tag: string) => {
+    setSelectedTags(prev => [...prev, tag]);
+  };
+
+  // 태그 제거 핸들러
+  const handleTagRemove = (tag: string) => {
+    setSelectedTags(prev => prev.filter(t => t !== tag));
+  };
+
   // 서재 생성/수정 핸들러
   const handleSubmit = async () => {
     if (mode === 'create' && !currentUser) {
@@ -76,6 +95,7 @@ export function LibraryDialog({
           name: name.trim(),
           description: description.trim() || undefined,
           isPublic,
+          tags: selectedTags.length > 0 ? selectedTags : undefined,
         };
 
         await onCreateLibrary(libraryData);
@@ -85,6 +105,7 @@ export function LibraryDialog({
           name: name.trim(),
           description: description.trim() || undefined,
           isPublic,
+          tags: selectedTags,
         };
 
         await onUpdateLibrary(library.id, updateData);
@@ -109,6 +130,7 @@ export function LibraryDialog({
       setName('');
       setDescription('');
       setIsPublic(true);
+      setSelectedTags([]);
     }
   };
 
@@ -134,7 +156,7 @@ export function LibraryDialog({
             </Button>
           </div>
 
-          <div className="px-5 py-4">
+          <div className="max-h-[calc(100vh-200px)] overflow-y-auto px-5 py-4">
             {mode === 'edit' && library && (
               <div className="mb-6 text-sm text-gray-600">
                 <span className="font-medium text-gray-800">
@@ -175,6 +197,42 @@ export function LibraryDialog({
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                 />
+              </div>
+
+              {/* 태그 선택기 추가 */}
+              <div className="space-y-3">
+                <Label
+                  htmlFor="libraryTags"
+                  className="text-sm font-medium text-gray-700"
+                >
+                  태그 선택
+                </Label>
+                <ErrorBoundary
+                  fallbackRender={() => (
+                    <div className="rounded-xl border border-red-100 bg-red-50 p-3 text-sm text-red-500">
+                      태그 로딩 중 오류가 발생했습니다.
+                    </div>
+                  )}
+                >
+                  <Suspense
+                    fallback={
+                      <div className="animate-pulse space-y-4">
+                        <div className="h-10 w-full rounded-md bg-gray-100"></div>
+                        <div className="flex flex-wrap gap-2">
+                          <div className="h-6 w-16 rounded-full bg-gray-100"></div>
+                          <div className="h-6 w-20 rounded-full bg-gray-100"></div>
+                        </div>
+                      </div>
+                    }
+                  >
+                    <TagSelector
+                      selectedTags={selectedTags}
+                      onTagSelect={handleTagSelect}
+                      onTagRemove={handleTagRemove}
+                      maxTags={5}
+                    />
+                  </Suspense>
+                </ErrorBoundary>
               </div>
 
               <div className="flex items-center justify-between rounded-xl bg-gray-50 p-4">

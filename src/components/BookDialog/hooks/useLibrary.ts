@@ -105,6 +105,15 @@ export function useLibrary(
               },
             });
           }
+
+          // 서재 정보 쿼리 무효화
+          queryClient.invalidateQueries({
+            queryKey: ['library', libraryId],
+          });
+          // 최근 활동 업데이트를 위한 쿼리 무효화
+          queryClient.invalidateQueries({
+            queryKey: ['library-updates', libraryId],
+          });
         },
       }
     );

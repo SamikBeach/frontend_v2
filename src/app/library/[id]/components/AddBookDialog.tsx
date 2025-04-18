@@ -1,6 +1,6 @@
 'use client';
 
-import { addBookToLibrary } from '@/apis/library';
+import { addBookToLibrary, addBookToLibraryWithIsbn } from '@/apis/library';
 import { searchBooks } from '@/apis/search';
 import { SearchResult } from '@/apis/search/types';
 import { Button } from '@/components/ui/button';
@@ -33,9 +33,8 @@ export function AddBookDialog({
   libraryId,
 }: AddBookDialogProps) {
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 500);
+  const debouncedQuery = useDebounce(query, 300);
   const [selectedBook, setSelectedBook] = useState<SearchResult | null>(null);
-  const [isAdding, setIsAdding] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
@@ -65,9 +64,20 @@ export function AddBookDialog({
       enabled: debouncedQuery.length >= 2,
     });
 
+  // 디버깅을 위한 useEffect 추가
+  useEffect(() => {
+    if (selectedBook) {
+      console.log('Selected book:', selectedBook);
+      console.log('Book ID:', selectedBook.bookId || selectedBook.id || -1);
+      console.log('Book Title:', selectedBook.title);
+      console.log('ISBN:', selectedBook.isbn);
+      console.log('ISBN13:', selectedBook.isbn13);
+    }
+  }, [selectedBook]);
+
   // 서재에 책 추가 mutation
-  const { mutateAsync: addBookMutation } = useMutation({
-    mutationFn: ({
+  const { mutate: addBookMutation, isPending } = useMutation({
+    mutationFn: async ({
       libraryId,
       bookId,
       isbn,
@@ -75,19 +85,46 @@ export function AddBookDialog({
       libraryId: number;
       bookId: number;
       isbn?: string;
-    }) => addBookToLibrary(libraryId, { bookId, isbn }),
-    onSuccess: () => {
+    }) => {
+      console.log('Mutation called with:', { libraryId, bookId, isbn });
+
+      // bookId가 -1인 경우에는 반드시 ISBN이 필요
+      if (bookId === -1 && !isbn) {
+        throw new Error('ISBN이 필요합니다');
+      }
+
+      // ISBN이 있는 경우 addBookToLibraryWithIsbn 사용
+      if (isbn) {
+        console.log('Using addBookToLibraryWithIsbn');
+        return addBookToLibraryWithIsbn({
+          libraryId,
+          bookId: bookId,
+          isbn,
+        });
+      } else {
+        console.log('Using addBookToLibrary');
+        return addBookToLibrary(libraryId, { bookId });
+      }
+    },
+    onSuccess: data => {
+      console.log('Success response:', data);
       toast.success('책이 서재에 추가되었습니다.');
       queryClient.invalidateQueries({ queryKey: ['library', libraryId] });
+      queryClient.invalidateQueries({
+        queryKey: ['library-updates', libraryId],
+      });
       onOpenChange(false);
     },
     onError: (error: any) => {
+      console.error('Error adding book:', error);
       let errorMessage = '책 추가 중 오류가 발생했습니다.';
 
       if (error.response?.data?.message) {
         errorMessage = error.response.data.message;
+        console.error('API error message:', error.response.data.message);
       } else if (error.message) {
         errorMessage = error.message;
+        console.error('Error message:', error.message);
       }
 
       toast.error(errorMessage);
@@ -95,20 +132,40 @@ export function AddBookDialog({
   });
 
   // 서재에 책 추가 핸들러
-  const handleAddBook = async () => {
-    if (!selectedBook || !selectedBook.bookId) return;
+  const handleAddBook = () => {
+    console.log('Add book button clicked');
 
-    setIsAdding(true);
+    if (!selectedBook) {
+      console.error('No book selected');
+      return;
+    }
+
+    // bookId가 없는 경우 id를 대신 사용하고, 둘 다 없으면 -1 사용
+    const bookId = selectedBook.bookId || selectedBook.id || -1;
+    console.log('Using bookId:', bookId);
+
+    if (bookId === -1) {
+      console.log('Book has no ID, using default ID -1');
+    }
+
+    const isbn = selectedBook.isbn13 || selectedBook.isbn || '';
+    console.log('Using ISBN:', isbn);
+
+    // ISBN이 없는데 bookId가 -1인 경우
+    if (bookId === -1 && !isbn) {
+      toast.error('ISBN 정보가 없어 책을 추가할 수 없습니다.');
+      return;
+    }
+
+    // 직접 함수 호출로 변경
     try {
-      await addBookMutation({
+      addBookMutation({
         libraryId,
-        bookId: selectedBook.bookId,
-        isbn: selectedBook.isbn13 || selectedBook.isbn,
+        bookId: bookId,
+        isbn: isbn,
       });
     } catch (error) {
-      console.error('책 추가 중 오류 발생:', error);
-    } finally {
-      setIsAdding(false);
+      console.error('Error in handleAddBook:', error);
     }
   };
 
@@ -128,7 +185,7 @@ export function AddBookDialog({
 
   // 다이얼로그 닫기 핸들러
   const handleCloseDialog = () => {
-    if (!isAdding) {
+    if (!isPending) {
       onOpenChange(false);
     }
   };
@@ -149,7 +206,7 @@ export function AddBookDialog({
               size="icon"
               className="rounded-full"
               onClick={handleCloseDialog}
-              disabled={isAdding}
+              disabled={isPending}
             >
               <X className="h-5 w-5" />
             </Button>
@@ -236,17 +293,17 @@ export function AddBookDialog({
             <Button
               variant="outline"
               onClick={handleCloseDialog}
-              disabled={isAdding}
+              disabled={isPending}
               className="rounded-lg"
             >
               취소
             </Button>
             <Button
               onClick={handleAddBook}
-              disabled={!selectedBook || isAdding}
+              disabled={!selectedBook || isPending}
               className="rounded-lg bg-gray-900 hover:bg-gray-800"
             >
-              {isAdding ? '추가 중...' : '서재에 추가하기'}
+              {isPending ? '추가 중...' : '서재에 추가하기'}
             </Button>
           </div>
         </div>
