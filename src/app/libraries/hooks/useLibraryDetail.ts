@@ -6,7 +6,7 @@ import {
   unsubscribeFromLibrary,
   UpdateHistoryItem,
 } from '@/apis/library';
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 interface UseLibraryDetailResult {
@@ -24,13 +24,12 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
     retry: 1, // 실패 시 1번 재시도
   });
 
-  // 최근 업데이트 가져오기 (useSuspenseQuery 대신 useQuery 사용)
-  const { data: recentUpdates } = useQuery<UpdateHistoryItem[]>({
+  // 최근 업데이트 가져오기 (useSuspenseQuery 사용)
+  const { data: recentUpdates } = useSuspenseQuery<UpdateHistoryItem[]>({
     queryKey: ['library-updates', libraryId],
     queryFn: () => getLibraryUpdates(libraryId, 5), // 최신 5개 항목만 가져오기
     staleTime: 5 * 60 * 1000,
     retry: 1,
-    enabled: !!library, // useQuery에서는 enabled 옵션 사용 가능
   });
 
   // 구독하기 mutation

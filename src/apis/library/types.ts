@@ -1,5 +1,21 @@
 import { Book } from '../book/types';
 
+// 서재 활동 유형 (백엔드 enum과 일치)
+export enum LibraryActivityType {
+  LIBRARY_CREATE = 'LIBRARY_CREATE', // 서재 생성
+  LIBRARY_UPDATE = 'LIBRARY_UPDATE', // 서재 정보 수정
+  LIBRARY_TITLE_UPDATE = 'LIBRARY_TITLE_UPDATE', // 서재 제목 수정
+  LIBRARY_DELETE = 'LIBRARY_DELETE', // 서재 삭제
+  BOOK_ADD = 'BOOK_ADD', // 책 추가
+  BOOK_REMOVE = 'BOOK_REMOVE', // 책 제거
+  BOOK_UPDATE = 'BOOK_UPDATE', // 책 정보 수정
+  TAG_ADD = 'TAG_ADD', // 태그 추가
+  TAG_REMOVE = 'TAG_REMOVE', // 태그 제거
+  SUBSCRIPTION_ADD = 'SUBSCRIPTION_ADD', // 구독 추가
+  SUBSCRIPTION_REMOVE = 'SUBSCRIPTION_REMOVE', // 구독 취소
+  OTHER = 'OTHER', // 기타 활동
+}
+
 // 서재 정렬 옵션 (백엔드 enum과 일치)
 export enum LibrarySortOption {
   SUBSCRIBERS = 'subscribers', // 구독자 많은 순
@@ -48,8 +64,13 @@ export interface BookPreview {
 
 // 서재 업데이트 이력 타입
 export interface UpdateHistoryItem {
+  id: number;
   date: Date;
   message: string;
+  activityType: LibraryActivityType;
+  userId?: number;
+  bookId?: number;
+  tagId?: number;
 }
 
 // 서재 구독자 정보 타입

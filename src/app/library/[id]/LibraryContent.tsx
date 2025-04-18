@@ -1,18 +1,13 @@
 import { Book as BookType } from '@/apis/book';
 import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
-import { selectedBookAtom, selectedBookIdAtom } from '@/atoms/book';
 import { BookCard } from '@/components/BookCard';
 import { Separator } from '@/components/ui/separator';
-import { useSetAtom } from 'jotai';
 import { useParams } from 'next/navigation';
 
 export function LibraryContent() {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
   const { library } = useLibraryDetail(libraryId);
-
-  const setSelectedBookId = useSetAtom(selectedBookIdAtom);
-  const setSelectedBook = useSetAtom(selectedBookAtom);
 
   if (!library) {
     return null;
@@ -24,13 +19,6 @@ export function LibraryContent() {
       ...libraryBook.book,
       id: libraryBook.bookId,
     })) || [];
-
-  // 책 선택 핸들러
-  const handleBookClick = (book: BookType) => {
-    // 선택된 책 ID 및 데이터 모두 저장
-    setSelectedBookId(book.id.toString());
-    setSelectedBook(book);
-  };
 
   return (
     <div className="space-y-3">
@@ -55,11 +43,7 @@ export function LibraryContent() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
           {booksWithDetails.length > 0 ? (
             booksWithDetails.map(book => (
-              <BookCard
-                key={book.id}
-                book={book as BookType}
-                onClick={handleBookClick}
-              />
+              <BookCard key={book.id} book={book as BookType} />
             ))
           ) : (
             <div className="col-span-full py-8 text-center">
