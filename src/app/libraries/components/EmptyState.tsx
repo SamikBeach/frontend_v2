@@ -1,6 +1,4 @@
-import { Button } from '@/components/ui/button';
-import { AlertCircle, Folder, PlusCircle, Search } from 'lucide-react';
-import Link from 'next/link';
+import { AlertCircle, Folder, Search } from 'lucide-react';
 import { EmptyStateProps } from '../types';
 
 export function EmptyState({ searchQuery, selectedTag }: EmptyStateProps) {
@@ -27,15 +25,6 @@ export function EmptyState({ searchQuery, selectedTag }: EmptyStateProps) {
             ? '다른 태그를 선택하거나 모든 태그에서 서재를 찾아보세요.'
             : '서재를 만들면 읽고 싶은 책이나 관심 있는 주제별로 책을 모아볼 수 있습니다.'}
       </p>
-
-      {!searchQuery && selectedTag === 'all' && (
-        <Link href="/libraries/create" className="mt-4">
-          <Button className="flex items-center gap-2">
-            <PlusCircle className="h-4 w-4" />
-            <span>새 서재 만들기</span>
-          </Button>
-        </Link>
-      )}
     </div>
   );
 }

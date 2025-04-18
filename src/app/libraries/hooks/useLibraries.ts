@@ -26,6 +26,7 @@ interface UseLibrariesResult {
   handleSortChange: (sortId: string) => void;
   handleTimeRangeChange: (timeRange: TimeRange) => void;
   handleSearchChange: (value: string) => void;
+  refetch: () => void;
 }
 
 export function useLibraries(): UseLibrariesResult {
@@ -69,29 +70,35 @@ export function useLibraries(): UseLibrariesResult {
   const tagId = tagFilter !== 'all' ? parseInt(tagFilter, 10) : undefined;
 
   // 데이터 가져오기 - 무한 스크롤 지원
-  const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
-    useInfiniteQuery({
-      queryKey: ['libraries', sortOption, searchQuery, tagId],
-      queryFn: async ({ pageParam = 1 }) => {
-        const apiSortOption = getApiSortOption();
-        return await getAllLibraries(
-          pageParam,
-          9, // 한 페이지당 9개 항목
-          apiSortOption,
-          searchQuery,
-          tagId
-        );
-      },
-      initialPageParam: 1,
-      getNextPageParam: lastPage => {
-        if (lastPage.meta.page < lastPage.meta.totalPages) {
-          return lastPage.meta.page + 1;
-        }
-        return undefined;
-      },
-      placeholderData: keepPreviousData,
-      retry: 1, // 실패 시 1번 재시도
-    });
+  const {
+    data,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteQuery({
+    queryKey: ['libraries', sortOption, searchQuery, tagId],
+    queryFn: async ({ pageParam = 1 }) => {
+      const apiSortOption = getApiSortOption();
+      return await getAllLibraries(
+        pageParam,
+        9, // 한 페이지당 9개 항목
+        apiSortOption,
+        searchQuery,
+        tagId
+      );
+    },
+    initialPageParam: 1,
+    getNextPageParam: lastPage => {
+      if (lastPage.meta.page < lastPage.meta.totalPages) {
+        return lastPage.meta.page + 1;
+      }
+      return undefined;
+    },
+    placeholderData: keepPreviousData,
+    retry: 1, // 실패 시 1번 재시도
+  });
 
   // 모든 페이지의 서재 데이터 병합
   const libraries = useMemo(() => {
@@ -134,6 +141,7 @@ export function useLibraries(): UseLibrariesResult {
     handleSortChange,
     handleTimeRangeChange,
     handleSearchChange,
+    refetch,
   };
 }
 
