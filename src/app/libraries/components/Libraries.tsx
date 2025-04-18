@@ -47,7 +47,7 @@ export function Libraries() {
     <>
       {/* 필터 영역 - 스크롤 시 상단에 고정 */}
       <div className="sticky top-[56px] z-30 bg-white">
-        <div className="mx-auto w-full px-4 py-2">
+        <div className="mx-auto w-full p-4">
           <div className="relative">
             {/* xl 이상 화면에서 보이는 검색바와 정렬 버튼 */}
             <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:flex xl:items-center xl:gap-4">
