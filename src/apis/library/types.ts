@@ -8,7 +8,6 @@ export enum LibraryActivityType {
   LIBRARY_DELETE = 'LIBRARY_DELETE', // 서재 삭제
   BOOK_ADD = 'BOOK_ADD', // 책 추가
   BOOK_REMOVE = 'BOOK_REMOVE', // 책 제거
-  BOOK_UPDATE = 'BOOK_UPDATE', // 책 정보 수정
   TAG_ADD = 'TAG_ADD', // 태그 추가
   TAG_REMOVE = 'TAG_REMOVE', // 태그 제거
   SUBSCRIPTION_ADD = 'SUBSCRIPTION_ADD', // 구독 추가

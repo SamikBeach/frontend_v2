@@ -51,7 +51,7 @@ function LibrarySidebarContent({ libraryId }: { libraryId: number }) {
       case LibraryActivityType.LIBRARY_CREATE:
         return '🏛️';
       case LibraryActivityType.LIBRARY_UPDATE:
-        return '📝';
+        return '📚';
       case LibraryActivityType.LIBRARY_TITLE_UPDATE:
         return '✏️';
       case LibraryActivityType.LIBRARY_DELETE:
@@ -60,8 +60,6 @@ function LibrarySidebarContent({ libraryId }: { libraryId: number }) {
         return '📚';
       case LibraryActivityType.BOOK_REMOVE:
         return '📕';
-      case LibraryActivityType.BOOK_UPDATE:
-        return '📖';
       case LibraryActivityType.TAG_ADD:
         return '🏷️';
       case LibraryActivityType.TAG_REMOVE:
@@ -142,6 +140,7 @@ function LibrarySidebarContent({ libraryId }: { libraryId: number }) {
         return (
           <>
             {activityIcon}{' '}
+            <span className="font-medium text-gray-800">📚 서재</span>{' '}
             <span className="font-medium text-gray-800">{library.name}</span>의
             정보가 수정되었습니다.
           </>
@@ -186,26 +185,6 @@ function LibrarySidebarContent({ libraryId }: { libraryId: number }) {
             {activityIcon}{' '}
             <span className="font-medium text-gray-800">{bookTitle}</span> 책이
             서재에서 제거되었습니다.
-          </>
-        );
-      }
-
-      case LibraryActivityType.BOOK_UPDATE: {
-        const bookTitle = getBookTitleById(update.bookId);
-        return (
-          <>
-            {activityIcon}{' '}
-            <span
-              className="cursor-pointer font-medium text-gray-800 hover:underline"
-              onClick={() => {
-                if (update.bookId) {
-                  openBookDialog(update.bookId.toString());
-                }
-              }}
-            >
-              {bookTitle}
-            </span>{' '}
-            책 정보가 업데이트되었습니다.
           </>
         );
       }
