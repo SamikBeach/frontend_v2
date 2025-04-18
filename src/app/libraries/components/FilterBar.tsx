@@ -69,7 +69,6 @@ function FilterBarContent({
       id: String(tag.id),
       name: tag.tagName,
       color: getTagColor(index),
-      icon: getTagIcon(index),
     })),
   ];
 
@@ -94,7 +93,7 @@ function FilterBarContent({
                 categoryFilter === category.id ? undefined : category.color,
             }}
           >
-            {categoryFilter === category.id && category.icon}
+            {category.id === 'all' && categoryFilter !== 'all' && category.icon}
             {category.name}
           </button>
         ))}
