@@ -4,15 +4,13 @@ import { LibraryTagResponseDto } from '@/apis/library/types';
 import { libraryCategoryFilterAtom } from '@/atoms/library';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAtom } from 'jotai';
-import { BookOpen, Clock, Flame, Hash, Users } from 'lucide-react';
 import { Suspense } from 'react';
-import { usePopularLibraryTags } from '../hooks/usePopularTags';
+import { useAllLibraryTags } from '../hooks/useAllLibraryTags';
 
 export interface Category {
   id: string;
   name: string;
   color: string;
-  icon?: React.ReactNode;
 }
 
 // 태그 색상 배열 - 파스텔톤
@@ -53,7 +51,7 @@ function FilterBarContent({
   categoryFilter: string;
   setCategoryFilter: (id: string) => void;
 }) {
-  const { tags: popularTags } = usePopularLibraryTags(10);
+  const { tags: allTags } = useAllLibraryTags(20);
 
   // 카테고리 생성
   const categories: Category[] = [
@@ -62,10 +60,9 @@ function FilterBarContent({
       id: 'all',
       name: '전체',
       color: '#E2E8F0',
-      icon: <Flame className="h-3.5 w-3.5" />,
     },
-    // 인기 태그 기반 카테고리
-    ...(popularTags || []).map((tag: LibraryTagResponseDto, index: number) => ({
+    // 모든 태그 기반 카테고리
+    ...(allTags || []).map((tag: LibraryTagResponseDto, index: number) => ({
       id: String(tag.id),
       name: tag.tagName,
       color: getTagColor(index),
@@ -93,26 +90,12 @@ function FilterBarContent({
                 categoryFilter === category.id ? undefined : category.color,
             }}
           >
-            {category.id === 'all' && categoryFilter !== 'all' && category.icon}
             {category.name}
           </button>
         ))}
       </div>
     </div>
   );
-}
-
-// 태그 인덱스에 따른 아이콘 반환
-function getTagIcon(index: number): React.ReactNode {
-  const icons = [
-    <Flame key="flame" className="h-3.5 w-3.5" />,
-    <Users key="users" className="h-3.5 w-3.5" />,
-    <BookOpen key="book" className="h-3.5 w-3.5" />,
-    <Clock key="clock" className="h-3.5 w-3.5" />,
-    <Hash key="hash" className="h-3.5 w-3.5" />,
-  ];
-
-  return icons[index % icons.length];
 }
 
 export function FilterBar() {

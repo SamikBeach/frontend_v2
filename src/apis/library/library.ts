@@ -19,7 +19,6 @@ import {
  * 모든 서재 목록 조회 (공개된 서재만) - 페이지네이션, 검색, 정렬, 태그 필터링 지원
  */
 export const getAllLibraries = async (
-  userId?: number,
   page: number = 1,
   limit: number = 10,
   sort?: LibrarySortOption,
@@ -28,7 +27,6 @@ export const getAllLibraries = async (
 ): Promise<PaginatedLibraryResponse> => {
   const params: Record<string, string> = {};
 
-  if (userId) params.userId = userId.toString();
   if (page) params.page = page.toString();
   if (limit) params.limit = limit.toString();
   if (sort) params.sort = sort;

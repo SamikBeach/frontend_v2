@@ -72,11 +72,10 @@ export function useLibraries(): UseLibrariesResult {
   // 데이터 가져오기 - 무한 스크롤 지원
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
-      queryKey: ['libraries', user?.id, sortOption, searchQuery, tagId],
+      queryKey: ['libraries', sortOption, searchQuery, tagId],
       queryFn: async ({ pageParam = 1 }) => {
         const apiSortOption = getApiSortOption();
         return await getAllLibraries(
-          user?.id,
           pageParam,
           9, // 한 페이지당 9개 항목
           apiSortOption,
