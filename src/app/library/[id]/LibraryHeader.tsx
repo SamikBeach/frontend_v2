@@ -13,16 +13,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { getTagColor } from '@/utils/tags';
 import { useQueryClient } from '@tanstack/react-query';
-import {
-  Bell,
-  Edit,
-  Eye,
-  EyeOff,
-  MoreHorizontal,
-  Plus,
-  Trash,
-} from 'lucide-react';
+import { Bell, Edit, Eye, EyeOff, MoreHorizontal, Trash } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -34,16 +27,6 @@ interface ApiTag extends Omit<LibraryTag, 'name' | 'tagName'> {
   name?: string;
   tagName?: string;
 }
-
-// 파스텔톤 색상 배열
-const pastelColors = [
-  '#FFD6E0', // 연한 분홍
-  '#FFEFB5', // 연한 노랑
-  '#D1F0C2', // 연한 초록
-  '#C7CEEA', // 연한 파랑
-  '#F0E6EF', // 연한 보라
-  '#E2F0CB', // 연한 민트
-];
 
 export function LibraryHeader() {
   const params = useParams();
@@ -106,10 +89,9 @@ export function LibraryHeader() {
                 {library.tags.map((tag, index) => (
                   <Badge
                     key={tag.id}
-                    className="rounded-full border-0 px-4 py-1 text-sm font-medium text-gray-700"
+                    className="rounded-full border-0 px-2.5 py-0.5 text-xs font-medium text-gray-700"
                     style={{
-                      backgroundColor:
-                        pastelColors[index % pastelColors.length],
+                      backgroundColor: getTagColor(index % 8),
                     }}
                   >
                     {(tag as ApiTag).tagName || (tag as ApiTag).name}
@@ -172,12 +154,6 @@ export function LibraryHeader() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    onSelect={() => setShowAddBookDialog(true)}
-                    className="cursor-pointer"
-                  >
-                    <Plus className="mr-2 h-4 w-4" />책 추가하기
-                  </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={() => setShowEditDialog(true)}
                     className="cursor-pointer"

@@ -155,7 +155,7 @@ function LibrarySidebarContent({ libraryId }: { libraryId: number }) {
         );
 
       case LibraryActivityType.BOOK_ADD: {
-        const bookTitle = getBookTitleById(update.bookId);
+        const bookTitle = update.bookTitle || getBookTitleById(update.bookId);
         return (
           <>
             {activityIcon}{' '}
@@ -176,14 +176,24 @@ function LibrarySidebarContent({ libraryId }: { libraryId: number }) {
 
       case LibraryActivityType.BOOK_REMOVE: {
         const bookTitle =
+          update.bookTitle ||
           getBookTitleById(update.bookId) ||
           update.message.match(/"(.+?)"/)?.at(1) ||
           '알 수 없는 책';
         return (
           <>
             {activityIcon}{' '}
-            <span className="font-medium text-gray-800">{bookTitle}</span> 책이
-            서재에서 제거되었습니다.
+            <span
+              className="cursor-pointer font-medium text-gray-800 hover:underline"
+              onClick={() => {
+                if (update.bookId) {
+                  openBookDialog(update.bookId.toString());
+                }
+              }}
+            >
+              {bookTitle}
+            </span>{' '}
+            책이 서재에서 제거되었습니다.
           </>
         );
       }

@@ -1,12 +1,13 @@
 'use client';
 
+import { getPopularLibraryTags } from '@/apis/library/library-tag';
 import {
   CreateLibraryDto,
   Library,
   UpdateLibraryDto,
 } from '@/apis/library/types';
-import { TagSelector } from '@/app/libraries/components/TagSelector';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -19,8 +20,10 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { getTagColor } from '@/utils/tags';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { BookOpen, Edit, X } from 'lucide-react';
-import { Suspense, useState } from 'react';
+import { createContext, Suspense, useContext, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
 
@@ -35,6 +38,15 @@ interface LibraryDialogProps {
   library?: Library;
   onUpdateLibrary?: (id: number, data: UpdateLibraryDto) => Promise<void>;
 }
+
+// 태그 관련 컨텍스트 생성
+interface TagContextType {
+  selectedTags: string[];
+  handleTagSelect: (tag: string) => void;
+  handleTagRemove: (tag: string) => void;
+}
+
+const TagContext = createContext<TagContextType | undefined>(undefined);
 
 export function LibraryDialog({
   open,
@@ -67,12 +79,23 @@ export function LibraryDialog({
 
   // 태그 추가 핸들러
   const handleTagSelect = (tag: string) => {
+    if (selectedTags.length >= 5) {
+      toast.warning('태그는 최대 5개까지 선택할 수 있습니다.');
+      return;
+    }
     setSelectedTags(prev => [...prev, tag]);
   };
 
   // 태그 제거 핸들러
   const handleTagRemove = (tag: string) => {
     setSelectedTags(prev => prev.filter(t => t !== tag));
+  };
+
+  // 컨텍스트 값 설정
+  const tagContextValue = {
+    selectedTags,
+    handleTagSelect,
+    handleTagRemove,
   };
 
   // 서재 생성/수정 핸들러
@@ -157,15 +180,6 @@ export function LibraryDialog({
           </div>
 
           <div className="max-h-[calc(100vh-200px)] overflow-y-auto px-5 py-4">
-            {mode === 'edit' && library && (
-              <div className="mb-6 text-sm text-gray-600">
-                <span className="font-medium text-gray-800">
-                  {library.name}
-                </span>
-                의 정보를 수정해보세요
-              </div>
-            )}
-
             <div className="space-y-6">
               <div className="space-y-3">
                 <Label
@@ -199,13 +213,13 @@ export function LibraryDialog({
                 />
               </div>
 
-              {/* 태그 선택기 추가 */}
+              {/* 태그 선택 섹션 */}
               <div className="space-y-3">
                 <Label
                   htmlFor="libraryTags"
                   className="text-sm font-medium text-gray-700"
                 >
-                  태그 선택
+                  태그 선택 (최대 5개)
                 </Label>
                 <ErrorBoundary
                   fallbackRender={() => (
@@ -217,7 +231,6 @@ export function LibraryDialog({
                   <Suspense
                     fallback={
                       <div className="animate-pulse space-y-4">
-                        <div className="h-10 w-full rounded-md bg-gray-100"></div>
                         <div className="flex flex-wrap gap-2">
                           <div className="h-6 w-16 rounded-full bg-gray-100"></div>
                           <div className="h-6 w-20 rounded-full bg-gray-100"></div>
@@ -225,12 +238,9 @@ export function LibraryDialog({
                       </div>
                     }
                   >
-                    <TagSelector
-                      selectedTags={selectedTags}
-                      onTagSelect={handleTagSelect}
-                      onTagRemove={handleTagRemove}
-                      maxTags={5}
-                    />
+                    <TagContext.Provider value={tagContextValue}>
+                      <TagList />
+                    </TagContext.Provider>
                   </Suspense>
                 </ErrorBoundary>
               </div>
@@ -296,3 +306,72 @@ export function LibraryDialog({
     </>
   );
 }
+
+const TagList = () => {
+  // TagContext 사용
+  const { selectedTags, handleTagSelect, handleTagRemove } = useContext(
+    TagContext
+  ) || {
+    selectedTags: [],
+    handleTagSelect: () => {},
+    handleTagRemove: () => {},
+  };
+
+  // 인기 태그 불러오기
+  const { data: popularTags } = useSuspenseQuery({
+    queryKey: ['library', 'tags', 'popular'],
+    queryFn: () => getPopularLibraryTags(),
+    staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유지
+  });
+
+  // 태그 토글 핸들러
+  const toggleTag = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      handleTagRemove(tag);
+    } else {
+      handleTagSelect(tag);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* 선택된 태그 표시 영역 (보이지 않음) */}
+      <div className="hidden">
+        {selectedTags.length > 0
+          ? selectedTags.map(tag => <span key={tag}>{tag}</span>)
+          : null}
+      </div>
+
+      {/* 태그 목록 */}
+      <div className="mt-2">
+        <div className="flex flex-wrap gap-2">
+          {popularTags && popularTags.length > 0 ? (
+            popularTags.map((tag, index) => {
+              const isSelected = selectedTags.includes(tag.tagName);
+              return (
+                <Badge
+                  key={tag.tagId}
+                  className={`cursor-pointer rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                    isSelected ? 'bg-gray-900 text-white' : 'text-gray-700'
+                  }`}
+                  style={{
+                    backgroundColor: isSelected
+                      ? '#1f2937'
+                      : getTagColor(index % 8),
+                  }}
+                  onClick={() => toggleTag(tag.tagName)}
+                >
+                  {tag.tagName}
+                </Badge>
+              );
+            })
+          ) : (
+            <div className="text-xs text-gray-500">
+              태그를 불러오는 중입니다
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
