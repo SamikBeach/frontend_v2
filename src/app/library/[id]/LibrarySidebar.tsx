@@ -59,8 +59,19 @@ export function LibrarySidebar() {
   const isAddBookUpdate = (message: string): boolean => {
     if (!message) return false;
     return (
-      (message.includes('추가') || message.includes('📚')) &&
+      (message.includes('추가') ||
+        message.includes('📚') ||
+        message.includes('🏛️')) &&
       (message.includes('책') || message.includes('도서'))
+    );
+  };
+
+  // 메시지에 라이브러리 생성 내용이 있는지 확인하는 함수
+  const isLibraryCreateUpdate = (message: string): boolean => {
+    if (!message) return false;
+    return (
+      message.includes('🏛️') ||
+      (message.includes('서재') && message.includes('생성'))
     );
   };
 

@@ -1,10 +1,12 @@
-import { TagResponseDto } from '@/apis/library/types';
+'use client';
+
+import { LibraryTagResponseDto } from '@/apis/library/types';
 import { libraryCategoryFilterAtom } from '@/atoms/library';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAtom } from 'jotai';
 import { BookOpen, Clock, Flame, Hash, Users } from 'lucide-react';
 import { Suspense } from 'react';
-import { usePopularTags } from '../hooks/usePopularTags';
+import { usePopularLibraryTags } from '../hooks/usePopularTags';
 
 export interface Category {
   id: string;
@@ -51,7 +53,7 @@ function FilterBarContent({
   categoryFilter: string;
   setCategoryFilter: (id: string) => void;
 }) {
-  const { tags: popularTags } = usePopularTags(10);
+  const { tags: popularTags } = usePopularLibraryTags(10);
 
   // 카테고리 생성
   const categories: Category[] = [
@@ -63,9 +65,9 @@ function FilterBarContent({
       icon: <Flame className="h-3.5 w-3.5" />,
     },
     // 인기 태그 기반 카테고리
-    ...(popularTags || []).map((tag: TagResponseDto, index: number) => ({
+    ...(popularTags || []).map((tag: LibraryTagResponseDto, index: number) => ({
       id: String(tag.id),
-      name: tag.name,
+      name: tag.tagName,
       color: getTagColor(index),
       icon: getTagIcon(index),
     })),

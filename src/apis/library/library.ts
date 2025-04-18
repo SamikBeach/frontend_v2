@@ -16,14 +16,15 @@ import {
 } from './types';
 
 /**
- * 모든 서재 목록 조회 (공개된 서재만) - 페이지네이션, 검색, 정렬 지원
+ * 모든 서재 목록 조회 (공개된 서재만) - 페이지네이션, 검색, 정렬, 태그 필터링 지원
  */
 export const getAllLibraries = async (
   userId?: number,
   page: number = 1,
   limit: number = 10,
   sort?: LibrarySortOption,
-  query?: string
+  query?: string,
+  tagId?: number
 ): Promise<PaginatedLibraryResponse> => {
   const params: Record<string, string> = {};
 
@@ -32,6 +33,7 @@ export const getAllLibraries = async (
   if (limit) params.limit = limit.toString();
   if (sort) params.sort = sort;
   if (query && query.trim() !== '') params.query = query;
+  if (tagId) params.tagId = tagId.toString();
 
   const response = await api.get<PaginatedLibraryResponse>('/library', {
     params,

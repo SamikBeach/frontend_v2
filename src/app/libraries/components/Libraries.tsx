@@ -4,7 +4,6 @@ import { Clock, Flame, Library } from 'lucide-react';
 import { useLibraries } from '../hooks/useLibraries';
 import { SortOption } from '../types';
 import { FilterBar } from './FilterBar';
-import { LibraryBreadcrumb } from './LibraryBreadcrumb';
 import { LibraryList, LibraryListSkeleton } from './LibraryListWithPagination';
 import { SearchBar } from './SearchBar';
 import { SortDropdown } from './SortDropdown';
@@ -46,11 +45,6 @@ export function Libraries() {
 
   return (
     <>
-      {/* 브레드크럼 */}
-      <div className="mx-auto w-full px-4 py-2">
-        <LibraryBreadcrumb />
-      </div>
-
       {/* 필터 영역 - 스크롤 시 상단에 고정 */}
       <div className="sticky top-[56px] z-30 bg-white">
         <div className="mx-auto w-full px-4 py-2">

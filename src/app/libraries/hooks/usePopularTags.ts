@@ -1,26 +1,28 @@
-import { getPopularTags } from '@/apis/library/tag';
-import { TagResponseDto } from '@/apis/library/types';
+import { getPopularLibraryTags } from '@/apis/library/library-tag';
+import { LibraryTagResponseDto } from '@/apis/library/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
-interface UsePopularTagsResult {
-  tags: TagResponseDto[];
+interface UsePopularLibraryTagsResult {
+  tags: LibraryTagResponseDto[];
   error?: Error | null;
 }
 
-export function usePopularTags(limit: number = 10): UsePopularTagsResult {
+export function usePopularLibraryTags(
+  limit: number = 10
+): UsePopularLibraryTagsResult {
   const [error, setError] = useState<Error | null>(null);
 
   const { data } = useSuspenseQuery({
-    queryKey: ['popularTags', limit],
+    queryKey: ['popularLibraryTags', limit],
     queryFn: async () => {
       try {
-        return await getPopularTags(limit);
+        return await getPopularLibraryTags(limit);
       } catch (err) {
         if (err instanceof Error) {
           setError(err);
         } else {
-          setError(new Error('Failed to fetch popular tags'));
+          setError(new Error('Failed to fetch popular library tags'));
         }
         return [];
       }

@@ -65,10 +65,14 @@ export function useLibraries(): UseLibrariesResult {
     }
   };
 
+  // 태그 ID 얻기 (전체가 아닌 경우에만)
+  const tagId =
+    categoryFilter !== 'all' ? parseInt(categoryFilter, 10) : undefined;
+
   // 데이터 가져오기 - 무한 스크롤 지원
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useInfiniteQuery({
-      queryKey: ['libraries', user?.id, sortOption, searchQuery],
+      queryKey: ['libraries', user?.id, sortOption, searchQuery, tagId],
       queryFn: async ({ pageParam = 1 }) => {
         const apiSortOption = getApiSortOption();
         return await getAllLibraries(
@@ -76,7 +80,8 @@ export function useLibraries(): UseLibrariesResult {
           pageParam,
           9, // 한 페이지당 9개 항목
           apiSortOption,
-          searchQuery
+          searchQuery,
+          tagId
         );
       },
       initialPageParam: 1,
@@ -118,28 +123,8 @@ export function useLibraries(): UseLibrariesResult {
     [setSearchQuery]
   );
 
-  // 카테고리로 필터링된 서재 목록
-  const filteredLibraries = useMemo(() => {
-    if (!libraries || libraries.length === 0) return [];
-
-    // 카테고리 필터링
-    if (categoryFilter !== 'all') {
-      return libraries.filter(library => {
-        // 태그 목록에서 카테고리와 일치하는 태그가 있는지 확인
-        return (
-          library.tags &&
-          Array.isArray(library.tags) &&
-          library.tags.length > 0 &&
-          library.tags.some(tag => tag && tag.name === categoryFilter)
-        );
-      });
-    }
-
-    return libraries;
-  }, [libraries, categoryFilter]);
-
   return {
-    libraries: filteredLibraries,
+    libraries,
     isLoading,
     isFetchingNextPage,
     hasNextPage,

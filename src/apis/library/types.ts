@@ -20,7 +20,14 @@ export interface LibraryBook {
 // 서재 태그 타입
 export interface LibraryTag {
   id: number;
-  name: string;
+  tagId: number;
+  tagName: string;
+  description?: string;
+  usageCount?: number;
+  libraryId?: number;
+  note?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
 // 서재 소유자 타입
@@ -53,19 +60,22 @@ export interface SubscriberInfo {
   profileImage?: string;
 }
 
-// 태그 정보 타입
-export interface TagResponseDto {
+// 라이브러리 태그 정보 타입
+export interface LibraryTagResponseDto {
   id: number;
-  name: string;
+  tagId: number;
+  tagName: string;
   description?: string;
   usageCount: number;
+  libraryId?: number;
+  note?: string;
   createdAt: Date;
-  updatedAt: Date;
+  updatedAt?: Date;
 }
 
-// 태그 목록 응답 타입
-export interface TagListResponseDto {
-  tags: TagResponseDto[];
+// 라이브러리 태그 목록 응답 타입
+export interface LibraryTagListResponseDto {
+  tags: LibraryTagResponseDto[];
   totalCount: number;
 }
 
@@ -97,6 +107,8 @@ export interface PaginationMeta {
   totalPages: number;
   sort?: LibrarySortOption;
   query?: string;
+  tagId?: number;
+  tagName?: string;
 }
 
 // 페이지네이션된 서재 목록 응답 타입
