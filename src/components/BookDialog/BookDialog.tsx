@@ -15,6 +15,7 @@ import {
   BookRightPanel,
 } from './components';
 
+import { useQueryParams } from '@/hooks/useQueryParams';
 import { BookFullSkeleton, ErrorFallback } from './components/common';
 
 function BookDialogContent() {
@@ -73,9 +74,10 @@ function BookDialogContent() {
 }
 
 export function BookDialog() {
-  const { isOpen, close } = useDialogQuery({ type: 'book' });
-
-  if (!isOpen) return null;
+  const { searchParams } = useQueryParams();
+  // URL에 id 파라미터가 있으면 'id' 타입으로, 없으면 'isbn' 타입으로 설정
+  const idType = searchParams.has('id') ? 'id' : 'isbn';
+  const { isOpen, close, id } = useDialogQuery({ type: 'book', idType });
 
   return (
     <Dialog

@@ -2,12 +2,17 @@ import { Book as BookType } from '@/apis/book';
 import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { BookCard } from '@/components/BookCard';
 import { Separator } from '@/components/ui/separator';
+import { useDialogQuery } from '@/hooks';
 import { useParams } from 'next/navigation';
 
 export function LibraryContent() {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
   const { library } = useLibraryDetail(libraryId);
+  const { open: openBookDialog } = useDialogQuery({
+    type: 'book',
+    idType: 'id',
+  });
 
   if (!library) {
     return null;
@@ -19,6 +24,11 @@ export function LibraryContent() {
       ...libraryBook.book,
       id: libraryBook.bookId,
     })) || [];
+
+  // 책 클릭 핸들러
+  const handleBookClick = (book: BookType) => {
+    openBookDialog(book.id.toString());
+  };
 
   return (
     <div className="space-y-3">
@@ -43,7 +53,11 @@ export function LibraryContent() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
           {booksWithDetails.length > 0 ? (
             booksWithDetails.map(book => (
-              <BookCard key={book.id} book={book as BookType} />
+              <BookCard
+                key={book.id}
+                book={book as BookType}
+                onClick={handleBookClick}
+              />
             ))
           ) : (
             <div className="col-span-full py-8 text-center">

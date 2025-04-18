@@ -25,7 +25,10 @@ export function LibrarySidebar() {
 
 function LibrarySidebarContent({ libraryId }: { libraryId: number }) {
   const currentUser = useCurrentUser();
-  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
+  const { open: openBookDialog } = useDialogQuery({
+    type: 'book',
+    idType: 'id',
+  });
 
   // useLibraryDetail 훅으로 상태와 핸들러 함수 가져오기
   const { library } = useLibraryDetail(libraryId);

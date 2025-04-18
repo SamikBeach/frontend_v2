@@ -13,9 +13,15 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const dialog = searchParams.get('dialog');
     const isbn = searchParams.get('isbn');
+    const id = searchParams.get('id');
 
-    if (dialog === 'book' && isbn) {
-      setDialogState({ type: 'book', id: isbn });
+    if (dialog === 'book') {
+      // isbn이 있으면 isbn을 우선적으로 사용하고, 없으면 id 사용
+      if (isbn) {
+        setDialogState({ type: 'book', id: isbn });
+      } else if (id) {
+        setDialogState({ type: 'book', id });
+      }
     } else {
       setDialogState(null);
     }

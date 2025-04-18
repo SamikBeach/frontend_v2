@@ -27,11 +27,18 @@ export const getBookById = async (id: number): Promise<Book> => {
 };
 
 /**
- * ISBN으로 도서 조회
- * isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
+ * ISBN 또는 ID로 도서 조회
+ * 입력값이 숫자만으로 이루어져 있고 길이가 짧다면 ID로 간주하고,
+ * 그 외의 경우에는 ISBN으로 간주함
  */
-export const getBookByIsbn = async (isbn: string): Promise<Book> => {
-  const response = await api.get<Book>(`/book/isbn/${isbn}`);
+export const getBookByIsbn = async (value: string): Promise<Book> => {
+  // 숫자만으로 이루어져 있고 길이가 짧은 경우(10자 미만) ID로 간주
+  if (/^\d+$/.test(value) && value.length < 10) {
+    return getBookById(parseInt(value));
+  }
+
+  // 그 외의 경우 ISBN으로 간주
+  const response = await api.get<Book>(`/book/isbn/${value}`);
   return response.data;
 };
 
