@@ -57,7 +57,7 @@ function LibrarySidebarContent({ libraryId }: { libraryId: number }) {
       case LibraryActivityType.LIBRARY_DELETE:
         return '🗑️';
       case LibraryActivityType.BOOK_ADD:
-        return '📚';
+        return '📘';
       case LibraryActivityType.BOOK_REMOVE:
         return '📕';
       case LibraryActivityType.TAG_ADD:
@@ -140,9 +140,8 @@ function LibrarySidebarContent({ libraryId }: { libraryId: number }) {
         return (
           <>
             {activityIcon}{' '}
-            <span className="font-medium text-gray-800">📚 서재</span>{' '}
-            <span className="font-medium text-gray-800">{library.name}</span>의
-            정보가 수정되었습니다.
+            <span className="font-medium text-gray-800">{library.name}</span>{' '}
+            서재 정보가 수정되었습니다.
           </>
         );
 
