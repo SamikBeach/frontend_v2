@@ -2,8 +2,8 @@ import { Library as ApiLibrary, BookPreview } from '@/apis/library/types';
 import { TimeRange } from '@/components/SortDropdown';
 import { ReactNode } from 'react';
 
-// 서재 카테고리 타입
-export interface Category {
+// 서재 태그 타입
+export interface Tag {
   id: string;
   name: string;
   color: string;
@@ -21,7 +21,7 @@ export interface Library {
   id: number;
   title: string;
   description: string;
-  category: string;
+  tag: string;
   owner: UserProfile;
   books: BookPreview[];
   followers: number;
@@ -38,18 +38,18 @@ export interface SortOption {
   sortFn?: (a: ApiLibrary, b: ApiLibrary) => number;
 }
 
-// 카테고리 버튼 속성
-export interface CategoryButtonProps {
-  category: Category;
+// 태그 버튼 속성
+export interface TagButtonProps {
+  tag: Tag;
   isSelected: boolean;
   onClick: (id: string) => void;
 }
 
 // 필터바 속성
 export interface FilterBarProps {
-  categories: Category[];
-  selectedCategory: string;
-  onCategoryClick: (id: string) => void;
+  tags: Tag[];
+  selectedTag: string;
+  onTagClick: (id: string) => void;
 }
 
 // 정렬 드롭다운 속성
@@ -87,5 +87,5 @@ export interface SearchBarProps {
 // 빈 상태 표시 속성
 export interface EmptyStateProps {
   searchQuery: string;
-  selectedCategory: string;
+  selectedTag: string;
 }

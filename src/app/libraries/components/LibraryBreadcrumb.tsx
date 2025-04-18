@@ -1,8 +1,6 @@
-import { usePopularTags } from '@/app/libraries/hooks/usePopularTags';
-import {
-  libraryCategoryFilterAtom,
-  librarySearchQueryAtom,
-} from '@/atoms/library';
+import { LibraryTagResponseDto } from '@/apis/library/types';
+import { usePopularLibraryTags } from '@/app/libraries/hooks/usePopularTags';
+import { librarySearchQueryAtom, libraryTagFilterAtom } from '@/atoms/library';
 import { useQueryParams } from '@/hooks';
 import { useAtom } from 'jotai';
 import { ChevronRight, Loader2 } from 'lucide-react';
@@ -12,85 +10,82 @@ import { Suspense } from 'react';
 // 실제 브레드크럼 컨텐츠 컴포넌트
 function LibraryBreadcrumbContent() {
   const { clearQueryParams, updateQueryParams } = useQueryParams();
-  const [selectedCategory, setSelectedCategory] = useAtom(
-    libraryCategoryFilterAtom
-  );
+  const [selectedTag, setSelectedTag] = useAtom(libraryTagFilterAtom);
   const [searchQuery, setSearchQuery] = useAtom(librarySearchQueryAtom);
-  const { tags: popularTags } = usePopularTags(10);
+  const { tags: popularTags } = usePopularLibraryTags(10);
 
-  // 카테고리 이름 가져오기
-  const getCategoryName = (categoryId: string) => {
-    if (categoryId === 'all') return '전체';
+  // 태그 이름 가져오기
+  const getTagName = (tagId: string) => {
+    if (tagId === 'all') return '전체';
 
-    const tag = popularTags.find(tag => String(tag.id) === categoryId);
-    return tag ? tag.name : categoryId;
+    const tag = popularTags.find(
+      (tag: LibraryTagResponseDto) => String(tag.id) === tagId
+    );
+    return tag ? tag.tagName : tagId;
   };
 
   const handleClearFilters = () => {
-    setSelectedCategory('all');
+    setSelectedTag('all');
     setSearchQuery('');
     clearQueryParams();
   };
 
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId);
+  const handleTagClick = (tagId: string) => {
+    setSelectedTag(tagId);
     updateQueryParams({
-      category: categoryId,
+      tag: tagId,
     });
   };
 
   return (
-    <div className="flex items-center text-[14px] text-gray-500">
+    <div className="flex items-center gap-1 text-sm text-gray-500">
       <Link
         href="/libraries"
-        onClick={e => {
-          e.preventDefault();
-          handleClearFilters();
-        }}
-        className={
-          selectedCategory === 'all' && !searchQuery
-            ? 'font-medium text-gray-900'
-            : 'hover:text-gray-900'
-        }
+        className="text-gray-600 hover:text-gray-900"
+        onClick={handleClearFilters}
       >
         서재
       </Link>
-      {selectedCategory !== 'all' && (
+
+      {selectedTag !== 'all' && (
         <>
-          <ChevronRight className="mx-1 h-4 w-4" />
-          <span className="font-medium text-gray-900">
-            {getCategoryName(selectedCategory)}
-          </span>
+          <ChevronRight className="h-4 w-4" />
+          <button
+            onClick={() => handleTagClick(selectedTag)}
+            className="text-gray-900"
+          >
+            {getTagName(selectedTag)}
+          </button>
         </>
       )}
+
       {searchQuery && (
         <>
-          <ChevronRight className="mx-1 h-4 w-4" />
-          <span className="font-medium text-gray-900">검색: {searchQuery}</span>
+          <ChevronRight className="h-4 w-4" />
+          <span className="text-gray-900">검색: {searchQuery}</span>
         </>
       )}
     </div>
   );
 }
 
-// 로딩 중 표시 컴포넌트
-function BreadcrumbSkeleton() {
+// 로딩 상태를 보여주는 스켈레톤 컴포넌트
+function LibraryBreadcrumbSkeleton() {
   return (
-    <div className="flex items-center text-[14px] text-gray-500">
-      <span className="font-medium text-gray-900">서재</span>
-      <ChevronRight className="mx-1 h-4 w-4" />
-      <div className="flex items-center">
-        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+    <div className="flex items-center gap-1 text-sm">
+      <span>서재</span>
+      <ChevronRight className="h-4 w-4" />
+      <div className="flex items-center gap-1">
+        <Loader2 className="h-3 w-3 animate-spin" />
         <span>로딩 중...</span>
       </div>
     </div>
   );
 }
 
-// 외부로 노출되는 컴포넌트
 export function LibraryBreadcrumb() {
   return (
-    <Suspense fallback={<BreadcrumbSkeleton />}>
+    <Suspense fallback={<LibraryBreadcrumbSkeleton />}>
       <LibraryBreadcrumbContent />
     </Suspense>
   );

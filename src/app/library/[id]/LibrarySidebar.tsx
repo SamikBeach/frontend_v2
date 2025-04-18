@@ -27,29 +27,44 @@ export function LibrarySidebar() {
   // 구독자 정보 (최대 3명)
   const previewSubscribers = library.subscribers?.slice(0, 3) || [];
 
-  // 업데이트 메시지에서 책 제목을 강조 처리하는 함수
-  const formatUpdateMessage = (message: string) => {
-    // 책 제목 추출 및 강조 처리
-    if (!message) return '';
-
-    // 예: "라이브러리에 새로운 책이 추가되었습니다: 네 인생 우습지 않다 - 인생 일타강사 전한길의 50가지 행복론"
-    // 책 제목은 ":" 이후의 텍스트로 간주
-    if (message.includes('추가되었습니다:')) {
-      const parts = message.split('추가되었습니다:');
-      if (parts.length > 1) {
-        const bookTitle = parts[1].trim();
-        return `📚 <span class="font-medium text-gray-800">${bookTitle}</span>이 서재에 추가되었습니다.`;
+  // Update 메시지를 형식화하는 함수
+  const formatUpdateMessage = (message: string): React.ReactNode => {
+    // 라이브러리 생성 메시지인 경우
+    if (isLibraryCreateUpdate(message)) {
+      // "서재 {서재명}(이)가 생성되었습니다" 또는 "🏛️ {서재명}이 생성되었습니다" 패턴 매칭
+      const match = message.match(
+        /(?:서재 (.+?)(?:\(이\)|\(가\))?가|🏛️ (.+?)이) 생성되었습니다/
+      );
+      if (match && (match[1] || match[2])) {
+        const libraryName = match[1] || match[2];
+        return (
+          <>
+            🏛️ <span className="font-medium text-gray-800">{libraryName}</span>
+            이 생성되었습니다.
+          </>
+        );
       }
+      return message;
     }
 
-    // 서재 생성 메시지 포맷팅
-    if (message.includes('서재 "') && message.includes('"가 생성되었습니다')) {
-      const regex = /서재 "(.+)"가 생성되었습니다/;
-      const match = message.match(regex);
-      if (match && match[1]) {
-        const libraryName = match[1];
-        return `🏛️ <span class="font-medium text-gray-800">${libraryName}</span>이 생성되었습니다.`;
+    // 책 추가 메시지인 경우
+    if (isAddBookUpdate(message)) {
+      // "책 {책제목}(이)가 {서재명}에 추가되었습니다" 패턴 매칭
+      const match = message.match(
+        /책 (.+?)(?:\(이\)|\(가\))?가 (.+?)에 추가되었습니다/
+      );
+      if (match && match[1] && match[2]) {
+        const bookTitle = match[1];
+        const libraryName = match[2];
+        return (
+          <>
+            📚 <span className="font-medium text-gray-800">{bookTitle}</span>이{' '}
+            <span className="font-medium text-gray-800">{libraryName}</span>에
+            추가되었습니다.
+          </>
+        );
       }
+      return message.includes('📚') ? message : `📚 ${message}`;
     }
 
     return message;
@@ -58,26 +73,58 @@ export function LibrarySidebar() {
   // 메시지 내용으로 업데이트 유형 추정
   const isAddBookUpdate = (message: string): boolean => {
     if (!message) return false;
+    // Check for both the book emoji and the Korean text for book addition
     return (
-      (message.includes('추가') ||
-        message.includes('📚') ||
-        message.includes('🏛️')) &&
-      (message.includes('책') || message.includes('도서'))
+      message.includes('📚') ||
+      (message.includes('책') && message.includes('추가'))
     );
   };
 
   // 메시지에 라이브러리 생성 내용이 있는지 확인하는 함수
   const isLibraryCreateUpdate = (message: string): boolean => {
     if (!message) return false;
+    // Use a more reliable check for library creation messages
     return (
       message.includes('🏛️') ||
-      (message.includes('서재') && message.includes('생성'))
+      (message.includes('서재') &&
+        (message.includes('생성') || message.includes('만들')))
     );
   };
 
   // 현재 사용자가 구독자인지 확인하는 함수
   const isCurrentUserSubscriber = (subscriberId: number) => {
     return currentUser?.id === subscriberId;
+  };
+
+  // 가장 최근 업데이트
+  const renderRecentUpdates = () => {
+    if (!library.recentUpdates?.length) {
+      return (
+        <div className="text-gray-500 italic">아직 업데이트가 없습니다.</div>
+      );
+    }
+
+    return library.recentUpdates.slice(0, 3).map((update, index) => {
+      const formattedMessage = formatUpdateMessage(update.message);
+      const isReactNode = typeof formattedMessage !== 'string';
+
+      return (
+        <div key={index} className="mb-2 rounded-md bg-white p-3 last:mb-0">
+          <div className="flex flex-col">
+            <div className="text-gray-700">
+              {isReactNode ? (
+                formattedMessage
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: formattedMessage }} />
+              )}
+            </div>
+            <span className="mt-1 text-xs text-gray-500">
+              {formatRelativeTime(update.date)}
+            </span>
+          </div>
+        </div>
+      );
+    });
   };
 
   return (
@@ -204,26 +251,7 @@ export function LibrarySidebar() {
             <Clock className="mr-2 h-4 w-4 text-gray-500" />
             <h3 className="font-medium text-gray-900">최근 활동</h3>
           </div>
-          <div className="space-y-3">
-            {library.recentUpdates.map((update, index) => (
-              <div
-                key={index}
-                className="relative rounded-lg bg-white p-3 text-sm"
-              >
-                <div className="flex flex-col">
-                  <p
-                    className="text-gray-700"
-                    dangerouslySetInnerHTML={{
-                      __html: formatUpdateMessage(update.message),
-                    }}
-                  />
-                  <span className="mt-1 text-xs text-gray-500">
-                    {formatRelativeTime(update.date)}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+          <div className="space-y-3">{renderRecentUpdates()}</div>
 
           <div className="mt-4 flex items-center justify-center rounded-lg bg-gray-100 p-2.5 text-xs text-gray-600">
             구독하면 이 서재의 모든 활동 소식을 볼 수 있습니다

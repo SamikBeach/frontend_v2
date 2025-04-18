@@ -1,11 +1,7 @@
 import { cn } from '@/lib/utils';
-import { CategoryButtonProps } from '../types';
+import { TagButtonProps } from '../types';
 
-export function CategoryButton({
-  category,
-  isSelected,
-  onClick,
-}: CategoryButtonProps) {
+export function TagButton({ tag, isSelected, onClick }: TagButtonProps) {
   return (
     <button
       className={cn(
@@ -15,11 +11,11 @@ export function CategoryButton({
           : 'bg-[#F9FAFB] text-gray-700 hover:bg-gray-100'
       )}
       style={{
-        backgroundColor: isSelected ? undefined : category.color,
+        backgroundColor: isSelected ? undefined : tag.color,
       }}
-      onClick={() => onClick(category.id)}
+      onClick={() => onClick(tag.id)}
     >
-      {category.name}
+      {tag.name}
     </button>
   );
 }

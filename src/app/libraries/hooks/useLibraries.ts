@@ -2,9 +2,9 @@ import { TimeRange } from '@/apis/book/types';
 import { getAllLibraries } from '@/apis/library';
 import { Library, LibrarySortOption } from '@/apis/library/types';
 import {
-  libraryCategoryFilterAtom,
   librarySearchQueryAtom,
   librarySortOptionAtom,
+  libraryTagFilterAtom,
   libraryTimeRangeAtom,
 } from '@/atoms/library';
 import { useQueryParams } from '@/hooks';
@@ -19,7 +19,7 @@ interface UseLibrariesResult {
   isFetchingNextPage: boolean;
   hasNextPage: boolean | undefined;
   fetchNextPage: () => void;
-  categoryFilter: string;
+  tagFilter: string;
   sortOption: string;
   timeRange: TimeRange;
   searchQuery: string;
@@ -30,7 +30,7 @@ interface UseLibrariesResult {
 
 export function useLibraries(): UseLibrariesResult {
   const user = useCurrentUser();
-  const [categoryFilter] = useAtom(libraryCategoryFilterAtom);
+  const [tagFilter] = useAtom(libraryTagFilterAtom);
   const [sortOption, setSortOption] = useAtom(librarySortOptionAtom);
   const [timeRange, setTimeRange] = useAtom(libraryTimeRangeAtom);
   const [searchQuery, setSearchQuery] = useAtom(librarySearchQueryAtom);
@@ -39,12 +39,12 @@ export function useLibraries(): UseLibrariesResult {
   // URL 쿼리 파라미터 업데이트 - useCallback으로 메모이제이션
   const updateUrlParams = useCallback(() => {
     updateQueryParams({
-      category: categoryFilter,
+      tag: tagFilter,
       sort: sortOption,
       timeRange,
       q: searchQuery || undefined,
     });
-  }, [categoryFilter, sortOption, timeRange, searchQuery, updateQueryParams]);
+  }, [tagFilter, sortOption, timeRange, searchQuery, updateQueryParams]);
 
   // 컴포넌트 마운트 시에만 URL 파라미터 업데이트
   useEffect(() => {
@@ -66,8 +66,7 @@ export function useLibraries(): UseLibrariesResult {
   };
 
   // 태그 ID 얻기 (전체가 아닌 경우에만)
-  const tagId =
-    categoryFilter !== 'all' ? parseInt(categoryFilter, 10) : undefined;
+  const tagId = tagFilter !== 'all' ? parseInt(tagFilter, 10) : undefined;
 
   // 데이터 가져오기 - 무한 스크롤 지원
   const { data, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
@@ -128,7 +127,7 @@ export function useLibraries(): UseLibrariesResult {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-    categoryFilter,
+    tagFilter,
     sortOption,
     timeRange,
     searchQuery,

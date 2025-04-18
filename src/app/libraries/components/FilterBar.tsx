@@ -1,13 +1,13 @@
 'use client';
 
 import { LibraryTagResponseDto } from '@/apis/library/types';
-import { libraryCategoryFilterAtom } from '@/atoms/library';
+import { libraryTagFilterAtom } from '@/atoms/library';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
 import { useAllLibraryTags } from '../hooks/useAllLibraryTags';
 
-export interface Category {
+export interface Tag {
   id: string;
   name: string;
   color: string;
@@ -45,23 +45,23 @@ function FilterBarSkeleton() {
 
 // 실제 필터바 내용 컴포넌트
 function FilterBarContent({
-  categoryFilter,
-  setCategoryFilter,
+  tagFilter,
+  setTagFilter,
 }: {
-  categoryFilter: string;
-  setCategoryFilter: (id: string) => void;
+  tagFilter: string;
+  setTagFilter: (id: string) => void;
 }) {
   const { tags: allTags } = useAllLibraryTags(20);
 
-  // 카테고리 생성
-  const categories: Category[] = [
-    // "전체" 카테고리
+  // 태그 생성
+  const tags: Tag[] = [
+    // "전체" 태그
     {
       id: 'all',
       name: '전체',
       color: '#E2E8F0',
     },
-    // 모든 태그 기반 카테고리
+    // 모든 태그 기반
     ...(allTags || []).map((tag: LibraryTagResponseDto, index: number) => ({
       id: String(tag.id),
       name: tag.tagName,
@@ -69,28 +69,27 @@ function FilterBarContent({
     })),
   ];
 
-  const handleCategoryClick = (categoryId: string) => {
-    setCategoryFilter(categoryId);
+  const handleTagClick = (tagId: string) => {
+    setTagFilter(tagId);
   };
 
   return (
     <div className="no-scrollbar flex gap-2 overflow-x-auto py-1">
       <div className="flex gap-2 px-0.5">
-        {categories.map((category: Category) => (
+        {tags.map((tag: Tag) => (
           <button
-            key={category.id}
-            onClick={() => handleCategoryClick(category.id)}
+            key={tag.id}
+            onClick={() => handleTagClick(tag.id)}
             className={`flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-full px-4 text-sm font-medium transition-all ${
-              categoryFilter === category.id
+              tagFilter === tag.id
                 ? 'bg-gray-900 text-white'
                 : 'hover:bg-gray-50'
             }`}
             style={{
-              backgroundColor:
-                categoryFilter === category.id ? undefined : category.color,
+              backgroundColor: tagFilter === tag.id ? undefined : tag.color,
             }}
           >
-            {category.name}
+            {tag.name}
           </button>
         ))}
       </div>
@@ -99,16 +98,11 @@ function FilterBarContent({
 }
 
 export function FilterBar() {
-  const [categoryFilter, setCategoryFilter] = useAtom(
-    libraryCategoryFilterAtom
-  );
+  const [tagFilter, setTagFilter] = useAtom(libraryTagFilterAtom);
 
   return (
     <Suspense fallback={<FilterBarSkeleton />}>
-      <FilterBarContent
-        categoryFilter={categoryFilter}
-        setCategoryFilter={setCategoryFilter}
-      />
+      <FilterBarContent tagFilter={tagFilter} setTagFilter={setTagFilter} />
     </Suspense>
   );
 }

@@ -34,7 +34,7 @@ export function Libraries() {
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-    categoryFilter,
+    tagFilter,
     sortOption,
     timeRange,
     searchQuery,
@@ -88,14 +88,14 @@ export function Libraries() {
       </div>
 
       {/* 메인 콘텐츠 */}
-      <div className="px-4">
+      <div className="p-4">
         {/* 서재 목록 */}
         {isLoading ? (
           <LibraryListSkeleton />
         ) : (
           <LibraryList
             libraries={libraries}
-            categoryFilter={categoryFilter}
+            tagFilter={tagFilter}
             searchQuery={searchQuery}
             hasNextPage={hasNextPage}
             isFetchingNextPage={isFetchingNextPage}

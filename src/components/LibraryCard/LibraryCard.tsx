@@ -8,8 +8,9 @@ import {
 } from '@/components/ui/card';
 import { BookOpen, Users } from 'lucide-react';
 import Link from 'next/link';
+import { useMemo } from 'react';
 
-export interface Category {
+export interface Tag {
   id: string;
   name: string;
   color: string;
@@ -17,14 +18,15 @@ export interface Category {
 
 export interface LibraryCardProps {
   library: ApiLibrary;
-  categories?: Category[];
+  tags?: Tag[];
 }
 
-export function LibraryCard({ library, categories = [] }: LibraryCardProps) {
-  // 카테고리 찾기 (카테고리 ID가 있는 경우)
-  const category = library.category
-    ? categories.find(cat => cat.id === library.category)
-    : null;
+export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
+  // 서재의 태그 ID를 찾아 매핑
+  const tag = useMemo(() => {
+    if (!library.tagId || !tags.length) return null;
+    return tags.find(t => t.id === String(library.tagId));
+  }, [library.tagId, tags]);
 
   // 책 데이터 - previewBooks가 있으면 사용, 없으면 books에서 가져옴
   const displayBooks =
@@ -66,19 +68,22 @@ export function LibraryCard({ library, categories = [] }: LibraryCardProps) {
                 {ownerName[0]}
               </AvatarFallback>
             </Avatar>
-            <div>
-              <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-base font-medium text-gray-900 transition-colors duration-150 group-hover:text-[#3182F6]">
                   {library.name}
                 </h3>
-                {category && (
+                {tag && (
                   <span
-                    className="ml-1 rounded-full px-2 py-0.5 text-xs font-medium text-gray-700"
+                    className="rounded-full px-2.5 py-0.5 text-xs font-medium"
                     style={{
-                      backgroundColor: category.color,
+                      backgroundColor: `${tag.color}20`, // 투명도 추가
+                      color: tag.color,
+                      borderColor: `${tag.color}40`,
+                      borderWidth: '1px',
                     }}
                   >
-                    {category.name}
+                    {tag.name}
                   </span>
                 )}
               </div>

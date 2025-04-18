@@ -96,7 +96,7 @@ export interface Library {
   updatedAt?: Date;
   bookCount?: number;
   previewBooks?: BookPreview[];
-  category?: string; // 카테고리 ID
+  tagId?: string; // 태그 ID (이전 category 필드)
 }
 
 // 페이지네이션 메타데이터
