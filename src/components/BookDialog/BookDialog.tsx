@@ -77,7 +77,7 @@ export function BookDialog() {
   const { searchParams } = useQueryParams();
   // URL에 id 파라미터가 있으면 'id' 타입으로, 없으면 'isbn' 타입으로 설정
   const idType = searchParams.has('id') ? 'id' : 'isbn';
-  const { isOpen, close, id } = useDialogQuery({ type: 'book', idType });
+  const { isOpen, close } = useDialogQuery({ type: 'book', idType });
 
   return (
     <Dialog

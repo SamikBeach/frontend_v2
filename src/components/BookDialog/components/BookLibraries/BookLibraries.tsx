@@ -1,5 +1,5 @@
 import { CreateLibraryDto } from '@/apis/library/types';
-import { CreateLibraryDialog } from '@/components/Library';
+import { LibraryDialog } from '@/components/Library';
 import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
@@ -37,9 +37,10 @@ export function BookLibraries() {
 
       {/* 서재 생성 다이얼로그 */}
       {isLoggedIn && (
-        <CreateLibraryDialog
+        <LibraryDialog
           open={isNewLibraryDialogOpen}
           onOpenChange={setIsNewLibraryDialogOpen}
+          mode="create"
           onCreateLibrary={handleCreateLibraryWithBook}
         />
       )}

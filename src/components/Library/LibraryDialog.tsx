@@ -1,4 +1,10 @@
-import { CreateLibraryDto } from '@/apis/library/types';
+'use client';
+
+import {
+  CreateLibraryDto,
+  Library,
+  UpdateLibraryDto,
+} from '@/apis/library/types';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,91 +18,132 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { BookOpen, X } from 'lucide-react';
+import { BookOpen, Edit, X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-interface CreateLibraryDialogProps {
+interface LibraryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreateLibrary: (library: CreateLibraryDto) => Promise<void>;
-  bookId?: number;
+  mode: 'create' | 'edit';
   className?: string;
+  // 생성 모드일 때 필요한 props
+  onCreateLibrary?: (library: CreateLibraryDto) => Promise<void>;
+  // 편집 모드일 때 필요한 props
+  library?: Library;
+  onUpdateLibrary?: (id: number, data: UpdateLibraryDto) => Promise<void>;
 }
 
-export function CreateLibraryDialog({
+export function LibraryDialog({
   open,
   onOpenChange,
-  onCreateLibrary,
+  mode,
   className,
-}: CreateLibraryDialogProps) {
+  onCreateLibrary,
+  library,
+  onUpdateLibrary,
+}: LibraryDialogProps) {
   const currentUser = useCurrentUser();
-  const [newLibraryName, setNewLibraryName] = useState('');
-  const [newLibraryDesc, setNewLibraryDesc] = useState('');
-  const [isPublic, setIsPublic] = useState(true);
-  const [isCreating, setIsCreating] = useState(false);
+  const [name, setName] = useState(
+    mode === 'edit' && library ? library.name : ''
+  );
+  const [description, setDescription] = useState(
+    mode === 'edit' && library ? library.description || '' : ''
+  );
+  const [isPublic, setIsPublic] = useState(
+    mode === 'edit' && library ? library.isPublic : true
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
-  // 새 서재 생성 핸들러
-  const handleCreateNewLibrary = async () => {
-    if (!currentUser) {
+  // 서재 생성/수정 핸들러
+  const handleSubmit = async () => {
+    if (mode === 'create' && !currentUser) {
       setAuthDialogOpen(true);
       return;
     }
 
-    if (!newLibraryName.trim()) {
+    if (!name.trim()) {
       toast.error('서재 이름을 입력해주세요.');
       return;
     }
 
-    setIsCreating(true);
+    setIsSubmitting(true);
 
     try {
-      const libraryData: CreateLibraryDto = {
-        name: newLibraryName.trim(),
-        description: newLibraryDesc.trim() || undefined,
-        isPublic,
-      };
+      if (mode === 'create' && onCreateLibrary) {
+        const libraryData: CreateLibraryDto = {
+          name: name.trim(),
+          description: description.trim() || undefined,
+          isPublic,
+        };
 
-      await onCreateLibrary(libraryData);
+        await onCreateLibrary(libraryData);
+        toast.success('새 서재가 생성되었습니다.');
+      } else if (mode === 'edit' && library && onUpdateLibrary) {
+        const updateData: UpdateLibraryDto = {
+          name: name.trim(),
+          description: description.trim() || undefined,
+          isPublic,
+        };
+
+        await onUpdateLibrary(library.id, updateData);
+        toast.success('서재 정보가 수정되었습니다.');
+      }
 
       // 다이얼로그 닫기 및 상태 초기화
       resetForm();
     } catch (error) {
-      console.error('서재 생성 오류:', error);
-      toast.error('서재 생성 중 오류가 발생했습니다');
+      console.error(`서재 ${mode === 'create' ? '생성' : '수정'} 오류:`, error);
+      toast.error(
+        `서재 ${mode === 'create' ? '생성' : '수정'} 중 오류가 발생했습니다`
+      );
     } finally {
-      setIsCreating(false);
+      setIsSubmitting(false);
     }
   };
 
   const resetForm = () => {
     onOpenChange(false);
-    setNewLibraryName('');
-    setNewLibraryDesc('');
-    setIsPublic(true);
+    if (mode === 'create') {
+      setName('');
+      setDescription('');
+      setIsPublic(true);
+    }
   };
 
   return (
     <>
-      <Dialog open={open} onOpenChange={isCreating ? undefined : onOpenChange}>
+      <Dialog
+        open={open}
+        onOpenChange={isSubmitting ? undefined : onOpenChange}
+      >
         <DialogContent className="fixed top-1/2 left-1/2 max-w-md -translate-x-1/2 -translate-y-1/2 transform rounded-2xl border-none p-0 shadow-lg">
           <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
             <DialogTitle className="text-base font-medium">
-              새 서재 만들기
+              {mode === 'create' ? '새 서재 만들기' : '서재 정보 수정'}
             </DialogTitle>
             <Button
               variant="ghost"
               size="icon"
               className="rounded-full"
               onClick={() => onOpenChange(false)}
-              disabled={isCreating}
+              disabled={isSubmitting}
             >
               <X className="h-4 w-4" />
             </Button>
           </div>
 
           <div className="px-5 py-4">
+            {mode === 'edit' && library && (
+              <div className="mb-6 text-sm text-gray-600">
+                <span className="font-medium text-gray-800">
+                  {library.name}
+                </span>
+                의 정보를 수정해보세요
+              </div>
+            )}
+
             <div className="space-y-6">
               <div className="space-y-3">
                 <Label
@@ -108,8 +155,8 @@ export function CreateLibraryDialog({
                 <Input
                   id="libraryName"
                   placeholder="서재 이름을 입력하세요"
-                  value={newLibraryName}
-                  onChange={e => setNewLibraryName(e.target.value)}
+                  value={name}
+                  onChange={e => setName(e.target.value)}
                   className="rounded-xl border-gray-200 focus:border-blue-200 focus:ring-2 focus:ring-blue-100"
                 />
               </div>
@@ -125,8 +172,8 @@ export function CreateLibraryDialog({
                   id="libraryDesc"
                   placeholder="서재에 대한 간단한 설명을 입력하세요"
                   className="min-h-[120px] resize-none rounded-xl border-gray-200 bg-gray-50 p-4 text-sm placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100"
-                  value={newLibraryDesc}
-                  onChange={e => setNewLibraryDesc(e.target.value)}
+                  value={description}
+                  onChange={e => setDescription(e.target.value)}
                 />
               </div>
 
@@ -158,18 +205,26 @@ export function CreateLibraryDialog({
               variant="outline"
               className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
               onClick={() => onOpenChange(false)}
-              disabled={isCreating}
+              disabled={isSubmitting}
             >
               취소
             </Button>
             <Button
               type="button"
               className="rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-200"
-              onClick={handleCreateNewLibrary}
-              disabled={!newLibraryName.trim() || isCreating}
+              onClick={handleSubmit}
+              disabled={!name.trim() || isSubmitting}
             >
-              <BookOpen className="mr-1.5 h-4 w-4" />
-              {isCreating ? '생성 중...' : '서재 만들기'}
+              {mode === 'create' ? (
+                <BookOpen className="mr-1.5 h-4 w-4" />
+              ) : (
+                <Edit className="mr-1.5 h-4 w-4" />
+              )}
+              {isSubmitting
+                ? `${mode === 'create' ? '생성' : '저장'} 중...`
+                : mode === 'create'
+                  ? '서재 만들기'
+                  : '저장하기'}
             </Button>
           </DialogFooter>
         </DialogContent>

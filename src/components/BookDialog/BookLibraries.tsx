@@ -6,7 +6,7 @@ import {
   LibraryTag,
 } from '@/apis/library/types';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
-import { CreateLibraryDialog } from '@/components/Library';
+import { LibraryDialog } from '@/components/Library';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -192,7 +192,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
                     key={index}
                     className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-normal text-gray-700 group-hover:bg-gray-200"
                   >
-                    {tag.name}
+                    {tag.tagName}
                   </Badge>
                 ))}
             </div>
@@ -232,10 +232,11 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
         </div>
       )}
 
-      {/* 새 서재 생성 다이얼로그 - 공통 컴포넌트 사용 */}
-      <CreateLibraryDialog
+      {/* 새 서재 생성 다이얼로그 */}
+      <LibraryDialog
         open={isNewLibraryDialogOpen}
         onOpenChange={setIsNewLibraryDialogOpen}
+        mode="create"
         onCreateLibrary={handleCreateLibraryWithBook}
       />
 
@@ -246,7 +247,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
         libraryName={conflictLibraryName}
       />
 
-      {/* 로그인 다이얼로그 */}
+      {/* 인증 다이얼로그 */}
       <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
