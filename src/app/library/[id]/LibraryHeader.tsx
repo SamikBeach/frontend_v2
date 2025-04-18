@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { useQueryClient } from '@tanstack/react-query';
 import { Bell, Edit, Eye, EyeOff, MoreHorizontal, Trash } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -40,6 +41,7 @@ export function LibraryHeader() {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
   const currentUser = useCurrentUser();
+  const queryClient = useQueryClient();
 
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showAddBookDialog, setShowAddBookDialog] = useState(false);
@@ -70,12 +72,16 @@ export function LibraryHeader() {
     if (!library) return;
     try {
       await updateLibrary(id, updateData);
+      // 서재 정보 갱신
+      queryClient.invalidateQueries({ queryKey: ['library', id] });
       toast.success('서재 정보가 수정되었습니다.');
     } catch (error) {
       console.error('서재 정보 수정 중 오류:', error);
       throw error;
     }
   };
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
     <>
@@ -144,7 +150,10 @@ export function LibraryHeader() {
           {library &&
             (isOwner ? (
               // 소유자인 경우 관리 버튼 표시
-              <DropdownMenu>
+              <DropdownMenu
+                open={isDropdownOpen}
+                onOpenChange={setIsDropdownOpen}
+              >
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
@@ -156,14 +165,14 @@ export function LibraryHeader() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
-                    onClick={() => setShowEditDialog(true)}
+                    onSelect={() => setShowEditDialog(true)}
                     className="cursor-pointer"
                   >
                     <Edit className="mr-2 h-4 w-4" />
                     서재 정보 수정
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={handleVisibilityToggle}
+                    onSelect={handleVisibilityToggle}
                     className="cursor-pointer"
                   >
                     {library.isPublic ? (
@@ -179,7 +188,10 @@ export function LibraryHeader() {
                     )}
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    onClick={() => setShowDeleteDialog(true)}
+                    onSelect={() => {
+                      setShowDeleteDialog(true);
+                      setIsDropdownOpen(false);
+                    }}
                     className="cursor-pointer text-red-600 hover:bg-red-50"
                   >
                     <Trash className="mr-2 h-4 w-4 text-red-600 group-hover:text-red-600" />
@@ -228,7 +240,7 @@ export function LibraryHeader() {
       {showAddBookDialog && (
         <AddBookDialog
           isOpen={showAddBookDialog}
-          onClose={() => setShowAddBookDialog(false)}
+          onOpenChange={setShowAddBookDialog}
           libraryId={libraryId}
         />
       )}
@@ -236,7 +248,7 @@ export function LibraryHeader() {
       {showDeleteDialog && library && (
         <DeleteLibraryDialog
           isOpen={showDeleteDialog}
-          onClose={() => setShowDeleteDialog(false)}
+          onOpenChange={setShowDeleteDialog}
           library={library}
         />
       )}

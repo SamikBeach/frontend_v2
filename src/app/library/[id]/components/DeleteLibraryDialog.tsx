@@ -18,13 +18,13 @@ import { toast } from 'sonner';
 
 interface DeleteLibraryDialogProps {
   isOpen: boolean;
-  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
   library: Library;
 }
 
 export function DeleteLibraryDialog({
   isOpen,
-  onClose,
+  onOpenChange,
   library,
 }: DeleteLibraryDialogProps) {
   const router = useRouter();
@@ -46,12 +46,13 @@ export function DeleteLibraryDialog({
       }
 
       toast.error(errorMessage);
-      onClose();
+      onOpenChange(false);
     },
   });
 
   const handleDelete = async () => {
     setIsDeleting(true);
+    onOpenChange(false);
     try {
       await mutateAsync(library.id);
     } catch (error) {
@@ -62,7 +63,7 @@ export function DeleteLibraryDialog({
   };
 
   return (
-    <AlertDialog open={isOpen} onOpenChange={onClose}>
+    <AlertDialog open={isOpen} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>서재를 삭제하시겠습니까?</AlertDialogTitle>
@@ -73,7 +74,11 @@ export function DeleteLibraryDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="cursor-pointer bg-red-500 hover:bg-red-600"
+          >
             {isDeleting ? '삭제 중...' : '삭제하기'}
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -81,4 +86,3 @@ export function DeleteLibraryDialog({
     </AlertDialog>
   );
 }
- 

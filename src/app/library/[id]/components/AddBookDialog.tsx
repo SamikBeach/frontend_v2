@@ -23,13 +23,13 @@ import { toast } from 'sonner';
 
 interface AddBookDialogProps {
   isOpen: boolean;
-  onClose: () => void;
+  onOpenChange: (open: boolean) => void;
   libraryId: number;
 }
 
 export function AddBookDialog({
   isOpen,
-  onClose,
+  onOpenChange,
   libraryId,
 }: AddBookDialogProps) {
   const [query, setQuery] = useState('');
@@ -79,7 +79,7 @@ export function AddBookDialog({
     onSuccess: () => {
       toast.success('책이 서재에 추가되었습니다.');
       queryClient.invalidateQueries({ queryKey: ['library', libraryId] });
-      onClose();
+      onOpenChange(false);
     },
     onError: (error: any) => {
       let errorMessage = '책 추가 중 오류가 발생했습니다.';
@@ -129,7 +129,7 @@ export function AddBookDialog({
   // 다이얼로그 닫기 핸들러
   const handleCloseDialog = () => {
     if (!isAdding) {
-      onClose();
+      onOpenChange(false);
     }
   };
 
