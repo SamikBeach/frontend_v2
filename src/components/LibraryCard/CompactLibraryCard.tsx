@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Tag } from '@/utils/tags';
 import { BookOpen, Users } from 'lucide-react';
 import Link from 'next/link';
 
@@ -9,7 +10,7 @@ export interface CompactLibraryProps {
   name: string;
   description?: string;
   thumbnail?: string;
-  tags?: string[];
+  tags?: Tag[];
   owner: {
     id: number;
     username: string;
@@ -56,37 +57,43 @@ export function CompactLibraryCard({
             </div>
           )}
           <div className="flex-1">
-            <h3 className="text-base font-medium text-gray-900 transition-colors duration-150 hover:text-blue-600">
-              {library.name}
-            </h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-base font-medium text-gray-900 transition-colors duration-150 hover:text-blue-600">
+                {library.name}
+              </h3>
 
-            {/* 태그를 제목 아래로 이동, 모든 태그 표시 */}
-            {library.tags && library.tags.length > 0 && (
-              <div className="mt-1 flex flex-wrap gap-1">
-                {library.tags.map((tag, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="rounded-full bg-gray-50 px-2 py-0.5 text-xs font-normal text-gray-700"
-                  >
-                    {tag}
-                  </Badge>
-                ))}
+              {/* 모든 태그를 서재 제목 옆에 표시 */}
+              {library.tags && library.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {library.tags.map(tag => (
+                    <span
+                      key={tag.id}
+                      className="rounded-full px-2 py-0.5 text-xs font-medium text-gray-700"
+                      style={{
+                        backgroundColor: tag.color,
+                      }}
+                    >
+                      {tag.name}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-1.5">
+              <div className="flex items-center gap-1.5">
+                <Avatar className="h-5 w-5 border border-gray-50">
+                  <AvatarImage
+                    src={library.owner.avatar}
+                    alt={library.owner.name}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-gray-50 text-[10px] text-gray-700">
+                    {library.owner.name[0]}
+                  </AvatarFallback>
+                </Avatar>
+                <p className="text-sm text-gray-500">{library.owner.name}</p>
               </div>
-            )}
-
-            <div className="mt-1.5 flex items-center gap-2">
-              <Avatar className="h-5 w-5 border border-gray-50">
-                <AvatarImage
-                  src={library.owner.avatar}
-                  alt={library.owner.name}
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-gray-50 text-[10px] text-gray-700">
-                  {library.owner.name[0]}
-                </AvatarFallback>
-              </Avatar>
-              <p className="text-sm text-gray-500">{library.owner.name}</p>
             </div>
           </div>
         </div>

@@ -3,32 +3,10 @@
 import { LibraryTagResponseDto } from '@/apis/library/types';
 import { libraryTagFilterAtom } from '@/atoms/library';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tag, createDefaultTag, getTagColor } from '@/utils/tags';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
 import { useAllLibraryTags } from '../hooks/useAllLibraryTags';
-
-export interface Tag {
-  id: string;
-  name: string;
-  color: string;
-}
-
-// 태그 색상 배열 - 파스텔톤
-const TAG_COLORS = [
-  '#FFF8E2', // 파스텔 옐로우
-  '#F2E2FF', // 파스텔 퍼플
-  '#FFE2EC', // 파스텔 코럴
-  '#E2FFFC', // 파스텔 민트
-  '#E2F0FF', // 파스텔 블루
-  '#FFECDA', // 파스텔 오렌지
-  '#ECFFE2', // 파스텔 그린
-  '#FFE2F7', // 파스텔 핑크
-];
-
-// 태그 인덱스에 따른 색상 반환
-function getTagColor(index: number): string {
-  return TAG_COLORS[index % TAG_COLORS.length];
-}
 
 // 스켈레톤 로더 컴포넌트
 function FilterBarSkeleton() {
@@ -56,11 +34,7 @@ function FilterBarContent({
   // 태그 생성
   const tags: Tag[] = [
     // "전체" 태그
-    {
-      id: 'all',
-      name: '전체',
-      color: '#E2E8F0',
-    },
+    createDefaultTag(),
     // 모든 태그 기반
     ...(allTags || []).map((tag: LibraryTagResponseDto, index: number) => ({
       id: String(tag.id),

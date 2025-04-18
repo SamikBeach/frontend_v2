@@ -1,41 +1,21 @@
 import { Library } from '@/apis/library/types';
 import { LibraryCard, LibraryCardSkeleton } from '@/components/LibraryCard';
 import { Button } from '@/components/ui/button';
+import { createDefaultTag, getTagColor, Tag } from '@/utils/tags';
 import { ArrowDown, CheckCircle2, Loader2 } from 'lucide-react';
 import { Suspense } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useAllLibraryTags } from '../hooks/useAllLibraryTags';
 import { EmptyState } from './EmptyState';
 
-// 태그 색상 배열 - 파스텔톤
-const TAG_COLORS = [
-  '#FFF8E2', // 파스텔 옐로우
-  '#F2E2FF', // 파스텔 퍼플
-  '#FFE2EC', // 파스텔 코럴
-  '#E2FFFC', // 파스텔 민트
-  '#E2F0FF', // 파스텔 블루
-  '#FFECDA', // 파스텔 오렌지
-  '#ECFFE2', // 파스텔 그린
-  '#FFE2F7', // 파스텔 핑크
-];
-
-// 태그 인덱스에 따른 색상 반환
-function getTagColor(index: number): string {
-  return TAG_COLORS[index % TAG_COLORS.length];
-}
-
 // 라이브러리 카드에 전달할 태그 정보를 생성하는 컴포넌트
 function LibraryListWithTags({ libraries, ...props }: LibraryListProps) {
   const { tags: allTags } = useAllLibraryTags(50);
 
   // 태그 목록 생성
-  const tags = [
+  const tags: Tag[] = [
     // "전체" 태그
-    {
-      id: 'all',
-      name: '전체',
-      color: '#E2E8F0',
-    },
+    createDefaultTag(),
     // 모든 라이브러리 태그 기반으로 변환
     ...(allTags || []).map((tag, index) => ({
       id: String(tag.tagId || tag.id),
