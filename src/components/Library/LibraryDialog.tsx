@@ -23,7 +23,7 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { getTagColor } from '@/utils/tags';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { BookOpen, Edit, X } from 'lucide-react';
-import { createContext, Suspense, useContext, useState } from 'react';
+import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
 
@@ -38,15 +38,6 @@ interface LibraryDialogProps {
   library?: Library;
   onUpdateLibrary?: (id: number, data: UpdateLibraryDto) => Promise<void>;
 }
-
-// 태그 관련 컨텍스트 생성
-interface TagContextType {
-  selectedTags: string[];
-  handleTagSelect: (tag: string) => void;
-  handleTagRemove: (tag: string) => void;
-}
-
-const TagContext = createContext<TagContextType | undefined>(undefined);
 
 export function LibraryDialog({
   open,
@@ -70,32 +61,38 @@ export function LibraryDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
-  // 태그 상태 추가
-  const [selectedTags, setSelectedTags] = useState<string[]>(
-    mode === 'edit' && library?.tags
-      ? library.tags.map(tag => (tag.tagName || '').toString())
-      : []
+  // 태그 상태 추가 (tagId 기반으로 변경)
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
+    mode === 'edit' && library?.tags ? library.tags.map(tag => tag.tagId) : []
+  );
+
+  // 태그 이름을 저장하기 위한 맵 (UI 표시용)
+  const [selectedTagNames, setSelectedTagNames] = useState<Map<number, string>>(
+    new Map(
+      mode === 'edit' && library?.tags
+        ? library.tags.map(tag => [tag.tagId, tag.tagName])
+        : []
+    )
   );
 
   // 태그 추가 핸들러
-  const handleTagSelect = (tag: string) => {
-    if (selectedTags.length >= 5) {
+  const handleTagSelect = (tagId: number, tagName: string) => {
+    if (selectedTagIds.length >= 5) {
       toast.warning('태그는 최대 5개까지 선택할 수 있습니다.');
       return;
     }
-    setSelectedTags(prev => [...prev, tag]);
+    setSelectedTagIds(prev => [...prev, tagId]);
+    setSelectedTagNames(prev => new Map(prev).set(tagId, tagName));
   };
 
   // 태그 제거 핸들러
-  const handleTagRemove = (tag: string) => {
-    setSelectedTags(prev => prev.filter(t => t !== tag));
-  };
-
-  // 컨텍스트 값 설정
-  const tagContextValue = {
-    selectedTags,
-    handleTagSelect,
-    handleTagRemove,
+  const handleTagRemove = (tagId: number) => {
+    setSelectedTagIds(prev => prev.filter(id => id !== tagId));
+    setSelectedTagNames(prev => {
+      const newMap = new Map(prev);
+      newMap.delete(tagId);
+      return newMap;
+    });
   };
 
   // 서재 생성/수정 핸들러
@@ -118,7 +115,7 @@ export function LibraryDialog({
           name: name.trim(),
           description: description.trim() || undefined,
           isPublic,
-          tags: selectedTags.length > 0 ? selectedTags : undefined,
+          tagIds: selectedTagIds.length > 0 ? selectedTagIds : undefined,
         };
 
         await onCreateLibrary(libraryData);
@@ -128,7 +125,7 @@ export function LibraryDialog({
           name: name.trim(),
           description: description.trim() || undefined,
           isPublic,
-          tags: selectedTags,
+          tagIds: selectedTagIds,
         };
 
         await onUpdateLibrary(library.id, updateData);
@@ -153,7 +150,17 @@ export function LibraryDialog({
       setName('');
       setDescription('');
       setIsPublic(true);
-      setSelectedTags([]);
+      setSelectedTagIds([]);
+      setSelectedTagNames(new Map());
+    }
+  };
+
+  // 태그 토글 핸들러
+  const toggleTag = (tagId: number, tagName: string) => {
+    if (selectedTagIds.includes(tagId)) {
+      handleTagRemove(tagId);
+    } else {
+      handleTagSelect(tagId, tagName);
     }
   };
 
@@ -238,9 +245,24 @@ export function LibraryDialog({
                       </div>
                     }
                   >
-                    <TagContext.Provider value={tagContextValue}>
-                      <TagList />
-                    </TagContext.Provider>
+                    <div className="space-y-4">
+                      {/* 선택된 태그 표시 영역 (보이지 않음) */}
+                      <div className="hidden">
+                        {selectedTagIds.length > 0
+                          ? selectedTagIds.map(tagId => (
+                              <span key={tagId}>{tagId}</span>
+                            ))
+                          : null}
+                      </div>
+
+                      {/* 태그 목록 */}
+                      <div className="mt-2">
+                        <TagList
+                          selectedTagIds={selectedTagIds}
+                          toggleTag={toggleTag}
+                        />
+                      </div>
+                    </div>
                   </Suspense>
                 </ErrorBoundary>
               </div>
@@ -307,16 +329,12 @@ export function LibraryDialog({
   );
 }
 
-const TagList = () => {
-  // TagContext 사용
-  const { selectedTags, handleTagSelect, handleTagRemove } = useContext(
-    TagContext
-  ) || {
-    selectedTags: [],
-    handleTagSelect: () => {},
-    handleTagRemove: () => {},
-  };
+interface TagListProps {
+  selectedTagIds: number[];
+  toggleTag: (tagId: number, tagName: string) => void;
+}
 
+const TagList = ({ selectedTagIds, toggleTag }: TagListProps) => {
   // 인기 태그 불러오기
   const { data: popularTags } = useSuspenseQuery({
     queryKey: ['library', 'tags', 'popular'],
@@ -324,54 +342,35 @@ const TagList = () => {
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시 유지
   });
 
-  // 태그 토글 핸들러
-  const toggleTag = (tag: string) => {
-    if (selectedTags.includes(tag)) {
-      handleTagRemove(tag);
-    } else {
-      handleTagSelect(tag);
-    }
-  };
-
   return (
-    <div className="space-y-4">
-      {/* 선택된 태그 표시 영역 (보이지 않음) */}
-      <div className="hidden">
-        {selectedTags.length > 0
-          ? selectedTags.map(tag => <span key={tag}>{tag}</span>)
-          : null}
-      </div>
+    <div className="flex flex-wrap gap-2">
+      {popularTags && popularTags.length > 0 ? (
+        popularTags.map((tag, index) => {
+          // tag.id를 사용 (이전 tagId 대신)
+          const tagId = tag.id;
+          const isSelected = selectedTagIds.includes(tagId);
+          const tagColor = getTagColor(index % 8);
 
-      {/* 태그 목록 */}
-      <div className="mt-2">
-        <div className="flex flex-wrap gap-2">
-          {popularTags && popularTags.length > 0 ? (
-            popularTags.map((tag, index) => {
-              const isSelected = selectedTags.includes(tag.tagName);
-              return (
-                <Badge
-                  key={tag.tagId}
-                  className={`cursor-pointer rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    isSelected ? 'bg-gray-900 text-white' : 'text-gray-700'
-                  }`}
-                  style={{
-                    backgroundColor: isSelected
-                      ? '#1f2937'
-                      : getTagColor(index % 8),
-                  }}
-                  onClick={() => toggleTag(tag.tagName)}
-                >
-                  {tag.tagName}
-                </Badge>
-              );
-            })
-          ) : (
-            <div className="text-xs text-gray-500">
-              태그를 불러오는 중입니다
-            </div>
-          )}
-        </div>
-      </div>
+          return (
+            <Badge
+              key={`tag-${tagId}-${index}`}
+              className={`cursor-pointer rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors duration-200 ${
+                isSelected
+                  ? 'bg-gray-900 text-white hover:bg-gray-800'
+                  : 'bg-opacity-90 hover:bg-opacity-100 text-gray-700'
+              }`}
+              style={{
+                backgroundColor: isSelected ? '#1f2937' : tagColor,
+              }}
+              onClick={() => toggleTag(tagId, tag.tagName)}
+            >
+              {tag.tagName}
+            </Badge>
+          );
+        })
+      ) : (
+        <div className="text-xs text-gray-500">태그를 불러오는 중입니다</div>
+      )}
     </div>
   );
 };

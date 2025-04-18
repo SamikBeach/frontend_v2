@@ -22,6 +22,7 @@ export const getAllLibraryTags = async (
 
 /**
  * 인기 라이브러리 태그 조회
+ * 응답 형태: { id, tagName, description, usageCount, note, createdAt, updatedAt }
  */
 export const getPopularLibraryTags = async (
   limit?: number

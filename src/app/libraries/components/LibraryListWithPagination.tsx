@@ -18,7 +18,7 @@ function LibraryListWithTags({ libraries, ...props }: LibraryListProps) {
     createDefaultTag(),
     // 모든 라이브러리 태그 기반으로 변환
     ...(allTags || []).map((tag, index) => ({
-      id: String(tag.tagId || tag.id),
+      id: String(tag.id),
       name: tag.tagName,
       color: getTagColor(index),
     })),

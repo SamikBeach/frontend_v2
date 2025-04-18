@@ -84,14 +84,12 @@ export interface SubscriberInfo {
 // 라이브러리 태그 정보 타입
 export interface LibraryTagResponseDto {
   id: number;
-  tagId: number;
   tagName: string;
-  description?: string;
+  description: string | null;
   usageCount: number;
-  libraryId?: number;
-  note?: string;
-  createdAt: Date;
-  updatedAt?: Date;
+  note: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // 라이브러리 태그 목록 응답 타입
@@ -150,7 +148,7 @@ export interface CreateLibraryDto {
   name: string;
   description?: string;
   isPublic?: boolean;
-  tags?: string[];
+  tagIds?: number[];
 }
 
 // 서재 업데이트 DTO
@@ -158,7 +156,7 @@ export interface UpdateLibraryDto {
   name?: string;
   description?: string;
   isPublic?: boolean;
-  tags?: string[];
+  tagIds?: number[];
 }
 
 // 서재에 책 추가 DTO
