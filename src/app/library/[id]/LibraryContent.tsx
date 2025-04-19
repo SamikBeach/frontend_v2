@@ -31,6 +31,7 @@ import { useDialogQuery } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { josa } from 'josa';
 import { ExternalLink, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -91,7 +92,7 @@ function DeleteBookDialog({
       <AlertDialogContent className="max-w-md rounded-xl">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-lg font-medium">
-            {bookTitle}을(를) 서재에서 삭제하시겠습니까?
+            {josa(`${bookTitle}#{을} 서재에서 삭제하시겠습니까?`)}
           </AlertDialogTitle>
           <AlertDialogDescription className="mt-2 text-sm text-gray-500">
             이 작업은 되돌릴 수 없습니다.
