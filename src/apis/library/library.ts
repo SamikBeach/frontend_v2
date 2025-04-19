@@ -1,18 +1,19 @@
 import api from '../axios';
 import {
+  AddBookResponse,
+  AddBooksToLibraryDto,
   AddBookToLibraryDto,
   AddTagToLibraryDto,
   CreateLibraryDto,
   HomePopularLibrariesResponse,
-  LibrariesForBookResponse,
   Library,
   LibraryBook,
   LibrarySortOption,
   LibraryTag,
   PaginatedLibraryResponse,
-  SubscriberInfo,
   UpdateHistoryItem,
   UpdateLibraryDto,
+  UserInfo,
 } from './types';
 
 /**
@@ -179,8 +180,8 @@ export const unsubscribeFromLibrary = async (
  */
 export const getLibrarySubscribers = async (
   libraryId: number
-): Promise<SubscriberInfo[]> => {
-  const response = await api.get<SubscriberInfo[]>(
+): Promise<UserInfo[]> => {
+  const response = await api.get<UserInfo[]>(
     `/library/${libraryId}/subscribers`
   );
   return response.data;
@@ -245,33 +246,32 @@ export const getLibrariesByBookId = async (
   limit: number = 10,
   isbn?: string,
   sort?: LibrarySortOption
-): Promise<LibrariesForBookResponse> => {
-  const response = await api.get<LibrariesForBookResponse>(
+): Promise<PaginatedLibraryResponse> => {
+  const params: Record<string, string> = {};
+
+  if (page) params.page = page.toString();
+  if (limit) params.limit = limit.toString();
+  if (isbn) params.isbn = isbn;
+  if (sort) params.sort = sort;
+
+  const response = await api.get<PaginatedLibraryResponse>(
     `/library/book/${bookId}`,
-    {
-      params: { page, limit, isbn, sort },
-    }
+    { params }
   );
+
   return response.data;
 };
 
 /**
- * 서재에 여러 책 추가
+ * 서재에 여러 권의 책 추가
  */
 export const addBooksToLibrary = async (
   libraryId: number,
-  addBooksToLibraryDto: {
-    books: AddBookToLibraryDto[];
-  }
-): Promise<{
-  success: number;
-  failed: number;
-  books: LibraryBook[];
-}> => {
-  const response = await api.post<{
-    success: number;
-    failed: number;
-    books: LibraryBook[];
-  }>(`/library/${libraryId}/books/batch`, addBooksToLibraryDto);
+  addBooksToLibraryDto: AddBooksToLibraryDto
+): Promise<AddBookResponse> => {
+  const response = await api.post<AddBookResponse>(
+    `/library/${libraryId}/books/batch`,
+    addBooksToLibraryDto
+  );
   return response.data;
 };

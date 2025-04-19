@@ -1,8 +1,8 @@
 import { getLibrariesByBookId } from '@/apis/library/library';
 import {
-  LibrariesForBookResponse,
-  LibraryDetail,
+  LibraryListItem,
   LibrarySortOption,
+  PaginatedLibraryResponse,
 } from '@/apis/library/types';
 import {
   keepPreviousData,
@@ -24,7 +24,7 @@ export function useBookLibraries(
   limit: number = 5,
   sort: LibrarySortOption = LibrarySortOption.SUBSCRIBERS
 ): {
-  libraries: LibraryDetail[];
+  libraries: LibraryListItem[];
   meta: {
     total: number;
     page: number;
@@ -56,7 +56,7 @@ export function useBookLibraries(
         return {
           data: [],
           meta: { total: 0, page: 1, limit, totalPages: 0 },
-        } as LibrariesForBookResponse;
+        } as PaginatedLibraryResponse;
       }
 
       const page = pageParam as number;
@@ -69,7 +69,7 @@ export function useBookLibraries(
         sort
       );
     },
-    getNextPageParam: (lastPage: LibrariesForBookResponse) => {
+    getNextPageParam: (lastPage: PaginatedLibraryResponse) => {
       const { meta } = lastPage;
       // 다음 페이지가 있는지 확인, 없으면 undefined 반환
       return meta.page < meta.totalPages ? meta.page + 1 : undefined;

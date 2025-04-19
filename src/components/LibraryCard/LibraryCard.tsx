@@ -1,4 +1,4 @@
-import { Library as ApiLibrary } from '@/apis/library/types';
+import { LibraryListItem } from '@/apis/library/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Card,
@@ -12,43 +12,25 @@ import Link from 'next/link';
 import { useMemo } from 'react';
 
 export interface LibraryCardProps {
-  library: ApiLibrary;
+  library: LibraryListItem;
   tags?: Tag[];
 }
 
 export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
-  // 서재의 태그 ID를 찾아 매핑
-  const tag = useMemo(() => {
-    if (!library.tagId || !tags.length) return null;
-    return tags.find(t => t.id === String(library.tagId));
-  }, [library.tagId, tags]);
-
-  // 서재에 연결된 태그 목록도 표시
+  // 서재에 연결된 태그 목록 표시
   const libraryTags = useMemo(() => {
     if (!library.tags || !tags.length) return [];
     return library.tags
       .map(libTag => {
         // 태그 ID를 문자열로 변환해서 일치하는 태그 찾기
-        const foundTag = tags.find(
-          t => t.id === String(libTag.tagId || libTag.id)
-        );
+        const foundTag = tags.find(t => t.id === String(libTag.tagId));
         return foundTag || null;
       })
       .filter(Boolean) as Tag[];
   }, [library.tags, tags]);
 
-  // 책 데이터 - previewBooks가 있으면 사용, 없으면 books에서 가져옴
-  const displayBooks =
-    library.previewBooks ||
-    (library.books
-      ? library.books.map(book => ({
-          id: book.bookId,
-          title: book.book.title,
-          author: book.book.author,
-          coverImage: book.book.coverImage,
-        }))
-      : []
-    ).slice(0, 3);
+  // 책 데이터 - previewBooks 사용
+  const displayBooks = library.previewBooks || [];
 
   // 소유자 정보
   const ownerName = library.owner.username;
@@ -56,11 +38,8 @@ export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
     ? `https://i.pravatar.cc/150?u=${library.owner.id}`
     : '';
 
-  // 책 개수 - bookCount가 있으면 사용, 없으면 books 배열에서 계산
-  const booksCount =
-    library.bookCount !== undefined
-      ? library.bookCount
-      : library.books?.length || 0;
+  // 책 개수
+  const booksCount = library.bookCount;
 
   return (
     <Link href={`/library/${library.id}`} className="block w-full">
@@ -83,19 +62,8 @@ export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
                   {library.name}
                 </h3>
 
-                {/* 메인 태그 및 모든 라이브러리 태그를 서재 제목 옆에 표시 */}
+                {/* 라이브러리 태그들을 서재 제목 옆에 표시 */}
                 <div className="flex flex-wrap gap-1.5">
-                  {tag && (
-                    <span
-                      className="rounded-full px-2.5 py-0.5 text-xs font-medium text-gray-700"
-                      style={{
-                        backgroundColor: tag.color,
-                      }}
-                    >
-                      {tag.name}
-                    </span>
-                  )}
-
                   {libraryTags.length > 0 &&
                     libraryTags.map(libTag => (
                       <span

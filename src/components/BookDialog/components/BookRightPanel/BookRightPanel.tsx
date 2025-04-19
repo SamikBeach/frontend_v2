@@ -1,9 +1,9 @@
 import { LibrarySortOption } from '@/apis/library/types';
 import { Suspense, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { BookLibraries } from '../../BookLibraries';
 import { BookReviews } from '../../BookReviews';
 import { useBookDetails, useBookLibraries } from '../../hooks';
+import { BookLibraries } from '../BookLibraries/BookLibraries';
 import { SimpleErrorFallback } from '../common/ErrorFallback';
 import { LibrariesSkeleton } from '../common/Skeletons';
 import { TabNavigation, TabType } from './TabNavigation';
