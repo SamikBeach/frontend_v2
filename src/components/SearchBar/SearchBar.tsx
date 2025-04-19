@@ -8,11 +8,7 @@ import { BookSearchDialog } from './BookSearchDialog';
 // 중복 키 이벤트 처리 방지를 위한 플래그
 let isHandlingKeyPress = false;
 
-interface SearchBarProps {
-  overlayClassName?: string;
-}
-
-export function SearchBar({ overlayClassName = 'bg-black/5' }: SearchBarProps) {
+export function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const searchBarRef = useRef<HTMLDivElement | null>(null);
@@ -90,7 +86,6 @@ export function SearchBar({ overlayClassName = 'bg-black/5' }: SearchBarProps) {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         searchBarRef={searchBarRef}
-        overlayClassName={overlayClassName}
       />
     </>
   );

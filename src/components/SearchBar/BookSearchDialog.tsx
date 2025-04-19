@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogOverlay,
   DialogPortal,
   DialogTitle,
 } from '@/components/ui/dialog';
@@ -77,14 +76,8 @@ function SearchResultsLoader({
   );
 }
 
-export function BookSearchDialog({
-  isOpen,
-  setIsOpen,
-  searchBarRef,
-  overlayClassName = 'bg-black/10',
-}: BookSearchDialogProps) {
+export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 300);
   const inputRef = useRef<HTMLInputElement>(null);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
   const queryClient = useQueryClient();
@@ -124,72 +117,71 @@ export function BookSearchDialog({
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogPortal>
-        <DialogOverlay className={cn('overflow-y-auto', overlayClassName)}>
-          <DialogContent
+        <DialogContent
+          className={cn(
+            'animate-expandDown fixed top-[6px] left-1/2 z-50 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
+            query ? 'h-[calc(100vh-32px)]' : 'auto'
+          )}
+          hideCloseButton
+          overlayClassName="bg-black/15"
+          onOpenAutoFocus={e => {
+            e.preventDefault();
+            setTimeout(() => {
+              inputRef.current?.focus();
+            }, 100);
+          }}
+        >
+          <DialogTitle className="sr-only">도서 검색</DialogTitle>
+          <div
             className={cn(
-              'animate-expandDown fixed top-[6px] left-1/2 z-50 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
-              query ? 'h-[calc(100vh-32px)]' : 'auto'
+              'animate-expandDown flex h-full w-full flex-col overflow-hidden rounded-xl bg-white p-4 ring-1 ring-black/5 transition-all',
+              query
+                ? 'h-full max-h-full'
+                : view === 'recent'
+                  ? 'h-auto max-h-[640px]'
+                  : 'auto'
             )}
-            hideCloseButton
-            onOpenAutoFocus={e => {
-              e.preventDefault();
-              setTimeout(() => {
-                inputRef.current?.focus();
-              }, 100);
-            }}
           >
-            <DialogTitle className="sr-only">도서 검색</DialogTitle>
-            <div
-              className={cn(
-                'animate-expandDown flex h-full w-full flex-col overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all',
-                query
-                  ? 'h-full max-h-full'
-                  : view === 'recent'
-                    ? 'h-auto max-h-[640px]'
-                    : 'auto'
-              )}
+            <Command
+              className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
+              shouldFilter={false}
+              loop={true}
             >
-              <Command
-                className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
-                shouldFilter={false}
-                loop={true}
-              >
-                <div className="sticky top-0 z-10 flex-shrink-0 border-b border-gray-200 bg-white">
-                  <CommandInput
-                    ref={inputRef}
-                    value={query}
-                    onValueChange={setQuery}
-                    className="h-16 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
-                    placeholder="도서 제목을 검색해보세요"
-                  />
-                </div>
-                <div className="flex-1 overflow-y-auto">
-                  <Suspense
-                    fallback={
-                      <div className="flex h-full w-full items-center justify-center">
-                        <div className="flex flex-col items-center justify-center">
-                          <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-                        </div>
+              <div className="sticky top-0 z-10 flex-shrink-0 border-b border-gray-200 bg-white">
+                <CommandInput
+                  ref={inputRef}
+                  value={query}
+                  onValueChange={setQuery}
+                  className="h-16 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
+                  placeholder="도서 제목을 검색해보세요"
+                />
+              </div>
+              <div className="flex-1 overflow-y-auto">
+                <Suspense
+                  fallback={
+                    <div className="flex h-full w-full items-center justify-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
                       </div>
-                    }
-                  >
-                    <SearchResultsLoader
-                      query={query}
-                      view={view}
-                      onItemClick={handleItemClick}
-                      onOpenChange={handleOpenChange}
-                      setQuery={setQuery}
-                    />
-                  </Suspense>
-                </div>
-              </Command>
-            </div>
-            <DialogClose className="absolute top-6 right-6 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none">
-              <X className="h-5 w-5" />
-              <span className="sr-only">Close</span>
-            </DialogClose>
-          </DialogContent>
-        </DialogOverlay>
+                    </div>
+                  }
+                >
+                  <SearchResultsLoader
+                    query={query}
+                    view={view}
+                    onItemClick={handleItemClick}
+                    onOpenChange={handleOpenChange}
+                    setQuery={setQuery}
+                  />
+                </Suspense>
+              </div>
+            </Command>
+          </div>
+          <DialogClose className="absolute top-6 right-6 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none">
+            <X className="h-5 w-5" />
+            <span className="sr-only">Close</span>
+          </DialogClose>
+        </DialogContent>
       </DialogPortal>
     </Dialog>
   );
