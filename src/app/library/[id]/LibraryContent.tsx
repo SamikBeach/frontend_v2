@@ -195,7 +195,7 @@ export function LibraryContent() {
               <div className="ml-2 h-6 w-8 animate-pulse rounded-full bg-gray-200"></div>
             </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
+          <div className="3xl:grid-cols-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <div
                 key={i}
@@ -298,11 +298,14 @@ export function LibraryContent() {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="3xl:grid-cols-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {booksWithDetails.length > 0 ? (
             booksWithDetails.map(book => (
               <div key={book.id} className="group relative">
-                <BookCard book={book as BookType} onClick={handleBookClick} />
+                <BookCard
+                  book={book as unknown as BookType}
+                  onClick={handleBookClick}
+                />
                 {isOwner && (
                   <div className="absolute top-2 right-2 z-10">
                     <DropdownMenu
