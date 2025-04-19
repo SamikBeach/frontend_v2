@@ -177,7 +177,7 @@ export function BookActionButtons() {
               userLibraries.map(library => (
                 <DropdownMenuItem
                   key={library.id}
-                  className="cursor-pointer rounded-lg py-2"
+                  className="cursor-pointer rounded-lg py-2 transition-colors hover:bg-gray-100"
                   onClick={() => handleAddToLibraryWithAuth(library.id)}
                 >
                   {library.name}
