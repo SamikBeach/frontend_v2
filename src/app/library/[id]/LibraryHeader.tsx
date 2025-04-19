@@ -160,7 +160,10 @@ export function LibraryHeader() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem
-                    onSelect={() => setShowEditDialog(true)}
+                    onSelect={() => {
+                      setShowEditDialog(true);
+                      setIsDropdownOpen(false);
+                    }}
                     className="cursor-pointer"
                   >
                     <Edit className="mr-2 h-4 w-4" />
