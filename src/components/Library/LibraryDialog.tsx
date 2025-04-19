@@ -239,8 +239,18 @@ export function LibraryDialog({
                     fallback={
                       <div className="animate-pulse space-y-4">
                         <div className="flex flex-wrap gap-2">
-                          <div className="h-6 w-16 rounded-full bg-gray-100"></div>
-                          <div className="h-6 w-20 rounded-full bg-gray-100"></div>
+                          {Array.from({ length: 8 }).map((_, index) => (
+                            <div
+                              key={index}
+                              className={`h-6 rounded-full bg-gray-100 ${
+                                index % 3 === 0
+                                  ? 'w-20'
+                                  : index % 3 === 1
+                                    ? 'w-24'
+                                    : 'w-16'
+                              }`}
+                            ></div>
+                          ))}
                         </div>
                       </div>
                     }
@@ -346,14 +356,14 @@ const TagList = ({ selectedTagIds, toggleTag }: TagListProps) => {
     <div className="flex flex-wrap gap-2">
       {popularTags && popularTags.length > 0 ? (
         popularTags.map((tag, index) => {
-          // tag.id를 사용 (이전 tagId 대신)
-          const tagId = tag.id;
+          // API 응답 구조에 맞게 tagId를 가져옴
+          const tagId = tag.id; // LibraryTagResponseDto는 id 프로퍼티 사용
           const isSelected = selectedTagIds.includes(tagId);
           const tagColor = getTagColor(index % 8);
 
           return (
             <Badge
-              key={`tag-${tagId}-${index}`}
+              key={`tag-${tagId || index}-${index}`}
               className={`cursor-pointer rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors duration-200 ${
                 isSelected
                   ? 'bg-gray-900 text-white hover:bg-gray-800'
