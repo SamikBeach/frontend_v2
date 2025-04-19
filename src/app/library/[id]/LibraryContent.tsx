@@ -1,5 +1,9 @@
 import { Book as BookType } from '@/apis/book';
-import { removeBookFromLibrary } from '@/apis/library';
+import {
+  addBookToLibrary,
+  getLibrariesByUser,
+  removeBookFromLibrary,
+} from '@/apis/library';
 import { BookCard } from '@/components/BookCard';
 import {
   AlertDialog,
@@ -16,13 +20,17 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
 import { useDialogQuery } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ExternalLink, MoreHorizontal, Plus, Trash2 } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -129,7 +137,48 @@ export function LibraryContent() {
     title: string;
   } | null>(null);
   const [showAddBookDialog, setShowAddBookDialog] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // 개별 책의 드롭다운 상태를 관리하기 위한 Map
+  const [openDropdownIds, setOpenDropdownIds] = useState<Set<number>>(
+    new Set()
+  );
+
+  // 사용자의 서재 목록 불러오기
+  const { data: userLibraries = [], isLoading: isLoadingLibraries } = useQuery({
+    queryKey: ['user-libraries', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser) return [];
+      return await getLibrariesByUser(currentUser.id);
+    },
+    enabled: !!currentUser,
+  });
+
+  // 책을 다른 서재로 이동하는 mutation
+  const { mutate: moveBook } = useMutation({
+    mutationFn: async ({
+      bookId,
+      sourceLibraryId,
+      targetLibraryId,
+    }: {
+      bookId: number;
+      sourceLibraryId: number;
+      targetLibraryId: number;
+    }) => {
+      // 1. 먼저 타겟 서재에 책 추가
+      await addBookToLibrary(targetLibraryId, { bookId });
+
+      // 2. 소스 서재에서 책 제거
+      await removeBookFromLibrary(sourceLibraryId, bookId);
+    },
+    onSuccess: () => {
+      // 양쪽 서재 모두 캐시 무효화
+      queryClient.invalidateQueries({ queryKey: ['library', libraryId] });
+      toast.success('책이 다른 서재로 이동되었습니다.');
+    },
+    onError: error => {
+      console.error('책 이동 중 오류 발생:', error);
+      toast.error('책을 이동하는 중 오류가 발생했습니다.');
+    },
+  });
 
   if (isLoading || !library) {
     return (
@@ -181,13 +230,33 @@ export function LibraryContent() {
       title: title || '제목 없음',
     });
     setDeleteDialogOpen(true);
-    setIsDropdownOpen(false);
+    // 드롭다운 닫기
+    setOpenDropdownIds(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(bookId);
+      return newSet;
+    });
   };
 
-  // 다른 서재로 이동 핸들러
-  const handleMoveToOtherLibrary = (bookId: number) => {
-    // 여기서는 단순히 책 상세 페이지로 이동하여 사용자가 다른 서재에 추가할 수 있게 합니다
-    openBookDialog(bookId.toString());
+  // 책 다른 서재로 이동 핸들러
+  const handleMoveToLibrary = (bookId: number, targetLibraryId: number) => {
+    if (targetLibraryId === libraryId) {
+      toast.error('같은 서재로 이동할 수 없습니다.');
+      return;
+    }
+
+    moveBook({
+      bookId,
+      sourceLibraryId: libraryId,
+      targetLibraryId,
+    });
+
+    // 드롭다운 닫기
+    setOpenDropdownIds(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(bookId);
+      return newSet;
+    });
   };
 
   // 삭제 후 캐시 업데이트
@@ -236,15 +305,25 @@ export function LibraryContent() {
                 {isOwner && (
                   <div className="absolute top-2 right-2 z-10">
                     <DropdownMenu
-                      open={isDropdownOpen}
-                      onOpenChange={setIsDropdownOpen}
+                      open={openDropdownIds.has(book.id)}
+                      onOpenChange={open => {
+                        setOpenDropdownIds(prev => {
+                          const newSet = new Set(prev);
+                          if (open) {
+                            newSet.add(book.id);
+                          } else {
+                            newSet.delete(book.id);
+                          }
+                          return newSet;
+                        });
+                      }}
                     >
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
                           size="icon"
                           className={`bg-opacity-80 hover:bg-opacity-100 h-8 w-8 rounded-full bg-white p-1.5 ${
-                            isDropdownOpen
+                            openDropdownIds.has(book.id)
                               ? 'visible'
                               : 'visible md:invisible md:group-hover:visible'
                           }`}
@@ -253,13 +332,54 @@ export function LibraryContent() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuItem
-                          onClick={() => handleMoveToOtherLibrary(book.id)}
-                          className="cursor-pointer"
-                        >
-                          <ExternalLink className="mr-2 h-4 w-4" />
-                          <span>다른 서재로 옮기기</span>
-                        </DropdownMenuItem>
+                        <DropdownMenuSub>
+                          <DropdownMenuSubTrigger className="flex w-full cursor-pointer items-center">
+                            <ExternalLink className="mr-4 h-4 w-4 flex-shrink-0" />
+                            <span className="w-full text-left">
+                              다른 서재로 옮기기
+                            </span>
+                          </DropdownMenuSubTrigger>
+                          <DropdownMenuPortal>
+                            <DropdownMenuSubContent className="max-h-80 w-48 overflow-y-auto">
+                              {isLoadingLibraries ? (
+                                <DropdownMenuItem
+                                  disabled
+                                  className="flex w-full"
+                                >
+                                  <span className="w-full text-left">
+                                    서재 목록 불러오는 중...
+                                  </span>
+                                </DropdownMenuItem>
+                              ) : userLibraries.length === 0 ? (
+                                <DropdownMenuItem
+                                  disabled
+                                  className="flex w-full"
+                                >
+                                  <span className="w-full text-left">
+                                    이동할 서재가 없습니다
+                                  </span>
+                                </DropdownMenuItem>
+                              ) : (
+                                userLibraries
+                                  .filter(lib => lib.id !== libraryId) // 현재 서재 제외
+                                  .map(lib => (
+                                    <DropdownMenuItem
+                                      key={lib.id}
+                                      onClick={e => {
+                                        e.stopPropagation();
+                                        handleMoveToLibrary(book.id, lib.id);
+                                      }}
+                                      className="flex w-full cursor-pointer"
+                                    >
+                                      <span className="w-full text-left">
+                                        {lib.name}
+                                      </span>
+                                    </DropdownMenuItem>
+                                  ))
+                              )}
+                            </DropdownMenuSubContent>
+                          </DropdownMenuPortal>
+                        </DropdownMenuSub>
                         <DropdownMenuItem
                           onClick={e => {
                             e.stopPropagation();
@@ -268,10 +388,10 @@ export function LibraryContent() {
                               book.title || '제목 없음'
                             );
                           }}
-                          className="cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-600"
+                          className="flex w-full cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-600"
                         >
-                          <Trash2 className="mr-2 h-4 w-4 text-red-600" />
-                          <span className="text-red-600 hover:text-red-600">
+                          <Trash2 className="mr-2 h-4 w-4 flex-shrink-0 text-red-600" />
+                          <span className="w-full text-left text-red-600 hover:text-red-600">
                             삭제하기
                           </span>
                         </DropdownMenuItem>
