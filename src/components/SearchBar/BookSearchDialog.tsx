@@ -3,6 +3,7 @@
 import { Command, CommandInput } from '@/components/ui/command';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogOverlay,
   DialogPortal,
@@ -10,8 +11,9 @@ import {
 } from '@/components/ui/dialog';
 import { useDialogQuery } from '@/hooks';
 import { useDebounce } from '@/hooks/useDebounce';
+import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { MutableRefObject, Suspense, useEffect, useRef, useState } from 'react';
 import { SearchResults } from './SearchResults';
 import { useSearchQuery } from './hooks';
@@ -78,7 +80,8 @@ function SearchResultsLoader({
 export function BookSearchDialog({
   isOpen,
   setIsOpen,
-  overlayClassName = 'bg-transparent',
+  searchBarRef,
+  overlayClassName = 'bg-black/10',
 }: BookSearchDialogProps) {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
@@ -121,72 +124,72 @@ export function BookSearchDialog({
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogPortal>
-        <DialogOverlay
-          className={`data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 ${overlayClassName}`}
-          onClick={handleClose}
-        />
-        <DialogContent
-          className={`fixed top-[6px] left-1/2 z-50 w-[800px] max-w-[calc(100vw-32px)] ${
-            query ? 'h-[calc(100vh-32px)]' : 'max-h-[800px]'
-          } -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full`}
-          overlayClassName={overlayClassName}
-          closeClassName="hidden"
-          aria-describedby={undefined}
-          onOpenAutoFocus={e => {
-            e.preventDefault();
-            setTimeout(() => {
-              inputRef.current?.focus();
-            }, 100);
-          }}
-        >
-          <DialogTitle className="sr-only">도서 검색</DialogTitle>
-          <div
-            className={`animate-expandDown flex ${
-              query ? 'h-full max-h-full' : 'auto'
-            } flex-col overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all`}
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
+        <DialogOverlay className={cn('overflow-y-auto', overlayClassName)}>
+          <DialogContent
+            className={cn(
+              'animate-expandDown fixed top-[6px] left-1/2 z-50 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
+              query ? 'h-[calc(100vh-32px)]' : 'auto'
+            )}
+            hideCloseButton
+            onOpenAutoFocus={e => {
+              e.preventDefault();
+              setTimeout(() => {
+                inputRef.current?.focus();
+              }, 100);
             }}
           >
-            <Command
-              className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
-              shouldFilter={false}
-              loop={true}
+            <DialogTitle className="sr-only">도서 검색</DialogTitle>
+            <div
+              className={cn(
+                'animate-expandDown flex h-full w-full flex-col overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all',
+                query
+                  ? 'h-full max-h-full'
+                  : view === 'recent'
+                    ? 'h-auto max-h-[640px]'
+                    : 'auto'
+              )}
             >
-              <div className="sticky top-0 z-10 flex-shrink-0 border-b border-gray-200 bg-white">
-                <CommandInput
-                  ref={inputRef}
-                  value={query}
-                  onValueChange={setQuery}
-                  className="h-16 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
-                  placeholder="도서 제목을 검색해보세요"
-                />
-              </div>
-              <div className="flex-1 overflow-y-auto">
-                <Suspense
-                  fallback={
-                    <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
-                      <div className="flex flex-col items-center justify-center">
-                        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-                      </div>
-                    </div>
-                  }
-                >
-                  <SearchResultsLoader
-                    query={query}
-                    view={view}
-                    onItemClick={handleItemClick}
-                    onOpenChange={handleOpenChange}
-                    setQuery={setQuery}
+              <Command
+                className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
+                shouldFilter={false}
+                loop={true}
+              >
+                <div className="sticky top-0 z-10 flex-shrink-0 border-b border-gray-200 bg-white">
+                  <CommandInput
+                    ref={inputRef}
+                    value={query}
+                    onValueChange={setQuery}
+                    className="h-16 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
+                    placeholder="도서 제목을 검색해보세요"
                   />
-                </Suspense>
-              </div>
-            </Command>
-          </div>
-        </DialogContent>
+                </div>
+                <div className="flex-1 overflow-y-auto">
+                  <Suspense
+                    fallback={
+                      <div className="flex h-full w-full items-center justify-center">
+                        <div className="flex flex-col items-center justify-center">
+                          <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                        </div>
+                      </div>
+                    }
+                  >
+                    <SearchResultsLoader
+                      query={query}
+                      view={view}
+                      onItemClick={handleItemClick}
+                      onOpenChange={handleOpenChange}
+                      setQuery={setQuery}
+                    />
+                  </Suspense>
+                </div>
+              </Command>
+            </div>
+            <DialogClose className="absolute top-6 right-6 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none">
+              <X className="h-5 w-5" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+          </DialogContent>
+        </DialogOverlay>
       </DialogPortal>
     </Dialog>
   );

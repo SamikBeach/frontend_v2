@@ -12,9 +12,7 @@ interface SearchBarProps {
   overlayClassName?: string;
 }
 
-export function SearchBar({
-  overlayClassName = 'bg-black/10',
-}: SearchBarProps) {
+export function SearchBar({ overlayClassName = 'bg-black/5' }: SearchBarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const searchBarRef = useRef<HTMLDivElement | null>(null);

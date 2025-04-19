@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 
-import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogTitle } from '@/components/ui/dialog';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 
 import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { BookInfo, BookInfoSkeleton } from './components/BookInfo';
@@ -16,6 +17,8 @@ import {
 } from './components';
 
 import { useQueryParams } from '@/hooks/useQueryParams';
+import { cn } from '@/lib/utils';
+import { X } from 'lucide-react';
 import { BookFullSkeleton, ErrorFallback } from './components/common';
 
 function BookDialogContent() {
@@ -86,19 +89,40 @@ export function BookDialog() {
         if (!open) close();
       }}
     >
-      <DialogContent
-        className="w-full max-w-none rounded-lg bg-white p-0 md:max-w-screen-xl"
-        aria-describedby={undefined}
-      >
-        {/* DialogTitle 컴포넌트는 접근성 목적으로 필요합니다. 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
-        <DialogTitle className="sr-only">도서 상세 정보</DialogTitle>
-        <ErrorBoundary FallbackComponent={ErrorFallback}>
-          <Suspense fallback={<BookFullSkeleton />}>
-            <BookHeader />
-            <BookDialogContent />
-          </Suspense>
-        </ErrorBoundary>
-      </DialogContent>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay
+          data-slot="dialog-overlay"
+          className={cn(
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 overflow-y-auto bg-black/50'
+          )}
+        >
+          <div className="min-h-full rounded-lg py-5">
+            <DialogPrimitive.Content
+              data-slot="dialog-content"
+              className={cn(
+                'relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg md:max-w-screen-xl'
+              )}
+            >
+              {/* DialogTitle 컴포넌트는 접근성 목적으로 필요합니다. 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
+              <DialogTitle className="sr-only">도서 상세 정보</DialogTitle>
+              <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <Suspense fallback={<BookFullSkeleton />}>
+                  <BookHeader />
+                  <BookDialogContent />
+                </Suspense>
+              </ErrorBoundary>
+              <DialogPrimitive.Close
+                className={cn(
+                  'ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none'
+                )}
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </DialogPrimitive.Close>
+            </DialogPrimitive.Content>
+          </div>
+        </DialogPrimitive.Overlay>
+      </DialogPrimitive.Portal>
     </Dialog>
   );
 }

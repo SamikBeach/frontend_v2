@@ -19,7 +19,7 @@ export function useSearchQuery(query: string, limit: number = 5) {
       }
       return undefined; // 더 이상 페이지가 없음을 나타냄
     },
-    enabled: !!query.trim(), // 검색어가 빈 문자열이면 API 호출 안함
+    enabled: query !== undefined, // 검색어가 정의되어 있으면 API 호출
     staleTime: 1000 * 60 * 5, // 5분 동안 데이터 유지
     refetchOnWindowFocus: false, // 창 포커스 시 다시 불러오지 않음
   });
