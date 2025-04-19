@@ -254,3 +254,24 @@ export const getLibrariesByBookId = async (
   );
   return response.data;
 };
+
+/**
+ * 서재에 여러 책 추가
+ */
+export const addBooksToLibrary = async (
+  libraryId: number,
+  addBooksToLibraryDto: {
+    books: AddBookToLibraryDto[];
+  }
+): Promise<{
+  success: number;
+  failed: number;
+  books: LibraryBook[];
+}> => {
+  const response = await api.post<{
+    success: number;
+    failed: number;
+    books: LibraryBook[];
+  }>(`/library/${libraryId}/books/batch`, addBooksToLibraryDto);
+  return response.data;
+};

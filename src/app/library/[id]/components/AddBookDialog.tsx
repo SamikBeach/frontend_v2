@@ -1,8 +1,9 @@
 'use client';
 
-import { addBookToLibrary, addBookToLibraryWithIsbn } from '@/apis/library';
+import { addBooksToLibrary } from '@/apis/library';
 import { searchBooks } from '@/apis/search';
 import { SearchResult } from '@/apis/search/types';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,13 +12,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
   useInfiniteQuery,
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import { Loader2, MessageSquare, Search, Star } from 'lucide-react';
+import { Loader2, MessageSquare, Search, Star, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -34,7 +41,7 @@ export function AddBookDialog({
 }: AddBookDialogProps) {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
-  const [selectedBook, setSelectedBook] = useState<SearchResult | null>(null);
+  const [selectedBooks, setSelectedBooks] = useState<SearchResult[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const queryClient = useQueryClient();
@@ -45,6 +52,10 @@ export function AddBookDialog({
       setTimeout(() => {
         inputRef.current?.focus();
       }, 100);
+    } else {
+      // 다이얼로그가 닫힐 때 선택된 책 목록 초기화
+      setSelectedBooks([]);
+      setQuery('');
     }
   }, [isOpen]);
 
@@ -65,34 +76,28 @@ export function AddBookDialog({
     });
 
   // 서재에 책 추가 mutation
-  const { mutate: addBookMutation, isPending } = useMutation({
-    mutationFn: async ({
-      libraryId,
-      bookId,
-      isbn,
-    }: {
-      libraryId: number;
-      bookId: number;
-      isbn?: string;
-    }) => {
-      // bookId가 -1인 경우에는 반드시 ISBN이 필요
-      if (bookId === -1 && !isbn) {
-        throw new Error('ISBN이 필요합니다');
+  const { mutate: addBooksMutation, isPending } = useMutation({
+    mutationFn: async () => {
+      if (selectedBooks.length === 0) {
+        throw new Error('선택된 책이 없습니다');
       }
 
-      // ISBN이 있는 경우 addBookToLibraryWithIsbn 사용
-      if (isbn) {
-        return addBookToLibraryWithIsbn({
-          libraryId,
-          bookId: bookId,
+      const books = selectedBooks.map(book => {
+        const bookId = book.bookId || book.id || -1;
+        const isbn = book.isbn13 || book.isbn || '';
+        return {
+          bookId,
           isbn,
-        });
-      } else {
-        return addBookToLibrary(libraryId, { bookId });
-      }
+          note: '',
+        };
+      });
+
+      return addBooksToLibrary(libraryId, { books });
     },
     onSuccess: data => {
-      toast.success('책이 서재에 추가되었습니다.');
+      toast.success(
+        `${data.success}권의 책이 서재에 추가되었습니다.${data.failed > 0 ? ` (${data.failed}권 실패)` : ''}`
+      );
       queryClient.invalidateQueries({ queryKey: ['library', libraryId] });
       queryClient.invalidateQueries({
         queryKey: ['library-updates', libraryId],
@@ -112,27 +117,63 @@ export function AddBookDialog({
     },
   });
 
-  // 서재에 책 추가 핸들러
-  const handleAddBook = () => {
-    if (!selectedBook) {
-      return;
-    }
+  // 책 선택/해제 핸들러
+  const toggleBookSelection = (book: SearchResult) => {
+    setSelectedBooks(prev => {
+      // 고유 식별을 위해 bookId/id와 ISBN을 모두 확인
+      const bookIdentifier = getBookIdentifier(book);
+      const isSelected = prev.some(
+        selectedBook => getBookIdentifier(selectedBook) === bookIdentifier
+      );
 
-    // bookId가 없는 경우 id를 대신 사용하고, 둘 다 없으면 -1 사용
-    const bookId = selectedBook.bookId || selectedBook.id || -1;
-    const isbn = selectedBook.isbn13 || selectedBook.isbn || '';
-
-    // ISBN이 없는데 bookId가 -1인 경우
-    if (bookId === -1 && !isbn) {
-      toast.error('ISBN 정보가 없어 책을 추가할 수 없습니다.');
-      return;
-    }
-
-    addBookMutation({
-      libraryId,
-      bookId: bookId,
-      isbn: isbn,
+      if (isSelected) {
+        return prev.filter(
+          selectedBook => getBookIdentifier(selectedBook) !== bookIdentifier
+        );
+      } else {
+        return [...prev, book];
+      }
     });
+  };
+
+  // 선택된 책 제거 핸들러
+  const removeSelectedBook = (book: SearchResult) => {
+    setSelectedBooks(prev =>
+      prev.filter(
+        selectedBook =>
+          getBookIdentifier(selectedBook) !== getBookIdentifier(book)
+      )
+    );
+  };
+
+  // 책 식별자 생성 헬퍼 함수
+  const getBookIdentifier = (book: SearchResult): string => {
+    const id = book.bookId || book.id || -1;
+    const isbn = book.isbn13 || book.isbn || '';
+    return `${id}-${isbn}`;
+  };
+
+  // 서재에 책 추가 핸들러
+  const handleAddBooks = () => {
+    if (selectedBooks.length === 0) {
+      toast.error('적어도 한 권의 책을 선택해주세요.');
+      return;
+    }
+
+    // ISBN이 없고 bookId가 -1인 책이 있는지 확인
+    const invalidBook = selectedBooks.find(
+      book =>
+        (book.bookId || book.id || -1) === -1 && !(book.isbn13 || book.isbn)
+    );
+
+    if (invalidBook) {
+      toast.error(
+        `"${invalidBook.title}" 책의 ISBN 정보가 없어 추가할 수 없습니다.`
+      );
+      return;
+    }
+
+    addBooksMutation();
   };
 
   // 검색 결과 리스트 (전체 페이지 병합)
@@ -155,7 +196,7 @@ export function AddBookDialog({
     if (!isPending) {
       onOpenChange(false);
       setQuery('');
-      setSelectedBook(null);
+      setSelectedBooks([]);
     }
   };
 
@@ -244,6 +285,44 @@ export function AddBookDialog({
           </div>
         </div>
 
+        {/* 선택된 책 목록 섹션 */}
+        {selectedBooks.length > 0 && (
+          <div className="mt-2 mb-2">
+            <h3 className="mb-1 px-2 text-xs font-medium text-gray-700">
+              선택된 책 ({selectedBooks.length})
+            </h3>
+            <ScrollArea className="max-h-20 w-full overflow-y-auto rounded-md border border-gray-100 bg-gray-50 p-2">
+              <div className="flex flex-wrap gap-2">
+                {selectedBooks.map(book => (
+                  <Badge
+                    key={`selected-${getBookIdentifier(book)}`}
+                    variant="outline"
+                    className="flex items-center gap-1 bg-white py-1 pr-1 pl-2"
+                  >
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="max-w-[200px] truncate text-xs">
+                          {book.title}
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{book.title}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <button
+                      onClick={() => removeSelectedBook(book)}
+                      className="ml-1 rounded-full p-1 hover:bg-gray-200"
+                      aria-label="책 선택 해제"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        )}
+
         {query.length > 0 && (
           <div className="sticky top-[40px] z-10 bg-white py-0">
             <h3 className="px-2 text-xs font-medium text-gray-700">
@@ -285,12 +364,10 @@ export function AddBookDialog({
             <div className="px-1">
               <div>
                 {searchResults.map(book => {
-                  const bookKey = `${book.bookId || book.id || ''}-${
-                    book.isbn || book.isbn13 || ''
-                  }`;
-                  const isSelected =
-                    selectedBook?.bookId === book.bookId ||
-                    selectedBook?.id === book.id;
+                  const bookKey = getBookIdentifier(book);
+                  const isSelected = selectedBooks.some(
+                    selectedBook => getBookIdentifier(selectedBook) === bookKey
+                  );
 
                   const imageUrl = normalizeImageUrl(
                     book.coverImage || book.image
@@ -299,13 +376,15 @@ export function AddBookDialog({
                   return (
                     <div
                       key={bookKey}
-                      className="group relative flex cursor-pointer items-start gap-4 rounded-md bg-white px-3 py-3.5 transition-colors hover:bg-gray-50"
-                      onClick={() => setSelectedBook(book)}
+                      className={`group relative flex cursor-pointer items-start gap-4 rounded-md bg-white px-3 py-3.5 transition-colors hover:bg-gray-50 ${
+                        isSelected ? 'bg-gray-50' : ''
+                      }`}
+                      onClick={() => toggleBookSelection(book)}
                       role="button"
                       tabIndex={0}
                       onKeyDown={e => {
                         if (e.key === 'Enter' || e.key === ' ') {
-                          setSelectedBook(book);
+                          toggleBookSelection(book);
                         }
                       }}
                     >
@@ -373,6 +452,13 @@ export function AddBookDialog({
                           </div>
                         )}
                       </div>
+
+                      {/* 선택 상태 표시 배지 */}
+                      {isSelected && (
+                        <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-white shadow-sm">
+                          <span className="text-xs font-bold">✓</span>
+                        </div>
+                      )}
                     </div>
                   );
                 })}
@@ -395,8 +481,13 @@ export function AddBookDialog({
           >
             취소
           </Button>
-          <Button onClick={handleAddBook} disabled={!selectedBook || isPending}>
-            {isPending ? '추가 중...' : '서재에 추가하기'}
+          <Button
+            onClick={handleAddBooks}
+            disabled={selectedBooks.length === 0 || isPending}
+          >
+            {isPending
+              ? '추가 중...'
+              : `서재에 ${selectedBooks.length > 0 ? `${selectedBooks.length}권 ` : ''}추가하기`}
           </Button>
         </div>
       </DialogContent>
