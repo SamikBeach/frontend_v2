@@ -33,13 +33,13 @@ export function BookCoverSection() {
     <>
       {/* 책 표지 이미지 */}
       <div
-        className="relative aspect-[3/4] cursor-pointer overflow-hidden rounded-2xl bg-gray-50"
+        className="relative flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-2xl bg-gray-50"
         onClick={handleOpenAladin}
       >
         <img
           src={book.coverImage}
           alt={book.title}
-          className="h-full w-full object-cover"
+          className="h-auto w-full object-contain"
           loading="eager"
         />
       </div>
