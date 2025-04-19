@@ -7,11 +7,12 @@ import {
   UpdateHistoryItem,
   updateLibrary,
 } from '@/apis/library';
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 interface UseLibraryDetailResult {
-  library: Library;
+  library: Library | null;
+  isLoading: boolean;
   isSubscribed: boolean;
   handleSubscriptionToggle: () => Promise<void>;
   updateLibraryVisibility: (id: number, isPublic: boolean) => Promise<void>;
@@ -19,19 +20,24 @@ interface UseLibraryDetailResult {
 
 export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
   // 서재 데이터 가져오기
-  const { data: library, refetch } = useQuery({
+  const {
+    data: library,
+    refetch,
+    isLoading,
+  } = useQuery({
     queryKey: ['library', libraryId],
     queryFn: () => getLibraryById(libraryId),
     staleTime: 5 * 60 * 1000, // 5분 동안 데이터 유지
     retry: 1, // 실패 시 1번 재시도
   });
 
-  // 최근 업데이트 가져오기 (useSuspenseQuery 사용)
-  const { data: recentUpdates } = useSuspenseQuery<UpdateHistoryItem[]>({
+  // 최근 업데이트 가져오기
+  const { data: recentUpdates } = useQuery<UpdateHistoryItem[]>({
     queryKey: ['library-updates', libraryId],
     queryFn: () => getLibraryUpdates(libraryId, 5), // 최신 5개 항목만 가져오기
     staleTime: 5 * 60 * 1000,
     retry: 1,
+    enabled: !!library, // 라이브러리 데이터가 있을 때만 실행
   });
 
   // 구독하기 mutation
@@ -132,7 +138,8 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
     : null;
 
   return {
-    library: libraryWithUpdates as Library,
+    library: libraryWithUpdates as Library | null,
+    isLoading,
     isSubscribed: !!library?.isSubscribed,
     handleSubscriptionToggle,
     updateLibraryVisibility,

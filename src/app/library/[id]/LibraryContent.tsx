@@ -1,6 +1,5 @@
 import { Book as BookType } from '@/apis/book';
 import { removeBookFromLibrary } from '@/apis/library';
-import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { BookCard } from '@/components/BookCard';
 import {
   AlertDialog,
@@ -29,6 +28,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { AddBookDialog } from './components/AddBookDialog';
+import { useLibraryDetail } from './hooks';
 
 // DeleteBookDialog 컴포넌트: 책 삭제 확인 다이얼로그
 interface DeleteBookDialogProps {
@@ -113,7 +113,7 @@ export function LibraryContent() {
   const params = useParams();
   const router = useRouter();
   const libraryId = parseInt(params.id as string, 10);
-  const { library } = useLibraryDetail(libraryId);
+  const { library, isLoading } = useLibraryDetail(libraryId);
   const currentUser = useCurrentUser();
   const isMobile = useIsMobile();
   const { open: openBookDialog } = useDialogQuery({
@@ -131,8 +131,31 @@ export function LibraryContent() {
   const [showAddBookDialog, setShowAddBookDialog] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  if (!library) {
-    return null;
+  if (isLoading || !library) {
+    return (
+      <div className="space-y-3">
+        <div className="rounded-xl bg-white py-2">
+          <div className="h-4 w-3/4 animate-pulse rounded bg-gray-200"></div>
+        </div>
+        <Separator className="border-gray-100" />
+        <div>
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
+              <div className="ml-2 h-6 w-8 animate-pulse rounded-full bg-gray-200"></div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="aspect-[2/3] animate-pulse rounded-lg bg-gray-200"
+              ></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   // 현재 사용자가 서재 소유자인지 확인

@@ -1,5 +1,4 @@
 import { LibraryActivityType, UpdateHistoryItem } from '@/apis/library/types';
-import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,10 +10,16 @@ import { ko } from 'date-fns/locale';
 import { BookOpen, Calendar, Clock, Users } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { useLibraryDetail } from './hooks';
 
 export function LibrarySidebar() {
   const params = useParams();
   const libraryId = parseInt(params.id as string, 10);
+  const { library, isLoading } = useLibraryDetail(libraryId);
+
+  if (isLoading || !library) {
+    return <LibrarySidebarSkeleton />;
+  }
 
   return (
     <Suspense fallback={<LibrarySidebarSkeleton />}>

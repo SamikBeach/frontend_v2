@@ -2,7 +2,6 @@
 
 import { updateLibrary } from '@/apis/library';
 import { LibraryTag } from '@/apis/library/types';
-import { useLibraryDetail } from '@/app/libraries/hooks/useLibraryDetail';
 import { LibraryDialog } from '@/components/Library';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -21,6 +20,8 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { AddBookDialog } from './components/AddBookDialog';
 import { DeleteLibraryDialog } from './components/DeleteLibraryDialog';
+import { useLibraryDetail } from './hooks';
+import { LibraryHeaderSkeleton } from './LibraryHeaderSkeleton';
 
 // 실제 API에서 오는 태그 타입 (LibraryTag 인터페이스와 일치하지 않는 경우를 위한 추가 타입)
 interface ApiTag extends Omit<LibraryTag, 'name' | 'tagName'> {
@@ -38,9 +39,9 @@ export function LibraryHeader() {
   const [showAddBookDialog, setShowAddBookDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // useLibraryDetail 훅으로 상태와 핸들러 함수 가져오기
   const {
     library,
+    isLoading,
     isSubscribed,
     handleSubscriptionToggle,
     updateLibraryVisibility,
@@ -73,6 +74,10 @@ export function LibraryHeader() {
   };
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  if (isLoading || !library) {
+    return <LibraryHeaderSkeleton />;
+  }
 
   return (
     <>
