@@ -129,6 +129,7 @@ export function LibraryContent() {
     title: string;
   } | null>(null);
   const [showAddBookDialog, setShowAddBookDialog] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   if (!library) {
     return null;
@@ -157,6 +158,7 @@ export function LibraryContent() {
       title: title || '제목 없음',
     });
     setDeleteDialogOpen(true);
+    setIsDropdownOpen(false);
   };
 
   // 다른 서재로 이동 핸들러
@@ -210,12 +212,19 @@ export function LibraryContent() {
                 <BookCard book={book as BookType} onClick={handleBookClick} />
                 {isOwner && (
                   <div className="absolute top-2 right-2 z-10">
-                    <DropdownMenu>
+                    <DropdownMenu
+                      open={isDropdownOpen}
+                      onOpenChange={setIsDropdownOpen}
+                    >
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="bg-opacity-80 hover:bg-opacity-100 h-8 w-8 rounded-full bg-white p-1.5 shadow-sm"
+                          className={`bg-opacity-80 hover:bg-opacity-100 h-8 w-8 rounded-full bg-white p-1.5 ${
+                            isDropdownOpen
+                              ? 'visible'
+                              : 'visible md:invisible md:group-hover:visible'
+                          }`}
                         >
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
@@ -226,7 +235,7 @@ export function LibraryContent() {
                           className="cursor-pointer"
                         >
                           <ExternalLink className="mr-2 h-4 w-4" />
-                          <span>다른 서재에 추가</span>
+                          <span>다른 서재로 옮기기</span>
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={e => {
@@ -236,10 +245,12 @@ export function LibraryContent() {
                               book.title || '제목 없음'
                             );
                           }}
-                          className="cursor-pointer text-red-600 hover:bg-red-50"
+                          className="cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-600"
                         >
                           <Trash2 className="mr-2 h-4 w-4 text-red-600" />
-                          <span>삭제</span>
+                          <span className="text-red-600 hover:text-red-600">
+                            삭제하기
+                          </span>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
