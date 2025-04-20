@@ -5,7 +5,14 @@ import { searchBooks } from '@/apis/search';
 import { SearchResult } from '@/apis/search/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -19,12 +26,13 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { useDebounce } from '@/hooks/useDebounce';
+import { cn } from '@/lib/utils';
 import {
   useInfiniteQuery,
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import { Loader2, MessageSquare, Search, Star, X } from 'lucide-react';
+import { Loader2, MessageSquare, Star, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -72,7 +80,7 @@ export function AddBookDialog({
         }
         return undefined;
       },
-      enabled: debouncedQuery !== undefined,
+      enabled: debouncedQuery !== undefined && debouncedQuery.trim() !== '',
     });
 
   // 서재에 책 추가 mutation
@@ -148,9 +156,7 @@ export function AddBookDialog({
 
   // 책 식별자 생성 헬퍼 함수
   const getBookIdentifier = (book: SearchResult): string => {
-    const id = book.bookId || book.id || -1;
-    const isbn = book.isbn13 || book.isbn || '';
-    return `${id}-${isbn}`;
+    return `${book.isbn}-${book.isbn13}-${book.title}`;
   };
 
   // 서재에 책 추가 핸들러
@@ -224,11 +230,6 @@ export function AddBookDialog({
     );
   };
 
-  // 검색 실행 핸들러
-  const handleSearch = () => {
-    // 검색은 이미 디바운스로 실행되므로 추가 작업 필요 없음
-  };
-
   // 하이라이트 텍스트 처리
   const highlightText = (text: string, highlight?: string) => {
     if (!highlight) return text;
@@ -260,33 +261,16 @@ export function AddBookDialog({
       <ResponsiveDialogContent
         className="flex h-[900px] min-w-[800px] flex-col bg-white p-5 pb-2"
         drawerClassName="flex flex-col bg-white p-5 pb-2 h-[80vh]"
+        onOpenAutoFocus={e => {
+          e.preventDefault();
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 100);
+        }}
       >
         <ResponsiveDialogHeader className="mb-0.5">
           <ResponsiveDialogTitle>서재에 책 추가</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
-
-        <div className="sticky top-0 z-10 flex w-full items-center gap-2 bg-white pb-0.5">
-          <div className="relative flex-1">
-            <Input
-              ref={inputRef}
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              className="h-9 w-full rounded-lg pl-10"
-              placeholder="도서 제목, 저자, ISBN 등으로 검색"
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  handleSearch();
-                }
-              }}
-            />
-            <button
-              className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              onClick={handleSearch}
-            >
-              <Search className="h-4 w-4" />
-            </button>
-          </div>
-        </div>
 
         {/* 선택된 책 목록 섹션 */}
         {selectedBooks.length > 0 && (
@@ -326,157 +310,171 @@ export function AddBookDialog({
           </div>
         )}
 
-        {query.length > 0 && (
-          <div className="sticky top-[40px] z-10 mt-2 bg-white py-0">
-            <h3 className="px-2 text-xs font-medium text-gray-700">
-              &ldquo;{query}&rdquo; 검색 결과
-              {totalResults ? ` (${totalResults})` : ''}
-            </h3>
-          </div>
-        )}
-
-        <div
-          className="mt-0.5 flex-1 overflow-y-auto bg-white pr-2 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
-          onScroll={handleScroll}
+        <Command
+          className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
+          shouldFilter={false}
+          loop={true}
         >
-          {query.length === 0 ? (
-            <div className="flex h-full w-full items-center justify-center p-8 text-sm text-gray-500">
-              검색어를 입력해주세요.
-            </div>
-          ) : isLoading || isDebouncing ? (
-            <div className="flex h-[300px] w-full items-center justify-center">
-              <div className="flex flex-col items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-              </div>
-            </div>
-          ) : searchResults.length === 0 ? (
-            <div className="flex h-[300px] w-full items-center justify-center">
-              <div className="flex flex-col items-center justify-center py-6 text-center">
-                <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-                  <span className="text-4xl">📚</span>
+          <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-100 bg-white">
+            <CommandInput
+              ref={inputRef}
+              value={query}
+              onValueChange={setQuery}
+              className="h-12 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
+              placeholder="도서 제목, 저자, ISBN 등으로 검색"
+            />
+          </div>
+
+          <div className="h-full flex-1 overflow-y-auto">
+            <CommandList
+              className="h-full !max-h-none [&>div]:h-full"
+              onScroll={handleScroll}
+            >
+              {query.length > 0 && (
+                <div className="sticky top-0 z-10 bg-white px-4 py-2 text-xs font-medium text-gray-500">
+                  &ldquo;{query}&rdquo; 검색 결과
+                  {totalResults ? ` (${totalResults})` : ''}
                 </div>
-                <p className="mb-3 text-xl font-medium text-gray-800">
-                  검색 결과가 없습니다
-                </p>
-                <p className="text-sm text-gray-500">
-                  다른 검색어로 시도해보세요
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="px-1">
-              <div>
-                {searchResults.map(book => {
-                  const bookKey = getBookIdentifier(book);
-                  const isSelected = selectedBooks.some(
-                    selectedBook => getBookIdentifier(selectedBook) === bookKey
-                  );
+              )}
 
-                  const imageUrl = normalizeImageUrl(
-                    book.coverImage || book.image
-                  );
-
-                  return (
-                    <div
-                      key={bookKey}
-                      className={`group relative flex cursor-pointer items-start gap-4 rounded-md bg-white px-3 py-3.5 transition-colors hover:bg-gray-50 ${
-                        isSelected ? 'bg-gray-50' : ''
-                      }`}
-                      onClick={() => toggleBookSelection(book)}
-                      role="button"
-                      tabIndex={0}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                          toggleBookSelection(book);
-                        }
-                      }}
-                    >
-                      <div className="relative w-[140px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white">
-                        <img
-                          src={imageUrl}
-                          alt={book.title}
-                          className="h-auto w-full object-contain"
-                          onError={e => {
-                            e.currentTarget.src = '/images/no-image.png';
-                          }}
-                          loading="lazy"
-                        />
+              {query.length === 0 ? (
+                <div className="flex h-full w-full items-center justify-center p-8 text-sm text-gray-500">
+                  검색어를 입력해주세요.
+                </div>
+              ) : isLoading || isDebouncing ? (
+                <div className="flex h-[300px] w-full items-center justify-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                  </div>
+                </div>
+              ) : searchResults.length === 0 ? (
+                <CommandEmpty className="py-6 text-center">
+                  <div className="flex h-[300px] w-full items-center justify-center">
+                    <div className="flex flex-col items-center justify-center py-6 text-center">
+                      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                        <span className="text-4xl">📚</span>
                       </div>
+                      <p className="mb-3 text-xl font-medium text-gray-800">
+                        검색 결과가 없습니다
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        다른 검색어로 시도해보세요
+                      </p>
+                    </div>
+                  </div>
+                </CommandEmpty>
+              ) : (
+                <CommandGroup className="px-1">
+                  <div className="space-y-1">
+                    {searchResults.map(book => {
+                      const bookKey = getBookIdentifier(book);
+                      const isSelected = selectedBooks.some(
+                        selectedBook =>
+                          getBookIdentifier(selectedBook) === bookKey
+                      );
 
-                      <div className="flex min-w-0 flex-1 flex-col justify-start pt-1">
-                        <h4 className="line-clamp-2 text-base font-medium text-gray-900 group-hover:text-gray-800">
-                          {highlightText(book.title, query)}
-                        </h4>
+                      const imageUrl = normalizeImageUrl(
+                        book.coverImage || book.image
+                      );
 
-                        {book.author && (
-                          <p className="mt-1.5 line-clamp-1 text-sm text-gray-500">
-                            {book.author}
-                          </p>
-                        )}
+                      return (
+                        <CommandItem
+                          key={bookKey}
+                          className={cn(
+                            'group relative flex h-auto cursor-pointer items-start gap-4 rounded-md px-3 py-3.5 transition-colors hover:bg-gray-50',
+                            isSelected ? 'bg-gray-50' : ''
+                          )}
+                          onSelect={() => toggleBookSelection(book)}
+                        >
+                          <div className="relative w-[140px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white">
+                            <img
+                              src={imageUrl}
+                              alt={book.title}
+                              className="h-auto w-full object-contain"
+                              onError={e => {
+                                e.currentTarget.src = '/images/no-image.png';
+                              }}
+                              loading="lazy"
+                            />
+                          </div>
 
-                        <div className="mt-2.5 flex items-center gap-3">
-                          {book.rating && book.rating > 0 && (
-                            <div className="flex items-center">
-                              {renderStarRating(book.rating)}
-                              <span className="mx-1.5 text-sm font-medium text-gray-800">
-                                {typeof book.rating === 'number'
-                                  ? book.rating.toFixed(1)
-                                  : book.rating}
-                              </span>
-                              {book.totalRatings && book.totalRatings > 0 && (
-                                <span className="text-sm text-gray-500">
-                                  ({book.totalRatings})
-                                </span>
+                          <div className="flex min-w-0 flex-1 flex-col justify-start pt-1">
+                            <h4 className="line-clamp-2 text-base font-medium text-gray-900 group-hover:text-gray-800">
+                              {highlightText(book.title, query)}
+                            </h4>
+
+                            {book.author && (
+                              <p className="mt-1.5 line-clamp-1 text-sm text-gray-500">
+                                {book.author}
+                              </p>
+                            )}
+
+                            <div className="mt-2.5 flex items-center gap-3">
+                              {book.rating && book.rating > 0 && (
+                                <div className="flex items-center">
+                                  {renderStarRating(book.rating)}
+                                  <span className="mx-1.5 text-sm font-medium text-gray-800">
+                                    {typeof book.rating === 'number'
+                                      ? book.rating.toFixed(1)
+                                      : book.rating}
+                                  </span>
+                                  {book.totalRatings &&
+                                    book.totalRatings > 0 && (
+                                      <span className="text-sm text-gray-500">
+                                        ({book.totalRatings})
+                                      </span>
+                                    )}
+                                </div>
+                              )}
+
+                              {book.reviews && book.reviews > 0 && (
+                                <div className="flex items-center border-l border-gray-200 pl-3">
+                                  <MessageSquare className="h-4 w-4 text-gray-400" />
+                                  <span className="text-md ml-1.5 text-gray-500">
+                                    {book.reviews > 999
+                                      ? `${Math.floor(book.reviews / 1000)}k`
+                                      : book.reviews}
+                                  </span>
+                                </div>
                               )}
                             </div>
-                          )}
 
-                          {book.reviews && book.reviews > 0 && (
-                            <div className="flex items-center border-l border-gray-200 pl-3">
-                              <MessageSquare className="h-4 w-4 text-gray-400" />
-                              <span className="text-md ml-1.5 text-gray-500">
-                                {book.reviews > 999
-                                  ? `${Math.floor(book.reviews / 1000)}k`
-                                  : book.reviews}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-
-                        {book.publisher && (
-                          <div className="mt-2 text-sm text-gray-500">
-                            <span>{book.publisher}</span>
-                            {(book.isbn13 || book.isbn) && (
-                              <>
-                                <span className="mx-1.5">·</span>
-                                <span>{book.isbn13 || book.isbn}</span>
-                              </>
+                            {book.publisher && (
+                              <div className="mt-2 text-sm text-gray-500">
+                                <span>{book.publisher}</span>
+                                {(book.isbn13 || book.isbn) && (
+                                  <>
+                                    <span className="mx-1.5">·</span>
+                                    <span>{book.isbn13 || book.isbn}</span>
+                                  </>
+                                )}
+                              </div>
                             )}
                           </div>
-                        )}
+
+                          {/* 선택 상태 표시 배지 */}
+                          {isSelected && (
+                            <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-white shadow-sm">
+                              <span className="text-xs font-bold">✓</span>
+                            </div>
+                          )}
+                        </CommandItem>
+                      );
+                    })}
+
+                    {isFetchingNextPage && (
+                      <div className="flex justify-center py-4">
+                        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                       </div>
-
-                      {/* 선택 상태 표시 배지 */}
-                      {isSelected && (
-                        <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-white shadow-sm">
-                          <span className="text-xs font-bold">✓</span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-
-                {isFetchingNextPage && (
-                  <div className="flex justify-center py-4">
-                    <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                    )}
                   </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+                </CommandGroup>
+              )}
+            </CommandList>
+          </div>
+        </Command>
 
-        <div className="flex justify-end gap-2 bg-white px-0 py-3">
+        <div className="mt-2 flex justify-end gap-2 bg-white px-0 py-3">
           <Button
             variant="outline"
             onClick={handleCloseDialog}
