@@ -20,13 +20,66 @@ import { BookFullSkeleton, ErrorFallback } from './components/common';
 
 import {
   ResponsiveDialog,
-  ResponsiveDialogClose,
   ResponsiveDialogContent,
   ResponsiveDialogPortal,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 
-function BookDialogContent() {
+// 모바일용 BookDialogContent 컴포넌트
+function MobileBookDialogContent() {
+  return (
+    <>
+      <div className="mx-auto w-full px-4 pt-4 pb-28">
+        <div className="space-y-6">
+          {/* 책 표지 및 기본 정보 */}
+          <BookCoverSection />
+
+          {/* 별점 정보 */}
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <Suspense
+              fallback={
+                <div className="h-24 animate-pulse rounded-xl bg-gray-50 p-4"></div>
+              }
+            >
+              <BookRatingSection />
+            </Suspense>
+          </ErrorBoundary>
+
+          {/* 읽기 통계 */}
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <BookReadingStats />
+          </ErrorBoundary>
+
+          {/* 기능 버튼들 */}
+          <div className="flex flex-col gap-3">
+            {/* 읽기 상태 및 서재에 담기 버튼 */}
+            <BookActionButtons />
+          </div>
+
+          {/* 책 설명, 저자 소개 */}
+          <div className="space-y-1">
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <Suspense fallback={<BookInfoSkeleton />}>
+                <BookInfo />
+              </Suspense>
+            </ErrorBoundary>
+            <p className="mt-2 text-right text-xs text-gray-400">
+              정보제공: 알라딘
+            </p>
+          </div>
+
+          {/* 리뷰 및 관련 정보 */}
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <BookRightPanel />
+          </ErrorBoundary>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// 데스크톱용 BookDialogContent 컴포넌트
+function DesktopBookDialogContent() {
   return (
     <>
       <div className="mx-auto w-full max-w-screen-xl px-10 pt-4 pb-10">
@@ -96,28 +149,33 @@ export function BookDialog() {
         onOpenChange={open => {
           if (!open) close();
         }}
+        snapPoints={[1]}
+        shouldScaleBackground={false}
       >
         <ResponsiveDialogPortal>
           <ResponsiveDialogContent
-            drawerClassName="w-full bg-white p-0 z-[100] rounded-t-lg overflow-auto h-[90vh]"
+            drawerClassName="w-full bg-white p-0 z-[100] rounded-t-[16px] overflow-hidden h-[92vh] shadow-lg"
             hideCloseButton
           >
-            <ResponsiveDialogTitle
-              className="sr-only"
-              drawerClassName="sr-only"
-            >
-              도서 상세 정보
-            </ResponsiveDialogTitle>
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
-              <Suspense fallback={<BookFullSkeleton />}>
-                <BookHeader />
-                <BookDialogContent />
-              </Suspense>
-            </ErrorBoundary>
-            <ResponsiveDialogClose drawerClassName="absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none ring-offset-background focus:ring-ring">
-              <X className="h-4 w-4" />
-              <span className="sr-only">Close</span>
-            </ResponsiveDialogClose>
+            <div className="flex h-full flex-col">
+              <ResponsiveDialogTitle
+                className="sr-only"
+                drawerClassName="sr-only"
+              >
+                도서 상세 정보
+              </ResponsiveDialogTitle>
+
+              <ErrorBoundary FallbackComponent={ErrorFallback}>
+                <Suspense fallback={<BookFullSkeleton />}>
+                  <div className="sticky top-0 z-10">
+                    <BookHeader />
+                  </div>
+                  <div className="pb-safe h-full overflow-y-auto">
+                    <MobileBookDialogContent />
+                  </div>
+                </Suspense>
+              </ErrorBoundary>
+            </div>
           </ResponsiveDialogContent>
         </ResponsiveDialogPortal>
       </ResponsiveDialog>
@@ -143,7 +201,7 @@ export function BookDialog() {
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <Suspense fallback={<BookFullSkeleton />}>
                   <BookHeader />
-                  <BookDialogContent />
+                  <DesktopBookDialogContent />
                 </Suspense>
               </ErrorBoundary>
               <DialogPrimitive.Close className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">

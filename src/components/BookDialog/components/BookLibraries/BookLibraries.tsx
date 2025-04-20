@@ -160,7 +160,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
 
   return (
     <div className="p-1">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {libraries.map((library: LibraryListItem) => (
           <div key={library.id}>
             <LibraryCard
@@ -221,7 +221,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
 export function LibrariesSkeleton() {
   return (
     <div className="p-1">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {[1, 2, 3, 4].map(i => (
           <div key={i} className="h-full rounded-xl bg-[#F9FAFB] p-4">
             <div className="flex items-center gap-3">
