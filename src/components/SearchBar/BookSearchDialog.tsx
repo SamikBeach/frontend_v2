@@ -147,7 +147,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
                 : view === 'recent'
                   ? 'h-auto max-h-[640px]'
                   : 'auto',
-              'max-md:h-screen max-md:rounded-none max-md:p-4 max-md:pt-6 max-md:pb-0 max-md:ring-0'
+              'max-md:h-screen max-md:rounded-none max-md:p-4 max-md:pt-0 max-md:pb-0 max-md:ring-0'
             )}
           >
             <Command
