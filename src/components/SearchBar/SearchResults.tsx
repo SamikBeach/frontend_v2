@@ -85,7 +85,7 @@ function RecentSearches({
 // 인기 검색어 스켈레톤
 function PopularSearchesSkeleton() {
   return (
-    <CommandGroup className="pt-4">
+    <CommandGroup>
       <div className="mb-2 px-4">
         <h3 className="flex items-center text-sm font-medium text-gray-700">
           인기 검색어 로딩 중...
@@ -241,9 +241,9 @@ export function SearchResults({
     >
       <CommandGroup
         heading={`"${query}" 검색 결과${totalResults ? ` (${totalResults})` : ''}`}
-        className="px-2 pt-4 pb-20"
+        className="px-2"
       >
-        <div className="mt-6 space-y-1">
+        <div className="space-y-1">
           {searchResults.map((book, index) => {
             // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
             const bookKey =

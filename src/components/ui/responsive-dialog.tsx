@@ -39,13 +39,18 @@ const ResponsiveDialogContext = React.createContext<{ isMobile: boolean }>({
 function ResponsiveDialogRoot({
   children,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Root>) {
+}: React.ComponentProps<typeof DialogPrimitive.Root> & {
+  shouldScaleBackground?: boolean;
+  snapPoints?: Array<number>;
+}) {
   const isMobile = useIsMobile();
 
   return (
     <ResponsiveDialogContext.Provider value={{ isMobile }}>
       {isMobile ? (
-        <Drawer {...props}>{children}</Drawer>
+        <Drawer shouldScaleBackground={false} snapPoints={[1]} {...props}>
+          {children}
+        </Drawer>
       ) : (
         <Dialog {...props}>{children}</Dialog>
       )}
@@ -78,12 +83,13 @@ function ResponsiveDialogOverlay({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
   const { isMobile } = useResponsiveDialog();
-  return isMobile ? (
-    // Drawer already handles its own overlay
-    <React.Fragment />
-  ) : (
-    <DialogOverlay className={className} {...props} />
-  );
+
+  // 모바일에서는 오버레이를 렌더링하지 않음 (Drawer에서 자체적으로 처리)
+  if (isMobile) {
+    return null;
+  }
+
+  return <DialogOverlay className={className} {...props} />;
 }
 
 // Trigger component
@@ -111,7 +117,7 @@ function ResponsiveDialogContent({
 
   if (isMobile) {
     return (
-      <DrawerContent className={cn(drawerClassName)} {...props}>
+      <DrawerContent className={cn('z-[100]', drawerClassName)} {...props}>
         {children}
       </DrawerContent>
     );
