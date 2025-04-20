@@ -1,7 +1,6 @@
 'use client';
 
 import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import * as React from 'react';
 
@@ -117,7 +116,7 @@ function ResponsiveDialogContent({
 
   if (isMobile) {
     return (
-      <DrawerContent className={cn('z-[100]', drawerClassName)} {...props}>
+      <DrawerContent className={drawerClassName} {...props}>
         {children}
       </DrawerContent>
     );
