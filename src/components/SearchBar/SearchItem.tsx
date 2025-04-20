@@ -63,7 +63,7 @@ export function SearchItem({
       <>
         {parts.map((part, index) =>
           part.toLowerCase() === highlight?.toLowerCase() ? (
-            <span key={index} className="font-medium text-gray-900">
+            <span key={index} className="font-medium text-gray-700">
               {part}
             </span>
           ) : (
@@ -350,7 +350,7 @@ export function SearchItem({
       {/* 도서 정보 */}
       <div className="flex min-w-0 flex-1 flex-col justify-start pt-1">
         <h4
-          className={`line-clamp-2 ${isSmall ? 'text-sm' : 'text-base'} font-medium text-gray-900 group-hover:text-gray-800`}
+          className={`line-clamp-2 ${isSmall ? 'text-sm' : 'text-base'} font-medium text-gray-800 group-hover:text-gray-700`}
         >
           {highlightText(item.title, item.highlight)}
         </h4>

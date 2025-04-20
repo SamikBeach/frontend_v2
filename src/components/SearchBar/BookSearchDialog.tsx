@@ -147,7 +147,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
                 : view === 'recent'
                   ? 'h-auto max-h-[640px]'
                   : 'auto',
-              'max-md:h-screen max-md:rounded-none max-md:p-4 max-md:pt-6 max-md:ring-0'
+              'max-md:h-screen max-md:rounded-none max-md:p-4 max-md:pt-6 max-md:pb-0 max-md:ring-0'
             )}
           >
             <Command
@@ -155,7 +155,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
               shouldFilter={false}
               loop={true}
             >
-              <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-200 bg-white">
+              <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-100 bg-white">
                 <CommandInput
                   ref={inputRef}
                   value={query}

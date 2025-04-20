@@ -42,11 +42,11 @@ function RecentSearches({
   const recentSearches = recentSearchData?.books || [];
 
   return (
-    <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pt-2 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+    <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
       {/* 최근 검색 목록 */}
       {recentSearches.length > 0 && (
         <div>
-          <div className="mb-2 flex items-center justify-between px-4">
+          <div className="mb-2 flex items-center justify-between px-4 pt-2">
             <h3 className="flex items-center text-sm font-medium text-gray-700">
               <Clock className="mr-2 h-4 w-4 text-gray-500" />
               최근 검색 기록
@@ -193,7 +193,7 @@ export function SearchResults({
     return (
       <CommandPrimitive.List
         ref={listRef}
-        className="h-full !max-h-none overflow-y-auto pt-2 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+        className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
       >
         <div className="flex h-[540px] w-full items-center justify-center">
           <div className="flex flex-col items-center justify-center">
@@ -212,7 +212,7 @@ export function SearchResults({
     return (
       <CommandPrimitive.List
         ref={listRef}
-        className="h-full !max-h-none overflow-y-auto pt-2 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+        className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
       >
         <CommandEmpty className="py-6 text-center">
           <div className="flex h-[540px] w-full items-center justify-center">
@@ -237,12 +237,15 @@ export function SearchResults({
   return (
     <CommandPrimitive.List
       ref={listRef}
-      className="h-full !max-h-none overflow-y-auto pt-2 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+      className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
     >
-      <CommandGroup
-        heading={`"${query}" 검색 결과${totalResults ? ` (${totalResults})` : ''}`}
-        className="px-2"
-      >
+      {/* 검색 결과 헤더 */}
+      <div className="sticky top-0 z-10 bg-white px-4 py-2 text-xs font-medium text-gray-500">
+        &ldquo;{query}&rdquo; 검색 결과
+        {totalResults ? ` (${totalResults})` : ''}
+      </div>
+
+      <CommandGroup className="px-2">
         <div className="space-y-1">
           {searchResults.map((book, index) => {
             // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
@@ -304,8 +307,7 @@ export function SearchResults({
         </div>
       )}
 
-      {/* 추가 패딩 (모바일 뷰에서 마지막 항목이 보이도록) */}
-      <div className="h-10" />
+      {/* 모바일 뷰에서는 더이상 추가 패딩이 필요없음 */}
     </CommandPrimitive.List>
   );
 }
