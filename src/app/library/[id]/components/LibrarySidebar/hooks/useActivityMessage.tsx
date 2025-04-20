@@ -201,7 +201,8 @@ export function useActivityMessage(library: Library) {
       }
 
       case LibraryActivityType.SUBSCRIPTION_ADD: {
-        const username = getUsernameById(update.userId);
+        // 백엔드에서 userName이 제공되면 사용하고, 그렇지 않으면 기존 방식으로 이름을 찾음
+        const username = update.userName || getUsernameById(update.userId);
         return (
           <>
             {activityIcon}{' '}
@@ -212,7 +213,8 @@ export function useActivityMessage(library: Library) {
       }
 
       case LibraryActivityType.SUBSCRIPTION_REMOVE: {
-        const username = getUsernameById(update.userId);
+        // 백엔드에서 userName이 제공되면 사용하고, 그렇지 않으면 기존 방식으로 이름을 찾음
+        const username = update.userName || getUsernameById(update.userId);
         return (
           <>
             {activityIcon}{' '}
