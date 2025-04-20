@@ -2,12 +2,12 @@
 
 import { Command, CommandInput } from '@/components/ui/command';
 import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogPortal,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  ResponsiveDialog,
+  ResponsiveDialogClose,
+  ResponsiveDialogContent,
+  ResponsiveDialogPortal,
+  ResponsiveDialogTitle,
+} from '@/components/ui/responsive-dialog';
 import { useDialogQuery } from '@/hooks';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
@@ -115,12 +115,16 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
   }, [isOpen, queryClient]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogPortal>
-        <DialogContent
+    <ResponsiveDialog open={isOpen} onOpenChange={handleOpenChange}>
+      <ResponsiveDialogPortal>
+        <ResponsiveDialogContent
           className={cn(
             'animate-expandDown fixed top-[6px] left-1/2 z-50 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
             query ? 'h-[calc(100vh-32px)]' : 'auto'
+          )}
+          drawerClassName={cn(
+            'animate-expandUp gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none',
+            query ? 'h-[80vh]' : 'h-auto max-h-[80vh]'
           )}
           hideCloseButton
           overlayClassName="bg-black/15"
@@ -131,7 +135,9 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
             }, 100);
           }}
         >
-          <DialogTitle className="sr-only">도서 검색</DialogTitle>
+          <ResponsiveDialogTitle className="sr-only">
+            도서 검색
+          </ResponsiveDialogTitle>
           <div
             className={cn(
               'animate-expandDown flex h-full w-full flex-col overflow-hidden rounded-xl bg-white p-4 ring-1 ring-black/5 transition-all',
@@ -177,12 +183,15 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
               </div>
             </Command>
           </div>
-          <DialogClose className="absolute top-6 right-6 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none">
+          <ResponsiveDialogClose
+            className="absolute top-6 right-6 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none"
+            drawerClassName="absolute top-4 right-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none"
+          >
             <X className="h-5 w-5" />
             <span className="sr-only">Close</span>
-          </DialogClose>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
+          </ResponsiveDialogClose>
+        </ResponsiveDialogContent>
+      </ResponsiveDialogPortal>
+    </ResponsiveDialog>
   );
 }

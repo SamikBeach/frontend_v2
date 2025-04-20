@@ -5,13 +5,13 @@ import { searchBooks } from '@/apis/search';
 import { SearchResult } from '@/apis/search/types';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import {
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from '@/components/ui/responsive-dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   Tooltip,
@@ -256,11 +256,14 @@ export function AddBookDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleCloseDialog}>
-      <DialogContent className="flex h-[900px] min-w-[800px] flex-col bg-white p-5 pb-2">
-        <DialogHeader className="mb-0.5">
-          <DialogTitle>서재에 책 추가</DialogTitle>
-        </DialogHeader>
+    <ResponsiveDialog open={isOpen} onOpenChange={handleCloseDialog}>
+      <ResponsiveDialogContent
+        className="flex h-[900px] min-w-[800px] flex-col bg-white p-5 pb-2"
+        drawerClassName="flex flex-col bg-white p-5 pb-2 h-[80vh]"
+      >
+        <ResponsiveDialogHeader className="mb-0.5">
+          <ResponsiveDialogTitle>서재에 책 추가</ResponsiveDialogTitle>
+        </ResponsiveDialogHeader>
 
         <div className="sticky top-0 z-10 flex w-full items-center gap-2 bg-white pb-0.5">
           <div className="relative flex-1">
@@ -490,7 +493,7 @@ export function AddBookDialog({
               : `서재에 ${selectedBooks.length > 0 ? `${selectedBooks.length}권 ` : ''}추가하기`}
           </Button>
         </div>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }

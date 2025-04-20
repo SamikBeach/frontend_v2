@@ -9,14 +9,14 @@ import {
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogFooter,
+  ResponsiveDialogTitle,
+} from '@/components/ui/responsive-dialog';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -166,18 +166,19 @@ export function LibraryDialog({
 
   return (
     <>
-      <Dialog
+      <ResponsiveDialog
         open={open}
         onOpenChange={isSubmitting ? undefined : onOpenChange}
       >
-        <DialogContent
+        <ResponsiveDialogContent
           onOpenAutoFocus={e => e.preventDefault()}
           className="fixed top-1/2 left-1/2 max-w-md -translate-x-1/2 -translate-y-1/2 transform rounded-2xl border-none p-0 shadow-lg"
+          drawerClassName="border-t rounded-t-2xl p-0"
         >
           <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
-            <DialogTitle className="text-base font-medium">
+            <ResponsiveDialogTitle className="text-base font-medium">
               {mode === 'create' ? '새 서재 만들기' : '서재 정보 수정'}
-            </DialogTitle>
+            </ResponsiveDialogTitle>
             <Button
               variant="ghost"
               size="icon"
@@ -302,7 +303,10 @@ export function LibraryDialog({
             </div>
           </div>
 
-          <DialogFooter className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4">
+          <ResponsiveDialogFooter
+            className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
+            drawerClassName="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
+          >
             <Button
               type="button"
               variant="outline"
@@ -329,9 +333,9 @@ export function LibraryDialog({
                   ? '서재 만들기'
                   : '저장하기'}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </ResponsiveDialogFooter>
+        </ResponsiveDialogContent>
+      </ResponsiveDialog>
 
       <AuthDialog
         open={authDialogOpen}
