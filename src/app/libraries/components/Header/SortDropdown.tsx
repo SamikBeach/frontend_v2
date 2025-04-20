@@ -1,6 +1,6 @@
 import { Library } from '@/apis/library/types';
 import { SortDropdown as CommonSortDropdown } from '@/components/SortDropdown';
-import { SortDropdownProps } from '../types';
+import { SortDropdownProps } from '../../types';
 
 export function SortDropdown({
   selectedSort,

@@ -6,7 +6,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Tag, createDefaultTag, getTagColor } from '@/utils/tags';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
-import { useAllLibraryTags } from '../hooks/useAllLibraryTags';
+import { useAllLibraryTags } from '../../hooks/useAllLibraryTags';
+import { TagButton } from './TagButton';
 
 // 스켈레톤 로더 컴포넌트
 function FilterBarSkeleton() {
@@ -51,20 +52,12 @@ function FilterBarContent({
     <div className="no-scrollbar flex gap-2 overflow-x-auto py-1">
       <div className="flex gap-2 px-0.5">
         {tags.map((tag: Tag) => (
-          <button
+          <TagButton
             key={tag.id}
-            onClick={() => handleTagClick(tag.id)}
-            className={`flex h-9 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-full px-4 text-sm font-medium transition-all ${
-              tagFilter === tag.id
-                ? 'bg-gray-900 text-white'
-                : 'hover:bg-gray-50'
-            }`}
-            style={{
-              backgroundColor: tagFilter === tag.id ? undefined : tag.color,
-            }}
-          >
-            {tag.name}
-          </button>
+            tag={tag}
+            isSelected={tagFilter === tag.id}
+            onClick={handleTagClick}
+          />
         ))}
       </div>
     </div>

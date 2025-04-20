@@ -3,10 +3,8 @@
 import { Clock, Flame, Library } from 'lucide-react';
 import { useLibraries } from '../hooks/useLibraries';
 import { SortOption } from '../types';
-import { FilterBar } from './FilterBar';
-import { LibraryList, LibraryListSkeleton } from './LibraryListWithPagination';
-import { SearchBar } from './SearchBar';
-import { SortDropdown } from './SortDropdown';
+import { Header } from './Header';
+import { LibraryList, LibraryListSkeleton } from './LibraryList';
 
 // 정렬 옵션 정의
 const sortOptions: SortOption[] = [
@@ -45,47 +43,16 @@ export function Libraries() {
 
   return (
     <>
-      {/* 필터 영역 - 스크롤 시 상단에 고정 */}
-      <div className="sticky top-[56px] z-30 bg-white">
-        <div className="mx-auto w-full p-4">
-          <div className="relative">
-            {/* xl 이상 화면에서 보이는 검색바와 정렬 버튼 */}
-            <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:flex xl:items-center xl:gap-4">
-              <SearchBar
-                onSearchChange={handleSearchChange}
-                value={searchQuery}
-              />
-              <SortDropdown
-                selectedSort={sortOption}
-                onSortChange={handleSortChange}
-                sortOptions={sortOptions}
-                selectedTimeRange={timeRange}
-                onTimeRangeChange={handleTimeRangeChange}
-              />
-            </div>
-
-            <div className="flex flex-col gap-4">
-              <FilterBar />
-              {/* xl 미만 화면에서 보이는 검색바와 정렬 버튼 */}
-              <div className="flex items-center gap-4 xl:hidden">
-                <div className="flex-1">
-                  <SearchBar
-                    onSearchChange={handleSearchChange}
-                    value={searchQuery}
-                  />
-                </div>
-                <SortDropdown
-                  selectedSort={sortOption}
-                  onSortChange={handleSortChange}
-                  sortOptions={sortOptions}
-                  selectedTimeRange={timeRange}
-                  onTimeRangeChange={handleTimeRangeChange}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Header 컴포넌트로 필터 영역 분리 */}
+      <Header
+        sortOption={sortOption}
+        sortOptions={sortOptions}
+        searchQuery={searchQuery}
+        timeRange={timeRange}
+        onSortChange={handleSortChange}
+        onTimeRangeChange={handleTimeRangeChange}
+        onSearchChange={handleSearchChange}
+      />
 
       {/* 메인 콘텐츠 */}
       <div className="p-4">

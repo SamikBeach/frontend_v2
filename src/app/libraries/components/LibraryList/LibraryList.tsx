@@ -1,39 +1,11 @@
 import { Library } from '@/apis/library/types';
-import { LibraryCard, LibraryCardSkeleton } from '@/components/LibraryCard';
 import { Button } from '@/components/ui/button';
-import { createDefaultTag, getTagColor, Tag } from '@/utils/tags';
 import { ArrowDown, CheckCircle2, Loader2 } from 'lucide-react';
-import { Suspense } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { useAllLibraryTags } from '../hooks/useAllLibraryTags';
 import { EmptyState } from './EmptyState';
+import { LibraryListWithTagsWrapper } from './LibraryListWithTags';
 
-// 라이브러리 카드에 전달할 태그 정보를 생성하는 컴포넌트
-function LibraryListWithTags({ libraries, ...props }: LibraryListProps) {
-  const { tags: allTags } = useAllLibraryTags(50);
-
-  // 태그 목록 생성
-  const tags: Tag[] = [
-    // "전체" 태그
-    createDefaultTag(),
-    // 모든 라이브러리 태그 기반으로 변환
-    ...(allTags || []).map((tag, index) => ({
-      id: String(tag.id),
-      name: tag.tagName,
-      color: getTagColor(index),
-    })),
-  ];
-
-  return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {libraries.map(library => (
-        <LibraryCard key={library.id} library={library} tags={tags} />
-      ))}
-    </div>
-  );
-}
-
-interface LibraryListProps {
+export interface LibraryListProps {
   libraries: Library[];
   searchQuery: string;
   tagFilter: string;
@@ -79,16 +51,7 @@ export function LibraryList({
       }
       scrollThreshold={0.8}
     >
-      <Suspense fallback={<LibraryListSkeleton />}>
-        <LibraryListWithTags
-          libraries={libraries}
-          searchQuery={searchQuery}
-          tagFilter={tagFilter}
-          hasNextPage={hasNextPage}
-          isFetchingNextPage={isFetchingNextPage}
-          fetchNextPage={fetchNextPage}
-        />
-      </Suspense>
+      <LibraryListWithTagsWrapper libraries={libraries} tagFilter={tagFilter} />
 
       {hasNextPage && !isFetchingNextPage && (
         <div className="mt-8 flex w-full justify-center">
@@ -103,16 +66,5 @@ export function LibraryList({
         </div>
       )}
     </InfiniteScroll>
-  );
-}
-
-// 로딩 스켈레톤
-export function LibraryListSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, index) => (
-        <LibraryCardSkeleton key={index} />
-      ))}
-    </div>
   );
 }

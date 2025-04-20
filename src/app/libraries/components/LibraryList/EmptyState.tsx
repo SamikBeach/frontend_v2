@@ -1,5 +1,9 @@
 import { AlertCircle, Folder, Search } from 'lucide-react';
-import { EmptyStateProps } from '../types';
+
+export interface EmptyStateProps {
+  searchQuery: string;
+  selectedTag: string;
+}
 
 export function EmptyState({ searchQuery, selectedTag }: EmptyStateProps) {
   return (
