@@ -111,10 +111,7 @@ function ResponsiveDialogContent({
 
   if (isMobile) {
     return (
-      <DrawerContent
-        className={cn('inset-0 h-[100vh]', drawerClassName)}
-        {...props}
-      >
+      <DrawerContent className={cn(drawerClassName)} {...props}>
         {children}
       </DrawerContent>
     );

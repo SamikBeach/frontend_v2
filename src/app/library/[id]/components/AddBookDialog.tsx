@@ -327,7 +327,7 @@ export function AddBookDialog({
         )}
 
         {query.length > 0 && (
-          <div className="sticky top-[40px] z-10 bg-white py-0">
+          <div className="sticky top-[40px] z-10 mt-2 bg-white py-0">
             <h3 className="px-2 text-xs font-medium text-gray-700">
               &ldquo;{query}&rdquo; 검색 결과
               {totalResults ? ` (${totalResults})` : ''}

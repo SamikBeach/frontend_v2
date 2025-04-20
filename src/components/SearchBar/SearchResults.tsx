@@ -42,7 +42,7 @@ function RecentSearches({
   const recentSearches = recentSearchData?.books || [];
 
   return (
-    <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+    <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pt-2 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
       {/* 최근 검색 목록 */}
       {recentSearches.length > 0 && (
         <div>
@@ -193,9 +193,9 @@ export function SearchResults({
     return (
       <CommandPrimitive.List
         ref={listRef}
-        className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+        className="h-full !max-h-none overflow-y-auto pt-2 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
       >
-        <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
+        <div className="flex h-[540px] w-full items-center justify-center">
           <div className="flex flex-col items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
           </div>
@@ -212,10 +212,10 @@ export function SearchResults({
     return (
       <CommandPrimitive.List
         ref={listRef}
-        className="h-full !max-h-none overflow-y-auto pt-4 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+        className="h-full !max-h-none overflow-y-auto pt-2 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
       >
         <CommandEmpty className="py-6 text-center">
-          <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
+          <div className="flex h-[540px] w-full items-center justify-center">
             <div className="flex flex-col items-center justify-center py-6 text-center">
               <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
                 <span className="text-4xl">📚</span>
@@ -237,69 +237,75 @@ export function SearchResults({
   return (
     <CommandPrimitive.List
       ref={listRef}
-      className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+      className="h-full !max-h-none overflow-y-auto pt-2 pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
     >
       <CommandGroup
         heading={`"${query}" 검색 결과${totalResults ? ` (${totalResults})` : ''}`}
+        className="px-2 pt-4 pb-20"
       >
-        {searchResults.map((book, index) => {
-          // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
-          const bookKey =
-            (book?.isbn13 ?? '') + (book?.isbn ?? '') + book.title;
+        <div className="mt-6 space-y-1">
+          {searchResults.map((book, index) => {
+            // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
+            const bookKey =
+              (book?.isbn13 ?? '') + (book?.isbn ?? '') + book.title;
 
-          return (
-            <SearchItem
-              key={bookKey}
-              item={{
-                id: book.id,
-                bookId: book.bookId,
-                type: 'book',
-                title: book.title,
-                author: book.author,
-                image: book.coverImage
-                  ? book.coverImage.replace(/^https?:\/\//, '//')
-                  : undefined,
-                coverImage: book.coverImage
-                  ? book.coverImage.replace(/^https?:\/\//, '//')
-                  : undefined,
-                highlight: query,
-                rating: book.rating,
-                reviews: book.reviews,
-                totalRatings: book.totalRatings,
-                isbn: book.isbn || '',
-                isbn13: book.isbn13 || '',
-                readingStats: book.readingStats,
-                userReadingStatus: book.userReadingStatus,
-                userRating: book.userRating,
-              }}
-              onClick={() =>
-                handleItemClick({
+            return (
+              <SearchItem
+                key={bookKey}
+                item={{
                   id: book.id,
                   bookId: book.bookId,
+                  type: 'book',
                   title: book.title,
                   author: book.author,
-                  image: book.coverImage,
-                  coverImage: book.coverImage,
-                  isbn: book.isbn,
-                  isbn13: book.isbn13,
+                  image: book.coverImage
+                    ? book.coverImage.replace(/^https?:\/\//, '//')
+                    : undefined,
+                  coverImage: book.coverImage
+                    ? book.coverImage.replace(/^https?:\/\//, '//')
+                    : undefined,
+                  highlight: query,
                   rating: book.rating,
                   reviews: book.reviews,
                   totalRatings: book.totalRatings,
+                  isbn: book.isbn || '',
+                  isbn13: book.isbn13 || '',
                   readingStats: book.readingStats,
                   userReadingStatus: book.userReadingStatus,
-                })
-              }
-            />
-          );
-        })}
+                  userRating: book.userRating,
+                }}
+                onClick={() =>
+                  handleItemClick({
+                    id: book.id,
+                    bookId: book.bookId,
+                    title: book.title,
+                    author: book.author,
+                    image: book.coverImage,
+                    coverImage: book.coverImage,
+                    isbn: book.isbn,
+                    isbn13: book.isbn13,
+                    rating: book.rating,
+                    reviews: book.reviews,
+                    totalRatings: book.totalRatings,
+                    readingStats: book.readingStats,
+                    userReadingStatus: book.userReadingStatus,
+                  })
+                }
+              />
+            );
+          })}
+        </div>
       </CommandGroup>
 
-      {/* 더 로드하는 중 표시 */}
+      {/* 로딩 인디케이터 */}
       {isLoading && searchResults.length > 0 && (
-        <div className="flex items-center justify-center py-4">
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <div className="py-4 text-center">
+          <Loader2 className="mx-auto h-5 w-5 animate-spin text-gray-400" />
         </div>
       )}
+
+      {/* 추가 패딩 (모바일 뷰에서 마지막 항목이 보이도록) */}
+      <div className="h-10" />
     </CommandPrimitive.List>
   );
 }

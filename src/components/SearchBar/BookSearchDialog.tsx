@@ -122,10 +122,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
             'animate-expandDown fixed top-[6px] left-1/2 z-50 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
             query ? 'h-[calc(100vh-32px)]' : 'auto'
           )}
-          drawerClassName={cn(
-            'animate-expandUp gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none',
-            query ? 'h-[80vh]' : 'h-auto max-h-[80vh]'
-          )}
+          drawerClassName="animate-expandUp gap-1 p-0 shadow-none outline-none"
           hideCloseButton
           overlayClassName="bg-black/15"
           onOpenAutoFocus={e => {
@@ -135,7 +132,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
             }, 100);
           }}
         >
-          <ResponsiveDialogTitle className="sr-only">
+          <ResponsiveDialogTitle className="sr-only" drawerClassName="sr-only">
             도서 검색
           </ResponsiveDialogTitle>
           <div
@@ -145,7 +142,8 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
                 ? 'h-full max-h-full'
                 : view === 'recent'
                   ? 'h-auto max-h-[640px]'
-                  : 'auto'
+                  : 'auto',
+              'max-md:h-screen max-md:rounded-none max-md:p-4 max-md:pt-6 max-md:ring-0'
             )}
           >
             <Command
@@ -153,7 +151,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
               shouldFilter={false}
               loop={true}
             >
-              <div className="sticky top-0 z-10 flex-shrink-0 border-b border-gray-200 bg-white">
+              <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-200 bg-white">
                 <CommandInput
                   ref={inputRef}
                   value={query}
@@ -162,7 +160,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
                   placeholder="도서 제목을 검색해보세요"
                 />
               </div>
-              <div className="flex-1 overflow-y-auto">
+              <div className="mt-2 flex-1 overflow-y-auto pt-2">
                 <Suspense
                   fallback={
                     <div className="flex h-full w-full items-center justify-center">
@@ -185,7 +183,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
           </div>
           <ResponsiveDialogClose
             className="absolute top-6 right-6 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none"
-            drawerClassName="absolute top-4 right-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none"
+            drawerClassName="absolute top-4 right-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none z-30"
           >
             <X className="h-5 w-5" />
             <span className="sr-only">Close</span>
