@@ -3,12 +3,13 @@ import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogDescription,
+  ResponsiveDialogFooter,
+  ResponsiveDialogTitle,
+} from '@/components/ui/responsive-dialog';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ReviewDialogProps {
   open: boolean;
@@ -33,6 +34,7 @@ export function ReviewDialog({
 }: ReviewDialogProps) {
   const [rating, setRating] = useState(initialRating);
   const [content, setContent] = useState(initialContent);
+  const isMobile = useIsMobile();
 
   // 모달이 열릴 때 초기 데이터 설정
   useEffect(() => {
@@ -67,12 +69,23 @@ export function ReviewDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={isSubmitting ? undefined : onOpenChange}>
-      <DialogContent className="fixed top-1/2 left-1/2 max-w-md -translate-x-1/2 -translate-y-1/2 transform rounded-2xl border-none p-0 shadow-lg">
+    <ResponsiveDialog
+      open={open}
+      onOpenChange={isSubmitting ? undefined : onOpenChange}
+      snapPoints={[1]}
+      shouldScaleBackground={false}
+    >
+      <ResponsiveDialogContent
+        className="max-w-md rounded-2xl border-none p-0 shadow-lg"
+        drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0 shadow-lg h-[100dvh]"
+      >
         <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
-          <DialogTitle className="text-base font-medium">
+          <ResponsiveDialogTitle
+            className="text-base font-medium"
+            drawerClassName="text-base font-medium"
+          >
             {isEditMode ? '리뷰 수정하기' : '리뷰 작성하기'}
-          </DialogTitle>
+          </ResponsiveDialogTitle>
           <Button
             variant="ghost"
             size="icon"
@@ -85,10 +98,13 @@ export function ReviewDialog({
         </div>
 
         <div className="px-5 py-4">
-          <DialogDescription className="mb-6 text-sm text-gray-600">
+          <ResponsiveDialogDescription
+            className="mb-6 text-sm text-gray-600"
+            drawerClassName="mb-6 text-sm text-gray-600"
+          >
             <span className="font-medium text-gray-800">{bookTitle}</span>에
             대한 {isEditMode ? '리뷰를 수정해주세요' : '리뷰를 남겨주세요'}
-          </DialogDescription>
+          </ResponsiveDialogDescription>
 
           <div className="mb-6 flex flex-col items-center space-y-3">
             <div className="relative flex w-full items-center justify-center">
@@ -133,7 +149,7 @@ export function ReviewDialog({
             </p>
           </div>
 
-          <div className="mb-4">
+          <div className={isMobile ? 'mb-4 flex-1' : 'mb-4'}>
             <textarea
               value={content}
               onChange={e => setContent(e.target.value)}
@@ -144,7 +160,10 @@ export function ReviewDialog({
           </div>
         </div>
 
-        <DialogFooter className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4">
+        <ResponsiveDialogFooter
+          className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
+          drawerClassName="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
+        >
           <Button
             variant="outline"
             className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
@@ -165,8 +184,8 @@ export function ReviewDialog({
                 ? '리뷰 수정하기'
                 : '리뷰 등록하기'}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
