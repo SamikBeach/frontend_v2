@@ -2,7 +2,9 @@ import { X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { DialogTitle } from '@/components/ui/dialog';
+import { ResponsiveDialogTitle } from '@/components/ui/responsive-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { useBookDetails } from '../hooks';
 
@@ -23,14 +25,24 @@ export function BookHeaderSkeleton() {
 export function BookHeader() {
   const { close } = useDialogQuery({ type: 'book' });
   const { book } = useBookDetails();
+  const isMobile = useIsMobile();
 
   const bookTitle = book ? book.title : '도서 상세 정보';
 
   return (
     <div className="sticky top-0 z-10 flex h-16 items-center justify-between rounded-t-lg bg-white/80 px-10 backdrop-blur-xl">
-      <DialogTitle className="max-w-[80%] truncate pl-2 text-xl font-bold text-gray-900">
-        {bookTitle}
-      </DialogTitle>
+      {isMobile ? (
+        <ResponsiveDialogTitle
+          className="max-w-[80%] truncate pl-2 text-xl font-bold text-gray-900"
+          drawerClassName="max-w-[80%] truncate pl-2 text-xl font-bold text-gray-900"
+        >
+          {bookTitle}
+        </ResponsiveDialogTitle>
+      ) : (
+        <DialogTitle className="max-w-[80%] truncate pl-2 text-xl font-bold text-gray-900">
+          {bookTitle}
+        </DialogTitle>
+      )}
       <Button
         variant="ghost"
         size="icon"

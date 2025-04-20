@@ -1,12 +1,12 @@
-import { Suspense } from 'react';
-
-import { Dialog, DialogTitle } from '@/components/ui/dialog';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-
-import { useDialogQuery } from '@/hooks/useDialogQuery';
-import { BookInfo, BookInfoSkeleton } from './components/BookInfo';
-
+import { X } from 'lucide-react';
+import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useDialogQuery } from '@/hooks/useDialogQuery';
+import { useQueryParams } from '@/hooks/useQueryParams';
+
 import {
   BookActionButtons,
   BookCoverSection,
@@ -15,11 +15,16 @@ import {
   BookReadingStats,
   BookRightPanel,
 } from './components';
-
-import { useQueryParams } from '@/hooks/useQueryParams';
-import { cn } from '@/lib/utils';
-import { X } from 'lucide-react';
+import { BookInfo, BookInfoSkeleton } from './components/BookInfo';
 import { BookFullSkeleton, ErrorFallback } from './components/common';
+
+import {
+  ResponsiveDialog,
+  ResponsiveDialogClose,
+  ResponsiveDialogContent,
+  ResponsiveDialogPortal,
+  ResponsiveDialogTitle,
+} from '@/components/ui/responsive-dialog';
 
 function BookDialogContent() {
   return (
@@ -81,41 +86,67 @@ export function BookDialog() {
   // URL에 id 파라미터가 있으면 'id' 타입으로, 없으면 'isbn' 타입으로 설정
   const idType = searchParams.has('id') ? 'id' : 'isbn';
   const { isOpen, close } = useDialogQuery({ type: 'book', idType });
+  const isMobile = useIsMobile();
 
+  // 모바일 환경에서는 ResponsiveDialog 사용, 데스크톱에서는 직접 Dialog 컴포넌트 스타일링
+  if (isMobile) {
+    return (
+      <ResponsiveDialog
+        open={isOpen}
+        onOpenChange={open => {
+          if (!open) close();
+        }}
+      >
+        <ResponsiveDialogPortal>
+          <ResponsiveDialogContent
+            drawerClassName="w-full bg-white p-0 z-[100] rounded-t-lg overflow-auto h-[90vh]"
+            hideCloseButton
+          >
+            <ResponsiveDialogTitle
+              className="sr-only"
+              drawerClassName="sr-only"
+            >
+              도서 상세 정보
+            </ResponsiveDialogTitle>
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <Suspense fallback={<BookFullSkeleton />}>
+                <BookHeader />
+                <BookDialogContent />
+              </Suspense>
+            </ErrorBoundary>
+            <ResponsiveDialogClose drawerClassName="absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none ring-offset-background focus:ring-ring">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </ResponsiveDialogClose>
+          </ResponsiveDialogContent>
+        </ResponsiveDialogPortal>
+      </ResponsiveDialog>
+    );
+  }
+
+  // 데스크톱 환경에서는 기존 Dialog 스타일 그대로 유지
   return (
-    <Dialog
+    <DialogPrimitive.Root
       open={isOpen}
       onOpenChange={open => {
         if (!open) close();
       }}
     >
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay
-          data-slot="dialog-overlay"
-          className={cn(
-            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 overflow-y-auto bg-black/50'
-          )}
-        >
+        <DialogPrimitive.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 overflow-y-auto bg-black/50">
           <div className="min-h-full rounded-lg py-5">
-            <DialogPrimitive.Content
-              data-slot="dialog-content"
-              className={cn(
-                'relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg md:max-w-screen-xl'
-              )}
-            >
-              {/* DialogTitle 컴포넌트는 접근성 목적으로 필요합니다. 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
-              <DialogTitle className="sr-only">도서 상세 정보</DialogTitle>
+            <DialogPrimitive.Content className="relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg md:max-w-screen-xl">
+              {/* DialogTitle 컴포넌트는 접근성 목적으로 필요하지만 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
+              <DialogPrimitive.Title className="sr-only">
+                도서 상세 정보
+              </DialogPrimitive.Title>
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <Suspense fallback={<BookFullSkeleton />}>
                   <BookHeader />
                   <BookDialogContent />
                 </Suspense>
               </ErrorBoundary>
-              <DialogPrimitive.Close
-                className={cn(
-                  'ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none'
-                )}
-              >
+              <DialogPrimitive.Close className="ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
                 <X className="h-4 w-4" />
                 <span className="sr-only">Close</span>
               </DialogPrimitive.Close>
@@ -123,6 +154,6 @@ export function BookDialog() {
           </div>
         </DialogPrimitive.Overlay>
       </DialogPrimitive.Portal>
-    </Dialog>
+    </DialogPrimitive.Root>
   );
 }
