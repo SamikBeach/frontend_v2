@@ -1,10 +1,10 @@
 'use client';
 
 import { Suspense } from 'react';
-import { LibraryContent } from './LibraryContent';
-import { LibraryDetailSkeleton } from './LibraryDetailSkeleton';
-import { LibraryHeader } from './LibraryHeader';
-import { LibrarySidebar } from './LibrarySidebar';
+import { LibraryContent } from './components/LibraryContent';
+import { LibraryDetailSkeleton } from './components/LibraryDetailSkeleton';
+import { LibraryHeader } from './components/LibraryHeader';
+import { LibrarySidebar } from './components/LibrarySidebar';
 
 function LibraryDetailContent() {
   return (
