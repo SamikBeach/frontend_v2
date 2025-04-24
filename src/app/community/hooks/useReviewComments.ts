@@ -1,11 +1,24 @@
 import {
-  Comment,
   createComment as apiCreateComment,
   deleteComment as apiDeleteComment,
   getReviewComments,
 } from '@/apis/review/review';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+
+// 댓글 및 댓글 생성 타입 정의
+interface Comment {
+  id: number;
+  content: string;
+  author: {
+    id: number;
+    username: string;
+    email?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+  replies?: Comment[];
+}
 
 interface UseReviewCommentsResult {
   comments: Comment[];
@@ -17,30 +30,38 @@ interface UseReviewCommentsResult {
   handleDeleteComment: (commentId: number) => Promise<void>;
   replyToCommentId: number | null;
   setReplyToCommentId: (id: number | null) => void;
+  refetch: () => Promise<any>;
 }
 
-export function useReviewComments(reviewId: number): UseReviewCommentsResult {
+export function useReviewComments(
+  reviewId: number,
+  showComments: boolean = false
+): UseReviewCommentsResult {
   const queryClient = useQueryClient();
   const [commentText, setCommentText] = useState('');
   const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
 
-  // 댓글 목록 조회
+  // 댓글 목록 조회 - showComments가 true일 때만 활성화
   const {
-    data: comments = [],
+    data: commentsResponse = { comments: [] },
     isLoading,
     error,
+    refetch,
   } = useQuery({
     queryKey: ['review-comments', reviewId],
     queryFn: () => getReviewComments(reviewId),
     staleTime: 1000 * 60 * 5, // 5분
+    enabled: showComments, // 댓글이 표시될 때만 데이터 가져오기
   });
+
+  const comments = commentsResponse.comments || [];
 
   // 댓글 추가 mutation
   const { mutateAsync: addComment, isPending: isAddingComment } = useMutation({
     mutationFn: async () => {
       return apiCreateComment(reviewId, {
         content: commentText,
-        parentCommentId: replyToCommentId || undefined,
+        ...(replyToCommentId ? { parentCommentId: replyToCommentId } : {}),
       });
     },
     onSuccess: () => {
@@ -102,5 +123,6 @@ export function useReviewComments(reviewId: number): UseReviewCommentsResult {
     handleDeleteComment,
     replyToCommentId,
     setReplyToCommentId,
+    refetch,
   };
 }

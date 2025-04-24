@@ -1,80 +1,40 @@
+import { getReviews } from '@/apis/review/review';
+import { ReviewType } from '@/apis/review/types';
 import {
-  getAllReviews,
-  ReviewResponseDto,
-  ReviewType,
-} from '@/apis/review/review';
-import {
-  communitySearchQueryAtom,
   communitySortOptionAtom,
   communityTypeFilterAtom,
 } from '@/atoms/community';
-import { useQueryParams } from '@/hooks';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useAtom } from 'jotai';
-import { useEffect, useState } from 'react';
+import { useAtomValue } from 'jotai';
+import { useState } from 'react';
 
-interface UseCommunityReviewsResult {
-  reviews: ReviewResponseDto[];
-  totalReviews: number;
-  totalPages: number;
-  currentPage: number;
-  typeFilter: ReviewType | 'all';
-  sortOption: 'popular' | 'latest' | 'following';
-  setCurrentPage: (page: number) => void;
-}
-
-export function useCommunityReviews(): UseCommunityReviewsResult {
-  // 상태는 atom에서 읽기만 하고 변경은 안함
-  const [typeFilter] = useAtom(communityTypeFilterAtom);
-  const [sortOption] = useAtom(communitySortOptionAtom);
-  const [searchQuery] = useAtom(communitySearchQueryAtom);
+export const useCommunityReviews = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const { updateQueryParams } = useQueryParams();
-  const currentUser = useCurrentUser();
-  const userId = currentUser?.id;
+  const typeFilter = useAtomValue(communityTypeFilterAtom);
+  const sortOption = useAtomValue(communitySortOptionAtom);
 
-  // URL 파라미터 업데이트
-  useEffect(() => {
-    updateQueryParams({
-      type: typeFilter !== 'all' ? typeFilter : undefined,
-      sort: sortOption,
-      page: currentPage > 1 ? currentPage.toString() : undefined,
-      q: searchQuery || undefined,
-    });
-  }, [typeFilter, sortOption, currentPage, searchQuery, updateQueryParams]);
-
-  // 게시물 데이터 가져오기
   const { data } = useSuspenseQuery({
-    queryKey: [
-      'community-reviews',
-      typeFilter,
-      sortOption,
-      currentPage,
-      userId,
-    ],
+    queryKey: ['communityReviews', sortOption, currentPage, typeFilter],
     queryFn: async () => {
-      // type이 'all'이면 백엔드에 전달하지 않음
+      // 타입이 'all'이면 백엔드에 전달하지 않음
       const type =
         typeFilter !== 'all' ? (typeFilter as ReviewType) : undefined;
-      // 결과 반환
-      return await getAllReviews(currentPage, 10, type);
+
+      // filter 값을 백엔드에 전달 (recent, popular, following)
+      const filter = sortOption as 'popular' | 'recent' | 'following';
+
+      // getReviews 함수 사용
+      return getReviews(currentPage, 10, filter, type);
     },
-    staleTime: 1000 * 60 * 5, // 5분
   });
 
-  // 데이터 추출 (useSuspenseQuery는 항상 data를 반환하므로 기본값 필요 없음)
-  const reviews = data.reviews;
-  const totalReviews = data.total;
-  const totalPages = data.totalPages;
-
   return {
-    reviews,
-    totalReviews,
-    totalPages,
+    reviews: data?.reviews || [],
+    totalReviews: data?.total || 0,
+    totalPages: data?.totalPages || 0,
     currentPage,
     typeFilter,
     sortOption,
     setCurrentPage,
   };
-}
+};

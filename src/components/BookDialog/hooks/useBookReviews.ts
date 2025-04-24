@@ -8,7 +8,11 @@ import { useAtom } from 'jotai';
 import { useCallback } from 'react';
 
 import { getBookReviews, likeReview, unlikeReview } from '@/apis/review';
-import { Review, ReviewSortType, ReviewsResponse } from '@/apis/review/types';
+import {
+  BookReviewsResponse,
+  Review,
+  ReviewSortType,
+} from '@/apis/review/types';
 import { bookReviewSortAtom } from '@/atoms/book';
 import { useBookDetails } from './useBookDetails';
 
@@ -34,7 +38,7 @@ export function useBookReviews() {
         return {
           data: [],
           meta: { total: 0, page: 1, limit, totalPages: 0, sort },
-        } as ReviewsResponse;
+        } as BookReviewsResponse;
       }
 
       const page = pageParam as number;
@@ -49,7 +53,7 @@ export function useBookReviews() {
       );
       return reviewsData;
     },
-    getNextPageParam: (lastPage: ReviewsResponse) => {
+    getNextPageParam: (lastPage: BookReviewsResponse) => {
       const { meta } = lastPage;
       // 다음 페이지가 있는지 확인, 없으면 undefined 반환 (hasNextPage가 false가 됨)
       return meta.page < meta.totalPages ? meta.page + 1 : undefined;

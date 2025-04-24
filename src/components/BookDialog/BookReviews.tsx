@@ -187,7 +187,9 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
               onKeyDown={e => {
                 if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                   e.preventDefault();
-                  handleCommentSubmitWithAuth();
+                  if (commentText.trim() && !isSubmitting) {
+                    handleCommentSubmitWithAuth();
+                  }
                 }
               }}
               disabled={isSubmitting}
@@ -243,11 +245,22 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                       onKeyDown={e => {
                         if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                           e.preventDefault();
-                          handleUpdateComment(comment.id);
+                          if (
+                            editCommentText.trim() &&
+                            !updateCommentMutation.isPending
+                          ) {
+                            handleUpdateComment(comment.id);
+                          }
                         }
                       }}
                     />
                     <div className="flex justify-end gap-2">
+                      <div className="mr-auto pl-1 text-xs text-gray-500">
+                        {navigator.platform.includes('Mac')
+                          ? 'Cmd+Enter'
+                          : 'Ctrl+Enter'}
+                        로 저장
+                      </div>
                       <Button
                         variant="outline"
                         size="sm"
