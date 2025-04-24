@@ -15,10 +15,18 @@ export function useReviewLike(): UseReviewLikeResult {
   // 좋아요 추가 mutation
   const { mutateAsync: addLike, isPending: isAddLikeLoading } = useMutation({
     mutationFn: (reviewId: number) => apiLikeReview(reviewId),
-    onSuccess: (_, reviewId) => {
-      // 게시물 데이터 새로고침
-      queryClient.invalidateQueries({ queryKey: ['community-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['review', reviewId] });
+    onSuccess: () => {
+      // 리뷰 목록 새로고침 (인피니트 쿼리인 경우도 고려)
+      queryClient.invalidateQueries({
+        queryKey: ['communityReviews'],
+        exact: false,
+      });
+
+      // 리뷰 목록 새로고침
+      queryClient.invalidateQueries({
+        queryKey: ['review'],
+        exact: false,
+      });
     },
   });
 
@@ -26,10 +34,18 @@ export function useReviewLike(): UseReviewLikeResult {
   const { mutateAsync: removeLike, isPending: isRemoveLikeLoading } =
     useMutation({
       mutationFn: (reviewId: number) => apiUnlikeReview(reviewId),
-      onSuccess: (_, reviewId) => {
-        // 게시물 데이터 새로고침
-        queryClient.invalidateQueries({ queryKey: ['community-reviews'] });
-        queryClient.invalidateQueries({ queryKey: ['review', reviewId] });
+      onSuccess: () => {
+        // 리뷰 목록 새로고침 (인피니트 쿼리인 경우도 고려)
+        queryClient.invalidateQueries({
+          queryKey: ['communityReviews'],
+          exact: false,
+        });
+
+        // 리뷰 목록 새로고침
+        queryClient.invalidateQueries({
+          queryKey: ['review'],
+          exact: false,
+        });
       },
     });
 

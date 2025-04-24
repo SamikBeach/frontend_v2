@@ -1,6 +1,15 @@
 import { SearchResult } from '@/apis/search/types';
 import { AddBookDialog } from '@/app/library/[id]/components';
 import { communityCategoryColors } from '@/atoms/community';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -30,7 +39,7 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
   const {
     content,
     setContent,
-    handleCreateReview,
+    handleCreateReview: submitReview,
     isLoading,
     type,
     setType,
@@ -39,6 +48,11 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
     rating,
     setRating,
   } = useCreateReview();
+
+  // Alert dialog states
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertTitle, setAlertTitle] = useState('');
 
   // Safely get first letter of name for avatar fallback
   const getNameInitial = () => {
@@ -77,6 +91,27 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
     if (newType !== 'review') {
       setSelectedBook(null);
       setRating(0);
+    }
+  };
+
+  // 검증 및 리뷰 생성 핸들러
+  const handleCreateReview = async () => {
+    // 내용이 없으면 제출 안함
+    if (!content.trim()) return;
+
+    // 유효성 검사 및 리뷰 생성 실행
+    const result = await submitReview();
+
+    if (!result.valid && result.message) {
+      setAlertTitle(
+        type === 'review' && !selectedBook
+          ? '책을 선택해주세요'
+          : selectedBook && rating === 0
+            ? '별점을 입력해주세요'
+            : '오류'
+      );
+      setAlertMessage(result.message);
+      setAlertDialogOpen(true);
     }
   };
 
@@ -292,6 +327,24 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
           onBookSelect={handleBookSelect}
         />
       )}
+
+      {/* 검증 경고 다이얼로그 */}
+      <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
+        <AlertDialogContent className="max-w-md rounded-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{alertTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              className="rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+              onClick={() => setAlertDialogOpen(false)}
+            >
+              확인
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

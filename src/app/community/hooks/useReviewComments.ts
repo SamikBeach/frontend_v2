@@ -69,8 +69,13 @@ export function useReviewComments(
         queryKey: ['review-comments', reviewId],
       });
       // 게시물 데이터의 댓글 수도 업데이트
-      queryClient.invalidateQueries({ queryKey: ['community-reviews'] });
-      queryClient.invalidateQueries({ queryKey: ['review', reviewId] });
+      queryClient.invalidateQueries({
+        queryKey: ['communityReviews'],
+        exact: false,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['review', reviewId],
+      });
     },
   });
 
@@ -85,8 +90,13 @@ export function useReviewComments(
           queryKey: ['review-comments', reviewId],
         });
         // 게시물 데이터의 댓글 수도 업데이트
-        queryClient.invalidateQueries({ queryKey: ['community-reviews'] });
-        queryClient.invalidateQueries({ queryKey: ['review', reviewId] });
+        queryClient.invalidateQueries({
+          queryKey: ['communityReviews'],
+          exact: false,
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['review', reviewId],
+        });
       },
     });
 

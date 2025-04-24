@@ -2,7 +2,6 @@ import { ReadingStatusType } from '@/apis/reading-status/types';
 import { deleteReview, updateReview } from '@/apis/review/review';
 import { ReviewResponseDto } from '@/apis/review/types';
 import { communityCategoryColors } from '@/atoms/community';
-import { ReviewDialog } from '@/components/ReviewDialog/ReviewDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -47,7 +46,7 @@ import {
   Trash,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useReviewComments, useReviewLike } from '../hooks';
 
@@ -134,9 +133,11 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   const queryClient = useQueryClient();
 
   // Review 수정 관련 상태
-  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editContent, setEditContent] = useState('');
+  const [editRating, setEditRating] = useState(0);
 
   // Review 좋아요 관련 훅
   const { handleLikeToggle, isLoading: isLikeLoading } = useReviewLike();
@@ -158,6 +159,14 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   // 현재 사용자가 리뷰 작성자인지 확인
   const isAuthor = currentUser.id === review.author.id;
 
+  // 초기 수정 상태 설정
+  useEffect(() => {
+    if (review) {
+      setEditContent(review.content);
+      setEditRating(extendedReview.authorRatings?.[0]?.rating || 0);
+    }
+  }, [review, extendedReview.authorRatings]);
+
   // 리뷰 수정 mutation
   const updateReviewMutation = useMutation({
     mutationFn: ({
@@ -172,9 +181,12 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
       return updateReview(id, { content, type: review.type });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['community-reviews'] });
+      queryClient.invalidateQueries({
+        queryKey: ['communityReviews'],
+        exact: false,
+      });
       toast.success('리뷰가 수정되었습니다.');
-      setReviewDialogOpen(false);
+      setIsEditMode(false);
     },
     onError: () => {
       toast.error('리뷰 수정 중 오류가 발생했습니다.');
@@ -188,7 +200,10 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   const deleteReviewMutation = useMutation({
     mutationFn: (id: number) => deleteReview(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['community-reviews'] });
+      queryClient.invalidateQueries({
+        queryKey: ['communityReviews'],
+        exact: false,
+      });
       toast.success('리뷰가 삭제되었습니다.');
     },
     onError: () => {
@@ -204,6 +219,23 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
       content,
       rating,
     });
+  };
+
+  // 리뷰 직접 수정 핸들러
+  const handleSaveEdit = () => {
+    setIsSubmitting(true);
+    updateReviewMutation.mutate({
+      id: review.id,
+      content: editContent,
+      rating: editRating,
+    });
+  };
+
+  // 수정 모드 취소 핸들러
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setEditContent(review.content);
+    setEditRating(extendedReview.authorRatings?.[0]?.rating || 0);
   };
 
   // 리뷰 삭제 핸들러
@@ -520,7 +552,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
                 <DropdownMenuItem
                   className="cursor-pointer rounded-lg py-2"
                   onSelect={() => {
-                    setReviewDialogOpen(true);
+                    setIsEditMode(true);
                     setIsDropdownOpen(false);
                   }}
                 >
@@ -544,201 +576,281 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
         </div>
       </CardHeader>
       <CardContent className="space-y-4 px-5 pt-0 pb-4">
-        {/* 본문 내용 */}
-        <p className="text-[15px] leading-relaxed whitespace-pre-line text-gray-800">
-          {displayContent}
-          {isLongContent && (
-            <button
-              onClick={() => setExpanded(!expanded)}
-              className="ml-1 font-medium text-gray-500 hover:text-gray-700"
-            >
-              {expanded ? '접기' : '더보기'}
-            </button>
-          )}
-        </p>
+        {!isEditMode ? (
+          <>
+            {/* 일반 모드: 본문 내용 */}
+            <p className="text-[15px] leading-relaxed whitespace-pre-line text-gray-800">
+              {displayContent}
+              {isLongContent && (
+                <button
+                  onClick={() => setExpanded(!expanded)}
+                  className="ml-1 font-medium text-gray-500 hover:text-gray-700"
+                >
+                  {expanded ? '접기' : '더보기'}
+                </button>
+              )}
+            </p>
 
-        {/* 이미지가 있는 경우 */}
-        {review.images && review.images.length > 0 && (
-          <div className="overflow-hidden rounded-xl">
-            <img
-              src={review.images[0].url}
-              alt="Review image"
-              className="h-auto w-full object-cover"
-            />
-          </div>
-        )}
+            {/* 이미지가 있는 경우 */}
+            {review.images && review.images.length > 0 && (
+              <div className="overflow-hidden rounded-xl">
+                <img
+                  src={review.images[0].url}
+                  alt="Review image"
+                  className="h-auto w-full object-cover"
+                />
+              </div>
+            )}
 
-        {/* 책 정보가 있는 경우 */}
-        {review.books && review.books.length > 0 && (
-          <div
-            className="flex cursor-pointer gap-3 rounded-xl border border-gray-100 bg-[#F9FAFB] p-3 transition-colors hover:bg-gray-100"
-            onClick={handleBookClick}
-          >
-            <div className="flex-shrink-0">
-              <img
-                src={review.books[0].coverImage}
-                alt={review.books[0].title}
-                className="h-[110px] w-[72px] rounded-lg object-cover shadow-sm"
+            {/* 책 정보가 있는 경우 */}
+            {review.books && review.books.length > 0 && (
+              <div
+                className="flex cursor-pointer gap-3 rounded-xl border border-gray-100 bg-[#F9FAFB] p-3 transition-colors hover:bg-gray-100"
+                onClick={handleBookClick}
+              >
+                <div className="flex-shrink-0">
+                  <img
+                    src={review.books[0].coverImage}
+                    alt={review.books[0].title}
+                    className="h-[110px] w-[72px] rounded-lg object-cover shadow-sm"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col justify-between py-1">
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-900">
+                      {review.books[0].title}
+                    </h4>
+                    <p className="text-xs text-gray-500">
+                      {review.books[0].author}
+                    </p>
+
+                    {/* 별점 및 리뷰 수 */}
+                    {renderRatingAndReviews(
+                      review.books[0] as ExtendedReviewBook
+                    )}
+
+                    {/* 읽기 상태 */}
+                    {renderReadingStatus(review.books[0] as ExtendedReviewBook)}
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            {/* 수정 모드: 편집 UI */}
+            <div className="flex flex-col gap-4">
+              <textarea
+                placeholder="리뷰 내용을 수정하세요"
+                className="min-h-[100px] resize-none rounded-xl border-gray-200 bg-[#F9FAFB] p-4 text-[15px]"
+                value={editContent}
+                onChange={e => setEditContent(e.target.value)}
+                disabled={isSubmitting}
               />
-            </div>
-            <div className="flex flex-1 flex-col justify-between py-1">
-              <div>
-                <h4 className="text-sm font-medium text-gray-900">
-                  {review.books[0].title}
-                </h4>
-                <p className="text-xs text-gray-500">
-                  {review.books[0].author}
-                </p>
 
-                {/* 별점 및 리뷰 수 */}
-                {renderRatingAndReviews(review.books[0] as ExtendedReviewBook)}
+              {/* 책 정보가 있는 경우 (리뷰 태그인 경우) */}
+              {review.books && review.books.length > 0 && (
+                <div className="flex items-start gap-3 rounded-xl border border-gray-100 bg-[#F9FAFB] p-3">
+                  <div className="flex-shrink-0">
+                    <img
+                      src={review.books[0].coverImage}
+                      alt={review.books[0].title}
+                      className="h-[70px] w-[45px] rounded-md object-cover shadow-sm"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div>
+                      <h4 className="text-sm font-medium text-gray-900">
+                        {review.books[0].title}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        {review.books[0].author}
+                      </p>
+                    </div>
 
-                {/* 읽기 상태 */}
-                {renderReadingStatus(review.books[0] as ExtendedReviewBook)}
+                    {/* 별점 표시 */}
+                    <div className="mt-2">
+                      <div className="flex items-center">
+                        {[1, 2, 3, 4, 5].map(star => (
+                          <Star
+                            key={star}
+                            className={`h-5 w-5 cursor-pointer ${
+                              star <= editRating
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-gray-200 hover:text-gray-300'
+                            }`}
+                            onClick={() => setEditRating(star)}
+                          />
+                        ))}
+                        {editRating > 0 && (
+                          <span className="ml-2 text-xs font-medium text-gray-700">
+                            {editRating === 1
+                              ? '별로예요'
+                              : editRating === 2
+                                ? '아쉬워요'
+                                : editRating === 3
+                                  ? '보통이에요'
+                                  : editRating === 4
+                                    ? '좋아요'
+                                    : '최고예요'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* 수정 버튼 */}
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  className="h-9 rounded-xl border-gray-200"
+                  onClick={handleCancelEdit}
+                  disabled={isSubmitting}
+                >
+                  취소
+                </Button>
+                <Button
+                  className="h-9 rounded-xl bg-gray-900 px-4 font-medium text-white hover:bg-gray-800"
+                  onClick={handleSaveEdit}
+                  disabled={!editContent.trim() || isSubmitting}
+                >
+                  <Pencil className="mr-1.5 h-4 w-4" />
+                  수정하기
+                </Button>
               </div>
             </div>
-          </div>
+          </>
         )}
       </CardContent>
       <Separator className="bg-gray-100" />
-      <CardFooter className="flex flex-col gap-4 px-5 py-3">
-        <div className="flex w-full items-center gap-3">
-          <button
-            onClick={handleLike}
-            disabled={isLikeLoading}
-            className={`flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 text-sm font-medium transition-colors ${
-              isLiked
-                ? 'bg-pink-50 text-pink-500'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <ThumbsUp
-              className={`mr-0.5 h-4 w-4 ${isLiked ? 'fill-pink-500' : ''}`}
-            />
-            <span>{likesCount}</span>
-          </button>
-          <button
-            onClick={handleToggleComments}
-            className={`flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 text-sm font-medium transition-colors ${
-              showComments
-                ? 'bg-gray-100 text-gray-900'
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-          >
-            <MessageCircle className="mr-0.5 h-4 w-4" />
-            <span>{review.commentCount || 0}</span>
-          </button>
-        </div>
+      {!isEditMode && (
+        <CardFooter className="flex flex-col gap-4 px-5 py-3">
+          <div className="flex w-full items-center gap-3">
+            <button
+              onClick={handleLike}
+              disabled={isLikeLoading}
+              className={`flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 text-sm font-medium transition-colors ${
+                isLiked
+                  ? 'bg-pink-50 text-pink-500'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <ThumbsUp
+                className={`mr-0.5 h-4 w-4 ${isLiked ? 'fill-pink-500' : ''}`}
+              />
+              <span>{likesCount}</span>
+            </button>
+            <button
+              onClick={handleToggleComments}
+              className={`flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 text-sm font-medium transition-colors ${
+                showComments
+                  ? 'bg-gray-100 text-gray-900'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <MessageCircle className="mr-0.5 h-4 w-4" />
+              <span>{review.commentCount || 0}</span>
+            </button>
+          </div>
 
-        {/* 댓글 섹션 */}
-        {showComments && (
-          <div className="w-full space-y-3">
-            {/* 댓글 입력 */}
-            <div className="flex gap-2">
-              <Avatar className="mt-1 h-7 w-7 flex-shrink-0">
-                <AvatarImage
-                  src={currentUser.avatar}
-                  alt={currentUser.name}
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-gray-200 text-gray-700">
-                  {getNameInitial(currentUser.name)}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <Input
-                      placeholder="댓글을 입력하세요..."
-                      value={commentText}
-                      onChange={e => setCommentText(e.target.value)}
-                      className="h-9 flex-1 rounded-xl border-gray-200 bg-gray-50 text-sm shadow-none"
-                      disabled={isCommentLoading}
-                      onKeyDown={e => {
-                        // Cmd+Enter(Mac) 또는 Ctrl+Enter(Windows)로 댓글 제출
-                        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-                          e.preventDefault();
-                          if (commentText.trim() && !isCommentLoading) {
-                            handleSubmitComment();
+          {/* 댓글 섹션 */}
+          {showComments && (
+            <div className="w-full space-y-3">
+              {/* 댓글 입력 */}
+              <div className="flex gap-2">
+                <Avatar className="mt-1 h-7 w-7 flex-shrink-0">
+                  <AvatarImage
+                    src={currentUser.avatar}
+                    alt={currentUser.name}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-gray-200 text-gray-700">
+                    {getNameInitial(currentUser.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="댓글을 입력하세요..."
+                        value={commentText}
+                        onChange={e => setCommentText(e.target.value)}
+                        className="h-9 flex-1 rounded-xl border-gray-200 bg-gray-50 text-sm shadow-none"
+                        disabled={isCommentLoading}
+                        onKeyDown={e => {
+                          // Cmd+Enter(Mac) 또는 Ctrl+Enter(Windows)로 댓글 제출
+                          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                            e.preventDefault();
+                            if (commentText.trim() && !isCommentLoading) {
+                              handleSubmitComment();
+                            }
                           }
-                        }
-                      }}
-                    />
+                        }}
+                      />
+                    </div>
+                    <Button
+                      size="icon"
+                      className="h-9 w-9 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+                      onClick={handleSubmitComment}
+                      disabled={!commentText.trim() || isCommentLoading}
+                    >
+                      <SendHorizontal className="h-4 w-4" />
+                    </Button>
                   </div>
+                </div>
+              </div>
+
+              {/* 댓글 로딩 상태 */}
+              {isCommentLoading ? (
+                <div className="my-6 flex flex-col items-center justify-center py-4">
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-gray-700"></div>
+                  <p className="mt-3 text-xs text-gray-500">
+                    댓글을 불러오는 중...
+                  </p>
+                </div>
+              ) : comments && comments.length > 0 ? (
+                <div className="space-y-3 pl-9">
+                  {comments.map(comment => (
+                    <CommentItem
+                      key={comment.id}
+                      comment={comment}
+                      formatDate={formatDate}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="my-2 flex flex-col items-center justify-center rounded-xl bg-gray-50 px-4 py-6 text-center">
+                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+                    <MessageCircle className="h-6 w-6 text-gray-400" />
+                  </div>
+                  <h4 className="text-sm font-medium text-gray-800">
+                    아직 댓글이 없습니다
+                  </h4>
+                  <p className="mt-1 text-xs text-gray-500">
+                    이 글에 첫 번째 댓글을 작성해보세요
+                  </p>
                   <Button
-                    size="icon"
-                    className="h-9 w-9 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
-                    onClick={handleSubmitComment}
-                    disabled={!commentText.trim() || isCommentLoading}
+                    variant="outline"
+                    className="mt-4 h-8 rounded-full border-gray-300 bg-white px-4 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+                    onClick={() => {
+                      // 댓글 입력창에 포커스
+                      const commentInput = document.querySelector(
+                        `input[placeholder="댓글을 입력하세요..."]`
+                      ) as HTMLInputElement;
+                      if (commentInput) commentInput.focus();
+                    }}
                   >
-                    <SendHorizontal className="h-4 w-4" />
+                    <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
+                    댓글 작성하기
                   </Button>
                 </div>
-              </div>
+              )}
             </div>
-
-            {/* 댓글 로딩 상태 */}
-            {isCommentLoading ? (
-              <div className="my-6 flex flex-col items-center justify-center py-4">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-gray-700"></div>
-                <p className="mt-3 text-xs text-gray-500">
-                  댓글을 불러오는 중...
-                </p>
-              </div>
-            ) : comments && comments.length > 0 ? (
-              <div className="space-y-3 pl-9">
-                {comments.map(comment => (
-                  <CommentItem
-                    key={comment.id}
-                    comment={comment}
-                    formatDate={formatDate}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="my-2 flex flex-col items-center justify-center rounded-xl bg-gray-50 px-4 py-6 text-center">
-                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                  <MessageCircle className="h-6 w-6 text-gray-400" />
-                </div>
-                <h4 className="text-sm font-medium text-gray-800">
-                  아직 댓글이 없습니다
-                </h4>
-                <p className="mt-1 text-xs text-gray-500">
-                  이 글에 첫 번째 댓글을 작성해보세요
-                </p>
-                <Button
-                  variant="outline"
-                  className="mt-4 h-8 rounded-full border-gray-300 bg-white px-4 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
-                  onClick={() => {
-                    // 댓글 입력창에 포커스
-                    const commentInput = document.querySelector(
-                      `input[placeholder="댓글을 입력하세요..."]`
-                    ) as HTMLInputElement;
-                    if (commentInput) commentInput.focus();
-                  }}
-                >
-                  <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
-                  댓글 작성하기
-                </Button>
-              </div>
-            )}
-          </div>
-        )}
-      </CardFooter>
-
-      {/* 리뷰 수정 다이얼로그 */}
-      <ReviewDialog
-        open={reviewDialogOpen}
-        onOpenChange={setReviewDialogOpen}
-        bookTitle={
-          review.books && review.books.length > 0 ? review.books[0].title : ''
-        }
-        initialContent={review.content}
-        initialRating={extendedReview.authorRatings?.[0]?.rating || 0}
-        isEditMode={true}
-        isSubmitting={isSubmitting}
-        onSubmit={handleEditReview}
-      />
+          )}
+        </CardFooter>
+      )}
 
       {/* 리뷰 삭제 확인 다이얼로그 */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
