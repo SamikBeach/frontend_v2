@@ -68,7 +68,13 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
 
   // 책 선택 핸들러
   const handleBookSelect = (book: SearchResult) => {
-    setSelectedBook(book);
+    // 이미지 속성 통일 (coverImage와 image 둘 다 있게 함)
+    const bookWithConsistentImage = {
+      ...book,
+      image: book.image || book.coverImage,
+      coverImage: book.coverImage || book.image,
+    };
+    setSelectedBook(bookWithConsistentImage);
     setBookDialogOpen(false);
   };
 
@@ -265,7 +271,7 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
                 <div className="mt-3 space-y-3">
                   <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-3">
                     <img
-                      src={selectedBook.image}
+                      src={selectedBook.image || selectedBook.coverImage}
                       alt={selectedBook.title}
                       className="h-16 w-12 rounded object-cover"
                     />
