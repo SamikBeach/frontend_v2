@@ -16,6 +16,7 @@ export const statusTexts = {
   [ReadingStatusType.WANT_TO_READ]: '읽고 싶어요',
   [ReadingStatusType.READING]: '읽는 중',
   [ReadingStatusType.READ]: '읽었어요',
+  NONE: '선택 안함',
 };
 
 // UI에 표시할 읽기 상태 아이콘 매핑
@@ -23,6 +24,7 @@ export const statusIcons = {
   [ReadingStatusType.WANT_TO_READ]: '📚',
   [ReadingStatusType.READING]: '📖',
   [ReadingStatusType.READ]: '✅',
+  NONE: '❌',
 };
 
 export function useReadingStatus() {
@@ -261,27 +263,27 @@ export function useReadingStatus() {
       },
     });
 
-  // 읽기 상태 변경 핸들러
+  // 읽기 상태 변경 핸들러 - status가 'NONE'이면 삭제 뮤테이션 호출
   const handleReadingStatusChange = useCallback(
-    (status: ReadingStatusType | null) => {
-      if (!book?.id) {
+    (status: ReadingStatusType | 'NONE') => {
+      if (!book || !book.id) {
         toast.error('책 정보가 없습니다.');
         return;
       }
 
-      // 현재 상태와 같은 경우 토글 동작 (선택 해제)
-      if (status === readingStatus) {
+      // 'NONE' 옵션이 선택되면 삭제 뮤테이션 호출
+      if (status === 'NONE') {
         deleteReadingStatusMutation(book.id);
+        setReadingStatus(null);
         return;
       }
 
-      // null인 경우 삭제
-      if (status === null) {
-        deleteReadingStatusMutation(book.id);
+      // 상태가 변하지 않았다면 아무것도 하지 않음
+      if (readingStatus === status) {
         return;
       }
 
-      // 읽기 상태 변경
+      // 읽기 상태 변경 뮤테이션 호출
       updateReadingStatusMutation({
         bookId: book.id,
         status,
@@ -290,20 +292,20 @@ export function useReadingStatus() {
     [
       book,
       readingStatus,
-      deleteReadingStatusMutation,
       updateReadingStatusMutation,
+      deleteReadingStatusMutation,
     ]
   );
 
-  // 읽기 상태별 스타일 가져오기
+  // 읽기 상태별 스타일 반환
   const getReadingStatusStyle = useCallback((status: ReadingStatusType) => {
     switch (status) {
       case ReadingStatusType.WANT_TO_READ:
-        return 'bg-purple-50 text-purple-600 hover:bg-purple-100';
+        return 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100';
       case ReadingStatusType.READING:
-        return 'bg-blue-50 text-blue-600 hover:bg-blue-100';
+        return 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100';
       case ReadingStatusType.READ:
-        return 'bg-green-50 text-green-600 hover:bg-green-100';
+        return 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100';
       default:
         return 'bg-gray-50 text-gray-700';
     }
@@ -311,10 +313,10 @@ export function useReadingStatus() {
 
   return {
     readingStatus,
-    handleReadingStatusChange,
     isPending: isUpdatePending || isDeletePending,
     statusTexts,
     statusIcons,
+    handleReadingStatusChange,
     getReadingStatusStyle,
   };
 }

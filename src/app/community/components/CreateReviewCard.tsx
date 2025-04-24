@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { BookOpen, Image, SendHorizontal } from 'lucide-react';
+import { BookOpen, SendHorizontal } from 'lucide-react';
 import { ChangeEvent, useRef } from 'react';
 import { useCreateReview } from '../hooks';
 
@@ -37,11 +37,6 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
     handleImageChange(e.target.files);
   };
 
-  // 이미지 버튼 클릭 시 파일 선택 다이얼로그 열기
-  const handleImageButtonClick = () => {
-    fileInputRef.current?.click();
-  };
-
   return (
     <Card className="mb-6 border-gray-200">
       <CardContent className="p-5">
@@ -64,15 +59,6 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
               onChange={e => setContent(e.target.value)}
             />
             <div className="mt-3 flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-9 rounded-xl border-gray-200 bg-white font-medium text-gray-700"
-                onClick={handleImageButtonClick}
-              >
-                <Image className="mr-1.5 h-4 w-4 text-gray-500" />
-                사진 추가
-              </Button>
               <Button
                 variant="outline"
                 size="sm"

@@ -76,8 +76,8 @@ export function ReviewDialog({
       shouldScaleBackground={false}
     >
       <ResponsiveDialogContent
-        className="max-w-md rounded-2xl border-none p-0 shadow-lg"
-        drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0 shadow-lg h-[100dvh]"
+        className="max-w-md rounded-2xl border-none p-0"
+        drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0 h-[100dvh]"
       >
         <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
           <ResponsiveDialogTitle

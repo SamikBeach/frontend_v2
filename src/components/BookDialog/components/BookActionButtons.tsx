@@ -76,7 +76,7 @@ export function BookActionButtons() {
   const displayStatusIcon = readingStatus ? statusIcons[readingStatus] : null;
 
   // 읽기 상태 변경 핸들러 래퍼 함수
-  const onReadingStatusChange = (status: ReadingStatusType) => {
+  const onReadingStatusChange = (status: ReadingStatusType | 'NONE') => {
     if (!currentUser) {
       setAuthDialogOpen(true);
       return;
@@ -159,6 +159,21 @@ export function BookActionButtons() {
                 </span>
               </DropdownMenuItem>
             ))}
+
+            {/* 선택 안함 옵션 */}
+            <DropdownMenuItem
+              key="none"
+              className={cn(
+                'mt-1 flex cursor-pointer items-center gap-2 rounded-lg border-t px-3 py-2',
+                readingStatus === null ? 'bg-gray-100' : '',
+                'hover:bg-red-50'
+              )}
+              onClick={() => onReadingStatusChange('NONE' as any)}
+              disabled={isPending}
+            >
+              <span className="text-base">{statusIcons['NONE']}</span>
+              <span className="text-red-600">{statusTexts['NONE']}</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
