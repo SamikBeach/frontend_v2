@@ -1,9 +1,15 @@
+import { createOrUpdateRating } from '@/apis/rating/rating';
 import { ReadingStatusType } from '@/apis/reading-status/types';
-import { deleteReview, updateReview } from '@/apis/review/review';
+import {
+  deleteReview,
+  updateComment,
+  updateReview,
+} from '@/apis/review/review';
 import { ReviewResponseDto, ReviewType } from '@/apis/review/types';
 import { SearchResult } from '@/apis/search/types';
 import { AddBookDialog } from '@/app/library/[id]/components';
 import { communityCategoryColors } from '@/atoms/community';
+import { ReviewDialog } from '@/components/ReviewDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -174,6 +180,9 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
 
+  // ReviewDialog 관련 상태
+  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+
   // Review 좋아요 관련 훅
   const { handleLikeToggle, isLoading: isLikeLoading } = useReviewLike();
   const [isLiked, setIsLiked] = useState(review.isLiked);
@@ -187,6 +196,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
     commentText,
     setCommentText,
     handleAddComment,
+    handleDeleteComment,
     isLoading: isCommentLoading,
     refetch,
   } = useReviewComments(review.id, showComments);
@@ -215,18 +225,21 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
       id,
       content,
       type,
+      bookId,
       isbn,
       rating,
     }: {
       id: number;
       content: string;
       type: ReviewType;
+      bookId?: number;
       isbn?: string;
       rating?: number;
     }) => {
       return updateReview(id, {
         content,
         type,
+        ...(bookId ? { bookId } : {}),
         ...(isbn ? { isbn } : {}),
         ...(rating ? { rating } : {}),
       });
@@ -255,11 +268,24 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
         queryKey: ['review', review.id],
       });
 
+      // 책 관련 데이터가 변경된 경우 책 데이터도 무효화
+      if (variables.isbn) {
+        queryClient.invalidateQueries({
+          queryKey: ['book-detail', variables.isbn],
+        });
+      }
+
       toast.success('리뷰가 수정되었습니다.');
       setIsEditMode(false);
+      setReviewDialogOpen(false);
     },
-    onError: () => {
-      toast.error('리뷰 수정 중 오류가 발생했습니다.');
+    onError: (error: any) => {
+      console.error('리뷰 업데이트 실패:', error);
+      const errorMessage =
+        error.response?.data?.message || '리뷰 수정 중 오류가 발생했습니다.';
+      setAlertTitle('오류');
+      setAlertMessage(errorMessage);
+      setAlertDialogOpen(true);
     },
     onSettled: () => {
       setIsSubmitting(false);
@@ -307,6 +333,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
 
   // 태그 변경 핸들러
   const handleTypeChange = (newType: string) => {
+    // 이제 UI에서 리뷰 옵션이 이미 필터링되므로 이 검사는 필요 없음
     setEditedType(newType as any);
     // 리뷰 태그가 아니면 책과 별점 초기화
     if (newType !== 'review') {
@@ -333,7 +360,11 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
 
   // 리뷰 수정 핸들러
   const handleEditReview = () => {
-    setIsEditMode(true);
+    if (review.type === 'review') {
+      setReviewDialogOpen(true);
+    } else {
+      setIsEditMode(true);
+    }
     setEditedContent(review.content);
     setEditedType(review.type);
     setEditedRating(
@@ -344,6 +375,57 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
     );
   };
 
+  // ReviewDialog에서 리뷰 수정 제출 핸들러
+  const handleReviewDialogSubmit = async (rating: number, content: string) => {
+    if (!content.trim()) return;
+
+    try {
+      setIsSubmitting(true);
+
+      // 선택된 책이 있는 경우
+      if (selectedBook) {
+        const bookId =
+          typeof selectedBook.id === 'number'
+            ? selectedBook.id
+            : parseInt(String(selectedBook.id), 10);
+        const bookIsbn = selectedBook.isbn || selectedBook.isbn13 || '';
+
+        // bookId가 없거나 음수인 경우 -1로 설정하고 반드시 ISBN 전달
+        const isNegativeBookId = bookId < 0;
+        const finalBookId = isNegativeBookId ? -1 : bookId;
+
+        // 1. 먼저 평점 업데이트
+        await createOrUpdateRating(
+          finalBookId,
+          { rating },
+          isNegativeBookId ? bookIsbn : undefined // bookId가 음수이거나 없는 경우 항상 ISBN 전달
+        );
+
+        // 2. 그 다음 리뷰 업데이트
+        await updateReviewMutation.mutateAsync({
+          id: review.id,
+          content: content,
+          type: 'review',
+          bookId: finalBookId,
+          isbn: isNegativeBookId ? bookIsbn : undefined, // 항상 ISBN 전달
+        });
+      } else {
+        // 책이 없는 경우에는 일반적인 리뷰 업데이트만 수행
+        await updateReviewMutation.mutateAsync({
+          id: review.id,
+          content: content,
+          type: 'review',
+        });
+      }
+    } catch (error) {
+      console.error('리뷰 업데이트 실패:', error);
+      toast.error('리뷰 수정 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // 인라인 리뷰 수정 저장 핸들러
   const handleSaveEdit = async () => {
     // 내용이 없으면 제출 안함
     if (!editedContent.trim()) return;
@@ -368,22 +450,45 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
     try {
       setIsSubmitting(true);
 
-      updateReviewMutation.mutate({
-        id: review.id,
-        content: editedContent,
-        type: editedType,
-        ...(editedType === 'review' && selectedBook
-          ? {
-              isbn: selectedBook.isbn || selectedBook.isbn13,
-              rating: editedRating,
-            }
-          : {}),
-      });
+      // 리뷰 타입이 'review'인 경우
+      if (editedType === 'review' && selectedBook) {
+        const bookId =
+          typeof selectedBook.id === 'number'
+            ? selectedBook.id
+            : parseInt(String(selectedBook.id), 10);
+        const bookIsbn = selectedBook.isbn || selectedBook.isbn13 || '';
+
+        // bookId가 없거나 음수인 경우 -1로 설정하고 반드시 ISBN 전달
+        const isNegativeBookId = bookId < 0;
+        const finalBookId = isNegativeBookId ? -1 : bookId;
+
+        // 1. 먼저 평점 업데이트
+        await createOrUpdateRating(
+          finalBookId,
+          { rating: editedRating },
+          isNegativeBookId ? bookIsbn : undefined
+        );
+
+        // 2. 그 다음 리뷰 업데이트 (rating 제외)
+        await updateReviewMutation.mutateAsync({
+          id: review.id,
+          content: editedContent,
+          type: editedType,
+          bookId: finalBookId,
+          isbn: isNegativeBookId ? bookIsbn : undefined,
+        });
+      } else {
+        // 리뷰 타입이 'review'가 아닌 경우 일반 리뷰 업데이트만 수행
+        await updateReviewMutation.mutateAsync({
+          id: review.id,
+          content: editedContent,
+          type: editedType,
+        });
+      }
     } catch (error) {
       console.error('리뷰 업데이트 실패:', error);
-      setAlertTitle('오류');
-      setAlertMessage('리뷰를 업데이트하는 중 오류가 발생했습니다.');
-      setAlertDialogOpen(true);
+      toast.error('리뷰 수정 중 오류가 발생했습니다.');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -714,7 +819,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
                 <DropdownMenuItem
                   className="cursor-pointer rounded-lg py-2"
                   onSelect={() => {
-                    setIsEditMode(true);
+                    handleEditReview();
                     setIsDropdownOpen(false);
                   }}
                 >
@@ -723,7 +828,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="cursor-pointer rounded-lg py-2 text-red-500 hover:text-red-500"
+                  className="cursor-pointer rounded-lg py-2 text-red-500 hover:bg-red-50 hover:text-red-500"
                   onSelect={() => {
                     setDeleteDialogOpen(true);
                     setIsDropdownOpen(false);
@@ -853,18 +958,21 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
                         토론
                       </div>
                     </SelectItem>
-                    <SelectItem value="review" className="cursor-pointer">
-                      <div className="flex items-center">
-                        <span
-                          className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
-                          style={{
-                            backgroundColor:
-                              communityCategoryColors.review || '#F9FAFB',
-                          }}
-                        ></span>
-                        리뷰
-                      </div>
-                    </SelectItem>
+                    {/* 원본 타입이 'review'인 경우에만 리뷰 옵션 표시 */}
+                    {review.type === 'review' && (
+                      <SelectItem value="review" className="cursor-pointer">
+                        <div className="flex items-center">
+                          <span
+                            className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                            style={{
+                              backgroundColor:
+                                communityCategoryColors.review || '#F9FAFB',
+                            }}
+                          ></span>
+                          리뷰
+                        </div>
+                      </SelectItem>
+                    )}
                     <SelectItem value="question" className="cursor-pointer">
                       <div className="flex items-center">
                         <span
@@ -1076,6 +1184,8 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
                       key={comment.id}
                       comment={comment}
                       formatDate={formatDate}
+                      currentUser={currentUser}
+                      onDelete={handleDeleteComment}
                     />
                   ))}
                 </div>
@@ -1110,6 +1220,27 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
           )}
         </CardFooter>
       )}
+
+      {/* Book search dialog */}
+      <AddBookDialog
+        isOpen={bookDialogOpen}
+        onOpenChange={setBookDialogOpen}
+        libraryId={0} // Dummy value since we're just using for book selection
+        onBookSelect={handleBookSelect}
+      />
+
+      {/* ReviewDialog for editing reviews of type 'review' */}
+      <ReviewDialog
+        open={reviewDialogOpen}
+        onOpenChange={setReviewDialogOpen}
+        bookTitle={selectedBook?.title || '리뷰 수정'}
+        initialRating={editedRating}
+        initialContent={editedContent}
+        isEditMode={true}
+        isSubmitting={isSubmitting}
+        onSubmit={handleReviewDialogSubmit}
+        onCancel={() => setReviewDialogOpen(false)}
+      />
 
       {/* 리뷰 삭제 확인 다이얼로그 */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
@@ -1146,14 +1277,6 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-
-      {/* Book search dialog */}
-      <AddBookDialog
-        isOpen={bookDialogOpen}
-        onOpenChange={setBookDialogOpen}
-        libraryId={0} // Dummy value since we're just using for book selection
-        onBookSelect={handleBookSelect}
-      />
     </Card>
   );
 }
@@ -1180,9 +1303,78 @@ function getReviewTypeName(type: string): string {
 interface CommentItemProps {
   comment: Comment;
   formatDate: (date: string | Date) => string;
+  currentUser: {
+    id: number;
+    name: string;
+    username: string;
+    avatar: string;
+  };
+  onDelete: (commentId: number) => Promise<void>;
 }
 
-function CommentItem({ comment, formatDate }: CommentItemProps) {
+function CommentItem({
+  comment,
+  formatDate,
+  currentUser,
+  onDelete,
+}: CommentItemProps) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(comment.content);
+  const queryClient = useQueryClient();
+
+  // 현재 사용자가 댓글 작성자인지 확인
+  const isAuthor = currentUser.id === comment.author.id;
+
+  // 댓글 수정 mutation
+  const updateCommentMutation = useMutation({
+    mutationFn: async ({
+      commentId,
+      content,
+    }: {
+      commentId: number;
+      content: string;
+    }) => {
+      return updateComment(commentId, { content });
+    },
+    onSuccess: () => {
+      // 댓글 목록 리로드
+      queryClient.invalidateQueries({
+        queryKey: ['review-comments'],
+        exact: false,
+      });
+      setIsEditing(false);
+      toast.success('댓글이 수정되었습니다.');
+    },
+    onError: () => {
+      toast.error('댓글 수정 중 오류가 발생했습니다.');
+    },
+  });
+
+  const handleEditComment = () => {
+    setIsEditing(true);
+    setIsDropdownOpen(false);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editedContent.trim()) return;
+
+    updateCommentMutation.mutate({
+      commentId: comment.id,
+      content: editedContent,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditedContent(comment.content);
+  };
+
+  const handleDeleteComment = () => {
+    onDelete(comment.id);
+    setIsDropdownOpen(false);
+  };
+
   return (
     <div className="flex gap-2">
       <Avatar className="h-7 w-7 flex-shrink-0">
@@ -1208,8 +1400,73 @@ function CommentItem({ comment, formatDate }: CommentItemProps) {
               {formatDate(comment.createdAt)}
             </span>
           </div>
+
+          {isAuthor && (
+            <DropdownMenu
+              open={isDropdownOpen}
+              onOpenChange={setIsDropdownOpen}
+            >
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                >
+                  <MoreHorizontal className="h-3.5 w-3.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-36 rounded-xl">
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-lg py-1.5 text-xs"
+                  onSelect={handleEditComment}
+                >
+                  <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                  수정하기
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  className="cursor-pointer rounded-lg py-1.5 text-xs text-red-500 hover:bg-red-50 hover:text-red-500"
+                  onSelect={handleDeleteComment}
+                >
+                  <Trash className="mr-1.5 h-3.5 w-3.5 text-red-500" />
+                  삭제하기
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
-        <p className="mt-1 text-sm text-gray-800">{comment.content}</p>
+
+        {isEditing ? (
+          <div className="mt-1.5">
+            <Textarea
+              value={editedContent}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setEditedContent(e.target.value)
+              }
+              className="min-h-[60px] w-full resize-none rounded-lg border-gray-200 bg-white text-xs"
+            />
+            <div className="mt-2 flex justify-end gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-7 rounded-full px-3 py-1 text-xs"
+                onClick={handleCancelEdit}
+              >
+                취소
+              </Button>
+              <Button
+                size="sm"
+                className="h-7 rounded-full bg-gray-900 px-3 py-1 text-xs text-white hover:bg-gray-800"
+                onClick={handleSaveEdit}
+                disabled={!editedContent.trim()}
+              >
+                저장
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-1 text-sm text-gray-800">{comment.content}</p>
+        )}
       </div>
     </div>
   );

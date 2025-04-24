@@ -1,4 +1,5 @@
-import { createReview, createReviewWithImages } from '@/apis/review/review';
+import { createOrUpdateRating } from '@/apis/rating/rating';
+import { createReview } from '@/apis/review/review';
 import { ReviewType } from '@/apis/review/types';
 import { SearchResult } from '@/apis/search/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -52,24 +53,56 @@ export function useCreateReview(): UseCreateReviewResult {
   const { mutateAsync: createReviewMutation, isPending: isLoading } =
     useMutation({
       mutationFn: async () => {
+        // 책이 선택된 경우에만 bookId와 isbn 처리
+        let bookId = undefined;
+        let bookIsbn = undefined;
+        let isNegativeBookId = false;
+
+        if (selectedBook) {
+          // ID 추출 - NaN 방지를 위한 안전한 형변환
+          const rawId = selectedBook.bookId ?? selectedBook.id;
+
+          if (typeof rawId === 'number') {
+            bookId = rawId;
+          } else if (typeof rawId === 'string') {
+            const parsedId = parseInt(rawId, 10);
+            bookId = isNaN(parsedId) ? -1 : parsedId;
+          } else {
+            bookId = -1;
+          }
+
+          // ISBN 추출
+          bookIsbn = selectedBook.isbn13 || selectedBook.isbn || '';
+
+          // 북 ID가 음수인지 확인
+          isNegativeBookId = bookId < 0;
+
+          // 음수일 경우 -1로 설정
+          if (isNegativeBookId) {
+            bookId = -1;
+          }
+        }
+
+        // 기본 리뷰 데이터 설정
         const reviewData = {
           content,
           type,
-          bookId: selectedBook
-            ? selectedBook.bookId || selectedBook.id
-            : undefined,
-          isbn: selectedBook
-            ? selectedBook.isbn13 || selectedBook.isbn
-            : undefined,
-          rating: selectedBook ? rating : undefined, // 책이 있을 때만 별점 전송
+          bookId: bookId,
+          // ISBN은 책이 선택된 경우 항상 전송
+          isbn: isNegativeBookId ? bookIsbn : undefined,
         };
 
-        // 이미지가 있으면 이미지와 함께 리뷰 생성, 없으면 일반 리뷰 생성
-        if (images.length > 0) {
-          return createReviewWithImages(reviewData, images);
-        } else {
-          return createReview(reviewData);
+        // 책이 선택되었고 별점이 있는 경우, 별점을 먼저 등록
+        if (selectedBook && rating > 0 && bookId !== undefined) {
+          // 별점 등록 API 호출 - isbn 항상 전송
+          await createOrUpdateRating(
+            bookId,
+            { rating },
+            isNegativeBookId ? bookIsbn : undefined
+          );
         }
+
+        return createReview(reviewData);
       },
       onSuccess: () => {
         // 게시물 목록 새로고침 - 올바른 쿼리 키로 무효화
