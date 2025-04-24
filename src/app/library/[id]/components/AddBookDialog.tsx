@@ -1,6 +1,5 @@
-'use client';
-
 import { addBooksToLibrary } from '@/apis/library';
+import { ReadingStatusType } from '@/apis/reading-status/types';
 import { searchBooks } from '@/apis/search';
 import { SearchResult } from '@/apis/search/types';
 import { Badge } from '@/components/ui/badge';
@@ -32,7 +31,15 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import { Loader2, MessageSquare, Star, X } from 'lucide-react';
+import {
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Loader2,
+  MessageSquare,
+  Star,
+  X,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -40,17 +47,20 @@ interface AddBookDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   libraryId: number;
+  onBookSelect?: (book: SearchResult) => void;
 }
 
 export function AddBookDialog({
   isOpen,
   onOpenChange,
   libraryId,
+  onBookSelect,
 }: AddBookDialogProps) {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebounce(query, 300);
   const [selectedBooks, setSelectedBooks] = useState<SearchResult[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const queryClient = useQueryClient();
 
@@ -127,6 +137,11 @@ export function AddBookDialog({
 
   // 책 선택/해제 핸들러
   const toggleBookSelection = (book: SearchResult) => {
+    if (onBookSelect) {
+      onBookSelect(book);
+      return;
+    }
+
     setSelectedBooks(prev => {
       // 고유 식별을 위해 bookId/id와 ISBN을 모두 확인
       const bookIdentifier = getBookIdentifier(book);
@@ -186,13 +201,36 @@ export function AddBookDialog({
   const searchResults = data?.pages.flatMap(page => page.books) || [];
   const totalResults = data?.pages[0]?.total || 0;
 
+  // useEffect를 사용하여 스크롤 이벤트 리스너 추가 (백업 메커니즘)
+  useEffect(() => {
+    if (debouncedQuery.trim() === '') return;
+
+    // CommandList 대신 부모 컨테이너 참조
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    const scrollHandler = () => {
+      if (!hasNextPage || isFetchingNextPage) return;
+
+      const { scrollTop, scrollHeight, clientHeight } = scrollContainer;
+      if (scrollHeight - scrollTop - clientHeight < 200) {
+        fetchNextPage();
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', scrollHandler);
+    return () => {
+      scrollContainer.removeEventListener('scroll', scrollHandler);
+    };
+  }, [debouncedQuery, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   // 스크롤 이벤트 핸들러
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     if (!hasNextPage || isFetchingNextPage) return;
 
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
     // 스크롤이 하단에 가까워지면 다음 페이지 로드
-    if (scrollHeight - scrollTop <= clientHeight * 1.5) {
+    if (scrollHeight - scrollTop - clientHeight < 200) {
       fetchNextPage();
     }
   };
@@ -239,7 +277,7 @@ export function AddBookDialog({
       <>
         {parts.map((part, index) =>
           part.toLowerCase() === highlight?.toLowerCase() ? (
-            <span key={index} className="font-medium text-gray-900">
+            <span key={index} className="font-medium text-gray-700">
               {part}
             </span>
           ) : (
@@ -259,7 +297,7 @@ export function AddBookDialog({
   return (
     <ResponsiveDialog open={isOpen} onOpenChange={handleCloseDialog}>
       <ResponsiveDialogContent
-        className="flex h-[900px] min-w-[800px] flex-col bg-white p-5 pb-2"
+        className="flex max-h-[90vh] min-w-[800px] flex-col bg-white p-5 pb-2"
         drawerClassName="flex flex-col bg-white p-5 pb-2 h-[80vh]"
         onOpenAutoFocus={e => {
           e.preventDefault();
@@ -268,13 +306,13 @@ export function AddBookDialog({
           }, 100);
         }}
       >
-        <ResponsiveDialogHeader className="mb-0.5">
-          <ResponsiveDialogTitle>서재에 책 추가</ResponsiveDialogTitle>
+        <ResponsiveDialogHeader className="mb-0.5 flex-shrink-0">
+          <ResponsiveDialogTitle>책 추가하기</ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
 
         {/* 선택된 책 목록 섹션 */}
         {selectedBooks.length > 0 && (
-          <div className="mt-2 mb-2">
+          <div className="mt-2 mb-2 flex-shrink-0">
             <h3 className="mb-1 px-2 text-xs font-medium text-gray-700">
               선택된 책 ({selectedBooks.length})
             </h3>
@@ -311,7 +349,7 @@ export function AddBookDialog({
         )}
 
         <Command
-          className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
+          className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
           shouldFilter={false}
           loop={true}
         >
@@ -325,20 +363,21 @@ export function AddBookDialog({
             />
           </div>
 
-          <div className="h-full flex-1 overflow-y-auto">
-            <CommandList
-              className="h-full !max-h-none [&>div]:h-full"
-              onScroll={handleScroll}
-            >
-              {query.length > 0 && (
-                <div className="sticky top-0 z-10 bg-white px-4 py-2 text-xs font-medium text-gray-500">
-                  &ldquo;{query}&rdquo; 검색 결과
-                  {totalResults ? ` (${totalResults})` : ''}
-                </div>
-              )}
+          <div
+            ref={scrollContainerRef}
+            className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+            onScroll={handleScroll}
+          >
+            {query.length > 0 && (
+              <div className="sticky top-0 z-10 bg-white px-4 py-2 text-xs font-medium text-gray-500">
+                &ldquo;{query}&rdquo; 검색 결과
+                {totalResults ? ` (${totalResults})` : ''}
+              </div>
+            )}
 
+            <CommandList className="!max-h-none">
               {query.length === 0 ? (
-                <div className="flex h-full w-full items-center justify-center p-8 text-sm text-gray-500">
+                <div className="flex h-[300px] w-full items-center justify-center p-8 text-sm text-gray-500">
                   검색어를 입력해주세요.
                 </div>
               ) : isLoading || isDebouncing ? (
@@ -399,7 +438,7 @@ export function AddBookDialog({
                           </div>
 
                           <div className="flex min-w-0 flex-1 flex-col justify-start pt-1">
-                            <h4 className="line-clamp-2 text-base font-medium text-gray-900 group-hover:text-gray-800">
+                            <h4 className="line-clamp-2 text-base font-medium text-gray-800 group-hover:text-gray-700">
                               {highlightText(book.title, query)}
                             </h4>
 
@@ -410,46 +449,143 @@ export function AddBookDialog({
                             )}
 
                             <div className="mt-2.5 flex items-center gap-3">
-                              {book.rating && book.rating > 0 && (
-                                <div className="flex items-center">
-                                  {renderStarRating(book.rating)}
-                                  <span className="mx-1.5 text-sm font-medium text-gray-800">
-                                    {typeof book.rating === 'number'
-                                      ? book.rating.toFixed(1)
-                                      : book.rating}
-                                  </span>
-                                  {book.totalRatings &&
-                                    book.totalRatings > 0 && (
-                                      <span className="text-sm text-gray-500">
-                                        ({book.totalRatings})
-                                      </span>
-                                    )}
-                                </div>
-                              )}
+                              <div className="flex items-center">
+                                {renderStarRating(book.rating)}
+                                <span className="mx-1.5 text-sm font-medium text-gray-800">
+                                  {typeof book.rating === 'number'
+                                    ? book.rating.toFixed(1)
+                                    : book.rating || '0.0'}
+                                </span>
+                                <span className="text-sm text-gray-500">
+                                  ({book.totalRatings || 0})
+                                </span>
+                              </div>
 
-                              {book.reviews && book.reviews > 0 && (
-                                <div className="flex items-center border-l border-gray-200 pl-3">
-                                  <MessageSquare className="h-4 w-4 text-gray-400" />
-                                  <span className="text-md ml-1.5 text-gray-500">
-                                    {book.reviews > 999
-                                      ? `${Math.floor(book.reviews / 1000)}k`
-                                      : book.reviews}
-                                  </span>
-                                </div>
-                              )}
+                              <div className="flex items-center border-l border-gray-200 pl-3">
+                                <MessageSquare className="h-4 w-4 text-gray-400" />
+                                <span className="ml-1.5 text-sm text-gray-500">
+                                  {book.reviews && book.reviews > 999
+                                    ? `${Math.floor(book.reviews / 1000)}k`
+                                    : book.reviews || 0}
+                                </span>
+                              </div>
                             </div>
 
-                            {book.publisher && (
-                              <div className="mt-2 text-sm text-gray-500">
-                                <span>{book.publisher}</span>
-                                {(book.isbn13 || book.isbn) && (
-                                  <>
-                                    <span className="mx-1.5">·</span>
-                                    <span>{book.isbn13 || book.isbn}</span>
-                                  </>
+                            {book.userReadingStatus && (
+                              <div className="mt-2.5">
+                                {book.userReadingStatus ===
+                                  ReadingStatusType.WANT_TO_READ && (
+                                  <div className="inline-flex items-center rounded-full bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-600">
+                                    <span className="flex items-center">
+                                      <Clock className="h-3.5 w-3.5 text-purple-500" />
+                                      <span className="ml-1">
+                                        읽고 싶어요
+                                        {(book.readingStats
+                                          ?.readingStatusCounts?.[
+                                          ReadingStatusType.WANT_TO_READ
+                                        ] ?? 0) > 0 &&
+                                          ` ${book.readingStats?.readingStatusCounts?.[ReadingStatusType.WANT_TO_READ]}`}
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                                {book.userReadingStatus ===
+                                  ReadingStatusType.READING && (
+                                  <div className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600">
+                                    <span className="flex items-center">
+                                      <BookOpen className="h-3.5 w-3.5 text-blue-500" />
+                                      <span className="ml-1">
+                                        읽는 중
+                                        {(book.readingStats
+                                          ?.readingStatusCounts?.[
+                                          ReadingStatusType.READING
+                                        ] ?? 0) > 0 &&
+                                          ` ${book.readingStats?.readingStatusCounts?.[ReadingStatusType.READING]}`}
+                                      </span>
+                                    </span>
+                                  </div>
+                                )}
+                                {book.userReadingStatus ===
+                                  ReadingStatusType.READ && (
+                                  <div className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-600">
+                                    <span className="flex items-center">
+                                      <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                                      <span className="ml-1">
+                                        읽었어요
+                                        {(book.readingStats
+                                          ?.readingStatusCounts?.[
+                                          ReadingStatusType.READ
+                                        ] ?? 0) > 0 &&
+                                          ` ${book.readingStats?.readingStatusCounts?.[ReadingStatusType.READ]}`}
+                                      </span>
+                                    </span>
+                                  </div>
                                 )}
                               </div>
                             )}
+
+                            {/* 읽기 상태 태그 (사용자가 읽기 상태가 없는 경우에만 표시) */}
+                            {!book.userReadingStatus &&
+                              book.readingStats?.readingStatusCounts && (
+                                <div className="mt-3 flex flex-wrap gap-1.5">
+                                  {(book.readingStats?.readingStatusCounts?.[
+                                    ReadingStatusType.WANT_TO_READ
+                                  ] ?? 0) > 0 && (
+                                    <div className="inline-flex items-center rounded-full bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-600">
+                                      <span className="flex items-center">
+                                        <Clock className="h-3.5 w-3.5 text-purple-500" />
+                                        <span className="ml-1">
+                                          읽고 싶어요{' '}
+                                          {
+                                            book.readingStats
+                                              ?.readingStatusCounts?.[
+                                              ReadingStatusType.WANT_TO_READ
+                                            ]
+                                          }
+                                        </span>
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {(book.readingStats?.readingStatusCounts?.[
+                                    ReadingStatusType.READING
+                                  ] ?? 0) > 0 && (
+                                    <div className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600">
+                                      <span className="flex items-center">
+                                        <BookOpen className="h-3.5 w-3.5 text-blue-500" />
+                                        <span className="ml-1">
+                                          읽는 중{' '}
+                                          {
+                                            book.readingStats
+                                              ?.readingStatusCounts?.[
+                                              ReadingStatusType.READING
+                                            ]
+                                          }
+                                        </span>
+                                      </span>
+                                    </div>
+                                  )}
+
+                                  {(book.readingStats?.readingStatusCounts?.[
+                                    ReadingStatusType.READ
+                                  ] ?? 0) > 0 && (
+                                    <div className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-600">
+                                      <span className="flex items-center">
+                                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                                        <span className="ml-1">
+                                          읽었어요{' '}
+                                          {
+                                            book.readingStats
+                                              ?.readingStatusCounts?.[
+                                              ReadingStatusType.READ
+                                            ]
+                                          }
+                                        </span>
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                           </div>
 
                           {/* 선택 상태 표시 배지 */}
@@ -474,7 +610,7 @@ export function AddBookDialog({
           </div>
         </Command>
 
-        <div className="mt-2 flex justify-end gap-2 bg-white px-0 py-3">
+        <div className="mt-2 flex flex-shrink-0 justify-end gap-2 bg-white px-0 py-3">
           <Button
             variant="outline"
             onClick={handleCloseDialog}
@@ -486,9 +622,7 @@ export function AddBookDialog({
             onClick={handleAddBooks}
             disabled={selectedBooks.length === 0 || isPending}
           >
-            {isPending
-              ? '추가 중...'
-              : `서재에 ${selectedBooks.length > 0 ? `${selectedBooks.length}권 ` : ''}추가하기`}
+            {isPending ? '추가 중...' : '추가하기'}
           </Button>
         </div>
       </ResponsiveDialogContent>

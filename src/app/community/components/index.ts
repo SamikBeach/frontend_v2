@@ -1,6 +1,6 @@
 export * from './CategoryFilter';
 export * from './CommunityBreadcrumb';
-export * from './CreateReviewCard';
+export { CreateReviewCard } from './CreateReviewCard';
 export * from './EventCard';
 export * from './FilterBar';
 export * from './ReadingGroupCard';

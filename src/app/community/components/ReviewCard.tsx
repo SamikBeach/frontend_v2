@@ -143,6 +143,8 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   const [isLiked, setIsLiked] = useState(review.isLiked);
   const [likesCount, setLikesCount] = useState(review.likeCount);
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
   // 댓글 관련 훅
   const {
     comments,
@@ -501,7 +503,10 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
             </div>
           </div>
           {isAuthor && (
-            <DropdownMenu>
+            <DropdownMenu
+              open={isDropdownOpen}
+              onOpenChange={setIsDropdownOpen}
+            >
               <DropdownMenuTrigger asChild>
                 <Button
                   variant="ghost"
@@ -514,7 +519,10 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
               <DropdownMenuContent align="end" className="w-48 rounded-xl">
                 <DropdownMenuItem
                   className="cursor-pointer rounded-lg py-2"
-                  onClick={() => setReviewDialogOpen(true)}
+                  onSelect={() => {
+                    setReviewDialogOpen(true);
+                    setIsDropdownOpen(false);
+                  }}
                 >
                   <Pencil className="mr-2 h-4 w-4" />
                   수정하기
@@ -522,7 +530,10 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer rounded-lg py-2 text-red-500 hover:text-red-500"
-                  onClick={() => setDeleteDialogOpen(true)}
+                  onSelect={() => {
+                    setDeleteDialogOpen(true);
+                    setIsDropdownOpen(false);
+                  }}
                 >
                   <Trash className="mr-2 h-4 w-4 text-red-500" />
                   삭제하기
