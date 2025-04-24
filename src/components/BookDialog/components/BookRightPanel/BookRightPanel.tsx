@@ -53,12 +53,7 @@ export function BookRightPanel() {
         className={isMobile ? 'mb-3' : 'mb-4'}
       />
 
-      <div
-        className={cn(
-          'overflow-hidden rounded-lg',
-          isMobile ? '' : 'border border-gray-100'
-        )}
-      >
+      <div className={cn('overflow-hidden rounded-lg')}>
         {activeTab === 'reviews' && (
           <ErrorBoundary FallbackComponent={SimpleErrorFallback}>
             <Suspense

@@ -90,35 +90,35 @@ export function useActivityMessage(library: Library) {
     switch (update.activityType) {
       case LibraryActivityType.LIBRARY_CREATE:
         return (
-          <>
+          <span className="text-sm">
             {activityIcon}{' '}
             <span className="font-medium text-gray-800">{library.name}</span>이
             생성되었습니다.
-          </>
+          </span>
         );
 
       case LibraryActivityType.LIBRARY_UPDATE:
         return (
-          <>
+          <span className="text-sm">
             {activityIcon}{' '}
             <span className="font-medium text-gray-800">{library.name}</span>{' '}
             서재 정보가 수정되었습니다.
-          </>
+          </span>
         );
 
       case LibraryActivityType.LIBRARY_TITLE_UPDATE:
         return (
-          <>
+          <span className="text-sm">
             {activityIcon} 서재 이름이{' '}
             <span className="font-medium text-gray-800">{library.name}</span>
             으로 변경되었습니다.
-          </>
+          </span>
         );
 
       case LibraryActivityType.BOOK_ADD: {
         const bookTitle = update.bookTitle || getBookTitleById(update.bookId);
         return (
-          <>
+          <span className="text-sm">
             {activityIcon}{' '}
             <span
               className="cursor-pointer font-medium text-gray-800 hover:underline"
@@ -130,8 +130,8 @@ export function useActivityMessage(library: Library) {
             >
               {bookTitle}
             </span>{' '}
-            책이 서재에 추가되었습니다.
-          </>
+            책이 추가되었습니다.
+          </span>
         );
       }
 
@@ -142,7 +142,7 @@ export function useActivityMessage(library: Library) {
           update.message.match(/"(.+?)"/)?.at(1) ||
           '알 수 없는 책';
         return (
-          <>
+          <span className="text-sm">
             {activityIcon}{' '}
             <span
               className="cursor-pointer font-medium text-gray-800 hover:underline"
@@ -154,8 +154,8 @@ export function useActivityMessage(library: Library) {
             >
               {bookTitle}
             </span>{' '}
-            책이 서재에서 제거되었습니다.
-          </>
+            책이 제거되었습니다.
+          </span>
         );
       }
 
@@ -163,9 +163,9 @@ export function useActivityMessage(library: Library) {
         const tagName = getTagNameById(update.tagId);
         const tagColor = getTagColor((update.tagId || 0) % 8);
         return (
-          <div className="flex items-center">
+          <div className="flex items-center text-sm">
             <span
-              className="mr-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+              className="mr-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
               style={{
                 backgroundColor: tagColor,
                 color: '#464646',
@@ -173,7 +173,7 @@ export function useActivityMessage(library: Library) {
             >
               {tagName}
             </span>
-            <span>태그가 서재에 추가되었습니다.</span>
+            <span>태그가 추가되었습니다.</span>
           </div>
         );
       }
@@ -185,9 +185,9 @@ export function useActivityMessage(library: Library) {
           '알 수 없는 태그';
         const tagColor = getTagColor((update.tagId || 0) % 8);
         return (
-          <div className="flex items-center">
+          <div className="flex items-center text-sm">
             <span
-              className="mr-1 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
+              className="mr-1 inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
               style={{
                 backgroundColor: tagColor,
                 color: '#464646',
@@ -195,7 +195,7 @@ export function useActivityMessage(library: Library) {
             >
               {tagName}
             </span>
-            <span>태그가 서재에서 제거되었습니다.</span>
+            <span>태그가 제거되었습니다.</span>
           </div>
         );
       }
@@ -204,11 +204,11 @@ export function useActivityMessage(library: Library) {
         // 백엔드에서 userName이 제공되면 사용하고, 그렇지 않으면 기존 방식으로 이름을 찾음
         const username = update.userName || getUsernameById(update.userId);
         return (
-          <>
+          <span className="text-sm">
             {activityIcon}{' '}
             <span className="font-medium text-gray-800">{username}</span>님이
-            서재를 구독했습니다.
-          </>
+            구독했습니다.
+          </span>
         );
       }
 
@@ -216,20 +216,20 @@ export function useActivityMessage(library: Library) {
         // 백엔드에서 userName이 제공되면 사용하고, 그렇지 않으면 기존 방식으로 이름을 찾음
         const username = update.userName || getUsernameById(update.userId);
         return (
-          <>
+          <span className="text-sm">
             {activityIcon}{' '}
             <span className="font-medium text-gray-800">{username}</span>님이
-            서재 구독을 취소했습니다.
-          </>
+            구독을 취소했습니다.
+          </span>
         );
       }
 
       default:
         // 기타 활동이거나 서버에서 직접 메시지가 제공된 경우
         return (
-          <>
+          <span className="text-sm">
             {activityIcon} {update.message}
-          </>
+          </span>
         );
     }
   };

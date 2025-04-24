@@ -35,7 +35,7 @@ export const LibrarySidebarUpdates: FC<LibrarySidebarUpdatesProps> = ({
       return (
         <div key={index} className="mb-2 rounded-md bg-white p-3 last:mb-0">
           <div className="flex flex-col">
-            <div className="text-gray-700">
+            <div className="text-sm text-gray-700">
               {isReactNode ? (
                 formattedMessage
               ) : (
@@ -46,7 +46,7 @@ export const LibrarySidebarUpdates: FC<LibrarySidebarUpdatesProps> = ({
                 />
               )}
             </div>
-            <span className="mt-1 text-xs text-gray-500">
+            <span className="mt-0.5 text-xs text-gray-500">
               {formatRelativeTime(update.date)}
             </span>
           </div>
@@ -58,12 +58,12 @@ export const LibrarySidebarUpdates: FC<LibrarySidebarUpdatesProps> = ({
   return (
     <div className="rounded-xl bg-gray-50 p-4">
       <div className="mb-3 flex items-center">
-        <Clock className="mr-2 h-4 w-4 text-gray-500" />
-        <h3 className="font-medium text-gray-900">최근 활동</h3>
+        <Clock className="mr-1.5 h-4 w-4 text-gray-500" />
+        <h3 className="text-sm font-medium text-gray-900">최근 활동</h3>
       </div>
-      <div className="space-y-3">{renderRecentUpdates()}</div>
+      <div className="space-y-2">{renderRecentUpdates()}</div>
 
-      <div className="mt-4 flex items-center justify-center rounded-lg bg-gray-100 p-2.5 text-xs text-gray-600">
+      <div className="mt-3 flex items-center justify-center rounded-lg bg-gray-100 p-2 text-xs text-gray-600">
         구독하면 이 서재의 모든 활동 소식을 볼 수 있습니다
       </div>
     </div>
