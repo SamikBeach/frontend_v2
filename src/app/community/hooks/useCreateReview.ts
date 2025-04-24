@@ -85,7 +85,7 @@ export function useCreateReview(): UseCreateReviewResult {
         setRating(0);
         setType('general');
 
-        toast.success('리뷰가 성공적으로 등록되었습니다.');
+        toast.success('리뷰가 등록되었습니다.');
       },
       onError: (error: any) => {
         let errorMessage = '리뷰 등록 중 오류가 발생했습니다.';

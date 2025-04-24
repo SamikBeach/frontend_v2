@@ -7,7 +7,9 @@ import {
 } from '@/atoms/community';
 import { LoadingSpinner } from '@/components';
 import { Button } from '@/components/ui/button';
+import { useSidebar } from '@/components/ui/sidebar';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
 import { CreateReviewCard, FilterBar, ReviewCard } from './components';
@@ -134,7 +136,7 @@ function CommunityContent() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pt-2 pb-3">
+    <div className="px-4 pt-2 pb-3">
       {/* 필터 바 */}
       <FilterBar
         selectedCategory={typeFilter}
@@ -158,8 +160,10 @@ function CommunityContent() {
 }
 
 export default function CommunityPage() {
+  const { open } = useSidebar();
+
   return (
-    <div className="bg-white pb-8">
+    <div className={cn('mx-auto max-w-3xl bg-white pb-8')}>
       <CommunityContent />
     </div>
   );

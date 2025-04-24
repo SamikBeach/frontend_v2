@@ -1,6 +1,8 @@
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { deleteReview, updateReview } from '@/apis/review/review';
-import { ReviewResponseDto } from '@/apis/review/types';
+import { ReviewResponseDto, ReviewType } from '@/apis/review/types';
+import { SearchResult } from '@/apis/search/types';
+import { AddBookDialog } from '@/app/library/[id]/components';
 import { communityCategoryColors } from '@/atoms/community';
 import {
   AlertDialog,
@@ -28,7 +30,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Textarea } from '@/components/ui/textarea';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -44,6 +54,7 @@ import {
   Star,
   ThumbsUp,
   Trash,
+  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -136,8 +147,32 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editContent, setEditContent] = useState('');
-  const [editRating, setEditRating] = useState(0);
+  const [editedContent, setEditedContent] = useState(review.content);
+  const [editedType, setEditedType] = useState(review.type);
+  const [editedRating, setEditedRating] = useState<number>(
+    extendedReview.rating ||
+      (extendedReview.authorRatings && extendedReview.authorRatings.length > 0
+        ? (extendedReview.authorRatings[0].rating as number)
+        : 0)
+  );
+  const [selectedBook, setSelectedBook] = useState<SearchResult | null>(
+    review.books && review.books.length > 0
+      ? {
+          id: review.books[0].id,
+          type: 'book',
+          isbn: (review.books[0] as any).isbn || '',
+          isbn13: (review.books[0] as any).isbn13 || '',
+          title: review.books[0].title,
+          author: review.books[0].author,
+          publisher: review.books[0].publisher,
+          image: review.books[0].coverImage,
+        }
+      : null
+  );
+  const [bookDialogOpen, setBookDialogOpen] = useState(false);
+  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertTitle, setAlertTitle] = useState('');
 
   // Review 좋아요 관련 훅
   const { handleLikeToggle, isLoading: isLikeLoading } = useReviewLike();
@@ -162,8 +197,15 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   // 초기 수정 상태 설정
   useEffect(() => {
     if (review) {
-      setEditContent(review.content);
-      setEditRating(extendedReview.authorRatings?.[0]?.rating || 0);
+      setEditedContent(review.content);
+      setEditedType(review.type);
+      setEditedRating(
+        extendedReview.rating ||
+          (extendedReview.authorRatings &&
+          extendedReview.authorRatings.length > 0
+            ? (extendedReview.authorRatings[0].rating as number)
+            : 0)
+      );
     }
   }, [review, extendedReview.authorRatings]);
 
@@ -172,19 +214,47 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
     mutationFn: ({
       id,
       content,
+      type,
+      isbn,
       rating,
     }: {
       id: number;
       content: string;
-      rating: number;
+      type: ReviewType;
+      isbn?: string;
+      rating?: number;
     }) => {
-      return updateReview(id, { content, type: review.type });
+      return updateReview(id, {
+        content,
+        type,
+        ...(isbn ? { isbn } : {}),
+        ...(rating ? { rating } : {}),
+      });
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
+      // 모든 리뷰 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: ['communityReviews'],
         exact: false,
       });
+
+      // 원본 타입과 수정된 타입이 다른 경우 두 타입 모두 무효화
+      if (review.type !== variables.type) {
+        queryClient.invalidateQueries({
+          queryKey: ['review', review.type],
+          exact: false,
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['review', variables.type],
+          exact: false,
+        });
+      }
+
+      // 단일 리뷰 데이터도 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['review', review.id],
+      });
+
       toast.success('리뷰가 수정되었습니다.');
       setIsEditMode(false);
     },
@@ -211,31 +281,123 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
     },
   });
 
+  // 책 선택 대화상자 열기 핸들러
+  const handleBookDialogOpen = () => {
+    if (editedType === 'review') {
+      setBookDialogOpen(true);
+    }
+  };
+
+  // 책 선택 핸들러
+  const handleBookSelect = (book: SearchResult) => {
+    setSelectedBook(book);
+    setBookDialogOpen(false);
+  };
+
+  // 책 선택 제거 핸들러
+  const handleRemoveSelectedBook = () => {
+    setSelectedBook(null);
+    setEditedRating(0);
+  };
+
+  // 별점 선택 핸들러
+  const handleRatingChange = (newRating: number) => {
+    setEditedRating(newRating);
+  };
+
+  // 태그 변경 핸들러
+  const handleTypeChange = (newType: string) => {
+    setEditedType(newType as any);
+    // 리뷰 태그가 아니면 책과 별점 초기화
+    if (newType !== 'review') {
+      setSelectedBook(null);
+      setEditedRating(0);
+    }
+  };
+
+  // 태그별 이름 가져오기
+  const getTagName = (tagType: string) => {
+    switch (tagType) {
+      case 'discussion':
+        return '토론';
+      case 'review':
+        return '리뷰';
+      case 'question':
+        return '질문';
+      case 'meetup':
+        return '모임';
+      default:
+        return '일반';
+    }
+  };
+
   // 리뷰 수정 핸들러
-  const handleEditReview = (rating: number, content: string) => {
-    setIsSubmitting(true);
-    updateReviewMutation.mutate({
-      id: review.id,
-      content,
-      rating,
-    });
+  const handleEditReview = () => {
+    setIsEditMode(true);
+    setEditedContent(review.content);
+    setEditedType(review.type);
+    setEditedRating(
+      extendedReview.rating ||
+        (extendedReview.authorRatings && extendedReview.authorRatings.length > 0
+          ? (extendedReview.authorRatings[0].rating as number)
+          : 0)
+    );
   };
 
-  // 리뷰 직접 수정 핸들러
-  const handleSaveEdit = () => {
-    setIsSubmitting(true);
-    updateReviewMutation.mutate({
-      id: review.id,
-      content: editContent,
-      rating: editRating,
-    });
+  const handleSaveEdit = async () => {
+    // 내용이 없으면 제출 안함
+    if (!editedContent.trim()) return;
+
+    // 리뷰 타입이면서 책이 선택되지 않았거나 별점이 없는 경우 알림 표시
+    if (editedType === 'review') {
+      if (!selectedBook) {
+        setAlertTitle('책을 선택해주세요');
+        setAlertMessage('리뷰를 작성하려면 책을 선택해야 합니다.');
+        setAlertDialogOpen(true);
+        return;
+      }
+
+      if (editedRating === 0) {
+        setAlertTitle('별점을 입력해주세요');
+        setAlertMessage('리뷰를 작성하려면 별점을 입력해야 합니다.');
+        setAlertDialogOpen(true);
+        return;
+      }
+    }
+
+    try {
+      setIsSubmitting(true);
+
+      updateReviewMutation.mutate({
+        id: review.id,
+        content: editedContent,
+        type: editedType,
+        ...(editedType === 'review' && selectedBook
+          ? {
+              isbn: selectedBook.isbn || selectedBook.isbn13,
+              rating: editedRating,
+            }
+          : {}),
+      });
+    } catch (error) {
+      console.error('리뷰 업데이트 실패:', error);
+      setAlertTitle('오류');
+      setAlertMessage('리뷰를 업데이트하는 중 오류가 발생했습니다.');
+      setAlertDialogOpen(true);
+      setIsSubmitting(false);
+    }
   };
 
-  // 수정 모드 취소 핸들러
   const handleCancelEdit = () => {
     setIsEditMode(false);
-    setEditContent(review.content);
-    setEditRating(extendedReview.authorRatings?.[0]?.rating || 0);
+    setEditedContent(review.content);
+    setEditedType(review.type);
+    setEditedRating(
+      extendedReview.rating ||
+        (extendedReview.authorRatings && extendedReview.authorRatings.length > 0
+          ? (extendedReview.authorRatings[0].rating as number)
+          : 0)
+    );
   };
 
   // 리뷰 삭제 핸들러
@@ -495,7 +657,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
                       ] || '#F9FAFB',
                   }}
                 >
-                  {getReviewTypeName(review.type)}
+                  {getTagName(review.type)}
                 </span>
               </div>
               <div className="mt-0.5 flex items-center gap-2">
@@ -638,88 +800,185 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
           </>
         ) : (
           <>
-            {/* 수정 모드: 편집 UI */}
-            <div className="flex flex-col gap-4">
-              <textarea
-                placeholder="리뷰 내용을 수정하세요"
-                className="min-h-[100px] resize-none rounded-xl border-gray-200 bg-[#F9FAFB] p-4 text-[15px]"
-                value={editContent}
-                onChange={e => setEditContent(e.target.value)}
-                disabled={isSubmitting}
+            {/* 편집 모드 */}
+            <div className="flex-1">
+              <Textarea
+                placeholder="어떤 책에 대해 이야기하고 싶으신가요?"
+                className="min-h-[100px] resize-none rounded-xl border-gray-200 bg-[#F9FAFB] text-[15px]"
+                value={editedContent}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setEditedContent(e.target.value)
+                }
               />
-
-              {/* 책 정보가 있는 경우 (리뷰 태그인 경우) */}
-              {review.books && review.books.length > 0 && (
-                <div className="flex items-start gap-3 rounded-xl border border-gray-100 bg-[#F9FAFB] p-3">
-                  <div className="flex-shrink-0">
-                    <img
-                      src={review.books[0].coverImage}
-                      alt={review.books[0].title}
-                      className="h-[70px] w-[45px] rounded-md object-cover shadow-sm"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-900">
-                        {review.books[0].title}
-                      </h4>
-                      <p className="text-xs text-gray-500">
-                        {review.books[0].author}
-                      </p>
-                    </div>
-
-                    {/* 별점 표시 */}
-                    <div className="mt-2">
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Select value={editedType} onValueChange={handleTypeChange}>
+                  <SelectTrigger className="h-9 w-[130px] cursor-pointer rounded-xl border-gray-200 bg-white font-medium text-gray-700">
+                    <SelectValue>
                       <div className="flex items-center">
-                        {[1, 2, 3, 4, 5].map(star => (
-                          <Star
-                            key={star}
-                            className={`h-5 w-5 cursor-pointer ${
-                              star <= editRating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-gray-200 hover:text-gray-300'
-                            }`}
-                            onClick={() => setEditRating(star)}
-                          />
-                        ))}
-                        {editRating > 0 && (
-                          <span className="ml-2 text-xs font-medium text-gray-700">
-                            {editRating === 1
-                              ? '별로예요'
-                              : editRating === 2
-                                ? '아쉬워요'
-                                : editRating === 3
-                                  ? '보통이에요'
-                                  : editRating === 4
-                                    ? '좋아요'
-                                    : '최고예요'}
-                          </span>
-                        )}
+                        <span
+                          className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                          style={{
+                            backgroundColor:
+                              communityCategoryColors[
+                                editedType as keyof typeof communityCategoryColors
+                              ] || '#F9FAFB',
+                          }}
+                        ></span>
+                        {getTagName(editedType)}
                       </div>
-                    </div>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="general" className="cursor-pointer">
+                      <div className="flex items-center">
+                        <span
+                          className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                          style={{
+                            backgroundColor:
+                              communityCategoryColors.general || '#F9FAFB',
+                          }}
+                        ></span>
+                        일반
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="discussion" className="cursor-pointer">
+                      <div className="flex items-center">
+                        <span
+                          className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                          style={{
+                            backgroundColor:
+                              communityCategoryColors.discussion || '#F9FAFB',
+                          }}
+                        ></span>
+                        토론
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="review" className="cursor-pointer">
+                      <div className="flex items-center">
+                        <span
+                          className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                          style={{
+                            backgroundColor:
+                              communityCategoryColors.review || '#F9FAFB',
+                          }}
+                        ></span>
+                        리뷰
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="question" className="cursor-pointer">
+                      <div className="flex items-center">
+                        <span
+                          className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                          style={{
+                            backgroundColor:
+                              communityCategoryColors.question || '#F9FAFB',
+                          }}
+                        ></span>
+                        질문
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="meetup" className="cursor-pointer">
+                      <div className="flex items-center">
+                        <span
+                          className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                          style={{
+                            backgroundColor:
+                              communityCategoryColors.meetup || '#F9FAFB',
+                          }}
+                        ></span>
+                        모임
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-9 rounded-xl border-gray-200 bg-white font-medium text-gray-700"
+                  onClick={handleBookDialogOpen}
+                  disabled={editedType !== 'review'}
+                >
+                  <BookOpen className="mr-1.5 h-4 w-4 text-gray-500" />
+                  {selectedBook ? '책 변경' : '책 추가'}
+                </Button>
+
+                {selectedBook && (
+                  <div className="flex items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-1.5">
+                    <img
+                      src={selectedBook.image}
+                      alt={selectedBook.title}
+                      className="h-5 w-4 rounded object-cover"
+                    />
+                    <span className="max-w-[150px] truncate text-sm font-medium text-gray-800">
+                      {selectedBook.title}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="ml-1.5 h-5 w-5 rounded-full p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleRemoveSelectedBook();
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                )}
+
+                {editedType === 'review' && selectedBook && (
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map(star => (
+                      <Star
+                        key={star}
+                        className={`h-5 w-5 cursor-pointer ${
+                          star <= editedRating
+                            ? 'fill-yellow-400 text-yellow-400'
+                            : 'fill-gray-200 text-gray-200'
+                        }`}
+                        onClick={() => handleRatingChange(star)}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                <div className="ml-auto flex gap-2">
+                  <Button
+                    variant="outline"
+                    className="h-9 rounded-xl border-gray-200 bg-white font-medium text-gray-700"
+                    onClick={handleCancelEdit}
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    className="h-9 rounded-xl bg-gray-900 px-4 font-medium text-white hover:bg-gray-800"
+                    onClick={handleSaveEdit}
+                    disabled={!editedContent.trim()}
+                  >
+                    <SendHorizontal className="mr-1.5 h-4 w-4" />
+                    저장
+                  </Button>
+                </div>
+              </div>
+
+              {selectedBook && editedType === 'review' && (
+                <div className="mt-3 flex items-center rounded-lg border border-gray-200 bg-gray-50 p-3">
+                  <img
+                    src={selectedBook.image}
+                    alt={selectedBook.title}
+                    className="h-16 w-12 rounded object-cover"
+                  />
+                  <div className="ml-3">
+                    <h3 className="font-medium text-gray-900">
+                      {selectedBook.title}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {selectedBook.author}
+                    </p>
                   </div>
                 </div>
               )}
-
-              {/* 수정 버튼 */}
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="outline"
-                  className="h-9 rounded-xl border-gray-200"
-                  onClick={handleCancelEdit}
-                  disabled={isSubmitting}
-                >
-                  취소
-                </Button>
-                <Button
-                  className="h-9 rounded-xl bg-gray-900 px-4 font-medium text-white hover:bg-gray-800"
-                  onClick={handleSaveEdit}
-                  disabled={!editContent.trim() || isSubmitting}
-                >
-                  <Pencil className="mr-1.5 h-4 w-4" />
-                  수정하기
-                </Button>
-              </div>
             </div>
           </>
         )}
@@ -872,6 +1131,29 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Alert Dialog for validation */}
+      <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
+        <AlertDialogContent className="rounded-xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>{alertTitle}</AlertDialogTitle>
+            <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction className="rounded-lg bg-gray-900 hover:bg-gray-800">
+              확인
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Book search dialog */}
+      <AddBookDialog
+        isOpen={bookDialogOpen}
+        onOpenChange={setBookDialogOpen}
+        libraryId={0} // Dummy value since we're just using for book selection
+        onBookSelect={handleBookSelect}
+      />
     </Card>
   );
 }
