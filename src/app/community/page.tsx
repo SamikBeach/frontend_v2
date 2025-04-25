@@ -135,14 +135,16 @@ function CommunityContent() {
   };
 
   return (
-    <div className="px-4 pt-2 pb-3">
-      {/* 필터 바 */}
-      <FilterArea
-        selectedCategory={typeFilter}
-        selectedSort={sortOption}
-        onCategoryClick={handleTypeFilterChange}
-        onSortClick={handleSortOptionChange}
-      />
+    <div className="px-4 pb-3">
+      {/* 필터 바 - 스크롤 시 상단에 고정 */}
+      <div className="sticky top-[56px] z-30 bg-white pt-4 pb-2">
+        <FilterArea
+          selectedCategory={typeFilter}
+          selectedSort={sortOption}
+          onCategoryClick={handleTypeFilterChange}
+          onSortClick={handleSortOptionChange}
+        />
+      </div>
 
       {/* 메인 콘텐츠 */}
       <div className="pt-2">
