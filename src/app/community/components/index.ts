@@ -1,4 +1,3 @@
-export * from './CategoryFilter';
-export { CreateReviewCard } from './CreateReviewCard';
-export * from './FilterBar';
-export * from './ReviewCard';
+export { CreateReviewCard } from './CreateReviewCard/CreateReviewCard';
+export * from './FilterArea';
+export { ReviewCard } from './ReviewCard';
