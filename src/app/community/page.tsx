@@ -5,8 +5,8 @@ import {
   communitySortOptionAtom,
   communityTypeFilterAtom,
 } from '@/atoms/community';
-import { LoadingSpinner } from '@/components';
 import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';

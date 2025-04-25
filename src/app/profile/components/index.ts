@@ -1,4 +1,5 @@
 export { default as ProfileBooks } from './ProfileBooks';
+export { ProfileEditDialog } from './ProfileEditDialog';
 export { default as ProfileHeader } from './ProfileHeader';
 export { default as ProfileRecentBooks } from './ProfileRecentBooks';
 export { default as ProfileReviews } from './ProfileReviews';

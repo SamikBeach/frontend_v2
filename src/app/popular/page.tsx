@@ -8,7 +8,6 @@ import {
   subcategoryFilterAtom,
   timeRangeAtom,
 } from '@/atoms/popular';
-import { LoadingSpinner } from '@/components';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -17,6 +16,7 @@ import { useSetAtom } from 'jotai';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import {
   BooksContent,
   CategoryFilter,

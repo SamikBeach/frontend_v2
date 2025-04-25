@@ -2,9 +2,9 @@ import { UserDetailResponseDto } from '@/apis/user/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Check, UserCircle, UserPlus } from 'lucide-react';
-import Link from 'next/link';
 import { useState } from 'react';
 import { useIsMyProfile } from '../hooks';
+import { ProfileEditDialog } from './ProfileEditDialog';
 
 interface ProfileHeaderProps {
   profileData: UserDetailResponseDto;
@@ -13,6 +13,7 @@ interface ProfileHeaderProps {
 export default function ProfileHeader({ profileData }: ProfileHeaderProps) {
   const isMyProfile = useIsMyProfile();
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const { user, followers, following, isEditable } = profileData;
 
@@ -24,6 +25,16 @@ export default function ProfileHeader({ profileData }: ProfileHeaderProps) {
   const handleFollowClick = () => {
     // TODO: 실제 팔로우 API 연동
     setIsFollowing(!isFollowing);
+  };
+
+  // 프로필 편집 다이얼로그 열기
+  const handleOpenEditDialog = () => {
+    setIsEditDialogOpen(true);
+  };
+
+  // 프로필 편집 다이얼로그 닫기
+  const handleCloseEditDialog = () => {
+    setIsEditDialogOpen(false);
   };
 
   return (
@@ -72,15 +83,14 @@ export default function ProfileHeader({ profileData }: ProfileHeaderProps) {
           </div>
 
           {isMyProfile ? (
-            <Link href="/profile/settings">
-              <Button
-                className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
-                variant="outline"
-              >
-                <UserCircle className="h-4 w-4" />
-                프로필 편집
-              </Button>
-            </Link>
+            <Button
+              onClick={handleOpenEditDialog}
+              className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
+              variant="outline"
+            >
+              <UserCircle className="h-4 w-4" />
+              프로필 편집
+            </Button>
           ) : (
             <Button
               onClick={handleFollowClick}
@@ -106,6 +116,13 @@ export default function ProfileHeader({ profileData }: ProfileHeaderProps) {
           )}
         </div>
       </div>
+
+      {/* 프로필 편집 다이얼로그 */}
+      <ProfileEditDialog
+        isOpen={isEditDialogOpen}
+        onClose={handleCloseEditDialog}
+        profileData={profileData}
+      />
     </div>
   );
 }

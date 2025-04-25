@@ -1,26 +1,37 @@
+import { createLibrary } from '@/apis/library/library';
+import { CreateLibraryDto } from '@/apis/library/types';
+import { LibraryDialog } from '@/components/Library';
 import { LibraryCard } from '@/components/LibraryCard';
 import { Button } from '@/components/ui/button';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { PlusCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { toast } from 'sonner';
 import { useIsMyProfile } from '../hooks';
 
 // 샘플 서재 데이터 (LibraryCard에 맞게 수정)
 const userLibraries: any[] = [
   {
     id: 1,
-    title: '철학 고전',
+    name: '철학 고전',
     description: '플라톤부터 니체까지, 철학 관련 고전 모음',
     category: 'philosophy',
     owner: {
+      id: 1,
       name: '내 서재',
       username: 'mybooks',
-      avatar: 'https://i.pravatar.cc/150?u=mybooks1',
+      email: 'user@example.com',
     },
-    followers: 42,
+    subscriberCount: 42,
     isPublic: true,
-    tags: ['철학', '고전', '서양철학'],
-    timestamp: '2023-01-15',
-    books: [
+    tags: [
+      { tagId: 1, tagName: '철학' },
+      { tagId: 2, tagName: '고전' },
+      { tagId: 3, tagName: '서양철학' },
+    ],
+    bookCount: 4,
+    previewBooks: [
       {
         id: 1,
         title: '국가',
@@ -39,29 +50,29 @@ const userLibraries: any[] = [
         author: '노자',
         coverImage: 'https://picsum.photos/seed/book3/120/180',
       },
-      {
-        id: 4,
-        title: '차라투스트라는 이렇게 말했다',
-        author: '니체',
-        coverImage: 'https://picsum.photos/seed/book4/120/180',
-      },
     ],
+    createdAt: new Date('2023-01-15'),
   },
   {
     id: 2,
-    title: '현대 문학',
+    name: '현대 문학',
     description: '20세기 이후 주요 문학 작품 모음',
     category: 'literature',
     owner: {
+      id: 1,
       name: '내 서재',
       username: 'mybooks',
-      avatar: 'https://i.pravatar.cc/150?u=mybooks2',
+      email: 'user@example.com',
     },
-    followers: 35,
+    subscriberCount: 35,
     isPublic: true,
-    tags: ['문학', '소설', '현대문학'],
-    timestamp: '2023-02-20',
-    books: [
+    tags: [
+      { tagId: 4, tagName: '문학' },
+      { tagId: 5, tagName: '소설' },
+      { tagId: 6, tagName: '현대문학' },
+    ],
+    bookCount: 4,
+    previewBooks: [
       {
         id: 5,
         title: '노인과 바다',
@@ -80,29 +91,29 @@ const userLibraries: any[] = [
         author: '가브리엘 가르시아 마르케스',
         coverImage: 'https://picsum.photos/seed/book7/120/180',
       },
-      {
-        id: 8,
-        title: '변신',
-        author: '프란츠 카프카',
-        coverImage: 'https://picsum.photos/seed/book8/120/180',
-      },
     ],
+    createdAt: new Date('2023-02-20'),
   },
   {
     id: 3,
-    title: '과학 교양',
+    name: '과학 교양',
     description: '일반인을 위한 과학 교양서 모음',
     category: 'science',
     owner: {
+      id: 1,
       name: '내 서재',
       username: 'mybooks',
-      avatar: 'https://i.pravatar.cc/150?u=mybooks3',
+      email: 'user@example.com',
     },
-    followers: 27,
+    subscriberCount: 27,
     isPublic: true,
-    tags: ['과학', '교양', '물리학'],
-    timestamp: '2023-03-10',
-    books: [
+    tags: [
+      { tagId: 7, tagName: '과학' },
+      { tagId: 8, tagName: '교양' },
+      { tagId: 9, tagName: '물리학' },
+    ],
+    bookCount: 4,
+    previewBooks: [
       {
         id: 9,
         title: '시간의 역사',
@@ -121,35 +132,50 @@ const userLibraries: any[] = [
         author: '리처드 도킨스',
         coverImage: 'https://picsum.photos/seed/book11/120/180',
       },
-      {
-        id: 12,
-        title: '사피엔스',
-        author: '유발 하라리',
-        coverImage: 'https://picsum.photos/seed/book12/120/180',
-      },
     ],
+    createdAt: new Date('2023-03-10'),
   },
 ];
 
 export default function ProfileBooks() {
   const isMyProfile = useIsMyProfile();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const [showLibraryDialog, setShowLibraryDialog] = useState(false);
+
+  // 새 서재 생성 mutation
+  const { mutateAsync: createLibraryMutation } = useMutation({
+    mutationFn: (data: CreateLibraryDto) => createLibrary(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['libraries', 'my'] });
+      toast.success('새 서재가 생성되었습니다.');
+    },
+  });
 
   // 새 서재 만들기 클릭 핸들러
   const handleCreateLibrary = () => {
-    // TODO: 새 서재 만들기 페이지로 이동
-    router.push('/library/new');
+    setShowLibraryDialog(true);
+  };
+
+  // 새 서재 생성 처리 함수
+  const handleCreateNewLibrary = async (libraryData: CreateLibraryDto) => {
+    try {
+      await createLibraryMutation(libraryData);
+    } catch (error) {
+      console.error('서재 생성 오류:', error);
+      throw error;
+    }
   };
 
   // 전체 책 수 계산
   const totalBooks = userLibraries.reduce(
-    (sum, library) => sum + library.books.length,
+    (sum, library) => sum + library.bookCount,
     0
   );
 
   // 전체 구독자 수 계산
   const totalFollowers = userLibraries.reduce(
-    (sum, library) => sum + library.followers,
+    (sum, library) => sum + library.subscriberCount,
     0
   );
 
@@ -178,6 +204,14 @@ export default function ProfileBooks() {
           <LibraryCard key={library.id} library={library} />
         ))}
       </div>
+
+      {/* 새 서재 만들기 다이얼로그 */}
+      <LibraryDialog
+        open={showLibraryDialog}
+        onOpenChange={setShowLibraryDialog}
+        mode="create"
+        onCreateLibrary={handleCreateNewLibrary}
+      />
     </>
   );
 }

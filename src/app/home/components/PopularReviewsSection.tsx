@@ -1,5 +1,4 @@
 import { HomeReviewPreview, ReviewType } from '@/apis/review/types';
-import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -8,6 +7,7 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
