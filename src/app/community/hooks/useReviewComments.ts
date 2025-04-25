@@ -1,10 +1,13 @@
 import {
   createComment as apiCreateComment,
   deleteComment as apiDeleteComment,
+  likeComment as apiLikeComment,
+  unlikeComment as apiUnlikeComment,
   getReviewComments,
 } from '@/apis/review/review';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 // 댓글 및 댓글 생성 타입 정의
 interface Comment {
@@ -15,6 +18,8 @@ interface Comment {
     username: string;
     email?: string;
   };
+  likeCount?: number;
+  isLiked?: boolean;
   createdAt: string;
   updatedAt: string;
   replies?: Comment[];
@@ -28,6 +33,7 @@ interface UseReviewCommentsResult {
   setCommentText: (text: string) => void;
   handleAddComment: () => Promise<void>;
   handleDeleteComment: (commentId: number) => Promise<void>;
+  handleLikeComment: (commentId: number, isLiked: boolean) => Promise<void>;
   replyToCommentId: number | null;
   setReplyToCommentId: (id: number | null) => void;
   refetch: () => Promise<any>;
@@ -100,6 +106,106 @@ export function useReviewComments(
       },
     });
 
+  // 댓글 좋아요 뮤테이션
+  const { mutate: likeComment, isPending: isLiking } = useMutation({
+    mutationFn: (commentId: number) => apiLikeComment(commentId),
+    onMutate: async commentId => {
+      // 낙관적 업데이트를 위해 기존 데이터 저장
+      await queryClient.cancelQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+      const previousComments = queryClient.getQueryData([
+        'review-comments',
+        reviewId,
+      ]);
+
+      // 낙관적 업데이트: 댓글의 좋아요 상태와 개수 변경
+      queryClient.setQueryData(['review-comments', reviewId], (old: any) => {
+        if (!old || !old.comments) return old;
+        return {
+          ...old,
+          comments: old.comments.map((comment: any) =>
+            comment.id === commentId
+              ? {
+                  ...comment,
+                  isLiked: true,
+                  likeCount: (comment.likeCount || 0) + 1,
+                }
+              : comment
+          ),
+        };
+      });
+
+      return { previousComments };
+    },
+    onSuccess: () => {
+      // 댓글 목록 완전히 새로고침하여 서버 상태 동기화
+      queryClient.invalidateQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+    },
+    onError: (error, commentId, context) => {
+      // 오류 발생 시 이전 상태로 복원
+      if (context?.previousComments) {
+        queryClient.setQueryData(
+          ['review-comments', reviewId],
+          context.previousComments
+        );
+      }
+      toast.error('좋아요 처리에 실패했습니다. 다시 시도해주세요.');
+    },
+  });
+
+  // 댓글 좋아요 취소 뮤테이션
+  const { mutate: unlikeComment, isPending: isUnliking } = useMutation({
+    mutationFn: (commentId: number) => apiUnlikeComment(commentId),
+    onMutate: async commentId => {
+      // 낙관적 업데이트를 위해 기존 데이터 저장
+      await queryClient.cancelQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+      const previousComments = queryClient.getQueryData([
+        'review-comments',
+        reviewId,
+      ]);
+
+      // 낙관적 업데이트: 댓글의 좋아요 상태와 개수 변경
+      queryClient.setQueryData(['review-comments', reviewId], (old: any) => {
+        if (!old || !old.comments) return old;
+        return {
+          ...old,
+          comments: old.comments.map((comment: any) =>
+            comment.id === commentId
+              ? {
+                  ...comment,
+                  isLiked: false,
+                  likeCount: Math.max(0, (comment.likeCount || 0) - 1),
+                }
+              : comment
+          ),
+        };
+      });
+
+      return { previousComments };
+    },
+    onSuccess: () => {
+      // 댓글 목록 완전히 새로고침하여 서버 상태 동기화
+      queryClient.invalidateQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+    },
+    onError: (error, commentId, context) => {
+      // 오류 발생 시 이전 상태로 복원
+      if (context?.previousComments) {
+        queryClient.setQueryData(
+          ['review-comments', reviewId],
+          context.previousComments
+        );
+      }
+      toast.error('좋아요 취소 처리에 실패했습니다. 다시 시도해주세요.');
+    },
+  });
+
   // 댓글 추가 핸들러
   const handleAddComment = async () => {
     if (!commentText.trim()) return;
@@ -123,14 +229,33 @@ export function useReviewComments(
     }
   };
 
+  // 댓글 좋아요 핸들러
+  const handleLikeComment = async (commentId: number, isLiked: boolean) => {
+    try {
+      if (isLiked) {
+        await unlikeComment(commentId);
+      } else {
+        await likeComment(commentId);
+      }
+    } catch (error) {
+      console.error('Failed to toggle comment like:', error);
+    }
+  };
+
   return {
     comments,
-    isLoading: isLoading || isAddingComment || isDeletingComment,
+    isLoading:
+      isLoading ||
+      isAddingComment ||
+      isDeletingComment ||
+      isLiking ||
+      isUnliking,
     error: error as Error | null,
     commentText,
     setCommentText,
     handleAddComment,
     handleDeleteComment,
+    handleLikeComment,
     replyToCommentId,
     setReplyToCommentId,
     refetch,

@@ -1,8 +1,5 @@
 import { ReviewType } from '@/apis/review/types';
-import {
-  communityCategoryColors,
-  communitySortColors,
-} from '@/atoms/community';
+import { communityCategoryColors } from '@/atoms/community';
 import { cn } from '@/lib/utils';
 
 interface FilterBarProps {
@@ -72,19 +69,11 @@ export function FilterBar({
               onSortClick(option.id as 'popular' | 'latest' | 'following')
             }
             className={cn(
-              'flex h-9 cursor-pointer items-center rounded-full px-4 text-[14px] font-medium transition-colors',
+              'flex h-9 cursor-pointer items-center rounded-full border px-4 text-[14px] font-medium transition-colors',
               selectedSort === option.id
-                ? 'bg-gray-900 text-white'
-                : 'text-gray-700 hover:opacity-90'
+                ? 'border-gray-300 bg-gray-100 text-gray-900'
+                : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
             )}
-            style={{
-              backgroundColor:
-                selectedSort === option.id
-                  ? undefined
-                  : communitySortColors[
-                      option.id as keyof typeof communitySortColors
-                    ] || '#F9FAFB',
-            }}
           >
             {option.name}
           </button>

@@ -47,6 +47,8 @@ export interface Comment {
   id: number;
   content: string;
   author: Author;
+  likeCount?: number;
+  isLiked?: boolean;
   createdAt: Date | string;
   updatedAt: Date | string;
   replies?: Comment[];

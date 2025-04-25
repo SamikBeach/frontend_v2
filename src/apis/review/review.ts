@@ -246,6 +246,20 @@ export const updateComment = async (
 };
 
 /**
+ * 댓글 좋아요
+ */
+export const likeComment = async (commentId: number): Promise<void> => {
+  await api.post(`/review/comment/${commentId}/like`);
+};
+
+/**
+ * 댓글 좋아요 취소
+ */
+export const unlikeComment = async (commentId: number): Promise<void> => {
+  await api.delete(`/review/comment/${commentId}/like`);
+};
+
+/**
  * 리뷰 목록 조회 (필터링, 페이지네이션 지원)
  */
 export const getReviews = async (

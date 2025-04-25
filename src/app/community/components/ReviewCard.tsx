@@ -65,7 +65,7 @@ import {
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { useReviewComments, useReviewLike } from '../hooks';
+import { useCommentLike, useReviewComments, useReviewLike } from '../hooks';
 
 // 읽기 통계 정보 인터페이스
 interface ReadingStats {
@@ -128,6 +128,8 @@ interface Comment {
   createdAt: string | Date;
   updatedAt: string | Date;
   replies?: Comment[];
+  isLiked?: boolean;
+  likeCount?: number;
 }
 
 interface ReviewCardProps {
@@ -187,6 +189,12 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   const { handleLikeToggle, isLoading: isLikeLoading } = useReviewLike();
   const [isLiked, setIsLiked] = useState(review.isLiked);
   const [likesCount, setLikesCount] = useState(review.likeCount);
+
+  // 댓글 좋아요 관련 훅
+  const {
+    handleLikeToggle: handleCommentLikeToggle,
+    isLoading: isCommentLikeLoading,
+  } = useCommentLike();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -1186,6 +1194,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
                       formatDate={formatDate}
                       currentUser={currentUser}
                       onDelete={handleDeleteComment}
+                      onLike={handleCommentLikeToggle}
                     />
                   ))}
                 </div>
@@ -1310,6 +1319,7 @@ interface CommentItemProps {
     avatar: string;
   };
   onDelete: (commentId: number) => Promise<void>;
+  onLike: (commentId: number, isLiked: boolean) => Promise<void>;
 }
 
 function CommentItem({
@@ -1317,10 +1327,13 @@ function CommentItem({
   formatDate,
   currentUser,
   onDelete,
+  onLike,
 }: CommentItemProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
+  const [isLiked, setIsLiked] = useState(comment.isLiked || false);
+  const [likeCount, setLikeCount] = useState(comment.likeCount || 0);
   const queryClient = useQueryClient();
 
   // 현재 사용자가 댓글 작성자인지 확인
@@ -1373,6 +1386,23 @@ function CommentItem({
   const handleDeleteComment = () => {
     onDelete(comment.id);
     setIsDropdownOpen(false);
+  };
+
+  // 댓글 좋아요 토글 핸들러
+  const handleLikeToggle = async () => {
+    // 낙관적 UI 업데이트
+    setIsLiked(!isLiked);
+    setLikeCount(prev => prev + (isLiked ? -1 : 1));
+
+    try {
+      // API 호출
+      await onLike(comment.id, isLiked);
+    } catch (error) {
+      // 에러 발생 시 UI 되돌리기
+      setIsLiked(isLiked);
+      setLikeCount(comment.likeCount || 0);
+      console.error('Failed to toggle comment like:', error);
+    }
   };
 
   return (
@@ -1465,7 +1495,26 @@ function CommentItem({
             </div>
           </div>
         ) : (
-          <p className="mt-1 text-sm text-gray-800">{comment.content}</p>
+          <>
+            <p className="mt-1 text-sm text-gray-800">{comment.content}</p>
+
+            {/* 좋아요 버튼 */}
+            <div className="mt-1 flex justify-start">
+              <button
+                onClick={handleLikeToggle}
+                className={`flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-colors ${
+                  isLiked
+                    ? 'bg-pink-50 text-pink-500'
+                    : 'text-gray-500 hover:bg-gray-100'
+                }`}
+              >
+                <ThumbsUp
+                  className={`h-3 w-3 ${isLiked ? 'fill-pink-500' : ''}`}
+                />
+                <span>{likeCount}</span>
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>

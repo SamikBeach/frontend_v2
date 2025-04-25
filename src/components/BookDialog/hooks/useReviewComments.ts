@@ -1,5 +1,7 @@
 import {
   addReviewComment,
+  likeComment as apiLikeComment,
+  unlikeComment as apiUnlikeComment,
   CreateCommentDto,
   deleteComment,
   getReviewComments,
@@ -122,6 +124,106 @@ export function useReviewComments(reviewId: number) {
     },
   });
 
+  // 댓글 좋아요 뮤테이션
+  const { mutate: likeComment, isPending: isLikingComment } = useMutation({
+    mutationFn: (commentId: number) => apiLikeComment(commentId),
+    onMutate: async commentId => {
+      // 낙관적 업데이트를 위해 기존 댓글 목록 저장
+      await queryClient.cancelQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+      const previousComments = queryClient.getQueryData([
+        'review-comments',
+        reviewId,
+      ]);
+
+      // 낙관적 업데이트: 댓글의 좋아요 상태와 개수 변경
+      queryClient.setQueryData(['review-comments', reviewId], (old: any) => {
+        if (!old || !old.comments) return old;
+        return {
+          ...old,
+          comments: old.comments.map((comment: any) =>
+            comment.id === commentId
+              ? {
+                  ...comment,
+                  isLiked: true,
+                  likeCount: (comment.likeCount || 0) + 1,
+                }
+              : comment
+          ),
+        };
+      });
+
+      return { previousComments };
+    },
+    onSuccess: () => {
+      // 댓글 목록 완전히 새로고침하여 서버 상태 동기화
+      queryClient.invalidateQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+    },
+    onError: (_, commentId, context) => {
+      // 오류 발생 시 이전 상태로 복원
+      if (context?.previousComments) {
+        queryClient.setQueryData(
+          ['review-comments', reviewId],
+          context.previousComments
+        );
+      }
+      toast.error('좋아요 처리에 실패했습니다. 다시 시도해주세요.');
+    },
+  });
+
+  // 댓글 좋아요 취소 뮤테이션
+  const { mutate: unlikeComment, isPending: isUnlikingComment } = useMutation({
+    mutationFn: (commentId: number) => apiUnlikeComment(commentId),
+    onMutate: async commentId => {
+      // 낙관적 업데이트를 위해 기존 댓글 목록 저장
+      await queryClient.cancelQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+      const previousComments = queryClient.getQueryData([
+        'review-comments',
+        reviewId,
+      ]);
+
+      // 낙관적 업데이트: 댓글의 좋아요 상태와 개수 변경
+      queryClient.setQueryData(['review-comments', reviewId], (old: any) => {
+        if (!old || !old.comments) return old;
+        return {
+          ...old,
+          comments: old.comments.map((comment: any) =>
+            comment.id === commentId
+              ? {
+                  ...comment,
+                  isLiked: false,
+                  likeCount: Math.max(0, (comment.likeCount || 0) - 1),
+                }
+              : comment
+          ),
+        };
+      });
+
+      return { previousComments };
+    },
+    onSuccess: () => {
+      // 댓글 목록 완전히 새로고침하여 서버 상태 동기화
+      queryClient.invalidateQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+    },
+    onError: (_, commentId, context) => {
+      // 오류 발생 시 이전 상태로 복원
+      if (context?.previousComments) {
+        queryClient.setQueryData(
+          ['review-comments', reviewId],
+          context.previousComments
+        );
+      }
+      toast.error('좋아요 취소 처리에 실패했습니다. 다시 시도해주세요.');
+    },
+  });
+
   // 리뷰의 댓글 수만 업데이트하는 헬퍼 함수
   const updateReviewCommentCount = (reviewId: number, changeAmount: number) => {
     // 'book-reviews' 쿼리 키들을 가져옴
@@ -214,6 +316,18 @@ export function useReviewComments(reviewId: number) {
     }
   };
 
+  // 댓글 좋아요 토글 핸들러
+  const handleLikeComment = useCallback(
+    (commentId: number, isLiked: boolean) => {
+      if (isLiked) {
+        unlikeComment(commentId);
+      } else {
+        likeComment(commentId);
+      }
+    },
+    [likeComment, unlikeComment]
+  );
+
   // 댓글 제출 핸들러
   const handleSubmitComment = useCallback(() => {
     if (!commentText.trim()) return;
@@ -241,8 +355,10 @@ export function useReviewComments(reviewId: number) {
     isLoading,
     isSubmitting,
     isDeleting,
+    isLikingComment: isLikingComment || isUnlikingComment,
     handleCommentTextChange,
     handleSubmitComment,
     handleDeleteComment,
+    handleLikeComment,
   };
 }
