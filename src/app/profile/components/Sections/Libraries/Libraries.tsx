@@ -297,21 +297,21 @@ export default function Libraries() {
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex flex-wrap gap-3">
-            <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-2.5 py-1">
-              <span className="text-xs text-gray-600">서재</span>
-              <span className="text-sm font-bold text-gray-900">
+            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5 select-none">
+              <span className="text-xs font-medium text-gray-500">서재</span>
+              <span className="text-sm font-semibold text-gray-900">
                 {totalLibraries}
               </span>
             </div>
-            <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-2.5 py-1">
-              <span className="text-xs text-gray-600">책</span>
-              <span className="text-sm font-bold text-gray-900">
+            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5 select-none">
+              <span className="text-xs font-medium text-gray-500">책</span>
+              <span className="text-sm font-semibold text-gray-900">
                 {totalBooks}
               </span>
             </div>
-            <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-2.5 py-1">
-              <span className="text-xs text-gray-600">구독자</span>
-              <span className="text-sm font-bold text-gray-900">
+            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5 select-none">
+              <span className="text-xs font-medium text-gray-500">구독자</span>
+              <span className="text-sm font-semibold text-gray-900">
                 {totalFollowers}
               </span>
             </div>

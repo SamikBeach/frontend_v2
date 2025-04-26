@@ -53,7 +53,7 @@ export function SummarySkeleton() {
           {Array.from({ length: 6 }).map((_, index) => (
             <Skeleton
               key={index}
-              className={`flex h-28 w-full flex-col items-center rounded-lg p-4 ${
+              className={`flex h-[133px] w-full flex-col items-center rounded-lg p-4 ${
                 index === 0
                   ? 'bg-violet-100'
                   : index < 4
