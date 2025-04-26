@@ -5,13 +5,14 @@ import {
   communitySortOptionAtom,
   communityTypeFilterAtom,
 } from '@/atoms/community';
+import { ReviewCard } from '@/components/ReviewCard';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
-import { CreateReviewCard, FilterArea, ReviewCard } from './components';
+import { CreateReviewCard, FilterArea } from './components';
 import { useCommunityReviews } from './hooks';
 
 // 로딩 상태 컴포넌트

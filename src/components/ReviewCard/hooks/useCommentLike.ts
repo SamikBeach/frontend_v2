@@ -9,6 +9,15 @@ interface UseCommentLikeResult {
   isLoading: boolean;
 }
 
+// Comment type definition
+interface Comment {
+  id: number;
+  isLiked?: boolean;
+  likeCount?: number;
+  replies?: Comment[];
+  [key: string]: any;
+}
+
 export function useCommentLike(): UseCommentLikeResult {
   const queryClient = useQueryClient();
 
@@ -28,7 +37,7 @@ export function useCommentLike(): UseCommentLikeResult {
       });
 
       // 각 쿼리 키에 대해 중첩 댓글 검색 및 업데이트
-      const previousDatas = {};
+      const previousDatas: Record<string, unknown> = {};
 
       queryKeys.forEach(query => {
         const previousData = queryClient.getQueryData(query.queryKey);
@@ -82,7 +91,7 @@ export function useCommentLike(): UseCommentLikeResult {
         });
 
         // 각 쿼리 키에 대해 중첩 댓글 검색 및 업데이트
-        const previousDatas = {};
+        const previousDatas: Record<string, unknown> = {};
 
         queryKeys.forEach(query => {
           const previousData = queryClient.getQueryData(query.queryKey);
@@ -124,8 +133,12 @@ export function useCommentLike(): UseCommentLikeResult {
     });
 
   // 중첩된 댓글의 좋아요 상태를 재귀적으로 업데이트하는 헬퍼 함수
-  const updateCommentsLikeStatus = (comments, targetId, liked) => {
-    return comments.map(comment => {
+  const updateCommentsLikeStatus = (
+    comments: Comment[],
+    targetId: number,
+    liked: boolean
+  ): Comment[] => {
+    return comments.map((comment): Comment => {
       if (comment.id === targetId) {
         return {
           ...comment,

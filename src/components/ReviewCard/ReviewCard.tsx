@@ -25,12 +25,12 @@ import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { useCommentLike, useReviewComments, useReviewLike } from '../../hooks';
 import { BookPreview } from './components/BookPreview';
 import { CommentSection } from './components/CommentSection';
 import { ReviewActions } from './components/ReviewActions';
 import { ReviewEditForm } from './components/ReviewEditForm';
 import { ReviewHeader } from './components/ReviewHeader';
+import { useCommentLike, useReviewComments, useReviewLike } from './hooks';
 import { ExtendedReviewResponseDto, ReviewCardProps } from './types';
 import { formatDate } from './utils';
 
@@ -83,10 +83,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   const [likesCount, setLikesCount] = useState(review.likeCount);
 
   // 댓글 좋아요 관련 훅
-  const {
-    handleLikeToggle: handleCommentLikeToggle,
-    isLoading: isCommentLikeLoading,
-  } = useCommentLike();
+  const { handleLikeToggle: handleCommentLikeToggle } = useCommentLike();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
