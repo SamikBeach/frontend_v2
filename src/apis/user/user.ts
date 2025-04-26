@@ -12,6 +12,7 @@ import {
   User,
   UserBooksResponseDto,
   UserDetailResponseDto,
+  UserReviewsResponseDto,
 } from './types';
 
 /**
@@ -194,5 +195,22 @@ export const getUserBooks = async (
   }
 
   const response = await api.get(`/user/${userId}/books`, { params });
+  return response.data;
+};
+
+/**
+ * 사용자의 리뷰 목록을 조회합니다.
+ * @param userId 사용자 ID
+ * @param page 페이지 번호 (기본값: 1)
+ * @param limit 페이지당 항목 수 (기본값: 10)
+ */
+export const getUserReviews = async (
+  userId: number,
+  page: number = 1,
+  limit: number = 10
+): Promise<UserReviewsResponseDto> => {
+  const response = await api.get(`/user/${userId}/reviews`, {
+    params: { page, limit },
+  });
   return response.data;
 };
