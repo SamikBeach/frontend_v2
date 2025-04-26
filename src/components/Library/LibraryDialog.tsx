@@ -119,7 +119,6 @@ export function LibraryDialog({
         };
 
         await onCreateLibrary(libraryData);
-        toast.success('새 서재가 생성되었습니다.');
       } else if (mode === 'edit' && library && onUpdateLibrary) {
         const updateData: UpdateLibraryDto = {
           name: name.trim(),

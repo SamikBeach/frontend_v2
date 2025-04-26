@@ -49,14 +49,7 @@ export function BookActionButtons() {
 
   // 새 서재 생성 핸들러
   const handleCreateNewLibrary = async (libraryData: CreateLibraryDto) => {
-    try {
-      const newLibrary = await createLibrary(libraryData);
-      if (newLibrary && book) {
-        toast.success(`'${newLibrary.name}' 서재가 생성되었습니다.`);
-      }
-    } catch (error) {
-      toast.error('서재 생성 중 오류가 발생했습니다.');
-    }
+    await createLibrary(libraryData);
   };
 
   // 에러 상태 처리
