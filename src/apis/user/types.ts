@@ -10,6 +10,7 @@ export interface User {
   name?: string;
   avatar?: string;
   bio?: string;
+  profileImage?: string;
   provider: AuthProvider;
   providerId?: string;
   status: UserStatus;
@@ -74,6 +75,7 @@ export interface UserDetailDto {
   username: string;
   email?: string;
   bio?: string;
+  profileImage?: string;
   provider: AuthProvider;
   createdAt: Date;
 }
@@ -200,6 +202,8 @@ export interface UserReviewsResponseDto {
 export interface FollowerResponseDto {
   id: number;
   username: string;
+  bio?: string;
+  profileImage?: string;
   isFollowing: boolean;
 }
 
@@ -209,6 +213,9 @@ export interface FollowerResponseDto {
 export interface FollowersListResponseDto {
   followers: FollowerResponseDto[];
   total: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
 }
 
 /**
@@ -217,4 +224,7 @@ export interface FollowersListResponseDto {
 export interface FollowingListResponseDto {
   following: FollowerResponseDto[];
   total: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
 }

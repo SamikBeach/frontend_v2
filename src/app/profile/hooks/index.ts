@@ -1,17 +1,8 @@
-import { Book, Review } from './types';
-import { useIsMyProfile } from './useIsMyProfile';
-import { useRecentBooks } from './useRecentBooks';
-import { useRecentReviews } from './useRecentReviews';
-import { useUserFollow } from './useUserFollow';
-import { useUserLibraries } from './useUserLibraries';
-import { useUserProfile } from './useUserProfile';
-
-export {
-  useIsMyProfile,
-  useRecentBooks,
-  useRecentReviews,
-  useUserFollow,
-  useUserLibraries,
-  useUserProfile,
-};
-export type { Book, Review };
+export { useIsMyProfile } from './useIsMyProfile';
+export { useRecentBooks } from './useRecentBooks';
+export { useRecentReviews } from './useRecentReviews';
+export { useUserFollow } from './useUserFollow';
+export { useUserFollowList } from './useUserFollowList';
+export type { FollowListType } from './useUserFollowList';
+export { useUserLibraries } from './useUserLibraries';
+export { useUserProfile } from './useUserProfile';

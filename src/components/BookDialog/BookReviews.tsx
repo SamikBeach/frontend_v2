@@ -221,7 +221,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
             <div key={comment.id} className="flex gap-2 pb-1">
               <Avatar className="mt-1 h-7 w-7 flex-shrink-0 border-0">
                 <AvatarImage
-                  src={comment.author.profileImage || ''}
+                  src={comment.author.profileImage || undefined}
                   alt={comment.author.username}
                 />
                 <AvatarFallback className="bg-gray-200 text-gray-700">
@@ -593,7 +593,7 @@ function ReviewsList({
               <div className="flex items-start gap-3.5">
                 <Avatar className="mt-0.5 h-9 w-9 flex-shrink-0">
                   <AvatarImage
-                    src={review.author.profileImage || ''}
+                    src={review.author.profileImage || undefined}
                     alt={review.author.username}
                   />
                   <AvatarFallback className="bg-gray-100">

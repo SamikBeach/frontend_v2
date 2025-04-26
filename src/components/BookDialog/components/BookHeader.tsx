@@ -1,7 +1,6 @@
 import { X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { DialogTitle } from '@/components/ui/dialog';
 import { ResponsiveDialogTitle } from '@/components/ui/responsive-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -44,18 +43,12 @@ export function BookHeader() {
         isMobile ? 'h-12 px-4' : 'h-16 px-10'
       )}
     >
-      {isMobile ? (
-        <ResponsiveDialogTitle
-          className="max-w-[80%] truncate pl-1 text-lg font-bold text-gray-900"
-          drawerClassName="max-w-[80%] truncate pl-1 text-lg font-bold text-gray-900"
-        >
-          {bookTitle}
-        </ResponsiveDialogTitle>
-      ) : (
-        <DialogTitle className="max-w-[80%] truncate pl-2 text-xl font-bold text-gray-900">
-          {bookTitle}
-        </DialogTitle>
-      )}
+      <ResponsiveDialogTitle
+        className="max-w-[80%] truncate pl-2 text-xl font-bold text-gray-900"
+        drawerClassName="max-w-[80%] truncate pl-1 text-lg font-bold text-gray-900"
+      >
+        {bookTitle}
+      </ResponsiveDialogTitle>
       <Button
         variant="ghost"
         size={isMobile ? 'sm' : 'icon'}

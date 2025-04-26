@@ -4,8 +4,14 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Check, UserCircle, UserPlus } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useIsMyProfile, useUserFollow, useUserProfile } from '../../hooks';
+import {
+  FollowListType,
+  useIsMyProfile,
+  useUserFollow,
+  useUserProfile,
+} from '../../hooks';
 import { ProfileEditDialog } from '../ProfileEditDialog';
+import { FollowListDialog } from './FollowListDialog';
 
 export default function ProfileHeader() {
   const params = useParams();
@@ -33,6 +39,8 @@ export default function ProfileHeader() {
   }, [initialIsFollowing, setIsFollowing]);
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [followDialogType, setFollowDialogType] =
+    useState<FollowListType | null>(null);
 
   // 사용자 표시 정보 설정
   const displayName = user.username || user.email?.split('@')[0] || '';
@@ -58,13 +66,27 @@ export default function ProfileHeader() {
     setIsEditDialogOpen(false);
   };
 
+  // 팔로워/팔로잉 다이얼로그 열기
+  const handleOpenFollowDialog = (type: FollowListType) => {
+    setFollowDialogType(type);
+  };
+
+  // 팔로워/팔로잉 다이얼로그 닫기
+  const handleCloseFollowDialog = () => {
+    setFollowDialogType(null);
+  };
+
   return (
     <div className="bg-white">
       <div className="mx-auto w-full px-4 pt-8 pb-6">
         <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <Avatar className="h-20 w-20 border-4 border-white">
-              <AvatarImage src="" alt={displayName} />
+              <AvatarImage
+                src={user.profileImage || undefined}
+                alt={displayName}
+                className="object-cover"
+              />
               <AvatarFallback className="bg-gray-200 text-2xl font-medium text-gray-700">
                 {initial}
               </AvatarFallback>
@@ -74,29 +96,30 @@ export default function ProfileHeader() {
                 <h1 className="text-2xl font-bold text-gray-900">
                   {displayName}
                 </h1>
-                {user.username && (
-                  <div className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                    @{user.username}
-                  </div>
-                )}
               </div>
               <p className="mt-1 max-w-xl text-sm text-gray-600">
                 {user.bio || '자기소개가 없습니다.'}
               </p>
               <div className="mt-2 flex gap-3 text-sm">
-                <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handleOpenFollowDialog('following')}
+                  className="flex cursor-pointer items-center gap-1"
+                >
                   <span className="font-semibold text-gray-900">
                     {following}
                   </span>
                   <span className="text-gray-500">팔로잉</span>
-                </div>
+                </button>
                 <div className="h-4 border-r border-gray-200" />
-                <div className="flex items-center gap-1">
+                <button
+                  onClick={() => handleOpenFollowDialog('followers')}
+                  className="flex cursor-pointer items-center gap-1"
+                >
                   <span className="font-semibold text-gray-900">
                     {followers}
                   </span>
                   <span className="text-gray-500">팔로워</span>
-                </div>
+                </button>
               </div>
             </div>
           </div>
@@ -143,6 +166,16 @@ export default function ProfileHeader() {
         onClose={handleCloseEditDialog}
         profileData={profileData}
       />
+
+      {/* 팔로워/팔로잉 다이얼로그 - 조건부 렌더링 */}
+      {followDialogType !== null && (
+        <FollowListDialog
+          userId={userId}
+          type={followDialogType}
+          isOpen={true}
+          onClose={handleCloseFollowDialog}
+        />
+      )}
     </div>
   );
 }

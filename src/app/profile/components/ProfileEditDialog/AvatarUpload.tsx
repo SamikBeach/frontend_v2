@@ -19,6 +19,7 @@ export function AvatarUpload({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     initialImage && initialImage.length > 0 ? initialImage : null
   );
+  const [isInitialImage, setIsInitialImage] = useState(!!initialImage);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initial = username.charAt(0).toUpperCase();
 
@@ -42,6 +43,7 @@ export function AvatarUpload({
     const reader = new FileReader();
     reader.onload = () => {
       setAvatarPreview(reader.result as string);
+      setIsInitialImage(false);
     };
     reader.readAsDataURL(file);
 
@@ -51,9 +53,11 @@ export function AvatarUpload({
 
   const handleRemoveAvatar = () => {
     setAvatarPreview(null);
+    setIsInitialImage(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    // null은 이미지 삭제를 의미
     onChange(null);
   };
 
@@ -73,7 +77,11 @@ export function AvatarUpload({
 
       <div className="relative mb-2">
         <Avatar className="h-24 w-24 border-4 border-white ring-2 ring-gray-100">
-          <AvatarImage src={avatarPreview || ''} alt={username} />
+          <AvatarImage
+            src={avatarPreview || undefined}
+            alt={username}
+            className="object-cover"
+          />
           <AvatarFallback className="bg-gray-200 text-3xl font-medium text-gray-700">
             {initial}
           </AvatarFallback>

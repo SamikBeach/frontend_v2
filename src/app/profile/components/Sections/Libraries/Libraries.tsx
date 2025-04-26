@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Pagination } from '@/components/ui/pagination';
 import { Tag, getTagColor } from '@/utils/tags';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { BookOpen, Plus } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -237,36 +237,45 @@ export default function Libraries() {
   if (libraries.length === 0) {
     return (
       <>
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">서재</h2>
-            <p className="text-sm text-gray-500">
+            <p className="mt-1 text-sm text-gray-500">
               아직 등록된 서재가 없습니다.
             </p>
           </div>
           {isMyProfile && (
             <Button
               onClick={handleCreateLibrary}
-              className="flex items-center gap-1.5 rounded-full bg-gray-900 text-white hover:bg-gray-800"
+              className="flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+              variant="outline"
             >
               <Plus className="h-4 w-4" />새 서재 만들기
             </Button>
           )}
         </div>
 
-        <div className="flex h-48 w-full items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50">
-          <div className="text-center">
-            <p className="text-sm text-gray-500">서재가 없습니다.</p>
-            {isMyProfile && (
-              <Button
-                onClick={handleCreateLibrary}
-                variant="link"
-                className="mt-2 text-sm text-blue-500"
-              >
-                새 서재 만들기
-              </Button>
-            )}
+        <div className="flex h-64 w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-10">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
+            <BookOpen className="h-8 w-8 text-gray-400" />
           </div>
+          <p className="mt-4 text-base font-medium text-gray-600">
+            서재가 없습니다
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+            {isMyProfile
+              ? '첫 번째 서재를 만들어보세요!'
+              : '이 사용자는 아직 서재를 만들지 않았습니다.'}
+          </p>
+          {isMyProfile && (
+            <Button
+              onClick={handleCreateLibrary}
+              variant="default"
+              className="mt-4 rounded-full bg-gray-900 px-5 text-sm hover:bg-gray-800"
+            >
+              <Plus className="mr-1.5 h-4 w-4" />새 서재 만들기
+            </Button>
+          )}
         </div>
       </>
     );
@@ -286,18 +295,32 @@ export default function Libraries() {
 
   return (
     <>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">서재</h2>
-          <p className="text-sm text-gray-500">
-            총 {totalLibraries}개의 서재, {totalBooks}권의 책, {totalFollowers}
-            명의 구독자
-          </p>
+          <div className="mt-2 flex flex-wrap gap-3">
+            <div className="flex items-center rounded-full bg-blue-50 px-3 py-1.5">
+              <span className="text-sm font-semibold text-blue-600">
+                {totalLibraries}개의 서재
+              </span>
+            </div>
+            <div className="flex items-center rounded-full bg-purple-50 px-3 py-1.5">
+              <span className="text-sm font-semibold text-purple-600">
+                {totalBooks}권의 책
+              </span>
+            </div>
+            <div className="flex items-center rounded-full bg-green-50 px-3 py-1.5">
+              <span className="text-sm font-semibold text-green-600">
+                {totalFollowers}명의 구독자
+              </span>
+            </div>
+          </div>
         </div>
         {isMyProfile && (
           <Button
             onClick={handleCreateLibrary}
-            className="flex items-center gap-1.5 rounded-full bg-gray-900 text-white hover:bg-gray-800"
+            className="flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            variant="outline"
           >
             <Plus className="h-4 w-4" />새 서재 만들기
           </Button>

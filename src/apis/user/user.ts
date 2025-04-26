@@ -18,17 +18,50 @@ import {
  */
 export const getCurrentUser = async (): Promise<User> => {
   const response = await api.get('/user/me');
+
+  // 백엔드 응답에 profileImage가 없는 경우를 대비한 예외 처리
+  if (!response.data.profileImage) {
+    response.data.profileImage = null;
+  }
+
   return response.data;
 };
 
 /**
  * 사용자 정보를 업데이트합니다.
  * 인증된 사용자만 접근 가능합니다.
+ * @param data 업데이트할 사용자 정보
+ * @param file 업로드할 프로필 이미지 (선택 사항)
  */
 export const updateUserInfo = async (
-  data: UpdateUserInfoRequest
+  data: UpdateUserInfoRequest & { removeProfileImage?: boolean },
+  file?: File
 ): Promise<UpdateUserInfoResponse> => {
-  const response = await api.put('/user/profile', data);
+  // FormData 생성
+  const formData = new FormData();
+
+  // 텍스트 데이터 추가
+  if (data.username) formData.append('username', data.username);
+  if (data.bio !== undefined) formData.append('bio', data.bio);
+
+  // 프로필 이미지 처리
+  if (data.removeProfileImage) {
+    // 프로필 이미지 제거 요청
+    formData.append('removeProfileImage', 'true');
+    formData.append('profileImage', ''); // 빈 문자열로 profileImage 필드 명시
+  } else if (file) {
+    // 새 이미지 업로드
+    formData.append('profileImage', file);
+  } else {
+    // 변경 없음 - profileImage 필드를 null로 명시 (백엔드에서 무시)
+    formData.append('profileImage', '');
+  }
+
+  const response = await api.put('/user/profile', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data;
 };
 
@@ -46,12 +79,13 @@ export const getUserProfile = async (
 
 /**
  * 사용자의 프로필 이미지를 업로드합니다.
+ * @deprecated 프로필 업데이트 API에 통합되었습니다. updateUserInfo 함수를 사용하세요.
  */
 export const uploadProfileImage = async (
   file: File
 ): Promise<UploadProfileImageResponse> => {
   const formData = new FormData();
-  formData.append('image', file);
+  formData.append('profileImage', file);
 
   const response = await api.post('/user/profile-image', formData, {
     headers: {
@@ -106,21 +140,33 @@ export const unfollowUser = async (userId: number): Promise<void> => {
 /**
  * 특정 사용자의 팔로워 목록을 가져옵니다.
  * @param userId 사용자 ID
+ * @param page 페이지 번호 (기본값: 1)
+ * @param limit 페이지당 아이템 수 (기본값: 10)
  */
 export const getUserFollowers = async (
-  userId: number
+  userId: number,
+  page: number = 1,
+  limit: number = 10
 ): Promise<FollowersListResponseDto> => {
-  const response = await api.get(`/user/${userId}/followers`);
+  const response = await api.get(`/user/${userId}/followers`, {
+    params: { page, limit },
+  });
   return response.data;
 };
 
 /**
  * 특정 사용자의 팔로잉 목록을 가져옵니다.
  * @param userId 사용자 ID
+ * @param page 페이지 번호 (기본값: 1)
+ * @param limit 페이지당 아이템 수 (기본값: 10)
  */
 export const getUserFollowing = async (
-  userId: number
+  userId: number,
+  page: number = 1,
+  limit: number = 10
 ): Promise<FollowingListResponseDto> => {
-  const response = await api.get(`/user/${userId}/following`);
+  const response = await api.get(`/user/${userId}/following`, {
+    params: { page, limit },
+  });
   return response.data;
 };

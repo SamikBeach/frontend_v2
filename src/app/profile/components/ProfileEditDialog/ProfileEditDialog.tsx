@@ -1,15 +1,18 @@
 'use client';
 
-import { UserDetailResponseDto } from '@/apis/user/types';
+import {
+  UpdateUserInfoRequest,
+  UserDetailResponseDto,
+} from '@/apis/user/types';
 import { updateUserInfo } from '@/apis/user/user';
 import { Button } from '@/components/ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+} from '@/components/ui/responsive-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -31,7 +34,15 @@ export function ProfileEditDialog({
 
   // 프로필 업데이트 mutation
   const { mutateAsync: updateProfile } = useMutation({
-    mutationFn: updateUserInfo,
+    mutationFn: async ({
+      userData,
+      file,
+    }: {
+      userData: UpdateUserInfoRequest;
+      file?: File;
+    }) => {
+      return updateUserInfo(userData, file);
+    },
     onSuccess: () => {
       // 프로필 정보 업데이트
       queryClient.invalidateQueries({ queryKey: ['profile'] });
@@ -53,17 +64,18 @@ export function ProfileEditDialog({
     try {
       setIsSubmitting(true);
 
-      // 프로필 정보 업데이트
-      await updateProfile({
-        username: formData.username,
-        bio: formData.bio,
-      });
+      // ProfileFormData에서 profileImage가 null인 경우는 프로필 이미지 삭제 요청
+      const removeProfileImage = formData.profileImage === null;
 
-      // 프로필 이미지 업로드가 있는 경우 처리 (추후 구현)
-      if (formData.avatar) {
-        // TODO: 프로필 이미지 업로드 API 구현 및 연동
-        console.log('프로필 이미지 업데이트:', formData.avatar);
-      }
+      // 프로필 정보 및 이미지 업데이트
+      await updateProfile({
+        userData: {
+          username: formData.username,
+          bio: formData.bio,
+          ...(removeProfileImage && { removeProfileImage: true }),
+        },
+        file: formData.profileImage || undefined,
+      });
     } catch (error) {
       console.error('프로필 업데이트 오류:', error);
       setIsSubmitting(false);
@@ -71,11 +83,11 @@ export function ProfileEditDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[400px]">
-        <DialogHeader>
-          <DialogTitle>프로필 수정</DialogTitle>
-        </DialogHeader>
+    <ResponsiveDialog open={isOpen} onOpenChange={onClose}>
+      <ResponsiveDialogContent className="sm:max-w-[400px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>프로필 수정</ResponsiveDialogTitle>
+        </ResponsiveDialogHeader>
 
         <ProfileEditForm
           profileData={profileData}
@@ -83,7 +95,7 @@ export function ProfileEditDialog({
           isSubmitting={isSubmitting}
         />
 
-        <DialogFooter className="mt-4 flex flex-row justify-end gap-2">
+        <ResponsiveDialogFooter className="mt-4 flex flex-row justify-end gap-2">
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             취소
           </Button>
@@ -94,8 +106,8 @@ export function ProfileEditDialog({
           >
             {isSubmitting ? '저장 중...' : '저장'}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }

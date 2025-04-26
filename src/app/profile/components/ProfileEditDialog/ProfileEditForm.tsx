@@ -16,7 +16,7 @@ interface ProfileEditFormProps {
 export interface ProfileFormData {
   username: string;
   bio: string;
-  avatar?: File | null;
+  profileImage?: File | null;
 }
 
 export function ProfileEditForm({
@@ -32,7 +32,7 @@ export function ProfileEditForm({
   const [formData, setFormData] = useState<ProfileFormData>({
     username: displayName,
     bio: user.bio || '',
-    avatar: null,
+    profileImage: null,
   });
 
   // 프로필 데이터가 변경되면 폼 데이터 업데이트
@@ -40,7 +40,7 @@ export function ProfileEditForm({
     setFormData({
       username: user.username || '',
       bio: user.bio || '',
-      avatar: null,
+      profileImage: null,
     });
   }, [user]);
 
@@ -57,7 +57,7 @@ export function ProfileEditForm({
   const handleAvatarChange = (file: File | null) => {
     setFormData(prev => ({
       ...prev,
-      avatar: file,
+      profileImage: file,
     }));
   };
 
@@ -70,7 +70,7 @@ export function ProfileEditForm({
     <form id="profile-edit-form" onSubmit={handleSubmit} className="space-y-4">
       <div className="mb-6 flex justify-center">
         <AvatarUpload
-          initialImage=""
+          initialImage={user.profileImage || ''}
           onChange={handleAvatarChange}
           username={displayName}
         />

@@ -25,11 +25,10 @@ export default function ProfileSummary({
       <div className="grid grid-cols-5 gap-3">
         {/* 내 서재 */}
         <button
-          onClick={() => onSectionChange('libraries')}
+          onClick={() => onSectionChange('books')}
           className={cn(
             `flex cursor-pointer flex-col items-center rounded-lg bg-blue-50 p-4 transition-transform hover:scale-105`,
-            selectedSection === 'libraries' &&
-              'ring-2 ring-gray-900 ring-offset-2'
+            selectedSection === 'books' && 'ring-2 ring-gray-900 ring-offset-2'
           )}
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
