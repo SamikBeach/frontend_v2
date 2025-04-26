@@ -4,11 +4,16 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function LibrariesSkeleton() {
   return (
     <>
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Skeleton className="mb-2 h-6 w-32" />
-          <Skeleton className="h-4 w-60" />
+          <div className="flex flex-wrap gap-3">
+            {/* 통계 정보(서재, 책, 구독자 수) 스켈레톤 */}
+            <Skeleton className="h-[34px] w-24 rounded-md" />
+            <Skeleton className="h-[34px] w-24 rounded-md" />
+            <Skeleton className="h-[34px] w-24 rounded-md" />
+          </div>
         </div>
+        {/* 새 서재 만들기 버튼 스켈레톤 */}
         <Skeleton className="h-10 w-32 rounded-full" />
       </div>
 
@@ -16,6 +21,11 @@ export function LibrariesSkeleton() {
         {Array.from({ length: 6 }).map((_, index) => (
           <LibraryCardSkeleton key={index} />
         ))}
+      </div>
+
+      {/* 페이지네이션 스켈레톤 */}
+      <div className="mt-6 flex justify-center">
+        <Skeleton className="h-10 w-52 rounded-full" />
       </div>
     </>
   );
