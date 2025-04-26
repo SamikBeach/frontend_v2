@@ -6,7 +6,6 @@ import { BookCard } from '@/components/BookCard';
 import { useDialogQuery } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
-import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -147,8 +146,6 @@ function BooksListSkeleton() {
 
 // 메인 컴포넌트 - 필터 탭 포함
 export default function ReadBooks() {
-  const params = useParams();
-  const userId = Number(params.id as string);
   const [selectedStatus, setSelectedStatus] = useState<
     ReadingStatusType | undefined
   >(undefined);

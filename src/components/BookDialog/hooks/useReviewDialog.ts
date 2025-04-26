@@ -98,19 +98,11 @@ export function useReviewDialog() {
                   if (isMatchingBook) {
                     return {
                       ...review,
-                      authorRating: {
+                      userRating: {
                         bookId: book.id,
                         rating: data.rating,
                         comment: data.comment || '',
                       },
-                      // authorRatings도 업데이트
-                      authorRatings: [
-                        {
-                          bookId: book.id,
-                          rating: data.rating,
-                          comment: data.comment || '',
-                        },
-                      ],
                     };
                   }
                   return review;

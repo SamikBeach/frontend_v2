@@ -2,6 +2,7 @@ import {
   Comment as ApiComment,
   ReviewResponseDto,
   ReviewUser,
+  UserRating,
 } from '@/apis/review/types';
 
 // 읽기 통계 정보 인터페이스
@@ -16,15 +17,6 @@ export interface ReadingStats {
   };
 }
 
-// 유저 평점 인터페이스
-export interface UserRating {
-  id: number;
-  rating: number;
-  comment?: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // Extend the ReviewBook interface to add the missing properties
 export interface ExtendedReviewBook {
   id: number;
@@ -37,13 +29,6 @@ export interface ExtendedReviewBook {
   reviews: number;
   userRating?: UserRating;
   readingStats?: ReadingStats;
-}
-
-// 저자 평점 인터페이스
-export interface AuthorRating {
-  bookId: number;
-  rating: number;
-  comment?: string;
 }
 
 // Extend the ReviewResponseDto to include rating property

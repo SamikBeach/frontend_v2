@@ -36,7 +36,7 @@ export interface ReviewResponseDto {
   author: Author;
   images: ReviewImage[];
   books: ReviewBook[];
-  authorRatings?: AuthorRating[];
+  userRating?: UserRating;
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
@@ -122,6 +122,12 @@ export interface ReviewComment {
   updatedAt: string;
 }
 
+export interface UserRating {
+  bookId: number;
+  rating: number;
+  comment?: string;
+}
+
 export interface AuthorRating {
   bookId: number;
   rating: number;
@@ -142,8 +148,7 @@ export interface Review {
   };
   books?: ReviewBook[];
   images: ReviewImage[];
-  authorRating?: AuthorRating;
-  authorRatings?: AuthorRating[];
+  userRating?: UserRating;
   likeCount?: number;
   likesCount?: number;
   commentCount?: number;

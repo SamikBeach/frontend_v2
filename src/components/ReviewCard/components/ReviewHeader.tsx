@@ -63,19 +63,17 @@ export function ReviewHeader({
             <TagName type={review.type} />
 
             {/* 별점 표시 - 리뷰 태그 우측에 위치 */}
-            {review.authorRatings && review.authorRatings.length > 0 && (
+            {review.userRating && (
               <div className="flex items-center rounded-full bg-yellow-50 px-2 py-0.5">
-                {renderStarRating(review.authorRatings[0].rating)}
+                {renderStarRating(review.userRating.rating)}
                 <span className="ml-0.5 text-xs font-medium text-yellow-700">
-                  {typeof review.authorRatings[0].rating === 'number'
-                    ? review.authorRatings[0].rating.toFixed(1)
-                    : parseFloat(
-                        String(review.authorRatings[0].rating)
-                      ).toFixed(1)}
+                  {typeof review.userRating.rating === 'number'
+                    ? review.userRating.rating.toFixed(1)
+                    : parseFloat(String(review.userRating.rating)).toFixed(1)}
                 </span>
               </div>
             )}
-            {!review.authorRatings && review.rating && review.rating > 0 && (
+            {!review.userRating && review.rating && review.rating > 0 && (
               <div className="flex items-center rounded-full bg-yellow-50 px-2 py-0.5">
                 {renderStarRating(review.rating)}
                 <span className="ml-0.5 text-xs font-medium text-yellow-700">
@@ -88,14 +86,12 @@ export function ReviewHeader({
           </div>
 
           {/* 날짜 표시는 별도의 라인에 배치 */}
-          <div className="mt-0.5">
-            <span className="text-xs text-gray-500">
-              {formatDistanceToNow(new Date(review.createdAt), {
-                addSuffix: true,
-                locale: ko,
-              })}
-            </span>
-          </div>
+          <span className="text-xs text-gray-500">
+            {formatDistanceToNow(new Date(review.createdAt), {
+              addSuffix: true,
+              locale: ko,
+            })}
+          </span>
         </div>
       </div>
       {isAuthor && (

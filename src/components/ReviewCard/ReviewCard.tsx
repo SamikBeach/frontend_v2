@@ -55,8 +55,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
   const [editedType, setEditedType] = useState<ReviewType>(review.type);
   const [editedRating, setEditedRating] = useState<number>(
     extendedReview.rating ||
-      (extendedReview.authorRatings && extendedReview.authorRatings.length > 0
-        ? (extendedReview.authorRatings[0].rating as number)
+      (extendedReview.userRating
+        ? (extendedReview.userRating.rating as number)
         : 0)
   );
   const [selectedBook, setSelectedBook] = useState<SearchResult | null>(
@@ -112,13 +112,12 @@ export function ReviewCard({ review }: ReviewCardProps) {
       setEditedType(review.type);
       setEditedRating(
         extendedReview.rating ||
-          (extendedReview.authorRatings &&
-          extendedReview.authorRatings.length > 0
-            ? (extendedReview.authorRatings[0].rating as number)
+          (extendedReview.userRating
+            ? (extendedReview.userRating.rating as number)
             : 0)
       );
     }
-  }, [review, extendedReview.authorRatings]);
+  }, [review, extendedReview.userRating]);
 
   // 리뷰 수정 mutation
   const updateReviewMutation = useMutation({
@@ -253,58 +252,51 @@ export function ReviewCard({ review }: ReviewCardProps) {
     setEditedType(review.type);
     setEditedRating(
       extendedReview.rating ||
-        (extendedReview.authorRatings && extendedReview.authorRatings.length > 0
-          ? (extendedReview.authorRatings[0].rating as number)
+        (extendedReview.userRating
+          ? (extendedReview.userRating.rating as number)
           : 0)
     );
   };
 
-  // ReviewDialog에서 리뷰 수정 제출 핸들러
+  // 리뷰 다이얼로그 제출 핸들러
   const handleReviewDialogSubmit = async (rating: number, content: string) => {
-    if (!content.trim()) return;
+    setIsSubmitting(true);
 
     try {
-      setIsSubmitting(true);
-
-      // 선택된 책이 있는 경우
+      // 1. 책이 선택된 경우 별점 정보 먼저 등록
       if (selectedBook) {
-        const bookId =
-          typeof selectedBook.id === 'number'
-            ? selectedBook.id
-            : parseInt(String(selectedBook.id), 10);
-        const bookIsbn = selectedBook.isbn || selectedBook.isbn13 || '';
-
-        // bookId가 없거나 음수인 경우 -1로 설정하고 반드시 ISBN 전달
+        const bookId = Number(selectedBook.id);
         const isNegativeBookId = bookId < 0;
-        const finalBookId = isNegativeBookId ? -1 : bookId;
+        const bookIsbn = selectedBook.isbn13 || selectedBook.isbn || '';
 
-        // 1. 먼저 평점 업데이트
+        // 별점 등록 API 호출
         await createOrUpdateRating(
-          finalBookId,
+          bookId,
           { rating },
-          isNegativeBookId ? bookIsbn : undefined // bookId가 음수이거나 없는 경우 항상 ISBN 전달
+          isNegativeBookId ? bookIsbn : undefined
         );
-
-        // 2. 그 다음 리뷰 업데이트
-        await updateReviewMutation.mutateAsync({
-          id: review.id,
-          content: content,
-          type: 'review',
-          bookId: finalBookId,
-          isbn: isNegativeBookId ? bookIsbn : undefined, // 항상 ISBN 전달
-        });
-      } else {
-        // 책이 없는 경우에는 일반적인 리뷰 업데이트만 수행
-        await updateReviewMutation.mutateAsync({
-          id: review.id,
-          content: content,
-          type: 'review',
-        });
       }
+
+      // 2. 리뷰 업데이트 호출
+      await updateReviewMutation.mutateAsync({
+        id: review.id,
+        content,
+        type: editedType,
+        ...(selectedBook
+          ? {
+              bookId: Number(selectedBook.id),
+              isbn:
+                Number(selectedBook.id) < 0
+                  ? selectedBook.isbn13 || selectedBook.isbn || ''
+                  : undefined,
+              rating,
+            }
+          : {}),
+      });
+
+      setIsSubmitting(false);
     } catch (error) {
       console.error('리뷰 업데이트 실패:', error);
-      toast.error('리뷰 수정 중 오류가 발생했습니다.');
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -383,8 +375,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
     setEditedType(review.type);
     setEditedRating(
       extendedReview.rating ||
-        (extendedReview.authorRatings && extendedReview.authorRatings.length > 0
-          ? (extendedReview.authorRatings[0].rating as number)
+        (extendedReview.userRating
+          ? (extendedReview.userRating.rating as number)
           : 0)
     );
   };

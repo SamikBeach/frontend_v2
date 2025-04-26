@@ -1,12 +1,10 @@
 import { ReviewResponseDto } from '@/apis/review/types';
 import { useUserReviewsInfinite } from '@/app/profile/hooks';
 import { ReviewCard } from '@/components/ReviewCard';
-import { useParams } from 'next/navigation';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CommunitySkeleton } from './CommunitySkeleton';
 
 export default function Community() {
-  const params = useParams();
   const pageSize = 6;
 
   // 모든 리뷰를 가져온 후 프론트에서 'review' 타입이 아닌 것만 필터링

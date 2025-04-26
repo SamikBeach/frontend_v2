@@ -1,29 +1,16 @@
 import { useUserReviewsInfinite } from '@/app/profile/hooks';
 import { ReviewCard } from '@/components/ReviewCard';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useParams } from 'next/navigation';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { ReviewsSkeleton } from './ReviewsSkeleton';
 
 export default function Reviews() {
   const params = useParams();
-  const userId = Number(params.id);
   const pageSize = 6;
 
   // 'review' 타입의 리뷰만 가져오는 hooks 사용
-  const {
-    reviews,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    totalReviews,
-  } = useUserReviewsInfinite(pageSize, 'review');
-
-  const currentUser = useCurrentUser();
-
-  // 현재 사용자 정보로 기본값 설정
-  const userProfile = currentUser;
+  const { reviews, isLoading, fetchNextPage, hasNextPage } =
+    useUserReviewsInfinite(pageSize, 'review');
 
   if (isLoading) {
     return <ReviewsSkeleton />;
