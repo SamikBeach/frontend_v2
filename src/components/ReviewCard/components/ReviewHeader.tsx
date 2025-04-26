@@ -1,3 +1,4 @@
+import { ReviewUser } from '@/apis/review/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -7,10 +8,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { formatDistanceToNow } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import Link from 'next/link';
 import { ExtendedReviewResponseDto } from '../types';
-import { formatDate, getNameInitial, renderStarRating } from '../utils';
+import { getNameInitial, renderStarRating } from '../utils';
 import { TagName } from './TagName';
 
 interface ReviewHeaderProps {
@@ -20,6 +23,7 @@ interface ReviewHeaderProps {
   setIsDropdownOpen: (state: boolean) => void;
   onEdit: () => void;
   onDelete: () => void;
+  onUserClick?: (userId: number) => void;
 }
 
 export function ReviewHeader({
@@ -29,27 +33,30 @@ export function ReviewHeader({
   setIsDropdownOpen,
   onEdit,
   onDelete,
+  onUserClick,
 }: ReviewHeaderProps) {
+  // Check if author has profileImage property, otherwise cast to ReviewUser
+  const author = review.author as ReviewUser;
+  const avatarSrc = author.profileImage || `/images/avatars/placeholder.png`;
+
   return (
     <div className="flex items-start justify-between">
       <div className="flex gap-3">
-        <Link href={`/profile/${review.author.username}`}>
-          <Avatar className="h-11 w-11 border-0">
-            <AvatarImage
-              src={`https://i.pravatar.cc/150?u=${review.author.id}`}
-              alt={review.author.username}
-              className="object-cover"
-            />
-            <AvatarFallback className="bg-gray-100 text-gray-800">
-              {getNameInitial(review.author.username)}
-            </AvatarFallback>
-          </Avatar>
-        </Link>
+        <Avatar
+          className="h-8 w-8 cursor-pointer"
+          onClick={() => onUserClick && onUserClick(review.author.id)}
+        >
+          <AvatarImage src={avatarSrc} alt={review.author.username} />
+          <AvatarFallback>
+            {getNameInitial(review.author.username)}
+          </AvatarFallback>
+        </Avatar>
         <div>
           <div className="flex items-center gap-2">
             <Link
-              href={`/profile/${review.author.username}`}
-              className="font-semibold text-gray-900 hover:text-gray-700"
+              href={`/profile/${review.author.id}`}
+              className="text-sm font-semibold text-gray-900 hover:text-gray-700"
+              onClick={() => onUserClick && onUserClick(review.author.id)}
             >
               {review.author.username}
             </Link>
@@ -80,7 +87,10 @@ export function ReviewHeader({
               </div>
             )}
             <span className="text-xs text-gray-500">
-              {formatDate(review.createdAt)}
+              {formatDistanceToNow(new Date(review.createdAt), {
+                addSuffix: true,
+                locale: ko,
+              })}
             </span>
           </div>
         </div>

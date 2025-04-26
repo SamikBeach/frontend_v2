@@ -21,12 +21,13 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { CommentSection } from './components';
 import { BookPreview } from './components/BookPreview';
-import { CommentSection } from './components/CommentSection';
 import { ReviewActions } from './components/ReviewActions';
 import { ReviewEditForm } from './components/ReviewEditForm';
 import { ReviewHeader } from './components/ReviewHeader';
@@ -34,9 +35,12 @@ import { useCommentLike, useReviewComments, useReviewLike } from './hooks';
 import { ExtendedReviewResponseDto, ReviewCardProps } from './types';
 import { formatDate } from './utils';
 
-export function ReviewCard({ review, currentUser }: ReviewCardProps) {
+export function ReviewCard({ review, ...props }: ReviewCardProps) {
   // Cast to our extended type
   const extendedReview = review as ExtendedReviewResponseDto;
+
+  // 현재 사용자 정보 가져오기
+  const currentUser = useCurrentUser();
 
   const [expanded, setExpanded] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -99,7 +103,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   } = useReviewComments(review.id, showComments);
 
   // 현재 사용자가 리뷰 작성자인지 확인
-  const isAuthor = currentUser.id === review.author.id;
+  const isAuthor = currentUser?.id === review.author.id;
 
   // 초기 수정 상태 설정
   useEffect(() => {
@@ -393,18 +397,24 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
 
   // 좋아요 핸들러 - 낙관적 UI 업데이트 적용
   const handleLike = async () => {
+    // 로그인하지 않은 경우 차단
+    if (!currentUser) {
+      // 로그인 필요 안내 (필요시 여기에 로그인 모달 열기 등의 코드 추가)
+      return;
+    }
+
     // 낙관적 UI 업데이트
     setIsLiked(!isLiked);
-    setLikesCount(prev => (isLiked ? prev - 1 : prev + 1));
+    setLikesCount(prev => (isLiked ? (prev || 0) - 1 : (prev || 0) + 1));
 
     try {
       // API 호출
-      await handleLikeToggle(review.id, isLiked);
+      await handleLikeToggle(review.id, isLiked || false);
     } catch (error) {
       // 에러 발생 시 UI 되돌리기
       setIsLiked(isLiked);
-      setLikesCount(review.likeCount);
-      console.error('Failed to toggle like:', error);
+      setLikesCount(likesCount);
+      console.error('좋아요 처리 중 오류:', error);
     }
   };
 
@@ -443,8 +453,29 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
     }
   };
 
+  // ReviewComments가 받는 currentUser 타입에 맞게 수정
+  const getUserForComments = () => {
+    if (!currentUser) {
+      return {
+        id: 0,
+        name: 'guest',
+        username: 'guest',
+        avatar: 'https://i.pravatar.cc/150?u=guest',
+      };
+    }
+
+    return {
+      id: currentUser.id,
+      name: currentUser.username || 'guest',
+      username: currentUser.username || 'guest',
+      avatar:
+        currentUser.profileImage ||
+        `https://i.pravatar.cc/150?u=${currentUser.id}`,
+    };
+  };
+
   return (
-    <Card className="mb-6 overflow-hidden border-gray-200 shadow-none">
+    <Card className="overflow-hidden border-gray-200 shadow-none">
       <CardHeader className="p-5 pb-3">
         <ReviewHeader
           review={extendedReview}
@@ -511,9 +542,9 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
       {!isEditMode && (
         <CardFooter className="flex flex-col gap-4 px-5 py-3">
           <ReviewActions
-            isLiked={isLiked}
-            likesCount={likesCount}
-            commentCount={review.commentCount}
+            isLiked={isLiked || false}
+            likesCount={likesCount || 0}
+            commentCount={review.commentCount || 0}
             showComments={showComments}
             isLikeLoading={isLikeLoading}
             onLike={handleLike}
@@ -521,11 +552,11 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
           />
 
           {/* 댓글 섹션 */}
-          {showComments && (
+          {showComments && comments && (
             <CommentSection
               comments={comments}
               formatDate={formatDate}
-              currentUser={currentUser}
+              currentUser={getUserForComments()}
               commentText={commentText}
               setCommentText={setCommentText}
               isCommentLoading={isCommentLoading}

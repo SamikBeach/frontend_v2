@@ -2,6 +2,7 @@ export * from './common';
 export { ProfileHeader } from './Header';
 export { ProfileEditDialog } from './ProfileEditDialog';
 export {
+  Community,
   Libraries,
   ReadBooks,
   Reviews,

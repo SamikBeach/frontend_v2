@@ -7,7 +7,6 @@ export interface User {
   id: number;
   email: string;
   username?: string;
-  name?: string;
   avatar?: string;
   bio?: string;
   profileImage?: string;
@@ -256,7 +255,7 @@ export interface ReadingStatusResponseDto {
     id: number;
     title: string;
     author: string;
-    coverImageUrl: string;
+    coverImage: string;
     isbn: string;
   };
 }

@@ -4,37 +4,70 @@ import {
   communitySortOptionAtom,
   communityTypeFilterAtom,
 } from '@/atoms/community';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
-import { useState } from 'react';
 
-export const useCommunityReviews = () => {
-  const [currentPage, setCurrentPage] = useState(1);
+/**
+ * 커뮤니티 리뷰를 무한 스크롤로 불러오는 훅
+ */
+export const useCommunityReviews = (limit: number = 10) => {
   const typeFilter = useAtomValue(communityTypeFilterAtom);
   const sortOption = useAtomValue(communitySortOptionAtom);
 
-  const { data } = useSuspenseQuery({
-    queryKey: ['communityReviews', sortOption, currentPage, typeFilter],
-    queryFn: async () => {
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    error,
+  } = useInfiniteQuery({
+    queryKey: ['communityReviews', sortOption, typeFilter, limit],
+    queryFn: async ({ pageParam = 1 }) => {
       // 타입이 'all'이면 백엔드에 전달하지 않음
       const type =
         typeFilter !== 'all' ? (typeFilter as ReviewType) : undefined;
 
       // filter 값을 백엔드에 전달 (recent, popular, following)
-      const filter = sortOption as 'popular' | 'recent' | 'following';
+      const filter = sortOption === 'latest' ? 'recent' : sortOption;
 
       // getReviews 함수 사용
-      return getReviews(currentPage, 10, filter, type);
+      const result = await getReviews(pageParam, limit, filter, type);
+
+      return {
+        ...result,
+        page: pageParam,
+        hasNextPage: pageParam < result.totalPages,
+      };
     },
+    getNextPageParam: lastPage => {
+      if (lastPage.hasNextPage) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
   });
 
+  // 모든 페이지의 리뷰 목록을 하나의 배열로 병합
+  const reviews = data?.pages.flatMap(page => page.reviews || []) || [];
+
+  // 첫 페이지의 총 리뷰 수 데이터
+  const totalReviews = data?.pages[0]?.total || 0;
+  const totalPages = data?.pages[0]?.totalPages || 0;
+
   return {
-    reviews: data?.reviews || [],
-    totalReviews: data?.total || 0,
-    totalPages: data?.totalPages || 0,
-    currentPage,
+    reviews,
+    isLoading,
+    isError,
+    error,
+    totalReviews,
+    totalPages,
     typeFilter,
     sortOption,
-    setCurrentPage,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   };
 };

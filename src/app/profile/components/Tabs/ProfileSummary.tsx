@@ -104,26 +104,26 @@ export default function ProfileSummary({
             />
           </div>
           <div className="mt-2 text-center">
-            <div className="flex items-center justify-center">
+            <div className="flex flex-col items-center">
               <span
                 className={cn(
-                  'block text-xl font-bold',
-                  selectedSection === 'reviews'
-                    ? 'text-gray-900'
-                    : 'text-gray-800'
-                )}
-              >
-                {reviewCount}
-              </span>
-              <span
-                className={cn(
-                  'ml-1 text-sm',
+                  'text-sm font-medium',
                   selectedSection === 'reviews'
                     ? 'text-amber-600'
                     : 'text-amber-500'
                 )}
               >
                 ★{averageRating.toFixed(1)}
+              </span>
+              <span
+                className={cn(
+                  'text-xl font-bold',
+                  selectedSection === 'reviews'
+                    ? 'text-gray-900'
+                    : 'text-gray-800'
+                )}
+              >
+                {reviewCount}
               </span>
             </div>
             <span

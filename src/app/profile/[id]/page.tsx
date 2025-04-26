@@ -7,6 +7,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { authUtils } from '@/apis/axios';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import {
+  Community,
   ErrorBoundary,
   ErrorView,
   HeaderSkeleton,
@@ -23,30 +24,12 @@ import {
   SummarySkeleton,
 } from '../components';
 
-// 커뮤니티 활동 컴포넌트
-// 임시로 추가한 컴포넌트, 실제로는 해당 컴포넌트 구현 필요
-function Community() {
-  return (
-    <div className="mb-10">
-      <h2 className="mb-6 text-xl font-semibold text-gray-900">
-        커뮤니티 활동
-      </h2>
-      <div className="rounded-lg bg-gray-50 p-10 text-center">
-        <p className="text-gray-500">아직 커뮤니티 활동 기록이 없습니다.</p>
-      </div>
-    </div>
-  );
-}
-
 export default function ProfilePage() {
   const params = useParams();
-  const userId = Number(params.id as string);
   const { getQueryParam, updateQueryParams } = useQueryParams();
   const activeSection = getQueryParam('section') || 'read';
   const router = useRouter();
 
-  const [isClient, setIsClient] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
@@ -56,11 +39,9 @@ export default function ProfilePage() {
 
   // 클라이언트 사이드에서만 인증 상태 확인
   useEffect(() => {
-    setIsClient(true);
     const checkAuth = () => {
       try {
         const isAuth = authUtils.isAuthenticated();
-        setIsAuthenticated(isAuth);
         if (!isAuth) {
           setShowAuthDialog(true);
         }

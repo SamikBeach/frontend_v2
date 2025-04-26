@@ -19,11 +19,17 @@ export function LoadingSpinner({
   return (
     <div
       className={cn(
-        'animate-spin rounded-full border-t-2 border-b-2 border-gray-900',
+        'relative animate-spin rounded-full',
         sizeClass[size],
         className
       )}
     >
+      {/* 외부 링 */}
+      <div className="absolute inset-0 rounded-full border-2 border-gray-200" />
+
+      {/* 회전하는 게이지 */}
+      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-gray-600" />
+
       <VisuallyHidden>로딩 중...</VisuallyHidden>
     </div>
   );

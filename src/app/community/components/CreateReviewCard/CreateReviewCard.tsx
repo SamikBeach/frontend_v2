@@ -18,9 +18,8 @@ import { UserAvatar } from './components/UserAvatar';
 
 export interface UserProfile {
   id: number;
-  name: string;
-  username: string;
-  avatar: string;
+  username?: string;
+  profileImage?: string;
 }
 
 interface CreateReviewCardProps {

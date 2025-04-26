@@ -1,44 +1,41 @@
 import { ReviewResponseDto } from '@/apis/review/types';
 import { useUserReviewsInfinite } from '@/app/profile/hooks';
 import { ReviewCard } from '@/components/ReviewCard';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useParams } from 'next/navigation';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { ReviewsSkeleton } from './ReviewsSkeleton';
+import { CommunitySkeleton } from './CommunitySkeleton';
 
-export default function Reviews() {
+export default function Community() {
   const params = useParams();
   const userId = Number(params.id);
   const pageSize = 6;
 
-  // 'review' 타입의 리뷰만 가져오는 hooks 사용
+  // 모든 리뷰를 가져온 후 프론트에서 'review' 타입이 아닌 것만 필터링
   const {
-    reviews,
+    reviews: allReviews,
     isLoading,
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage,
-    totalReviews,
-  } = useUserReviewsInfinite(pageSize, 'review');
+  } = useUserReviewsInfinite(pageSize, 'all');
 
-  const currentUser = useCurrentUser();
-
-  // 현재 사용자 정보로 기본값 설정
-  const userProfile = currentUser;
+  // 'review' 타입이 아닌 리뷰만 필터링
+  const communityReviews = allReviews.filter(
+    review => review.type !== 'review'
+  );
 
   if (isLoading) {
-    return <ReviewsSkeleton />;
+    return <CommunitySkeleton />;
   }
 
-  if (reviews.length === 0) {
+  if (communityReviews.length === 0) {
     return (
       <div className="mt-8 flex items-center justify-center rounded-lg bg-gray-50 py-16">
         <div className="text-center">
           <h3 className="text-lg font-medium text-gray-900">
-            작성한 책 리뷰가 없습니다
+            커뮤니티 활동이 없습니다
           </h3>
           <p className="mt-2 text-sm text-gray-500">
-            아직 작성한 책 리뷰가 없습니다. 책을 읽고 리뷰를 작성해보세요.
+            아직 커뮤니티 활동이 없습니다. 다양한 주제로 게시물을 작성해보세요.
           </p>
         </div>
       </div>
@@ -54,7 +51,7 @@ export default function Reviews() {
 
   return (
     <InfiniteScroll
-      dataLength={reviews.length}
+      dataLength={communityReviews.length}
       next={handleFetchNextPage}
       hasMore={hasNextPage ?? false}
       loader={
@@ -67,7 +64,7 @@ export default function Reviews() {
       style={{ overflow: 'visible' }} // 스크롤바 숨기기
     >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        {reviews.map((review: ReviewResponseDto) => (
+        {communityReviews.map((review: ReviewResponseDto) => (
           <ReviewCard key={review.id} review={review} />
         ))}
       </div>
