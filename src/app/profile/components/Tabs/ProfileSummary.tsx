@@ -39,36 +39,38 @@ export default function ProfileSummary({
           className={cn(
             `flex cursor-pointer flex-col items-center rounded-lg p-4 transition-colors`,
             selectedSection === 'read'
-              ? 'bg-violet-100'
-              : 'bg-violet-50 hover:bg-violet-100'
+              ? 'bg-violet-200'
+              : 'bg-violet-50 hover:bg-violet-200/70'
           )}
         >
           <div
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full bg-violet-100',
-              selectedSection === 'read' ? 'bg-violet-200' : ''
+              'flex h-10 w-10 items-center justify-center rounded-full',
+              selectedSection === 'read' ? 'bg-violet-300' : 'bg-violet-200'
             )}
           >
             <Book
               className={cn(
-                'h-5 w-5 text-violet-600',
-                selectedSection === 'read' ? 'text-violet-700' : ''
+                'h-5 w-5',
+                selectedSection === 'read'
+                  ? 'text-violet-800'
+                  : 'text-violet-700'
               )}
             />
           </div>
           <div className="mt-2 text-center">
             <span
               className={cn(
-                'block text-xl font-bold text-gray-900',
-                selectedSection === 'read' ? 'text-gray-900' : ''
+                'block text-xl font-bold',
+                selectedSection === 'read' ? 'text-gray-900' : 'text-gray-800'
               )}
             >
               {readCount}
             </span>
             <span
               className={cn(
-                'text-xs text-gray-600',
-                selectedSection === 'read' ? 'text-gray-800' : ''
+                'text-xs',
+                selectedSection === 'read' ? 'text-gray-900' : 'text-gray-700'
               )}
             >
               읽은 책
@@ -82,20 +84,22 @@ export default function ProfileSummary({
           className={cn(
             `flex cursor-pointer flex-col items-center rounded-lg p-4 transition-colors`,
             selectedSection === 'reviews'
-              ? 'bg-purple-100'
-              : 'bg-purple-50 hover:bg-purple-100'
+              ? 'bg-purple-200'
+              : 'bg-purple-50 hover:bg-purple-200/70'
           )}
         >
           <div
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full bg-purple-100',
-              selectedSection === 'reviews' ? 'bg-purple-200' : ''
+              'flex h-10 w-10 items-center justify-center rounded-full',
+              selectedSection === 'reviews' ? 'bg-purple-300' : 'bg-purple-200'
             )}
           >
             <MessageSquare
               className={cn(
-                'h-5 w-5 text-purple-600',
-                selectedSection === 'reviews' ? 'text-purple-700' : ''
+                'h-5 w-5',
+                selectedSection === 'reviews'
+                  ? 'text-purple-800'
+                  : 'text-purple-700'
               )}
             />
           </div>
@@ -103,16 +107,20 @@ export default function ProfileSummary({
             <div className="flex items-center justify-center">
               <span
                 className={cn(
-                  'block text-xl font-bold text-gray-900',
-                  selectedSection === 'reviews' ? 'text-gray-900' : ''
+                  'block text-xl font-bold',
+                  selectedSection === 'reviews'
+                    ? 'text-gray-900'
+                    : 'text-gray-800'
                 )}
               >
                 {reviewCount}
               </span>
               <span
                 className={cn(
-                  'ml-1 text-sm text-amber-500',
-                  selectedSection === 'reviews' ? 'text-amber-600' : ''
+                  'ml-1 text-sm',
+                  selectedSection === 'reviews'
+                    ? 'text-amber-600'
+                    : 'text-amber-500'
                 )}
               >
                 ★{averageRating.toFixed(1)}
@@ -120,8 +128,10 @@ export default function ProfileSummary({
             </div>
             <span
               className={cn(
-                'text-xs text-gray-600',
-                selectedSection === 'reviews' ? 'text-gray-800' : ''
+                'text-xs',
+                selectedSection === 'reviews'
+                  ? 'text-gray-900'
+                  : 'text-gray-700'
               )}
             >
               리뷰
@@ -135,36 +145,42 @@ export default function ProfileSummary({
           className={cn(
             `flex cursor-pointer flex-col items-center rounded-lg p-4 transition-colors`,
             selectedSection === 'libraries'
-              ? 'bg-blue-100'
-              : 'bg-blue-50 hover:bg-blue-100'
+              ? 'bg-blue-200'
+              : 'bg-blue-50 hover:bg-blue-200/70'
           )}
         >
           <div
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full bg-blue-100',
-              selectedSection === 'libraries' ? 'bg-blue-200' : ''
+              'flex h-10 w-10 items-center justify-center rounded-full',
+              selectedSection === 'libraries' ? 'bg-blue-300' : 'bg-blue-200'
             )}
           >
             <BookOpen
               className={cn(
-                'h-5 w-5 text-blue-600',
-                selectedSection === 'libraries' ? 'text-blue-700' : ''
+                'h-5 w-5',
+                selectedSection === 'libraries'
+                  ? 'text-blue-800'
+                  : 'text-blue-700'
               )}
             />
           </div>
           <div className="mt-2 text-center">
             <span
               className={cn(
-                'block text-xl font-bold text-gray-900',
-                selectedSection === 'libraries' ? 'text-gray-900' : ''
+                'block text-xl font-bold',
+                selectedSection === 'libraries'
+                  ? 'text-gray-900'
+                  : 'text-gray-800'
               )}
             >
               {libraryCount}
             </span>
             <span
               className={cn(
-                'text-xs text-gray-600',
-                selectedSection === 'libraries' ? 'text-gray-800' : ''
+                'text-xs',
+                selectedSection === 'libraries'
+                  ? 'text-gray-900'
+                  : 'text-gray-700'
               )}
             >
               서재
@@ -178,36 +194,42 @@ export default function ProfileSummary({
           className={cn(
             `flex cursor-pointer flex-col items-center rounded-lg p-4 transition-colors`,
             selectedSection === 'community'
-              ? 'bg-amber-100'
-              : 'bg-amber-50 hover:bg-amber-100'
+              ? 'bg-amber-200'
+              : 'bg-amber-50 hover:bg-amber-200/70'
           )}
         >
           <div
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full bg-amber-100',
-              selectedSection === 'community' ? 'bg-amber-200' : ''
+              'flex h-10 w-10 items-center justify-center rounded-full',
+              selectedSection === 'community' ? 'bg-amber-300' : 'bg-amber-200'
             )}
           >
             <Users
               className={cn(
-                'h-5 w-5 text-amber-600',
-                selectedSection === 'community' ? 'text-amber-700' : ''
+                'h-5 w-5',
+                selectedSection === 'community'
+                  ? 'text-amber-800'
+                  : 'text-amber-700'
               )}
             />
           </div>
           <div className="mt-2 text-center">
             <span
               className={cn(
-                'block text-xl font-bold text-gray-900',
-                selectedSection === 'community' ? 'text-gray-900' : ''
+                'block text-xl font-bold',
+                selectedSection === 'community'
+                  ? 'text-gray-900'
+                  : 'text-gray-800'
               )}
             >
               {/* 커뮤니티 활동 수 (API에서 가져와야 함) */}0
             </span>
             <span
               className={cn(
-                'text-xs text-gray-600',
-                selectedSection === 'community' ? 'text-gray-800' : ''
+                'text-xs',
+                selectedSection === 'community'
+                  ? 'text-gray-900'
+                  : 'text-gray-700'
               )}
             >
               커뮤니티
@@ -221,36 +243,44 @@ export default function ProfileSummary({
           className={cn(
             `flex cursor-pointer flex-col items-center rounded-lg p-4 transition-colors`,
             selectedSection === 'subscriptions'
-              ? 'bg-green-100'
-              : 'border border-green-200 bg-white hover:bg-green-50'
+              ? 'bg-green-200'
+              : 'border border-green-200 bg-white hover:bg-green-100'
           )}
         >
           <div
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full bg-green-100',
-              selectedSection === 'subscriptions' ? 'bg-green-200' : ''
+              'flex h-10 w-10 items-center justify-center rounded-full',
+              selectedSection === 'subscriptions'
+                ? 'bg-green-300'
+                : 'bg-green-200'
             )}
           >
             <Bell
               className={cn(
-                'h-5 w-5 text-green-600',
-                selectedSection === 'subscriptions' ? 'text-green-700' : ''
+                'h-5 w-5',
+                selectedSection === 'subscriptions'
+                  ? 'text-green-800'
+                  : 'text-green-700'
               )}
             />
           </div>
           <div className="mt-2 text-center">
             <span
               className={cn(
-                'block text-xl font-bold text-gray-900',
-                selectedSection === 'subscriptions' ? 'text-gray-900' : ''
+                'block text-xl font-bold',
+                selectedSection === 'subscriptions'
+                  ? 'text-gray-900'
+                  : 'text-gray-800'
               )}
             >
               {subscribedLibraryCount}
             </span>
             <span
               className={cn(
-                'text-xs text-gray-600',
-                selectedSection === 'subscriptions' ? 'text-gray-800' : ''
+                'text-xs',
+                selectedSection === 'subscriptions'
+                  ? 'text-gray-900'
+                  : 'text-gray-700'
               )}
             >
               구독한 서재
@@ -264,36 +294,36 @@ export default function ProfileSummary({
           className={cn(
             `flex cursor-pointer flex-col items-center rounded-lg p-4 transition-colors`,
             selectedSection === 'stats'
-              ? 'bg-blue-100'
-              : 'border border-blue-200 bg-white hover:bg-blue-50'
+              ? 'bg-blue-200'
+              : 'border border-blue-200 bg-white hover:bg-blue-100'
           )}
         >
           <div
             className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-full bg-blue-100',
-              selectedSection === 'stats' ? 'bg-blue-200' : ''
+              'flex h-10 w-10 items-center justify-center rounded-full',
+              selectedSection === 'stats' ? 'bg-blue-300' : 'bg-blue-200'
             )}
           >
             <AreaChart
               className={cn(
-                'h-5 w-5 text-blue-600',
-                selectedSection === 'stats' ? 'text-blue-700' : ''
+                'h-5 w-5',
+                selectedSection === 'stats' ? 'text-blue-800' : 'text-blue-700'
               )}
             />
           </div>
           <div className="mt-2 text-center">
             <span
               className={cn(
-                'block text-xl font-bold text-gray-900',
-                selectedSection === 'stats' ? 'text-gray-900' : ''
+                'block text-xl font-bold',
+                selectedSection === 'stats' ? 'text-gray-900' : 'text-gray-800'
               )}
             >
               &nbsp;
             </span>
             <span
               className={cn(
-                'text-xs text-gray-600',
-                selectedSection === 'stats' ? 'text-gray-800' : ''
+                'text-xs',
+                selectedSection === 'stats' ? 'text-gray-900' : 'text-gray-700'
               )}
             >
               통계

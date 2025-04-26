@@ -6,6 +6,7 @@ import { BookCard } from '@/components/BookCard';
 import { useDialogQuery } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -148,9 +149,27 @@ function BooksListSkeleton() {
 
 // 메인 컴포넌트 - 필터 탭 포함
 export default function ReadBooks() {
+  const params = useParams();
+  const userId = Number(params.id as string);
   const [selectedStatus, setSelectedStatus] = useState<
     ReadingStatusType | undefined
   >(undefined);
+
+  // 각 상태별 책 수를 가져오기 위한 쿼리들
+  const { total: totalBooks } = useUserBooks(undefined);
+  const { total: wantToReadBooks } = useUserBooks(
+    ReadingStatusType.WANT_TO_READ
+  );
+  const { total: readingBooks } = useUserBooks(ReadingStatusType.READING);
+  const { total: readBooks } = useUserBooks(ReadingStatusType.READ);
+
+  // 각 상태별 책 수를 포함한 필터 데이터
+  const filtersWithCount = [
+    { ...readingStatusFilters[0], count: totalBooks },
+    { ...readingStatusFilters[1], count: wantToReadBooks },
+    { ...readingStatusFilters[2], count: readingBooks },
+    { ...readingStatusFilters[3], count: readBooks },
+  ];
 
   const handleStatusChange = (statusType: ReadingStatusType | undefined) => {
     setSelectedStatus(statusType);
@@ -159,8 +178,8 @@ export default function ReadBooks() {
   return (
     <div>
       {/* 독서 상태 필터 */}
-      <div className="mb-6 flex gap-3">
-        {readingStatusFilters.map(status => (
+      <div className="mb-6 flex flex-wrap gap-3">
+        {filtersWithCount.map(status => (
           <button
             key={status.id}
             className={cn(
@@ -172,6 +191,9 @@ export default function ReadBooks() {
             onClick={() => handleStatusChange(status.type)}
           >
             <span>{status.name}</span>
+            <span className="ml-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-gray-100 px-1 text-[11px] text-gray-600">
+              {status.count || 0}
+            </span>
           </button>
         ))}
       </div>
