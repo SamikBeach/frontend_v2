@@ -12,6 +12,7 @@ export interface Author {
   id: number;
   username: string;
   email: string;
+  profileImage?: string;
 }
 
 export interface ReviewImage {

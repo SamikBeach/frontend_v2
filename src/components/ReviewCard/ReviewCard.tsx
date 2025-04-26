@@ -35,7 +35,7 @@ import { useCommentLike, useReviewComments, useReviewLike } from './hooks';
 import { ExtendedReviewResponseDto, ReviewCardProps } from './types';
 import { formatDate } from './utils';
 
-export function ReviewCard({ review, ...props }: ReviewCardProps) {
+export function ReviewCard({ review }: ReviewCardProps) {
   // Cast to our extended type
   const extendedReview = review as ExtendedReviewResponseDto;
 
@@ -460,7 +460,7 @@ export function ReviewCard({ review, ...props }: ReviewCardProps) {
         id: 0,
         name: 'guest',
         username: 'guest',
-        avatar: 'https://i.pravatar.cc/150?u=guest',
+        avatar: undefined,
       };
     }
 
@@ -468,9 +468,7 @@ export function ReviewCard({ review, ...props }: ReviewCardProps) {
       id: currentUser.id,
       name: currentUser.username || 'guest',
       username: currentUser.username || 'guest',
-      avatar:
-        currentUser.profileImage ||
-        `https://i.pravatar.cc/150?u=${currentUser.id}`,
+      avatar: currentUser.profileImage || undefined,
     };
   };
 

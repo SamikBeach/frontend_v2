@@ -23,7 +23,6 @@ export interface User {
  * 사용자 정보 업데이트 요청 인터페이스
  */
 export interface UpdateUserInfoRequest {
-  name?: string;
   username?: string;
   bio?: string;
 }
@@ -189,7 +188,7 @@ export interface UserLibrariesResponseDto {
  * 사용자 리뷰 목록 응답
  */
 export interface UserReviewsResponseDto {
-  reviews: ReviewPreviewDto[];
+  reviews: any[]; // Match actual server response
   total: number;
   page: number;
   totalPages: number;

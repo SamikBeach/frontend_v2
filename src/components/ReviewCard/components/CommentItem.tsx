@@ -108,10 +108,7 @@ export function CommentItem({
     <div className="flex gap-2">
       <Avatar className="h-7 w-7 flex-shrink-0">
         <AvatarImage
-          src={
-            (comment.author as any).profileImage ||
-            `/images/avatars/placeholder.png`
-          }
+          src={comment.author.profileImage || `/images/avatars/placeholder.png`}
           alt={comment.author.username}
           className="object-cover"
         />

@@ -1,4 +1,3 @@
-import { ReviewResponseDto } from '@/apis/review/types';
 import { useUserReviewsInfinite } from '@/app/profile/hooks';
 import { ReviewCard } from '@/components/ReviewCard';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -67,7 +66,7 @@ export default function Reviews() {
       style={{ overflow: 'visible' }} // 스크롤바 숨기기
     >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-        {reviews.map((review: ReviewResponseDto) => (
+        {reviews.map((review: any) => (
           <ReviewCard key={review.id} review={review} />
         ))}
       </div>

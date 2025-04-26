@@ -36,9 +36,7 @@ function BooksList({ status }: { status: ReadingStatusType | undefined }) {
     books = [],
     fetchNextPage,
     hasNextPage,
-    isFetchingNextPage,
     isLoading,
-    total,
   } = useUserBooks(status);
   const [, setSelectedBookId] = useAtom(selectedBookIdAtom);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });

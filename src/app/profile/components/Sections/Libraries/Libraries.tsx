@@ -45,17 +45,11 @@ export default function Libraries() {
   const pageSize = 6;
 
   // 서재 목록 가져오기 (무한 스크롤)
-  const {
-    libraries,
-    totalLibraries,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-  } = useUserLibraries({
-    userId,
-    pageSize,
-  });
+  const { libraries, totalLibraries, fetchNextPage, hasNextPage, isLoading } =
+    useUserLibraries({
+      userId,
+      pageSize,
+    });
 
   // 태그 리스트 생성
   const tags = formatLibraryTags(libraries);

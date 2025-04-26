@@ -7,7 +7,6 @@ import { CommunitySkeleton } from './CommunitySkeleton';
 
 export default function Community() {
   const params = useParams();
-  const userId = Number(params.id);
   const pageSize = 6;
 
   // 모든 리뷰를 가져온 후 프론트에서 'review' 타입이 아닌 것만 필터링

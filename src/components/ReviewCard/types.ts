@@ -1,5 +1,8 @@
-import { CommentWithReplies } from '@/apis/comment/types';
-import { ReviewResponseDto, ReviewUser } from '@/apis/review/types';
+import {
+  Comment as ApiComment,
+  ReviewResponseDto,
+  ReviewUser,
+} from '@/apis/review/types';
 
 // 읽기 통계 정보 인터페이스
 export interface ReadingStats {
@@ -44,17 +47,18 @@ export interface AuthorRating {
 }
 
 // Extend the ReviewResponseDto to include rating property
-export interface ExtendedReviewResponseDto extends ReviewResponseDto {
+export interface ExtendedReviewResponseDto
+  extends Omit<ReviewResponseDto, 'likeCount' | 'commentCount' | 'isLiked'> {
   book?: ExtendedReviewBook;
   comments?: Comment[];
   rating?: number;
   mentions?: ReviewUser[];
-  likeCount?: number;
+  likeCount: number;
   likesCount?: number;
-  commentCount?: number;
+  commentCount: number;
   commentsCount?: number;
   userLiked?: boolean;
-  isLiked?: boolean;
+  isLiked: boolean;
 }
 
 // 로컬에서 사용할 Comment 인터페이스 정의
@@ -87,13 +91,12 @@ export interface ReviewCardProps {
 }
 
 export interface CommentItemProps {
-  comment: CommentWithReplies;
+  comment: ApiComment & { replies?: ApiComment[] };
   formatDate: (date: string | Date) => string;
   currentUser: {
     id: number;
-    name: string;
     username: string;
-    avatar: string;
+    avatar?: string;
   };
   onLike?: (commentId: number, isLiked: boolean) => Promise<void>;
   onReply?: (commentId: number, content: string) => void;

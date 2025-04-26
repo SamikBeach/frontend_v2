@@ -53,7 +53,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
   };
 
   // 사용자 표시 정보 설정
-  const displayName = user.name || user.username || user.email.split('@')[0];
+  const displayName = user.username || user.email.split('@')[0];
   const initial = displayName.charAt(0).toUpperCase();
   const avatarUrl =
     user.profileImage || `https://i.pravatar.cc/150?u=${user.id}`;

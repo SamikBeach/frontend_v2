@@ -1,11 +1,10 @@
-import { ReviewResponseDto, ReviewType } from '@/apis/review/types';
-import { ReviewPreviewDto } from '@/apis/user/types';
+import { ReviewType } from '@/apis/review/types';
 import { getUserReviews } from '@/apis/user/user';
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 
 interface UseUserReviewsResult {
-  reviews: ReviewResponseDto[];
+  reviews: any[]; // Use any to match actual server response
   isLoading: boolean;
   error: Error | null;
   totalReviews: number;
@@ -15,31 +14,6 @@ interface UseUserReviewsResult {
   hasNextPage?: boolean;
   isFetchingNextPage?: boolean;
 }
-
-// 미리보기 리뷰를 완전한 리뷰로 변환하는 함수
-const transformReviewPreview = (
-  review: ReviewPreviewDto
-): ReviewResponseDto => {
-  return {
-    id: review.id,
-    content: review.content,
-    type: review.type as ReviewType,
-    author: {
-      id: 0, // API 응답에 없는 데이터이므로 기본값 설정
-      username: '',
-      email: '',
-    },
-    images: review.previewImage
-      ? [{ id: review.previewImage.id, url: review.previewImage.url }]
-      : [],
-    books: [],
-    likeCount: review.likeCount,
-    commentCount: review.commentCount,
-    isLiked: false,
-    createdAt: review.createdAt,
-    updatedAt: new Date(),
-  };
-};
 
 /**
  * 사용자 리뷰를 로드하는 훅 (페이지네이션 방식)
@@ -59,7 +33,7 @@ export function useUserReviews(
   });
 
   return {
-    reviews: data?.reviews ? data.reviews.map(transformReviewPreview) : [],
+    reviews: data?.reviews || [],
     isLoading,
     error: error as Error | null,
     totalReviews: data?.total || 0,
@@ -102,7 +76,7 @@ export function useUserReviewsByType(
   });
 
   return {
-    reviews: data?.reviews ? data.reviews.map(transformReviewPreview) : [],
+    reviews: data?.reviews || [],
     isLoading,
     error: error as Error | null,
     totalReviews: data?.total || 0,
@@ -156,10 +130,7 @@ export function useUserReviewsInfinite(
   });
 
   // 모든 페이지의 리뷰 목록을 하나의 배열로 병합
-  const reviews =
-    data?.pages.flatMap(
-      page => page.reviews?.map(transformReviewPreview) || []
-    ) || [];
+  const reviews = data?.pages.flatMap(page => page.reviews || []) || [];
 
   // 첫 페이지의 총 리뷰 수 데이터
   const totalReviews = data?.pages[0]?.total || 0;

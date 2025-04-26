@@ -18,7 +18,6 @@ export default function ProfileSettings({
   onSave,
 }: ProfileSettingsProps) {
   // 사용자 정보 상태 관리
-  const [name, setName] = useState(user?.name || user?.username || '');
   const [username, setUsername] = useState(user?.username || '');
   const [email, setEmail] = useState(user?.email || '');
   const [bio, setBio] = useState(user?.bio || '');
@@ -179,22 +178,6 @@ export default function ProfileSettings({
               </Button>
             </div>
           </div>
-        </div>
-
-        {/* 이름 필드 */}
-        <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4">
-          <Label
-            htmlFor="name"
-            className="text-sm font-medium text-gray-700 sm:w-36"
-          >
-            이름
-          </Label>
-          <Input
-            id="name"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            className="h-10 max-w-md rounded-md border-gray-200 text-sm"
-          />
         </div>
 
         {/* 사용자명 필드 */}

@@ -37,7 +37,7 @@ export function ReviewHeader({
 }: ReviewHeaderProps) {
   // Check if author has profileImage property, otherwise cast to ReviewUser
   const author = review.author as ReviewUser;
-  const avatarSrc = author.profileImage || `/images/avatars/placeholder.png`;
+  const avatarSrc = author.profileImage ?? undefined;
 
   return (
     <div className="flex items-start justify-between">
