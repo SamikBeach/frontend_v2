@@ -239,8 +239,7 @@ export default function Libraries() {
       <>
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">서재</h2>
-            <p className="mt-1 text-sm text-gray-500">
+            <p className="text-sm text-gray-500">
               아직 등록된 서재가 없습니다.
             </p>
           </div>
@@ -297,21 +296,23 @@ export default function Libraries() {
     <>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">서재</h2>
-          <div className="mt-2 flex flex-wrap gap-3">
-            <div className="flex items-center rounded-full bg-blue-50 px-3 py-1.5">
-              <span className="text-sm font-semibold text-blue-600">
-                {totalLibraries}개의 서재
+          <div className="flex flex-wrap gap-3">
+            <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-2.5 py-1">
+              <span className="text-xs text-gray-600">서재</span>
+              <span className="text-sm font-bold text-gray-900">
+                {totalLibraries}
               </span>
             </div>
-            <div className="flex items-center rounded-full bg-purple-50 px-3 py-1.5">
-              <span className="text-sm font-semibold text-purple-600">
-                {totalBooks}권의 책
+            <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-2.5 py-1">
+              <span className="text-xs text-gray-600">책</span>
+              <span className="text-sm font-bold text-gray-900">
+                {totalBooks}
               </span>
             </div>
-            <div className="flex items-center rounded-full bg-green-50 px-3 py-1.5">
-              <span className="text-sm font-semibold text-green-600">
-                {totalFollowers}명의 구독자
+            <div className="flex items-center gap-1 rounded-full border border-gray-200 bg-white px-2.5 py-1">
+              <span className="text-xs text-gray-600">구독자</span>
+              <span className="text-sm font-bold text-gray-900">
+                {totalFollowers}
               </span>
             </div>
           </div>

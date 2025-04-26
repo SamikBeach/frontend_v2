@@ -93,10 +93,6 @@ export default function SubscribedLibraries() {
 
   return (
     <>
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">구독한 서재</h2>
-      </div>
-
       {libraries.length === 0 ? (
         <div className="flex min-h-[300px] items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50">
           <div className="text-center">

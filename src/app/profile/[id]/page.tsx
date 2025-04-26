@@ -5,19 +5,23 @@ import { useParams, useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 import { authUtils } from '@/apis/axios';
-import { LibraryCardSkeleton } from '@/components/LibraryCard';
-import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import {
+  ErrorBoundary,
+  ErrorView,
+  HeaderSkeleton,
   Libraries,
+  LibrariesSkeleton,
+  PageSkeleton,
   ProfileHeader,
   ProfileSummary,
   ReadBooks,
   Reviews,
+  SectionSkeleton,
   Stats,
   SubscribedLibraries,
+  SummarySkeleton,
 } from '../components';
-import { ReadBooksSkeleton } from '../components/Sections/ReadBooks';
 
 // 커뮤니티 활동 컴포넌트
 // 임시로 추가한 컴포넌트, 실제로는 해당 컴포넌트 구현 필요
@@ -34,167 +38,6 @@ function Community() {
   );
 }
 
-// 섹션 스켈레톤 - 읽은 책 스켈레톤을 기본으로 사용
-function SectionSkeleton() {
-  return <ReadBooksSkeleton />;
-}
-
-// 헤더 스켈레톤
-function HeaderSkeleton() {
-  return (
-    <div className="bg-white">
-      <div className="mx-auto w-full px-4 pb-6">
-        <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-32 w-32 rounded-full" />
-            <div className="flex flex-col gap-2">
-              <Skeleton className="h-8 w-48" />
-              <Skeleton className="h-4 w-64" />
-              <div className="mt-2 flex gap-3">
-                <Skeleton className="h-5 w-20" />
-                <Skeleton className="h-5 w-20" />
-              </div>
-            </div>
-          </div>
-          <Skeleton className="mt-4 h-10 w-32 rounded-full sm:mt-0" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 서재 스켈레톤
-function LibrariesSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, index) => (
-        <LibraryCardSkeleton key={index} />
-      ))}
-    </div>
-  );
-}
-
-// 서머리 스켈레톤
-function SummarySkeleton() {
-  return (
-    <div className="border-t border-gray-100 bg-white">
-      <div className="mx-auto w-full px-4 py-6">
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-6">
-          {Array.from({ length: 6 }).map((_, index) => (
-            <Skeleton
-              key={index}
-              className={`flex h-[133px] w-full flex-col items-center rounded-lg p-4 ${
-                index === 0
-                  ? 'bg-violet-100'
-                  : index < 4
-                    ? 'bg-gray-50'
-                    : 'border border-gray-200 bg-white'
-              }`}
-            >
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                  index === 0 ? 'bg-violet-200' : ''
-                }`}
-              >
-                <Skeleton className="h-5 w-5" />
-              </div>
-              <div className="mt-2 w-full">
-                <Skeleton className="mx-auto mb-1 h-6 w-1/2" />
-                <Skeleton className="mx-auto h-4 w-2/3" />
-              </div>
-            </Skeleton>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 페이지 로딩 스켈레톤
-function PageSkeleton() {
-  return (
-    <div className="bg-white">
-      <HeaderSkeleton />
-      <SummarySkeleton />
-      <div className="mx-auto w-full px-4">
-        <SectionSkeleton />
-      </div>
-    </div>
-  );
-}
-
-// 로그인 필요 상태 컴포넌트
-function LoginRequired() {
-  const router = useRouter();
-
-  return (
-    <div className="flex h-[50vh] w-full flex-col items-center justify-center bg-gray-50 p-8 text-center">
-      <h2 className="mb-3 text-2xl font-semibold text-gray-800">
-        로그인이 필요합니다
-      </h2>
-      <p className="mb-6 max-w-md text-gray-600">
-        프로필 정보를 보려면 로그인이 필요합니다. 계정이 없으시면 회원가입을
-        해주세요.
-      </p>
-      <div className="flex gap-4">
-        <Button onClick={() => router.push('/auth/login')}>로그인</Button>
-        <Button variant="outline" onClick={() => router.push('/auth/signup')}>
-          회원가입
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-// 오류 상태 컴포넌트
-function ErrorState({ onRetry }: { onRetry: () => void }) {
-  return (
-    <div className="flex h-[50vh] w-full flex-col items-center justify-center bg-gray-50 p-8 text-center">
-      <h2 className="mb-3 text-2xl font-semibold text-gray-800">
-        정보를 불러올 수 없습니다
-      </h2>
-      <p className="mb-6 max-w-md text-gray-600">
-        프로필 정보를 불러오는 중 문제가 발생했습니다.
-      </p>
-      <Button onClick={onRetry}>다시 시도</Button>
-    </div>
-  );
-}
-
-// 에러 바운더리 역할을 하는 컴포넌트 (런타임에서만 사용됨)
-function ErrorBoundary({ children }: { children: React.ReactNode }) {
-  const [hasError, setHasError] = useState(false);
-  const router = useRouter();
-
-  useEffect(() => {
-    // 전역 에러 핸들러 등록
-    const handleError = () => {
-      setHasError(true);
-    };
-
-    window.addEventListener('error', handleError);
-    window.addEventListener('unhandledrejection', handleError);
-
-    return () => {
-      window.removeEventListener('error', handleError);
-      window.removeEventListener('unhandledrejection', handleError);
-    };
-  }, []);
-
-  if (hasError) {
-    return (
-      <ErrorState
-        onRetry={() => {
-          setHasError(false);
-          router.refresh();
-        }}
-      />
-    );
-  }
-
-  return <>{children}</>;
-}
-
 export default function ProfilePage() {
   const params = useParams();
   const userId = Number(params.id as string);
@@ -206,6 +49,7 @@ export default function ProfilePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   // 선택한 메뉴 아이템에 기반한 섹션 상태
   const [selectedSection, setSelectedSection] = useState(activeSection);
@@ -217,6 +61,9 @@ export default function ProfilePage() {
       try {
         const isAuth = authUtils.isAuthenticated();
         setIsAuthenticated(isAuth);
+        if (!isAuth) {
+          setShowAuthDialog(true);
+        }
       } catch (error) {
         console.error('인증 상태 확인 중 오류 발생:', error);
         setHasError(true);
@@ -257,14 +104,9 @@ export default function ProfilePage() {
     return <PageSkeleton />;
   }
 
-  // 클라이언트 사이드이고, 인증되지 않았으면 로그인 필요 상태 표시
-  if (isClient && !isAuthenticated) {
-    return <LoginRequired />;
-  }
-
   // 오류 상태면 오류 컴포넌트 표시
   if (hasError) {
-    return <ErrorState onRetry={handleRetry} />;
+    return <ErrorView onRetry={handleRetry} />;
   }
 
   // 선택된 섹션에 따라 컨텐츠 렌더링
@@ -317,6 +159,17 @@ export default function ProfilePage() {
 
   return (
     <ErrorBoundary>
+      {/* 로그인 다이얼로그 */}
+      <AuthDialog
+        open={showAuthDialog}
+        onOpenChange={open => {
+          setShowAuthDialog(open);
+          if (!open) {
+            router.push('/');
+          }
+        }}
+      />
+
       <div className="bg-white">
         {/* 프로필 헤더 */}
         <Suspense fallback={<HeaderSkeleton />}>

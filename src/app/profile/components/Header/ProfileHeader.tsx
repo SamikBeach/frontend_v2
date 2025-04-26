@@ -24,7 +24,6 @@ export default function ProfileHeader() {
     user,
     followers,
     following,
-    isEditable,
     isFollowing: initialIsFollowing,
   } = profileData;
 
