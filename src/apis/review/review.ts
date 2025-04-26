@@ -1,5 +1,6 @@
 import api from '../axios';
 import {
+  BookReviewsResponse,
   Comment,
   CommentsResponse,
   CreateCommentDto,
@@ -67,7 +68,7 @@ export const createReview = async (
     payload.isbn = data.isbn;
   }
 
-  const response = await api.post<ReviewResponseDto>('/review', payload);
+  const response = await api.post<any>('/review', payload);
   return response.data;
 };
 
@@ -145,11 +146,15 @@ export const unlikeReview = async (reviewId: number): Promise<void> => {
 /**
  * 리뷰의 댓글 목록 조회
  */
-export const getCommentsByReviewId = async (
+export const getReviewComments = async (
   reviewId: number
-): Promise<Comment[]> => {
-  const response = await api.get<Comment[]>(`/review/${reviewId}/comment`);
-  return response.data;
+): Promise<CommentsResponse> => {
+  const response = await api.get<any>(`/review/${reviewId}/comment`);
+
+  // 백엔드 API 응답 구조에 맞게 처리
+  return {
+    comments: response.data?.comments || response.data || [],
+  };
 };
 
 /**
@@ -159,7 +164,7 @@ export const createComment = async (
   reviewId: number,
   data: CreateCommentDto
 ): Promise<Comment> => {
-  const response = await api.post<Comment>(`/review/${reviewId}/comment`, data);
+  const response = await api.post<any>(`/review/${reviewId}/comment`, data);
   return response.data;
 };
 
@@ -176,13 +181,14 @@ export const deleteComment = async (commentId: number): Promise<void> => {
 export const getPopularReviewsForHome = async (
   limit: number = 4
 ): Promise<HomePopularReviewsResponse> => {
-  const response = await api.get<HomePopularReviewsResponse>(
-    '/review/popular/home',
-    {
-      params: { limit },
-    }
-  );
-  return response.data;
+  const response = await api.get<any>('/review/popular/home', {
+    params: { limit },
+  });
+
+  // 서버 응답이 배열 형태이거나 다른 형태일 수 있으므로 유연하게 처리
+  return {
+    reviews: Array.isArray(response.data) ? response.data : response.data || [],
+  };
 };
 
 /**
@@ -194,10 +200,23 @@ export const getBookReviews = async (
   limit: number = 10,
   sort: 'likes' | 'comments' | 'recent' = 'likes',
   isbn?: string
-): Promise<ReviewsResponse> => {
-  const response = await api.get<ReviewsResponse>(`/review/book/${bookId}`, {
-    params: { page, limit, sort, isbn },
-  });
+): Promise<BookReviewsResponse> => {
+  // 추가 파라미터 설정
+  const additionalParams: Record<string, string | number> = {
+    bookId,
+  };
+
+  // ISBN이 있는 경우 추가
+  if (isbn) {
+    additionalParams.isbn = isbn;
+  }
+
+  const response = await api.get<BookReviewsResponse>(
+    `/review/book/${bookId}`,
+    {
+      params: { page, limit, sort, isbn },
+    }
+  );
   return response.data;
 };
 
@@ -213,18 +232,6 @@ export const addReviewComment = async (
 };
 
 /**
- * 리뷰의 댓글 목록 조회
- */
-export const getReviewComments = async (
-  reviewId: number
-): Promise<CommentsResponse> => {
-  const response = await api.get<CommentsResponse>(
-    `/review/${reviewId}/comment`
-  );
-  return response.data;
-};
-
-/**
  * 댓글 수정
  */
 export const updateComment = async (
@@ -236,4 +243,58 @@ export const updateComment = async (
     data
   );
   return response.data;
+};
+
+/**
+ * 댓글 좋아요
+ */
+export const likeComment = async (commentId: number): Promise<void> => {
+  await api.post(`/review/comment/${commentId}/like`);
+};
+
+/**
+ * 댓글 좋아요 취소
+ */
+export const unlikeComment = async (commentId: number): Promise<void> => {
+  await api.delete(`/review/comment/${commentId}/like`);
+};
+
+/**
+ * 리뷰 목록 조회 (필터링, 페이지네이션 지원)
+ */
+export const getReviews = async (
+  page: number = 1,
+  limit: number = 10,
+  filter: 'popular' | 'recent' | 'following' = 'recent',
+  type?: ReviewType,
+  additionalParams?: Record<string, string | number>
+): Promise<ReviewsResponse> => {
+  // API 요청 파라미터 설정
+  const params: Record<string, string | number> = {
+    page,
+    limit,
+    filter, // 백엔드 API에서 filter 파라미터로 정렬 방식 지정
+  };
+
+  // 특정 리뷰 타입 필터링
+  if (type) {
+    params.type = type;
+  }
+
+  // 추가 파라미터 병합
+  if (additionalParams) {
+    Object.assign(params, additionalParams);
+  }
+
+  // API 요청
+  const response = await api.get<any>('/review', { params });
+
+  // 백엔드 응답 구조에 맞게 변환
+  return {
+    reviews: response.data?.reviews || response.data?.data || [],
+    total: response.data?.total || response.data?.meta?.total || 0,
+    page: response.data?.page || response.data?.meta?.page || page,
+    totalPages:
+      response.data?.totalPages || response.data?.meta?.totalPages || 1,
+  };
 };

@@ -1,3 +1,3 @@
 export * from './library';
-export * from './tag';
+export * from './library-tag';
 export * from './types';

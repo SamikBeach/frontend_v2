@@ -22,13 +22,13 @@ function enrichBookDetails(book: Book): BookDetails {
 }
 
 export function useBookDetails() {
-  const { isbn } = useDialogQuery({ type: 'book' });
+  const { id } = useDialogQuery({ type: 'book' });
   const { libraries } = useUserLibraries();
 
-  // 책 상세 정보 가져오기 (ISBN으로 API 호출)
+  // 책 상세 정보 가져오기 (ISBN 또는 ID로 API 호출)
   const { data: book } = useSuspenseQuery({
-    queryKey: ['book-detail', isbn],
-    queryFn: () => (isbn ? getBookByIsbn(isbn) : null),
+    queryKey: ['book-detail', id],
+    queryFn: () => (id ? getBookByIsbn(id) : null),
   });
 
   // 상세 정보와 UI에 필요한 추가 정보를 합침
@@ -36,7 +36,7 @@ export function useBookDetails() {
 
   return {
     book: displayBook,
-    isbn: isbn || '',
+    isbn: id || '', // 변수명은 유지하되 id 값을 사용
     userLibraries: libraries,
     userRating: displayBook?.userRating || null,
     userReadingStatus: displayBook?.userReadingStatus

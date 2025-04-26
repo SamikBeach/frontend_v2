@@ -5,12 +5,14 @@ import {
   communitySortOptionAtom,
   communityTypeFilterAtom,
 } from '@/atoms/community';
-import { LoadingSpinner } from '@/components';
+import { ReviewCard } from '@/components/ReviewCard';
 import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
-import { CreateReviewCard, FilterBar, ReviewCard } from './components';
+import { CreateReviewCard, FilterArea } from './components';
 import { useCommunityReviews } from './hooks';
 
 // 로딩 상태 컴포넌트
@@ -134,14 +136,16 @@ function CommunityContent() {
   };
 
   return (
-    <div className="mx-auto max-w-3xl px-4 pt-2 pb-3">
-      {/* 필터 바 */}
-      <FilterBar
-        selectedCategory={typeFilter}
-        selectedSort={sortOption}
-        onCategoryClick={handleTypeFilterChange}
-        onSortClick={handleSortOptionChange}
-      />
+    <div className="px-4 pb-3">
+      {/* 필터 바 - 스크롤 시 상단에 고정 */}
+      <div className="sticky top-[56px] z-30 bg-white pt-4 pb-2">
+        <FilterArea
+          selectedCategory={typeFilter}
+          selectedSort={sortOption}
+          onCategoryClick={handleTypeFilterChange}
+          onSortClick={handleSortOptionChange}
+        />
+      </div>
 
       {/* 메인 콘텐츠 */}
       <div className="pt-2">
@@ -159,7 +163,7 @@ function CommunityContent() {
 
 export default function CommunityPage() {
   return (
-    <div className="bg-white pb-8">
+    <div className={cn('mx-auto max-w-3xl bg-white pb-8')}>
       <CommunityContent />
     </div>
   );

@@ -1,4 +1,6 @@
 import { Badge } from '@/components/ui/badge';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useCallback } from 'react';
@@ -6,6 +8,7 @@ import { useBookDetails } from '../hooks';
 
 export function BookCoverSection() {
   const { book, isbn } = useBookDetails();
+  const isMobile = useIsMobile();
 
   // 알라딘으로 이동하는 함수
   const handleOpenAladin = useCallback(() => {
@@ -30,25 +33,38 @@ export function BookCoverSection() {
     : '';
 
   return (
-    <>
+    <div className={cn('flex', isMobile ? 'flex-col gap-4' : 'flex-col gap-3')}>
       {/* 책 표지 이미지 */}
       <div
-        className="relative aspect-[3/4] cursor-pointer overflow-hidden rounded-2xl bg-gray-50"
+        className={cn(
+          'relative overflow-hidden rounded-2xl bg-gray-50',
+          isMobile
+            ? 'mx-auto w-44 cursor-pointer' // 약간 넓게 조정
+            : 'flex w-full cursor-pointer items-center justify-center'
+        )}
         onClick={handleOpenAladin}
       >
         <img
           src={book.coverImage}
           alt={book.title}
-          className="h-full w-full object-cover"
+          className="h-auto w-full object-contain"
           loading="eager"
         />
       </div>
 
       {/* 책 정보(제목, 저자, 출판사, 출간일)는 이미지 아래에 배치 */}
-      <div className="space-y-2">
-        <div className="flex items-start gap-2">
+      <div className={cn('space-y-2', isMobile ? 'px-1 text-center' : '')}>
+        <div
+          className={cn(
+            'items-start gap-2',
+            isMobile ? 'flex flex-col items-center' : 'flex'
+          )}
+        >
           <h2
-            className="cursor-pointer text-xl font-bold text-gray-900"
+            className={cn(
+              'cursor-pointer font-bold text-gray-900',
+              isMobile ? 'line-clamp-2 text-lg' : 'text-xl'
+            )}
             onClick={handleOpenAladin}
           >
             {book.title}
@@ -56,7 +72,12 @@ export function BookCoverSection() {
 
           {/* 카테고리 태그 - 제목 우측으로 이동 */}
           {(book.category || book.subcategory) && (
-            <div className="mt-1 flex flex-wrap gap-1">
+            <div
+              className={cn(
+                'flex flex-wrap gap-1',
+                isMobile ? 'mt-1 justify-center' : 'mt-1'
+              )}
+            >
               {book.category && (
                 <Badge className="rounded-full bg-gray-800 px-2 py-0.5 text-[10px] font-medium text-white">
                   {book.category.name}
@@ -71,7 +92,9 @@ export function BookCoverSection() {
           )}
         </div>
 
-        <p className="text-gray-700">{book.author}</p>
+        <p className={cn('text-gray-700', isMobile ? 'text-sm' : '')}>
+          {book.author}
+        </p>
 
         {book.publisher && (
           <p className="text-sm text-gray-500">{book.publisher}</p>
@@ -80,6 +103,6 @@ export function BookCoverSection() {
           <p className="text-sm text-gray-500">출간일: {formattedDate}</p>
         )}
       </div>
-    </>
+    </div>
   );
 }

@@ -1,27 +1,42 @@
 import api from '../axios';
 import {
+  AddBookResponse,
+  AddBooksToLibraryDto,
   AddBookToLibraryDto,
   AddTagToLibraryDto,
   CreateLibraryDto,
   HomePopularLibrariesResponse,
-  LibrariesForBookResponse,
   Library,
   LibraryBook,
-  LibrarySummary,
+  LibrarySortOption,
   LibraryTag,
-  SubscriberInfo,
+  PaginatedLibraryResponse,
   UpdateHistoryItem,
   UpdateLibraryDto,
+  UserInfo,
 } from './types';
 
 /**
- * 모든 서재 목록 조회 (공개된 서재만)
+ * 모든 서재 목록 조회 (공개된 서재만) - 페이지네이션, 검색, 정렬, 태그 필터링 지원
  */
 export const getAllLibraries = async (
-  userId?: number
-): Promise<LibrarySummary[]> => {
-  const params = userId ? { userId: userId.toString() } : undefined;
-  const response = await api.get<LibrarySummary[]>('/library', { params });
+  page: number = 1,
+  limit: number = 10,
+  sort?: LibrarySortOption,
+  query?: string,
+  tagId?: number
+): Promise<PaginatedLibraryResponse> => {
+  const params: Record<string, string> = {};
+
+  if (page) params.page = page.toString();
+  if (limit) params.limit = limit.toString();
+  if (sort) params.sort = sort;
+  if (query && query.trim() !== '') params.query = query;
+  if (tagId) params.tagId = tagId.toString();
+
+  const response = await api.get<PaginatedLibraryResponse>('/library', {
+    params,
+  });
   return response.data;
 };
 
@@ -30,12 +45,15 @@ export const getAllLibraries = async (
  */
 export const getLibrariesByUser = async (
   userId: number,
-  requestingUserId?: number
-): Promise<LibrarySummary[]> => {
-  const params = requestingUserId
-    ? { requestingUserId: requestingUserId.toString() }
-    : undefined;
-  const response = await api.get<LibrarySummary[]>(`/library/user/${userId}`, {
+  requestingUserId?: number,
+  sort?: LibrarySortOption
+): Promise<Library[]> => {
+  const params: Record<string, string> = {};
+
+  if (requestingUserId) params.requestingUserId = requestingUserId.toString();
+  if (sort) params.sort = sort;
+
+  const response = await api.get<Library[]>(`/library/user/${userId}`, {
     params,
   });
   return response.data;
@@ -44,8 +62,16 @@ export const getLibrariesByUser = async (
 /**
  * 사용자가 구독한 서재 목록 조회
  */
-export const getSubscribedLibraries = async (): Promise<LibrarySummary[]> => {
-  const response = await api.get<LibrarySummary[]>('/library/subscribed');
+export const getSubscribedLibraries = async (
+  sort?: LibrarySortOption
+): Promise<Library[]> => {
+  const params: Record<string, string> = {};
+
+  if (sort) params.sort = sort;
+
+  const response = await api.get<Library[]>('/library/subscribed', {
+    params,
+  });
   return response.data;
 };
 
@@ -154,8 +180,8 @@ export const unsubscribeFromLibrary = async (
  */
 export const getLibrarySubscribers = async (
   libraryId: number
-): Promise<SubscriberInfo[]> => {
-  const response = await api.get<SubscriberInfo[]>(
+): Promise<UserInfo[]> => {
+  const response = await api.get<UserInfo[]>(
     `/library/${libraryId}/subscribers`
   );
   return response.data;
@@ -218,13 +244,34 @@ export const getLibrariesByBookId = async (
   bookId: number,
   page: number = 1,
   limit: number = 10,
-  isbn?: string
-): Promise<LibrariesForBookResponse> => {
-  const response = await api.get<LibrariesForBookResponse>(
+  isbn?: string,
+  sort?: LibrarySortOption
+): Promise<PaginatedLibraryResponse> => {
+  const params: Record<string, string> = {};
+
+  if (page) params.page = page.toString();
+  if (limit) params.limit = limit.toString();
+  if (isbn) params.isbn = isbn;
+  if (sort) params.sort = sort;
+
+  const response = await api.get<PaginatedLibraryResponse>(
     `/library/book/${bookId}`,
-    {
-      params: { page, limit, isbn },
-    }
+    { params }
+  );
+
+  return response.data;
+};
+
+/**
+ * 서재에 여러 권의 책 추가
+ */
+export const addBooksToLibrary = async (
+  libraryId: number,
+  addBooksToLibraryDto: AddBooksToLibraryDto
+): Promise<AddBookResponse> => {
+  const response = await api.post<AddBookResponse>(
+    `/library/${libraryId}/books/batch`,
+    addBooksToLibraryDto
   );
   return response.data;
 };

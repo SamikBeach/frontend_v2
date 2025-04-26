@@ -1,39 +1,29 @@
-import { LibrarySummary } from '@/apis/library/types';
-import {
-  SortOption as BaseSortOption,
-  TimeRange,
-} from '@/components/SortDropdown';
+import { Library as ApiLibrary, BookPreview } from '@/apis/library/types';
+import { TimeRange } from '@/components/SortDropdown';
+import { ReactNode } from 'react';
 
-// 서재 카테고리 타입
-export interface Category {
+// 서재 태그 타입
+export interface Tag {
   id: string;
   name: string;
   color: string;
 }
 
-// 책 정보 타입
-export interface Book {
-  id: number;
-  title: string;
-  author: string;
-  coverImage: string;
-}
-
-// 사용자 프로필 타입
+// 사용자 프로필 타입 (UI에서만 사용되는 확장된 타입)
 export interface UserProfile {
   name: string;
   username: string;
   avatar: string;
 }
 
-// 서재 타입
+// 서재 타입 (UI에서만 사용되는 확장된 타입)
 export interface Library {
   id: number;
   title: string;
   description: string;
-  category: string;
+  tag: string;
   owner: UserProfile;
-  books: Book[];
+  books: BookPreview[];
   followers: number;
   isPublic: boolean;
   tags: string[];
@@ -41,20 +31,25 @@ export interface Library {
 }
 
 // 정렬 옵션 타입 (라이브러리 용)
-export type SortOption = BaseSortOption<LibrarySummary>;
+export interface SortOption {
+  id: string;
+  label: string;
+  icon: ReactNode;
+  sortFn?: (a: ApiLibrary, b: ApiLibrary) => number;
+}
 
-// 카테고리 버튼 속성
-export interface CategoryButtonProps {
-  category: Category;
+// 태그 버튼 속성
+export interface TagButtonProps {
+  tag: Tag;
   isSelected: boolean;
   onClick: (id: string) => void;
 }
 
 // 필터바 속성
 export interface FilterBarProps {
-  categories: Category[];
-  selectedCategory: string;
-  onCategoryClick: (id: string) => void;
+  tags: Tag[];
+  selectedTag: string;
+  onTagClick: (id: string) => void;
 }
 
 // 정렬 드롭다운 속성
@@ -70,12 +65,12 @@ export interface SortDropdownProps {
 
 // 서재 카드 속성
 export interface LibraryCardProps {
-  library: import('@/apis/library/types').LibrarySummary;
+  library: ApiLibrary;
 }
 
 // 책 이미지 속성
 export interface BookImageProps {
-  book: Book;
+  book: BookPreview;
 }
 
 // 태그 목록 속성
@@ -92,5 +87,5 @@ export interface SearchBarProps {
 // 빈 상태 표시 속성
 export interface EmptyStateProps {
   searchQuery: string;
-  selectedCategory: string;
+  selectedTag: string;
 }

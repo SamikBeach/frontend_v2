@@ -2,16 +2,17 @@
 
 import { Command, CommandInput } from '@/components/ui/command';
 import {
-  Dialog,
-  DialogContent,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  ResponsiveDialog,
+  ResponsiveDialogClose,
+  ResponsiveDialogContent,
+  ResponsiveDialogPortal,
+  ResponsiveDialogTitle,
+} from '@/components/ui/responsive-dialog';
 import { useDialogQuery } from '@/hooks';
 import { useDebounce } from '@/hooks/useDebounce';
+import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
+import { Loader2, X } from 'lucide-react';
 import { MutableRefObject, Suspense, useEffect, useRef, useState } from 'react';
 import { SearchResults } from './SearchResults';
 import { useSearchQuery } from './hooks';
@@ -75,13 +76,8 @@ function SearchResultsLoader({
   );
 }
 
-export function BookSearchDialog({
-  isOpen,
-  setIsOpen,
-  overlayClassName = 'bg-transparent',
-}: BookSearchDialogProps) {
+export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 300);
   const inputRef = useRef<HTMLInputElement>(null);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
   const queryClient = useQueryClient();
@@ -119,19 +115,20 @@ export function BookSearchDialog({
   }, [isOpen, queryClient]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogPortal>
-        <DialogOverlay
-          className={`data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 ${overlayClassName}`}
-          onClick={handleClose}
-        />
-        <DialogContent
-          className={`fixed top-[6px] left-1/2 z-50 w-[800px] max-w-[calc(100vw-32px)] ${
-            query ? 'h-[calc(100vh-32px)]' : 'max-h-[800px]'
-          } -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full`}
-          overlayClassName={overlayClassName}
-          closeClassName="hidden"
-          aria-describedby={undefined}
+    <ResponsiveDialog
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      shouldScaleBackground={false}
+    >
+      <ResponsiveDialogPortal>
+        <ResponsiveDialogContent
+          className={cn(
+            'animate-expandDown fixed top-[6px] left-1/2 z-[100] max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
+            query ? 'h-[calc(100vh-32px)]' : 'auto'
+          )}
+          drawerClassName="animate-expandUp gap-1 p-0 shadow-none outline-none z-[100]"
+          hideCloseButton
+          overlayClassName="bg-black/5"
           onOpenAutoFocus={e => {
             e.preventDefault();
             setTimeout(() => {
@@ -139,24 +136,26 @@ export function BookSearchDialog({
             }, 100);
           }}
         >
-          <DialogTitle className="sr-only">도서 검색</DialogTitle>
+          <ResponsiveDialogTitle className="sr-only" drawerClassName="sr-only">
+            도서 검색
+          </ResponsiveDialogTitle>
           <div
-            className={`animate-expandDown flex ${
-              query ? 'h-full max-h-full' : 'auto'
-            } flex-col overflow-hidden rounded-xl bg-white p-4 shadow-lg ring-1 ring-black/5 transition-all`}
-            style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
+            className={cn(
+              'animate-expandDown flex h-full w-full flex-col overflow-hidden rounded-xl bg-white p-4 ring-1 ring-black/5 transition-all',
+              query
+                ? 'h-full max-h-full'
+                : view === 'recent'
+                  ? 'h-auto max-h-[640px]'
+                  : 'auto',
+              'max-md:h-screen max-md:rounded-none max-md:p-4 max-md:pt-0 max-md:pb-0 max-md:ring-0'
+            )}
           >
             <Command
               className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
               shouldFilter={false}
               loop={true}
             >
-              <div className="sticky top-0 z-10 flex-shrink-0 border-b border-gray-200 bg-white">
+              <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-100 bg-white">
                 <CommandInput
                   ref={inputRef}
                   value={query}
@@ -168,7 +167,7 @@ export function BookSearchDialog({
               <div className="flex-1 overflow-y-auto">
                 <Suspense
                   fallback={
-                    <div className="flex h-[540px] w-full translate-y-20 items-center justify-center">
+                    <div className="flex h-full w-full items-center justify-center">
                       <div className="flex flex-col items-center justify-center">
                         <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
                       </div>
@@ -186,8 +185,15 @@ export function BookSearchDialog({
               </div>
             </Command>
           </div>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
+          <ResponsiveDialogClose
+            className="absolute top-6 right-6 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none"
+            drawerClassName="absolute top-4 right-4 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none z-30"
+          >
+            <X className="h-5 w-5" />
+            <span className="sr-only">Close</span>
+          </ResponsiveDialogClose>
+        </ResponsiveDialogContent>
+      </ResponsiveDialogPortal>
+    </ResponsiveDialog>
   );
 }

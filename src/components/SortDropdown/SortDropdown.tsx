@@ -1,6 +1,5 @@
 import {
   ArrowDownAZ,
-  ArrowUpDown,
   Calendar,
   CalendarClock,
   CalendarDays,
@@ -104,6 +103,15 @@ interface SortDropdownProps<T = Book> {
   onTimeRangeChange?: (range: TimeRange) => void;
 }
 
+// 정렬 기준별 텍스트
+const SORT_LABELS: Record<string, string> = {
+  popular: '인기순',
+  books: '담긴 책 많은 순',
+  latest: '최신순',
+  title: '제목순',
+  relevance: '관련도순',
+};
+
 export function SortDropdown<T = Book>({
   selectedSort,
   onSortChange,
@@ -126,6 +134,9 @@ export function SortDropdown<T = Book>({
   const showTimeRangeFilter =
     currentSortOption.supportsTimeRange && onTimeRangeChange;
 
+  // 버튼에 표시할 정렬 텍스트
+  const sortButtonText = SORT_LABELS[selectedSort] || currentSortOption.label;
+
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       {showTimeRangeFilter && (
@@ -143,7 +154,7 @@ export function SortDropdown<T = Book>({
             {timeRangeOptions.map(option => (
               <DropdownMenuItem
                 key={option.id}
-                className={`flex items-center ${
+                className={`flex cursor-pointer items-center ${
                   option.id === selectedTimeRange
                     ? 'bg-gray-50 font-medium text-blue-600'
                     : ''
@@ -161,8 +172,8 @@ export function SortDropdown<T = Book>({
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" className="h-9 border-gray-200 bg-white">
-            <ArrowUpDown className="mr-2 h-4 w-4 text-gray-500" />
-            <span>{currentSortOption.label}</span>
+            {currentSortOption.icon}
+            <span>{sortButtonText}</span>
             <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
           </Button>
         </DropdownMenuTrigger>
@@ -170,7 +181,7 @@ export function SortDropdown<T = Book>({
           {sortOptions.map(option => (
             <DropdownMenuItem
               key={option.id}
-              className={`flex items-center ${
+              className={`flex cursor-pointer items-center ${
                 option.id === selectedSort
                   ? 'bg-gray-50 font-medium text-blue-600'
                   : ''

@@ -9,9 +9,11 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAtom } from 'jotai';
 import { Clock, Flame, MessageSquare } from 'lucide-react';
+import { useState } from 'react';
 
 export function ReviewSortDropdown() {
   const [sort, setSort] = useAtom(bookReviewSortAtom);
+  const [open, setOpen] = useState(false);
 
   // 정렬 옵션 배열 정의 (레이블, 값, 아이콘을 포함)
   const sortOptions = [
@@ -38,10 +40,11 @@ export function ReviewSortDropdown() {
 
   const handleSortChange = (newSort: ReviewSortType) => {
     setSort(newSort);
+    setOpen(false);
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -54,7 +57,7 @@ export function ReviewSortDropdown() {
           {selectedOption.label}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-36">
+      <DropdownMenuContent align="end" className="w-36" sideOffset={8}>
         {sortOptions.map(option => (
           <DropdownMenuItem
             key={option.value}

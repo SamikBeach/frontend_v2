@@ -14,16 +14,6 @@ export const searchBooks = async (
   page: number;
   totalPages: number;
 }> => {
-  // 쿼리가 없는 경우 빈 결과 반환
-  if (!query.trim()) {
-    return {
-      books: [],
-      total: 0,
-      page: 1,
-      totalPages: 0,
-    };
-  }
-
   const { data } = await api.get('/search', {
     params: {
       query,

@@ -55,7 +55,8 @@ export function UserDropdown({ user }: UserDropdownProps) {
   // 사용자 표시 정보 설정
   const displayName = user.name || user.username || user.email.split('@')[0];
   const initial = displayName.charAt(0).toUpperCase();
-  const avatarUrl = user.avatar || `https://i.pravatar.cc/150?u=${user.id}`;
+  const avatarUrl =
+    user.profileImage || `https://i.pravatar.cc/150?u=${user.id}`;
 
   return (
     <DropdownMenu>
@@ -84,19 +85,19 @@ export function UserDropdown({ user }: UserDropdownProps) {
         </div>
         <DropdownMenuSeparator />
         <Link href={`/profile/${user.id}`}>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <UserIcon className="mr-2 h-4 w-4" />
             <span>내 프로필</span>
           </DropdownMenuItem>
         </Link>
         <Link href="/profile/settings">
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <Settings className="mr-2 h-4 w-4" />
             <span>설정</span>
           </DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
           <LogOut className="mr-2 h-4 w-4" />
           <span>로그아웃</span>
         </DropdownMenuItem>

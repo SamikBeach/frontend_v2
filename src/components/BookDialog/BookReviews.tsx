@@ -101,9 +101,11 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
     commentText,
     isSubmitting,
     isDeleting,
+    isLikingComment,
     handleCommentTextChange,
     handleSubmitComment,
     handleDeleteComment,
+    handleLikeComment,
   } = useReviewComments(reviewId);
   const [editingCommentId, setEditingCommentId] = useState<number | null>(null);
   const [editCommentText, setEditCommentText] = useState('');
@@ -187,7 +189,9 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
               onKeyDown={e => {
                 if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                   e.preventDefault();
-                  handleCommentSubmitWithAuth();
+                  if (commentText.trim() && !isSubmitting) {
+                    handleCommentSubmitWithAuth();
+                  }
                 }
               }}
               disabled={isSubmitting}
@@ -217,7 +221,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
             <div key={comment.id} className="flex gap-2 pb-1">
               <Avatar className="mt-1 h-7 w-7 flex-shrink-0 border-0">
                 <AvatarImage
-                  src={comment.author.profileImage || ''}
+                  src={comment.author.profileImage || undefined}
                   alt={comment.author.username}
                 />
                 <AvatarFallback className="bg-gray-200 text-gray-700">
@@ -243,11 +247,22 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                       onKeyDown={e => {
                         if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
                           e.preventDefault();
-                          handleUpdateComment(comment.id);
+                          if (
+                            editCommentText.trim() &&
+                            !updateCommentMutation.isPending
+                          ) {
+                            handleUpdateComment(comment.id);
+                          }
                         }
                       }}
                     />
                     <div className="flex justify-end gap-2">
+                      <div className="mr-auto pl-1 text-xs text-gray-500">
+                        {navigator.platform.includes('Mac')
+                          ? 'Cmd+Enter'
+                          : 'Ctrl+Enter'}
+                        로 저장
+                      </div>
                       <Button
                         variant="outline"
                         size="sm"
@@ -337,6 +352,29 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                     <p className="text-[15px] leading-relaxed whitespace-pre-line text-gray-700">
                       {comment.content}
                     </p>
+
+                    {/* 좋아요 버튼 */}
+                    <div className="mt-1 flex justify-start">
+                      <button
+                        onClick={() =>
+                          handleLikeComment(
+                            comment.id,
+                            comment.isLiked || false
+                          )
+                        }
+                        disabled={isLikingComment}
+                        className={`flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-colors ${
+                          comment.isLiked
+                            ? 'bg-pink-50 text-pink-500'
+                            : 'text-gray-500 hover:bg-gray-100'
+                        }`}
+                      >
+                        <ThumbsUp
+                          className={`h-3 w-3 ${comment.isLiked ? 'fill-pink-500' : ''}`}
+                        />
+                        <span>{comment.likeCount || 0}</span>
+                      </button>
+                    </div>
                   </>
                 )}
               </div>
@@ -555,7 +593,7 @@ function ReviewsList({
               <div className="flex items-start gap-3.5">
                 <Avatar className="mt-0.5 h-9 w-9 flex-shrink-0">
                   <AvatarImage
-                    src={review.author.profileImage || ''}
+                    src={review.author.profileImage || undefined}
                     alt={review.author.username}
                   />
                   <AvatarFallback className="bg-gray-100">

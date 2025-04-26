@@ -10,6 +10,7 @@ export interface User {
   name?: string;
   avatar?: string;
   bio?: string;
+  profileImage?: string;
   provider: AuthProvider;
   providerId?: string;
   status: UserStatus;
@@ -20,10 +21,12 @@ export interface User {
 }
 
 /**
- * 사용자 정보 업데이트 요청
+ * 사용자 정보 업데이트 요청 인터페이스
  */
 export interface UpdateUserInfoRequest {
+  name?: string;
   username?: string;
+  bio?: string;
 }
 
 /**
@@ -71,8 +74,33 @@ export interface UserDetailDto {
   id: number;
   username: string;
   email?: string;
+  bio?: string;
+  profileImage?: string;
   provider: AuthProvider;
   createdAt: Date;
+}
+
+/**
+ * 서재 소유자 DTO
+ */
+export interface LibraryOwnerDto {
+  id: number;
+  username: string;
+  email: string;
+}
+
+/**
+ * 서재 태그 DTO
+ */
+export interface LibraryTagDto {
+  id: number;
+  tagId: number;
+  tagName: string;
+  usageCount: number;
+  libraryId: number;
+  note: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 /**
@@ -84,8 +112,11 @@ export interface LibraryPreviewDto {
   description: string;
   isPublic: boolean;
   subscriberCount: number;
+  owner: LibraryOwnerDto;
+  tags: LibraryTagDto[];
   bookCount: number;
   previewBooks: BookPreviewDto[];
+  isSubscribed: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -143,16 +174,16 @@ export interface UserDetailResponseDto {
   followers: number;
   following: number;
   isEditable: boolean;
+  isFollowing?: boolean;
+  libraries?: LibraryPreviewDto[];
 }
 
 /**
  * 사용자 서재 목록 응답
  */
 export interface UserLibrariesResponseDto {
-  libraries: LibraryPreviewDto[];
+  items: LibraryPreviewDto[];
   total: number;
-  page: number;
-  totalPages: number;
 }
 
 /**
@@ -163,4 +194,111 @@ export interface UserReviewsResponseDto {
   total: number;
   page: number;
   totalPages: number;
+}
+
+/**
+ * 팔로워/팔로잉 사용자 응답 DTO
+ */
+export interface FollowerResponseDto {
+  id: number;
+  username: string;
+  bio?: string;
+  profileImage?: string;
+  isFollowing: boolean;
+}
+
+/**
+ * 팔로워 목록 응답 DTO
+ */
+export interface FollowersListResponseDto {
+  followers: FollowerResponseDto[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+}
+
+/**
+ * 팔로잉 목록 응답 DTO
+ */
+export interface FollowingListResponseDto {
+  following: FollowerResponseDto[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+}
+
+/**
+ * 사용자 책 목록 응답 DTO
+ */
+export interface UserBooksResponseDto {
+  items: ExtendedReadingStatusResponseDto[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+}
+
+/**
+ * 기존 ReadingStatusResponseDto는 계속 유지
+ */
+export interface ReadingStatusResponseDto {
+  id: number;
+  status: string; // 서버에서 "READ", "READING", "WANT_TO_READ" 형식으로 반환됨
+  currentPage?: number;
+  startDate?: Date;
+  finishDate?: Date;
+  readingMemo?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  book: {
+    id: number;
+    title: string;
+    author: string;
+    coverImageUrl: string;
+    isbn: string;
+  };
+}
+
+/**
+ * 확장된 책 정보 DTO
+ */
+export interface ExtendedBookInfoDto {
+  id: number;
+  title: string;
+  author: string;
+  coverImage: string;
+  isbn: string;
+  publisher: string;
+  isbn13?: string;
+  translator?: string;
+  pageCount?: number;
+  publishDate?: Date;
+  rating?: number;
+  reviews?: number;
+  totalRatings?: number;
+  description?: string;
+  tags?: string[];
+  categoryId?: number;
+  subcategoryId?: number;
+  priceSales?: number;
+  priceStandard?: number;
+  isFeatured?: boolean;
+  isDiscovered?: boolean;
+}
+
+/**
+ * 확장된 독서 상태 응답 DTO
+ */
+export interface ExtendedReadingStatusResponseDto {
+  id: number;
+  status: string; // 서버에서 "READ", "READING", "WANT_TO_READ" 형식으로 반환됨
+  currentPage?: number;
+  startDate?: Date;
+  finishDate?: Date;
+  readingMemo?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  book: ExtendedBookInfoDto;
 }

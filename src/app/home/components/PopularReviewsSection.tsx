@@ -23,6 +23,12 @@ export function PopularReviewsSection({
   reviews,
   isLoading = false,
 }: PopularReviewsSectionProps) {
+  // 날짜 포맷팅 함수
+  const formatDate = (dateStr: string | Date) => {
+    const date = new Date(dateStr);
+    return format(date, 'MM.dd', { locale: ko });
+  };
+
   return (
     <section className="h-auto p-4">
       <div className="mb-2 flex items-center justify-between">
@@ -47,47 +53,36 @@ export function PopularReviewsSection({
         <div className="flex h-[200px] items-center justify-center">
           <LoadingSpinner />
         </div>
-      ) : reviews.length === 0 ? (
-        <div className="flex h-[200px] items-center justify-center">
-          <p className="text-sm text-gray-500">인기 게시물이 없습니다.</p>
-        </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4">
           {reviews.slice(0, 2).map(review => (
             <Card
               key={review.id}
-              className="group rounded-xl border border-gray-200"
+              className="border border-gray-200 shadow-none transition-colors hover:bg-gray-50"
             >
-              <Link href={`/community/review/${review.id}`}>
-                <CardHeader className="p-4 pb-3">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9 border-0">
-                      <AvatarImage
-                        src={`https://i.pravatar.cc/150?u=${review.id}`}
-                        alt={review.authorName}
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="bg-gray-100 text-gray-800">
-                        {review.authorName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="rounded-full px-2 py-0.5 text-[11px] font-medium text-gray-700"
-                          style={{
-                            backgroundColor: getReviewTypeColor(review.type),
-                          }}
-                        >
-                          {getReviewTypeName(review.type)}
-                        </span>
-                        <p className="text-xs text-gray-500">
-                          {review.authorName} · {formatDate(review.createdAt)}
-                        </p>
+              <Link href={`/community?review=${review.id}`}>
+                <CardHeader className="p-4 pb-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage
+                          src={`https://i.pravatar.cc/150?u=${review.authorName}`}
+                          alt={review.authorName}
+                        />
+                        <AvatarFallback>
+                          {review.authorName?.charAt(0).toUpperCase() || '?'}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">{review.authorName}</div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-500">
+                            {review.createdAt
+                              ? formatDate(review.createdAt)
+                              : ''}
+                          </span>
+                        </div>
                       </div>
-                      <p className="mt-1 line-clamp-1 text-[15px] font-medium text-gray-900 transition-colors duration-150 group-hover:text-[#3182F6]">
-                        {review.content}
-                      </p>
                     </div>
                   </div>
                 </CardHeader>
@@ -122,11 +117,11 @@ export function PopularReviewsSection({
                   <div className="flex gap-4">
                     <div className="flex items-center gap-1.5">
                       <ThumbsUp className="h-3.5 w-3.5 text-gray-400" />
-                      <span>{review.likeCount}</span>
+                      <span>{review.likeCount || 0}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                       <MessageCircle className="h-3.5 w-3.5 text-gray-400" />
-                      <span>{review.commentCount}</span>
+                      <span>{review.commentCount || 0}</span>
                     </div>
                   </div>
                 </CardFooter>
@@ -172,23 +167,5 @@ function getReviewTypeName(type: ReviewType): string {
       return '모임';
     default:
       return '일반';
-  }
-}
-
-// 날짜 포맷
-function formatDate(date: string | Date): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  const now = new Date();
-  const diffTime = Math.abs(now.getTime() - dateObj.getTime());
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-  if (diffDays < 1) {
-    return format(dateObj, '오늘 a h시 m분', { locale: ko });
-  } else if (diffDays < 2) {
-    return format(dateObj, '어제 a h시 m분', { locale: ko });
-  } else if (diffDays < 7) {
-    return format(dateObj, 'eeee', { locale: ko });
-  } else {
-    return format(dateObj, 'yyyy년 MM월 dd일', { locale: ko });
   }
 }

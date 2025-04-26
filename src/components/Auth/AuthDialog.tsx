@@ -1,13 +1,14 @@
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 import { Logo } from '../Logo';
 import { Button } from '../ui/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '../ui/dialog';
+  ResponsiveDialog,
+  ResponsiveDialogContent,
+  ResponsiveDialogHeader,
+  ResponsiveDialogTitle,
+  ResponsiveDialogTrigger,
+} from '../ui/responsive-dialog';
 import { LoginForm } from './LoginForm';
 import { ResetPasswordForm } from './ResetPasswordForm';
 import { SignUpForm } from './SignUpForm';
@@ -23,7 +24,7 @@ export type AuthMode =
   | 'resetPassword'; // 비밀번호 재설정
 
 interface AuthDialogProps
-  extends React.ComponentPropsWithoutRef<typeof Dialog> {
+  extends React.ComponentPropsWithoutRef<typeof ResponsiveDialog> {
   initialMode?: AuthMode;
 }
 
@@ -37,6 +38,7 @@ export function AuthDialog({
   const [email, setEmail] = useState<string>('');
   // 이전 모드 저장용 히스토리
   const [modeHistory, setModeHistory] = useState<AuthMode[]>([]);
+  const isMobile = useIsMobile();
 
   // 다이얼로그 외부 클릭 처리 (일부 모드에서는 닫기 방지)
   const handlePointerDownOutside = (e: Event) => {
@@ -96,7 +98,7 @@ export function AuthDialog({
   const showBackButton = mode !== 'login';
 
   return (
-    <Dialog
+    <ResponsiveDialog
       {...props}
       onOpenChange={open => {
         // 다이얼로그가 닫힐 때 상태 초기화
@@ -109,15 +111,23 @@ export function AuthDialog({
         }
         props.onOpenChange?.(open);
       }}
+      snapPoints={[1]}
+      shouldScaleBackground={false}
     >
-      <DialogContent
-        className="absolute top-1/2 left-1/2 w-[400px] max-w-[90vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-2xl border-0 p-0 shadow-xl"
+      <ResponsiveDialogContent
+        className="w-[400px] max-w-[90vw] overflow-hidden rounded-2xl border-0 p-0 shadow-xl"
+        drawerClassName="w-full max-w-none overflow-hidden rounded-t-[16px] border-0 p-0 shadow-xl h-[100dvh]"
         onPointerDownOutside={handlePointerDownOutside}
-        aria-describedby={undefined}
+        hideCloseButton
       >
         {/* 헤더 - 로고와 뒤로가기 버튼 */}
-        <DialogHeader className="relative flex h-14 items-center justify-center border-b border-gray-100 px-6">
-          <DialogTitle className="sr-only">로그인 / 회원가입</DialogTitle>
+        <ResponsiveDialogHeader
+          className="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
+          drawerClassName="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
+        >
+          <ResponsiveDialogTitle className="sr-only" drawerClassName="sr-only">
+            로그인 / 회원가입
+          </ResponsiveDialogTitle>
           {showBackButton && (
             <Button
               variant="ghost"
@@ -144,10 +154,14 @@ export function AuthDialog({
             </Button>
           )}
           <Logo />
-        </DialogHeader>
+        </ResponsiveDialogHeader>
 
         {/* 폼 컨테이너 */}
-        <div className="max-h-[80vh] overflow-y-auto px-7 py-6">
+        <div
+          className={`${
+            isMobile ? 'flex-1 overflow-y-auto' : 'max-h-[80vh] overflow-y-auto'
+          } px-7 py-6`}
+        >
           {/* 로그인 폼 */}
           {mode === 'login' && (
             <LoginForm
@@ -188,10 +202,10 @@ export function AuthDialog({
             />
           )}
         </div>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   );
 }
 
 // 트리거 컴포넌트 익스포트
-AuthDialog.Trigger = DialogTrigger;
+AuthDialog.Trigger = ResponsiveDialogTrigger;

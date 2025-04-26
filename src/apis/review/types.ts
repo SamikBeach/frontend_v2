@@ -35,6 +35,7 @@ export interface ReviewResponseDto {
   author: Author;
   images: ReviewImage[];
   books: ReviewBook[];
+  authorRatings?: AuthorRating[];
   likeCount: number;
   commentCount: number;
   isLiked: boolean;
@@ -46,6 +47,8 @@ export interface Comment {
   id: number;
   content: string;
   author: Author;
+  likeCount?: number;
+  isLiked?: boolean;
   createdAt: Date | string;
   updatedAt: Date | string;
   replies?: Comment[];
@@ -74,13 +77,10 @@ export interface UpdateCommentDto {
 }
 
 export interface ReviewsResponse {
-  data: Review[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
+  reviews: ReviewResponseDto[];
+  total: number;
+  page: number;
+  totalPages: number;
 }
 
 // 홈화면용 인기 리뷰 프리뷰 타입
@@ -155,4 +155,17 @@ export interface Review {
 
 export interface CommentsResponse {
   comments: ReviewComment[];
+}
+
+// 호환성 이슈 해결을 위한 기존 api 응답 형식 타입 정의
+export interface BookReviewsResponse {
+  data: Review[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    sort?: string;
+  };
+  book?: any; // 백엔드에서 주는 책 정보
 }
