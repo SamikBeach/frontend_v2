@@ -1,90 +1,139 @@
-import { useRecentBooks } from '@/app/profile/hooks';
+import { ReadingStatusType } from '@/apis/reading-status/types';
+import { useUserBooks } from '@/app/profile/hooks';
+import { selectedBookIdAtom } from '@/atoms/book';
+import { BookCard } from '@/components/BookCard';
+import { useDialogQuery } from '@/hooks';
 import { cn } from '@/lib/utils';
-import { Star } from 'lucide-react';
-import Image from 'next/image';
-import { useState } from 'react';
-import { ReadBooksSkeleton } from './ReadBooksSkeleton';
+import { useAtom } from 'jotai';
+import { Suspense, useState } from 'react';
 
-// 독서 상태 정의
-const readingStatuses = [
-  { id: 'finished', name: '읽었어요', count: 42 },
-  { id: 'reading', name: '읽고 있어요', count: 8 },
-  { id: 'want', name: '읽고 싶어요', count: 23 },
+// 독서 상태 필터 매핑 - 순서 변경: 전체, 읽고 싶어요, 읽는중, 읽었어요
+const readingStatusFilters = [
+  { id: 'ALL', name: '전체', type: undefined },
+  {
+    id: 'WANT_TO_READ',
+    name: '읽고 싶어요',
+    type: ReadingStatusType.WANT_TO_READ,
+  },
+  {
+    id: 'READING',
+    name: '읽는중',
+    type: ReadingStatusType.READING,
+  },
+  {
+    id: 'READ',
+    name: '읽었어요',
+    type: ReadingStatusType.READ,
+  },
 ];
 
-export default function ReadBooks() {
-  const { recentBooks = [], isLoading } = useRecentBooks();
-  const [selectedStatus, setSelectedStatus] = useState('all');
+// 책 목록 컴포넌트 - Suspense 내부에 위치할 컴포넌트
+function BooksList({ status }: { status: ReadingStatusType | undefined }) {
+  const { books = [] } = useUserBooks(status);
+  const [, setSelectedBookId] = useAtom(selectedBookIdAtom);
+  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
 
-  const handleStatusChange = (statusId: string) => {
-    setSelectedStatus(statusId);
+  // 책 선택 핸들러
+  const handleBookSelect = (book: any) => {
+    setSelectedBookId(book.id.toString());
+    // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
+    const bookIsbn = book.isbn13 || book.isbn;
+    openBookDialog(bookIsbn || book.id.toString());
   };
 
-  if (isLoading) {
-    return <ReadBooksSkeleton />;
+  if (books.length === 0) {
+    return (
+      <div className="flex h-40 w-full items-center justify-center rounded-lg bg-gray-50">
+        <p className="text-sm text-gray-500">책 목록이 없습니다.</p>
+      </div>
+    );
   }
 
   return (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      {books.map(book => (
+        <BookCard
+          key={book.id}
+          book={{
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            coverImage: book.coverImage,
+            rating: 0,
+            reviews: 0,
+          }}
+          onClick={handleBookSelect}
+        />
+      ))}
+    </div>
+  );
+}
+
+// 스켈레톤 컴포넌트 (BookList가 로딩 중일 때 표시)
+function BooksListSkeleton() {
+  return (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      {Array.from({ length: 12 }).map((_, index) => (
+        <div key={index} className="flex h-full w-full flex-col">
+          <div className="h-full w-full">
+            <div className="relative aspect-[3/4.5] w-full overflow-hidden rounded-lg bg-gray-100">
+              <div className="h-full w-full animate-pulse bg-gray-200" />
+            </div>
+            <div className="mt-2.5 space-y-1.5">
+              <div className="h-[15px] w-full animate-pulse rounded bg-gray-200" />
+              <div className="h-[13px] w-[70%] animate-pulse rounded bg-gray-200" />
+              <div className="mt-1.5 flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <div className="h-3.5 w-3.5 animate-pulse rounded-full bg-gray-200" />
+                  <div className="h-[13px] w-12 animate-pulse rounded bg-gray-200" />
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="h-3.5 w-3.5 animate-pulse rounded-full bg-gray-200" />
+                  <div className="h-[13px] w-8 animate-pulse rounded bg-gray-200" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// 메인 컴포넌트 - 필터 탭과 Suspense 래퍼 포함
+export default function ReadBooks() {
+  const [selectedStatus, setSelectedStatus] = useState<
+    ReadingStatusType | undefined
+  >(undefined);
+
+  const handleStatusChange = (statusType: ReadingStatusType | undefined) => {
+    setSelectedStatus(statusType);
+  };
+
+  return (
     <div>
-      {/* 독서 상태 필터 */}
+      {/* 독서 상태 필터 - Suspense 바깥에 위치 */}
       <div className="mb-6 flex gap-3">
-        {readingStatuses.map(status => (
+        {readingStatusFilters.map(status => (
           <button
             key={status.id}
             className={cn(
               'flex h-8 cursor-pointer items-center rounded-full border px-3 text-[13px] font-medium transition-all',
-              selectedStatus === status.id
+              selectedStatus === status.type
                 ? 'border-blue-200 bg-blue-50 text-blue-600'
                 : 'border-gray-200 text-gray-700 hover:bg-gray-50'
             )}
-            onClick={() => handleStatusChange(status.id)}
+            onClick={() => handleStatusChange(status.type)}
           >
             <span>{status.name}</span>
-            <span className="ml-1.5 rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-700">
-              {status.count}
-            </span>
           </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-        {recentBooks.map(book => (
-          <div key={book.id} className="group cursor-pointer">
-            <div className="relative aspect-[2/3] overflow-hidden rounded-lg bg-gray-100">
-              <Image
-                src={book.coverImage}
-                alt={book.title}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className="object-cover transition-transform duration-200 group-hover:scale-105"
-              />
-            </div>
-            <div className="mt-3">
-              <h3 className="line-clamp-1 text-[15px] font-medium text-gray-900 group-hover:text-blue-600">
-                {book.title}
-              </h3>
-              <p className="mt-0.5 text-xs text-gray-500">{book.author}</p>
-              <div className="mt-1 flex items-center">
-                <div className="flex items-center">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`h-3.5 w-3.5 ${
-                        i < Math.floor(book.rating || 0)
-                          ? 'fill-yellow-400 text-yellow-400'
-                          : 'fill-gray-200 text-gray-200'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <span className="ml-1 text-xs text-gray-500">
-                  ({book.rating?.toFixed(1) || '0.0'})
-                </span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
+      {/* 책 목록 컴포넌트 - Suspense 내부에 위치 */}
+      <Suspense fallback={<BooksListSkeleton />}>
+        <BooksList status={selectedStatus} />
+      </Suspense>
     </div>
   );
 }

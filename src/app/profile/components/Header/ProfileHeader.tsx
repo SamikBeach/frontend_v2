@@ -78,10 +78,10 @@ export default function ProfileHeader() {
 
   return (
     <div className="bg-white">
-      <div className="mx-auto w-full px-4 pt-8 pb-6">
+      <div className="mx-auto w-full px-4 pb-6">
         <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <Avatar className="h-20 w-20 border-4 border-white">
+            <Avatar className="h-32 w-32 border-4 border-white">
               <AvatarImage
                 src={user.profileImage || undefined}
                 alt={displayName}

@@ -1,4 +1,5 @@
 import api from '../axios';
+import { ReadingStatusType } from '../reading-status/types';
 import {
   AccountActionResponse,
   ChangePasswordRequest,
@@ -9,6 +10,7 @@ import {
   UpdateUserInfoResponse,
   UploadProfileImageResponse,
   User,
+  UserBooksResponseDto,
   UserDetailResponseDto,
 } from './types';
 
@@ -168,5 +170,29 @@ export const getUserFollowing = async (
   const response = await api.get(`/user/${userId}/following`, {
     params: { page, limit },
   });
+  return response.data;
+};
+
+/**
+ * 사용자의 읽은 책, 읽고 싶은 책, 읽는 중인 책 목록을 조회합니다.
+ * @param userId 사용자 ID
+ * @param status 독서 상태 필터 (선택 사항)
+ * @param page 페이지 번호 (기본값: 1)
+ * @param limit 페이지당 항목 수 (기본값: 10)
+ */
+export const getUserBooks = async (
+  userId: number,
+  status?: ReadingStatusType,
+  page: number = 1,
+  limit: number = 10
+): Promise<UserBooksResponseDto> => {
+  const params: Record<string, any> = { page, limit };
+
+  // 상태 필터가 제공된 경우에만 파라미터에 추가
+  if (status) {
+    params.status = status;
+  }
+
+  const response = await api.get(`/user/${userId}/books`, { params });
   return response.data;
 };

@@ -228,3 +228,32 @@ export interface FollowingListResponseDto {
   totalPages: number;
   hasNextPage: boolean;
 }
+
+/**
+ * 사용자 책 목록 응답 DTO
+ */
+export interface UserBooksResponseDto {
+  items: ReadingStatusResponseDto[];
+  total: number;
+  page: number;
+  totalPages: number;
+  hasNextPage: boolean;
+}
+
+export interface ReadingStatusResponseDto {
+  id: number;
+  status: string; // 서버에서 "READ", "READING", "WANT_TO_READ" 형식으로 반환됨
+  currentPage?: number;
+  startDate?: Date;
+  finishDate?: Date;
+  readingMemo?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  book: {
+    id: number;
+    title: string;
+    author: string;
+    coverImageUrl: string;
+    isbn: string;
+  };
+}
