@@ -207,7 +207,13 @@ export default function Libraries() {
   const { mutateAsync: createLibraryMutation } = useMutation({
     mutationFn: (data: CreateLibraryDto) => createLibrary(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['libraries', 'my'] });
+      queryClient.invalidateQueries({
+        queryKey: ['user-libraries', userId],
+      });
+
+      toast.success('새 서재가 생성되었습니다.');
+
+      setShowLibraryDialog(false);
     },
   });
 
@@ -220,7 +226,6 @@ export default function Libraries() {
   const handleCreateNewLibrary = async (libraryData: CreateLibraryDto) => {
     try {
       await createLibraryMutation(libraryData);
-      toast.success('새 서재가 생성되었습니다.');
     } catch (error) {
       console.error('서재 생성 오류:', error);
       toast.error('서재 생성에 실패했습니다.');
