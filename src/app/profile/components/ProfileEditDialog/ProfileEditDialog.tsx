@@ -46,6 +46,8 @@ export function ProfileEditDialog({
       queryClient.invalidateQueries({ queryKey: ['profile'] });
       // 사용자 정보 업데이트
       queryClient.invalidateQueries({ queryKey: ['user-libraries'] });
+      // 현재 로그인한 사용자 정보 업데이트
+      queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
       onClose();
       toast.success('프로필이 성공적으로 업데이트되었습니다.');
     },
