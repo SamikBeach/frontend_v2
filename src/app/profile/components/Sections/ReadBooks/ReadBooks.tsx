@@ -6,7 +6,8 @@ import { BookCard } from '@/components/BookCard';
 import { useDialogQuery } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
-import { Suspense, useState } from 'react';
+import { useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 // 독서 상태 필터 매핑 - 순서 변경: 전체, 읽고 싶어요, 읽는중, 읽었어요
 const readingStatusFilters = [
@@ -28,9 +29,16 @@ const readingStatusFilters = [
   },
 ];
 
-// 책 목록 컴포넌트 - Suspense 내부에 위치할 컴포넌트
+// 책 목록 컴포넌트 - 무한 스크롤 구현
 function BooksList({ status }: { status: ReadingStatusType | undefined }) {
-  const { books = [] } = useUserBooks(status);
+  const {
+    books = [],
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    total,
+  } = useUserBooks(status);
   const [, setSelectedBookId] = useAtom(selectedBookIdAtom);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
 
@@ -42,6 +50,12 @@ function BooksList({ status }: { status: ReadingStatusType | undefined }) {
     openBookDialog(bookIsbn || book.id.toString());
   };
 
+  // 로딩 중 상태
+  if (isLoading) {
+    return <BooksListSkeleton />;
+  }
+
+  // 데이터가 없는 경우
   if (books.length === 0) {
     return (
       <div className="flex h-40 w-full items-center justify-center rounded-lg bg-gray-50">
@@ -51,39 +65,53 @@ function BooksList({ status }: { status: ReadingStatusType | undefined }) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-      {books.map(book => {
-        // BookCard에 필요한 최소한의 필드만 전달
-        const bookData: Partial<Book> = {
-          id: book.id,
-          title: book.title,
-          author: book.author,
-          coverImage: book.coverImage,
-          rating: book.rating || 0,
-          reviews: book.reviews || 0,
-          isbn: book.isbn || '',
-          description: '',
-          publisher: book.publisher || '',
-        };
+    <InfiniteScroll
+      dataLength={books.length}
+      next={fetchNextPage}
+      hasMore={hasNextPage}
+      loader={
+        <div className="mt-6 flex w-full justify-center py-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+        </div>
+      }
+      scrollThreshold={0.9}
+      className="flex w-full flex-col pb-4"
+      style={{ overflow: 'visible' }} // 스크롤바 숨기기
+    >
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+        {books.map(book => {
+          // BookCard에 필요한 최소한의 필드만 전달
+          const bookData: Partial<Book> = {
+            id: book.id,
+            title: book.title,
+            author: book.author,
+            coverImage: book.coverImage,
+            rating: book.rating || 0,
+            reviews: book.reviews || 0,
+            isbn: book.isbn || '',
+            description: '',
+            publisher: book.publisher || '',
+          };
 
-        // 추가 필드 적용 (any 타입 캐스팅 사용)
-        if (book.totalRatings !== undefined) {
-          (bookData as any).totalRatings = book.totalRatings;
-        }
+          // 추가 필드 적용 (any 타입 캐스팅 사용)
+          if (book.totalRatings !== undefined) {
+            (bookData as any).totalRatings = book.totalRatings;
+          }
 
-        if (book.isbn13) {
-          bookData.isbn13 = book.isbn13;
-        }
+          if (book.isbn13) {
+            bookData.isbn13 = book.isbn13;
+          }
 
-        return (
-          <BookCard
-            key={book.id}
-            book={bookData as Book}
-            onClick={handleBookSelect}
-          />
-        );
-      })}
-    </div>
+          return (
+            <BookCard
+              key={book.id}
+              book={bookData as Book}
+              onClick={handleBookSelect}
+            />
+          );
+        })}
+      </div>
+    </InfiniteScroll>
   );
 }
 
@@ -118,7 +146,7 @@ function BooksListSkeleton() {
   );
 }
 
-// 메인 컴포넌트 - 필터 탭과 Suspense 래퍼 포함
+// 메인 컴포넌트 - 필터 탭 포함
 export default function ReadBooks() {
   const [selectedStatus, setSelectedStatus] = useState<
     ReadingStatusType | undefined
@@ -130,7 +158,7 @@ export default function ReadBooks() {
 
   return (
     <div>
-      {/* 독서 상태 필터 - Suspense 바깥에 위치 */}
+      {/* 독서 상태 필터 */}
       <div className="mb-6 flex gap-3">
         {readingStatusFilters.map(status => (
           <button
@@ -148,10 +176,8 @@ export default function ReadBooks() {
         ))}
       </div>
 
-      {/* 책 목록 컴포넌트 - Suspense 내부에 위치 */}
-      <Suspense fallback={<BooksListSkeleton />}>
-        <BooksList status={selectedStatus} />
-      </Suspense>
+      {/* 책 목록 컴포넌트 */}
+      <BooksList status={selectedStatus} />
     </div>
   );
 }

@@ -4,12 +4,12 @@ import { LibraryPreviewDto } from '@/apis/user/types';
 import { LibraryDialog } from '@/components/Library';
 import { LibraryCard } from '@/components/LibraryCard';
 import { Button } from '@/components/ui/button';
-import { Pagination } from '@/components/ui/pagination';
 import { Tag, getTagColor } from '@/utils/tags';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BookOpen, Plus } from 'lucide-react';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { toast } from 'sonner';
 import { useIsMyProfile, useUserLibraries } from '../../../hooks';
 import { LibrariesSkeleton } from '../../Skeletons';
@@ -42,22 +42,20 @@ export default function Libraries() {
   const isMyProfile = useIsMyProfile();
   const queryClient = useQueryClient();
   const [showLibraryDialog, setShowLibraryDialog] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
 
-  // 서재 목록 가져오기
-  const { libraries, totalLibraries, totalPages, isLoading } = useUserLibraries(
-    {
-      userId,
-      initialPage: currentPage,
-      pageSize,
-    }
-  );
-
-  // 페이지 변경 시 스크롤 위치 초기화
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentPage]);
+  // 서재 목록 가져오기 (무한 스크롤)
+  const {
+    libraries,
+    totalLibraries,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useUserLibraries({
+    userId,
+    pageSize,
+  });
 
   // 태그 리스트 생성
   const tags = formatLibraryTags(libraries);
@@ -67,7 +65,7 @@ export default function Libraries() {
     mutationFn: (data: CreateLibraryDto) => createLibrary(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['user-libraries', userId],
+        queryKey: ['user-libraries-infinite', userId],
       });
 
       toast.success('새 서재가 생성되었습니다.');
@@ -192,22 +190,25 @@ export default function Libraries() {
         )}
       </div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {libraries.map(library => (
-          <LibraryCard key={library.id} library={library} tags={tags} />
-        ))}
-      </div>
-
-      {/* 페이지네이션 */}
-      {totalPages > 1 && (
-        <div className="mt-6 flex justify-center">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+      <InfiniteScroll
+        dataLength={libraries.length}
+        next={fetchNextPage}
+        hasMore={hasNextPage}
+        loader={
+          <div className="mt-6 flex justify-center py-4">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
+          </div>
+        }
+        scrollThreshold={0.9}
+        className="flex w-full flex-col pb-4"
+        style={{ overflow: 'visible' }} // 스크롤바 숨기기
+      >
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {libraries.map(library => (
+            <LibraryCard key={library.id} library={library} tags={tags} />
+          ))}
         </div>
-      )}
+      </InfiniteScroll>
 
       {/* 새 서재 만들기 다이얼로그 */}
       {showLibraryDialog && (

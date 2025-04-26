@@ -205,6 +205,7 @@ export function LibraryDialog({
                   value={name}
                   onChange={e => setName(e.target.value)}
                   className="rounded-xl border-gray-200 focus:border-blue-200 focus:ring-2 focus:ring-blue-100"
+                  autoFocus
                 />
               </div>
 
