@@ -83,9 +83,19 @@ function SummarySkeleton() {
           {Array.from({ length: 6 }).map((_, index) => (
             <Skeleton
               key={index}
-              className="flex h-[133px] w-full flex-col items-center rounded-lg p-4"
+              className={`flex h-[133px] w-full flex-col items-center rounded-lg p-4 ${
+                index === 0
+                  ? 'bg-violet-100'
+                  : index < 4
+                    ? 'bg-gray-50'
+                    : 'border border-gray-200 bg-white'
+              }`}
             >
-              <div className="flex h-10 w-10 items-center justify-center rounded-full">
+              <div
+                className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                  index === 0 ? 'bg-violet-200' : ''
+                }`}
+              >
                 <Skeleton className="h-5 w-5" />
               </div>
               <div className="mt-2 w-full">
