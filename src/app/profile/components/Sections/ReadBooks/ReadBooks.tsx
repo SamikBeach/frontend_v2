@@ -3,6 +3,7 @@ import { cn } from '@/lib/utils';
 import { Star } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { ReadBooksSkeleton } from './ReadBooksSkeleton';
 
 // 독서 상태 정의
 const readingStatuses = [
@@ -11,7 +12,7 @@ const readingStatuses = [
   { id: 'want', name: '읽고 싶어요', count: 23 },
 ];
 
-export default function ProfileRecentBooks() {
+export default function ReadBooks() {
   const { recentBooks = [], isLoading } = useRecentBooks();
   const [selectedStatus, setSelectedStatus] = useState('all');
 
@@ -20,7 +21,7 @@ export default function ProfileRecentBooks() {
   };
 
   if (isLoading) {
-    return <div>책 목록을 불러오는 중...</div>;
+    return <ReadBooksSkeleton />;
   }
 
   return (

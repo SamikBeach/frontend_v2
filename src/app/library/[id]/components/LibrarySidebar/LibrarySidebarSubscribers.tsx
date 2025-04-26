@@ -1,11 +1,14 @@
+import { useUserFollow } from '@/app/profile/hooks';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { FC } from 'react';
 
 interface Subscriber {
   id: number;
   username: string;
   profileImage?: string;
+  isFollowing?: boolean;
 }
 
 interface LibrarySidebarSubscribersProps {
@@ -17,6 +20,8 @@ export const LibrarySidebarSubscribers: FC<LibrarySidebarSubscribersProps> = ({
   subscribers,
   isCurrentUserSubscriber,
 }) => {
+  const currentUser = useCurrentUser();
+
   if (!subscribers || subscribers.length === 0) {
     return null;
   }
@@ -28,35 +33,11 @@ export const LibrarySidebarSubscribers: FC<LibrarySidebarSubscribersProps> = ({
       <div className="mt-3 space-y-3">
         {subscribers.length > 0 ? (
           subscribers.map(subscriber => (
-            <div key={subscriber.id} className="flex items-center gap-2">
-              <Avatar className="h-8 w-8 border border-gray-200">
-                <AvatarImage
-                  src={
-                    subscriber.profileImage ||
-                    `https://i.pravatar.cc/150?u=${subscriber.id}`
-                  }
-                  alt={subscriber.username}
-                />
-                <AvatarFallback className="bg-gray-200">
-                  {subscriber.username[0]}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
-                  {subscriber.username}
-                </p>
-              </div>
-              {!isCurrentUserSubscriber(subscriber.id) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 rounded-full text-xs"
-                  // TODO: 유저 팔로우 기능 - 추후 구현 예정
-                >
-                  팔로우
-                </Button>
-              )}
-            </div>
+            <SubscriberItem
+              key={subscriber.id}
+              subscriber={subscriber}
+              isCurrentUser={currentUser?.id === subscriber.id}
+            />
           ))
         ) : (
           <p className="text-center text-sm text-gray-500">
@@ -64,6 +45,58 @@ export const LibrarySidebarSubscribers: FC<LibrarySidebarSubscribersProps> = ({
           </p>
         )}
       </div>
+    </div>
+  );
+};
+
+interface SubscriberItemProps {
+  subscriber: Subscriber;
+  isCurrentUser: boolean;
+}
+
+const SubscriberItem: FC<SubscriberItemProps> = ({
+  subscriber,
+  isCurrentUser,
+}) => {
+  const { isFollowing, toggleFollow, isLoading } = useUserFollow(
+    subscriber.isFollowing || false
+  );
+
+  // 팔로우 핸들러
+  const handleFollowClick = async () => {
+    await toggleFollow(subscriber.id);
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <Avatar className="h-8 w-8 border border-gray-200">
+        <AvatarImage
+          src={
+            subscriber.profileImage ||
+            `https://i.pravatar.cc/150?u=${subscriber.id}`
+          }
+          alt={subscriber.username}
+        />
+        <AvatarFallback className="bg-gray-200">
+          {subscriber.username[0]}
+        </AvatarFallback>
+      </Avatar>
+      <div className="flex-1">
+        <p className="text-sm font-medium text-gray-900">
+          {subscriber.username}
+        </p>
+      </div>
+      {!isCurrentUser && (
+        <Button
+          variant={isFollowing ? 'outline' : 'ghost'}
+          size="sm"
+          className="h-7 rounded-full text-xs"
+          onClick={handleFollowClick}
+          disabled={isLoading}
+        >
+          {isFollowing ? '팔로잉' : '팔로우'}
+        </Button>
+      )}
     </div>
   );
 };

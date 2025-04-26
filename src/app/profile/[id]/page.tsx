@@ -1,19 +1,17 @@
 'use client';
 
-import { getUserProfile } from '@/apis/user';
-import { UserDetailResponseDto } from '@/apis/user/types';
 import { useQueryParams } from '@/hooks';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 
+import { LibraryCardSkeleton } from '@/components/LibraryCard';
 import {
-  ProfileBooks,
+  Libraries,
   ProfileHeader,
-  ProfileRecentBooks,
-  ProfileReviews,
-  ProfileStats,
   ProfileSummary,
+  ReadBooks,
+  Reviews,
+  Stats,
   SubscribedLibraries,
 } from '../components';
 
@@ -26,20 +24,67 @@ function SectionLoading() {
   );
 }
 
-function ProfileContent() {
+// 헤더 로딩 스켈레톤
+function HeaderSkeleton() {
+  return (
+    <div className="bg-white">
+      <div className="mx-auto w-full px-4 pt-8 pb-6">
+        <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4">
+            <div className="h-20 w-20 animate-pulse rounded-full bg-gray-200"></div>
+            <div>
+              <div className="h-8 w-48 animate-pulse rounded-md bg-gray-200"></div>
+              <div className="mt-2 h-4 w-64 animate-pulse rounded-md bg-gray-200"></div>
+              <div className="mt-2 flex gap-3">
+                <div className="h-5 w-20 animate-pulse rounded-md bg-gray-200"></div>
+                <div className="h-5 w-20 animate-pulse rounded-md bg-gray-200"></div>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 h-10 w-32 animate-pulse rounded-full bg-gray-200 sm:mt-0"></div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 북스 섹션 스켈레톤
+function BooksSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <LibraryCardSkeleton key={index} />
+      ))}
+    </div>
+  );
+}
+
+// 서머리 스켈레톤
+function SummarySkeleton() {
+  return (
+    <div className="border-t border-gray-100 bg-white">
+      <div className="mx-auto w-full px-4 py-4">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-6">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <div
+              key={index}
+              className="h-16 animate-pulse rounded-lg bg-gray-100"
+            ></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function ProfilePage() {
   const params = useParams();
   const userId = Number(params.id as string);
   const { getQueryParam, updateQueryParams } = useQueryParams();
-  const activeSection = getQueryParam('section') || 'books';
+  const activeSection = getQueryParam('section') || 'libraries';
 
   // 선택한 메뉴 아이템에 기반한 섹션 상태
   const [selectedSection, setSelectedSection] = useState(activeSection);
-
-  // API 호출로 프로필 데이터 가져오기
-  const { data: profileData } = useSuspenseQuery<UserDetailResponseDto>({
-    queryKey: ['profile', userId],
-    queryFn: () => getUserProfile(userId),
-  });
 
   // 섹션 변경 핸들러
   const handleSectionChange = (sectionId: string) => {
@@ -51,34 +96,65 @@ function ProfileContent() {
   // 선택된 섹션에 따라 컨텐츠 렌더링
   const renderSectionContent = () => {
     switch (selectedSection) {
-      case 'books':
-        return <ProfileBooks />;
+      case 'libraries':
+        return (
+          <Suspense fallback={<BooksSkeleton />}>
+            <Libraries />
+          </Suspense>
+        );
       case 'subscriptions':
-        return <SubscribedLibraries />;
+        return (
+          <Suspense fallback={<BooksSkeleton />}>
+            <SubscribedLibraries />
+          </Suspense>
+        );
       case 'read':
-        return <ProfileRecentBooks />;
+        return (
+          <Suspense fallback={<SectionLoading />}>
+            <ReadBooks />
+          </Suspense>
+        );
       case 'reviews':
-        return <ProfileReviews />;
+        return (
+          <Suspense fallback={<SectionLoading />}>
+            <Reviews />
+          </Suspense>
+        );
       case 'groups':
-        return <ProfileBooks />;
+        return (
+          <Suspense fallback={<BooksSkeleton />}>
+            <Libraries />
+          </Suspense>
+        );
       case 'stats':
-        return <ProfileStats />;
+        return (
+          <Suspense fallback={<SectionLoading />}>
+            <Stats />
+          </Suspense>
+        );
       default:
-        return <ProfileBooks />;
+        return (
+          <Suspense fallback={<BooksSkeleton />}>
+            <Libraries />
+          </Suspense>
+        );
     }
   };
 
   return (
     <div className="bg-white">
       {/* 프로필 헤더 */}
-      <ProfileHeader profileData={profileData} />
+      <Suspense fallback={<HeaderSkeleton />}>
+        <ProfileHeader />
+      </Suspense>
 
       {/* 독서 정보 개요 */}
-      <ProfileSummary
-        selectedSection={selectedSection}
-        onSectionChange={handleSectionChange}
-        profileData={profileData}
-      />
+      <Suspense fallback={<SummarySkeleton />}>
+        <ProfileSummary
+          selectedSection={selectedSection}
+          onSectionChange={handleSectionChange}
+        />
+      </Suspense>
 
       {/* 섹션 컨텐츠 */}
       <div className="mx-auto w-full px-4 pt-6">
@@ -86,19 +162,5 @@ function ProfileContent() {
         {renderSectionContent()}
       </div>
     </div>
-  );
-}
-
-export default function ProfilePage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex h-screen items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-t-2 border-b-2 border-gray-900"></div>
-        </div>
-      }
-    >
-      <ProfileContent />
-    </Suspense>
   );
 }

@@ -1,30 +1,51 @@
-import { UserDetailResponseDto } from '@/apis/user/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Check, UserCircle, UserPlus } from 'lucide-react';
-import { useState } from 'react';
-import { useIsMyProfile } from '../hooks';
-import { ProfileEditDialog } from './ProfileEditDialog';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useIsMyProfile, useUserFollow, useUserProfile } from '../../hooks';
+import { ProfileEditDialog } from '../ProfileEditDialog';
 
-interface ProfileHeaderProps {
-  profileData: UserDetailResponseDto;
-}
+export default function ProfileHeader() {
+  const params = useParams();
+  const userId = Number(params.id as string);
+  const { profileData } = useUserProfile(userId);
 
-export default function ProfileHeader({ profileData }: ProfileHeaderProps) {
   const isMyProfile = useIsMyProfile();
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const currentUser = useCurrentUser();
+  const {
+    user,
+    followers,
+    following,
+    isEditable,
+    isFollowing: initialIsFollowing,
+  } = profileData;
 
-  const { user, followers, following, isEditable } = profileData;
+  const { isFollowing, setIsFollowing, toggleFollow, isLoading } =
+    useUserFollow(initialIsFollowing || false);
+
+  // 초기 팔로우 상태 설정
+  useEffect(() => {
+    if (initialIsFollowing !== undefined) {
+      setIsFollowing(initialIsFollowing);
+    }
+  }, [initialIsFollowing, setIsFollowing]);
+
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // 사용자 표시 정보 설정
   const displayName = user.username || user.email?.split('@')[0] || '';
   const initial = displayName.charAt(0).toUpperCase();
 
   // 팔로우 버튼 클릭 핸들러
-  const handleFollowClick = () => {
-    // TODO: 실제 팔로우 API 연동
-    setIsFollowing(!isFollowing);
+  const handleFollowClick = async () => {
+    if (!currentUser) {
+      // TODO: 로그인 다이얼로그 표시
+      return;
+    }
+
+    await toggleFollow(user.id);
   };
 
   // 프로필 편집 다이얼로그 열기
@@ -60,9 +81,7 @@ export default function ProfileHeader({ profileData }: ProfileHeaderProps) {
                 )}
               </div>
               <p className="mt-1 max-w-xl text-sm text-gray-600">
-                {
-                  '고전 문학을 좋아하는 독서가입니다. 플라톤부터 도스토예프스키까지 다양한 작품을 읽고 있습니다.'
-                }
+                {user.bio || '자기소개가 없습니다.'}
               </p>
               <div className="mt-2 flex gap-3 text-sm">
                 <div className="flex items-center gap-1">
@@ -100,6 +119,7 @@ export default function ProfileHeader({ profileData }: ProfileHeaderProps) {
                   : 'bg-gray-900 text-white hover:bg-gray-800'
               } text-sm font-medium sm:mt-0`}
               variant={isFollowing ? 'outline' : 'default'}
+              disabled={isLoading}
             >
               {isFollowing ? (
                 <>

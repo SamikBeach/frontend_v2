@@ -1,17 +1,39 @@
+import { useUserFollow } from '@/app/profile/hooks';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { FC } from 'react';
 
 interface LibrarySidebarOwnerProps {
   owner: {
     id: number;
     username: string;
+    isFollowing?: boolean;
   };
 }
 
 export const LibrarySidebarOwner: FC<LibrarySidebarOwnerProps> = ({
   owner,
 }) => {
+  const currentUser = useCurrentUser();
+  const { isFollowing, toggleFollow, isLoading } = useUserFollow(
+    owner.isFollowing || false
+  );
+  const isOwnProfile = currentUser?.id === owner.id;
+
+  // 팔로우 핸들러
+  const handleFollowClick = async () => {
+    if (!currentUser) {
+      // TODO: 로그인 다이얼로그 표시
+      return;
+    }
+
+    await toggleFollow(owner.id);
+  };
+
+  // 자기 자신이면 팔로우 버튼 숨김
+  const showFollowButton = !isOwnProfile && currentUser;
+
   return (
     <div className="rounded-xl bg-gray-50 p-4">
       <div className="flex items-center justify-between gap-3">
@@ -31,14 +53,21 @@ export const LibrarySidebarOwner: FC<LibrarySidebarOwnerProps> = ({
           </div>
         </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 rounded-full bg-gray-200 text-xs hover:bg-gray-300"
-          // TODO: 유저 팔로우 기능 - 추후 구현 예정
-        >
-          팔로우
-        </Button>
+        {showFollowButton && (
+          <Button
+            variant={isFollowing ? 'outline' : 'default'}
+            size="sm"
+            className={`h-7 rounded-full text-xs ${
+              isFollowing
+                ? 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                : 'bg-gray-900 text-white hover:bg-gray-800'
+            }`}
+            onClick={handleFollowClick}
+            disabled={isLoading}
+          >
+            {isFollowing ? '팔로잉' : '팔로우'}
+          </Button>
+        )}
       </div>
     </div>
   );

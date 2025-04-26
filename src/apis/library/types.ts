@@ -188,3 +188,9 @@ export interface AddBookResponse {
 export interface HomePopularLibrariesResponse {
   libraries: LibraryListItem[];
 }
+
+// 홈화면용 인기 서재 타입
+export interface HomeLibraryPreview extends LibraryListItem {
+  previewBooks: BookPreview[];
+  ownerName: string;
+}

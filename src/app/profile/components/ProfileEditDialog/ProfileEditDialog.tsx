@@ -1,6 +1,7 @@
 'use client';
 
 import { UserDetailResponseDto } from '@/apis/user/types';
+import { updateUserInfo } from '@/apis/user/user';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,7 +10,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { ProfileEditForm, ProfileFormData } from './ProfileEditForm';
 
 interface ProfileEditDialogProps {
@@ -24,22 +27,43 @@ export function ProfileEditDialog({
   profileData,
 }: ProfileEditDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
+
+  // 프로필 업데이트 mutation
+  const { mutateAsync: updateProfile } = useMutation({
+    mutationFn: updateUserInfo,
+    onSuccess: () => {
+      // 프로필 정보 업데이트
+      queryClient.invalidateQueries({ queryKey: ['profile'] });
+      // 사용자 정보 업데이트
+      queryClient.invalidateQueries({ queryKey: ['user-libraries'] });
+      onClose();
+      toast.success('프로필이 성공적으로 업데이트되었습니다.');
+    },
+    onError: (error: any) => {
+      console.error('프로필 업데이트 오류:', error);
+      toast.error('프로필 업데이트에 실패했습니다.');
+    },
+    onSettled: () => {
+      setIsSubmitting(false);
+    },
+  });
 
   const handleSubmit = async (formData: ProfileFormData) => {
     try {
       setIsSubmitting(true);
-      // 실제 API 연동은 추후 구현
-      console.log('프로필 업데이트:', {
-        displayName: formData.displayName, // 닉네임만 업데이트
+
+      // 프로필 정보 업데이트
+      await updateProfile({
+        username: formData.username,
         bio: formData.bio,
-        avatar: formData.avatar ? '프로필 이미지 변경됨' : '이미지 변경 없음',
       });
 
-      // API 호출 성공 가정
-      setTimeout(() => {
-        setIsSubmitting(false);
-        onClose();
-      }, 1000);
+      // 프로필 이미지 업로드가 있는 경우 처리 (추후 구현)
+      if (formData.avatar) {
+        // TODO: 프로필 이미지 업로드 API 구현 및 연동
+        console.log('프로필 이미지 업데이트:', formData.avatar);
+      }
     } catch (error) {
       console.error('프로필 업데이트 오류:', error);
       setIsSubmitting(false);

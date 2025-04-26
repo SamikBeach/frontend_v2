@@ -1,91 +1,21 @@
 import { cn } from '@/lib/utils';
-import {
-  AreaChart,
-  Bell,
-  Book,
-  BookOpen,
-  MessageSquare,
-  Users,
-} from 'lucide-react';
-
-// 메뉴 아이템 정의
-interface MenuItem {
-  id: string;
-  name: string;
-  icon: React.ElementType;
-  bgColor: string;
-  iconBgColor: string;
-  iconColor: string;
-}
-
-// 메뉴 아이템 정의
-const menuItems: MenuItem[] = [
-  {
-    id: 'books',
-    name: '내 서재',
-    icon: BookOpen,
-    bgColor: 'bg-blue-50',
-    iconBgColor: 'bg-blue-100',
-    iconColor: 'text-blue-600',
-  },
-  {
-    id: 'subscriptions',
-    name: '구독한 서재',
-    icon: Bell,
-    bgColor: 'bg-green-50',
-    iconBgColor: 'bg-green-100',
-    iconColor: 'text-green-600',
-  },
-  {
-    id: 'read',
-    name: '읽은 책',
-    icon: Book,
-    bgColor: 'bg-violet-50',
-    iconBgColor: 'bg-violet-100',
-    iconColor: 'text-violet-600',
-  },
-  {
-    id: 'reviews',
-    name: '내 리뷰',
-    icon: MessageSquare,
-    bgColor: 'bg-purple-50',
-    iconBgColor: 'bg-purple-100',
-    iconColor: 'text-purple-600',
-  },
-  {
-    id: 'groups',
-    name: '내 독서모임',
-    icon: Users,
-    bgColor: 'bg-amber-50',
-    iconBgColor: 'bg-amber-100',
-    iconColor: 'text-amber-600',
-  },
-  {
-    id: 'stats',
-    name: '내 통계',
-    icon: AreaChart,
-    bgColor: 'bg-green-50',
-    iconBgColor: 'bg-green-100',
-    iconColor: 'text-green-600',
-  },
-];
+import { AreaChart, Bell, Book, BookOpen, MessageSquare } from 'lucide-react';
+import { useParams } from 'next/navigation';
+import { useUserProfile } from '../../hooks';
 
 interface ProfileSummaryProps {
   selectedSection: string;
   onSectionChange: (section: string) => void;
-  profileData: {
-    libraryCount: number;
-    readCount: number;
-    subscribedLibraryCount: number;
-    reviewCount: number;
-  };
 }
 
 export default function ProfileSummary({
   selectedSection,
   onSectionChange,
-  profileData,
 }: ProfileSummaryProps) {
+  const params = useParams();
+  const userId = Number(params.id as string);
+  const { profileData } = useUserProfile(userId);
+
   // API에서 가져온 데이터 사용
   const { libraryCount, readCount, subscribedLibraryCount, reviewCount } =
     profileData;
@@ -95,10 +25,11 @@ export default function ProfileSummary({
       <div className="grid grid-cols-5 gap-3">
         {/* 내 서재 */}
         <button
-          onClick={() => onSectionChange('books')}
+          onClick={() => onSectionChange('libraries')}
           className={cn(
             `flex cursor-pointer flex-col items-center rounded-lg bg-blue-50 p-4 transition-transform hover:scale-105`,
-            selectedSection === 'books' && 'ring-2 ring-gray-900 ring-offset-2'
+            selectedSection === 'libraries' &&
+              'ring-2 ring-gray-900 ring-offset-2'
           )}
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
@@ -108,7 +39,7 @@ export default function ProfileSummary({
             <span className="block text-xl font-bold text-gray-900">
               {libraryCount}
             </span>
-            <span className="text-xs text-gray-600">내 서재</span>
+            <span className="text-xs text-gray-600">서재</span>
           </div>
         </button>
 

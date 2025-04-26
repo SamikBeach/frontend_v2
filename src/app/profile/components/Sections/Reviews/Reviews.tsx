@@ -1,12 +1,13 @@
 import { useRecentReviews } from '@/app/profile/hooks';
 import { CalendarDays, Heart, MessageCircle, Star } from 'lucide-react';
 import Image from 'next/image';
+import { ReviewsSkeleton } from './ReviewsSkeleton';
 
-export default function ProfileReviews() {
+export default function Reviews() {
   const { recentReviews = [], isLoading } = useRecentReviews();
 
   if (isLoading) {
-    return <div>리뷰를 불러오는 중...</div>;
+    return <ReviewsSkeleton />;
   }
 
   return (

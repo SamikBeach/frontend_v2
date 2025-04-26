@@ -4,7 +4,7 @@ import { UserDetailResponseDto } from '@/apis/user/types';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AvatarUpload } from './AvatarUpload';
 
 interface ProfileEditFormProps {
@@ -14,7 +14,7 @@ interface ProfileEditFormProps {
 }
 
 export interface ProfileFormData {
-  displayName: string;
+  username: string;
   bio: string;
   avatar?: File | null;
 }
@@ -30,10 +30,19 @@ export function ProfileEditForm({
   const displayName = user.username || user.email?.split('@')[0] || '';
 
   const [formData, setFormData] = useState<ProfileFormData>({
-    displayName: displayName,
-    bio: '고전 문학을 좋아하는 독서가입니다. 플라톤부터 도스토예프스키까지 다양한 작품을 읽고 있습니다.',
+    username: displayName,
+    bio: user.bio || '',
     avatar: null,
   });
+
+  // 프로필 데이터가 변경되면 폼 데이터 업데이트
+  useEffect(() => {
+    setFormData({
+      username: user.username || '',
+      bio: user.bio || '',
+      avatar: null,
+    });
+  }, [user]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -69,11 +78,11 @@ export function ProfileEditForm({
 
       <div className="grid gap-4">
         <div className="grid gap-2">
-          <Label htmlFor="displayName">닉네임</Label>
+          <Label htmlFor="username">닉네임</Label>
           <Input
-            id="displayName"
-            name="displayName"
-            value={formData.displayName}
+            id="username"
+            name="username"
+            value={formData.username}
             onChange={handleChange}
             disabled={isSubmitting}
             placeholder="변경할 닉네임을 입력하세요"
@@ -90,7 +99,8 @@ export function ProfileEditForm({
             onChange={handleChange}
             disabled={isSubmitting}
             className="resize-none"
-            placeholder="자기소개를 입력하세요"
+            placeholder="자기소개를 입력하세요 (최대 200자)"
+            maxLength={200}
           />
         </div>
       </div>

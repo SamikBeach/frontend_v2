@@ -20,10 +20,12 @@ export interface User {
 }
 
 /**
- * 사용자 정보 업데이트 요청
+ * 사용자 정보 업데이트 요청 인터페이스
  */
 export interface UpdateUserInfoRequest {
+  name?: string;
   username?: string;
+  bio?: string;
 }
 
 /**
@@ -71,8 +73,32 @@ export interface UserDetailDto {
   id: number;
   username: string;
   email?: string;
+  bio?: string;
   provider: AuthProvider;
   createdAt: Date;
+}
+
+/**
+ * 서재 소유자 DTO
+ */
+export interface LibraryOwnerDto {
+  id: number;
+  username: string;
+  email: string;
+}
+
+/**
+ * 서재 태그 DTO
+ */
+export interface LibraryTagDto {
+  id: number;
+  tagId: number;
+  tagName: string;
+  usageCount: number;
+  libraryId: number;
+  note: string | null;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 /**
@@ -84,8 +110,11 @@ export interface LibraryPreviewDto {
   description: string;
   isPublic: boolean;
   subscriberCount: number;
+  owner: LibraryOwnerDto;
+  tags: LibraryTagDto[];
   bookCount: number;
   previewBooks: BookPreviewDto[];
+  isSubscribed: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -143,16 +172,16 @@ export interface UserDetailResponseDto {
   followers: number;
   following: number;
   isEditable: boolean;
+  isFollowing?: boolean;
+  libraries?: LibraryPreviewDto[];
 }
 
 /**
  * 사용자 서재 목록 응답
  */
 export interface UserLibrariesResponseDto {
-  libraries: LibraryPreviewDto[];
+  items: LibraryPreviewDto[];
   total: number;
-  page: number;
-  totalPages: number;
 }
 
 /**
@@ -163,4 +192,29 @@ export interface UserReviewsResponseDto {
   total: number;
   page: number;
   totalPages: number;
+}
+
+/**
+ * 팔로워/팔로잉 사용자 응답 DTO
+ */
+export interface FollowerResponseDto {
+  id: number;
+  username: string;
+  isFollowing: boolean;
+}
+
+/**
+ * 팔로워 목록 응답 DTO
+ */
+export interface FollowersListResponseDto {
+  followers: FollowerResponseDto[];
+  total: number;
+}
+
+/**
+ * 팔로잉 목록 응답 DTO
+ */
+export interface FollowingListResponseDto {
+  following: FollowerResponseDto[];
+  total: number;
 }

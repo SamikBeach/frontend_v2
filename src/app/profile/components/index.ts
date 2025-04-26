@@ -1,8 +1,10 @@
-export { default as ProfileBooks } from './ProfileBooks';
+export { ProfileHeader } from './Header';
 export { ProfileEditDialog } from './ProfileEditDialog';
-export { default as ProfileHeader } from './ProfileHeader';
-export { default as ProfileRecentBooks } from './ProfileRecentBooks';
-export { default as ProfileReviews } from './ProfileReviews';
-export { default as ProfileStats } from './ProfileStats';
-export { default as ProfileSummary } from './ProfileSummary';
-export { default as SubscribedLibraries } from './SubscribedLibraries';
+export {
+  Libraries,
+  ReadBooks,
+  Reviews,
+  Stats,
+  SubscribedLibraries,
+} from './Sections';
+export { ProfileSummary } from './Tabs';
