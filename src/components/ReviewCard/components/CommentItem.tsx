@@ -110,7 +110,7 @@ export function CommentItem({
         <AvatarImage
           src={
             (comment.author as any).profileImage ||
-            `https://i.pravatar.cc/150?u=${comment.author.id}`
+            `/images/avatars/placeholder.png`
           }
           alt={comment.author.username}
           className="object-cover"

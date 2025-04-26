@@ -61,9 +61,8 @@ export function ReviewHeader({
               {review.author.username}
             </Link>
             <TagName type={review.type} />
-          </div>
-          <div className="mt-0.5 flex items-center gap-2">
-            {/* 저자 평점(authorRatings) 표시 또는 리뷰의 rating 값 사용 */}
+
+            {/* 별점 표시 - 리뷰 태그 우측에 위치 */}
             {review.authorRatings && review.authorRatings.length > 0 && (
               <div className="flex items-center rounded-full bg-yellow-50 px-2 py-0.5">
                 {renderStarRating(review.authorRatings[0].rating)}
@@ -86,6 +85,10 @@ export function ReviewHeader({
                 </span>
               </div>
             )}
+          </div>
+
+          {/* 날짜 표시는 별도의 라인에 배치 */}
+          <div className="mt-0.5">
             <span className="text-xs text-gray-500">
               {formatDistanceToNow(new Date(review.createdAt), {
                 addSuffix: true,
