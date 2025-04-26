@@ -8,7 +8,7 @@ import { Pagination } from '@/components/ui/pagination';
 import { Tag, getTagColor } from '@/utils/tags';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { BookOpen, Plus } from 'lucide-react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useIsMyProfile, useUserLibraries } from '../../../hooks';
@@ -40,7 +40,6 @@ export default function Libraries() {
   const params = useParams();
   const userId = Number(params.id as string);
   const isMyProfile = useIsMyProfile();
-  const router = useRouter();
   const queryClient = useQueryClient();
   const [showLibraryDialog, setShowLibraryDialog] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);

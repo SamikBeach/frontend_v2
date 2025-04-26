@@ -20,9 +20,17 @@ export function useUserBooks(status?: ReadingStatusType) {
       id: item.book.id,
       title: item.book.title,
       author: item.book.author,
-      coverImage: item.book.coverImageUrl,
+      coverImage: item.book.coverImage,
+      isbn: item.book.isbn,
+      isbn13: item.book.isbn13,
+      publisher: item.book.publisher,
+      rating: item.book.rating || 0,
+      reviews: item.book.reviews || 0,
+      totalRatings: item.book.totalRatings,
       status: item.status,
-      // 추가 필드가 필요하면 여기에 추가
+      currentPage: item.currentPage,
+      startDate: item.startDate,
+      finishDate: item.finishDate,
     })) || [];
 
   return {

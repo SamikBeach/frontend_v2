@@ -1,3 +1,4 @@
+import { Book } from '@/apis/book/types';
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { useUserBooks } from '@/app/profile/hooks';
 import { selectedBookIdAtom } from '@/atoms/book';
@@ -34,7 +35,7 @@ function BooksList({ status }: { status: ReadingStatusType | undefined }) {
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
 
   // 책 선택 핸들러
-  const handleBookSelect = (book: any) => {
+  const handleBookSelect = (book: Book) => {
     setSelectedBookId(book.id.toString());
     // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
     const bookIsbn = book.isbn13 || book.isbn;
@@ -51,20 +52,37 @@ function BooksList({ status }: { status: ReadingStatusType | undefined }) {
 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-      {books.map(book => (
-        <BookCard
-          key={book.id}
-          book={{
-            id: book.id,
-            title: book.title,
-            author: book.author,
-            coverImage: book.coverImage,
-            rating: 0,
-            reviews: 0,
-          }}
-          onClick={handleBookSelect}
-        />
-      ))}
+      {books.map(book => {
+        // BookCard에 필요한 최소한의 필드만 전달
+        const bookData: Partial<Book> = {
+          id: book.id,
+          title: book.title,
+          author: book.author,
+          coverImage: book.coverImage,
+          rating: book.rating || 0,
+          reviews: book.reviews || 0,
+          isbn: book.isbn || '',
+          description: '',
+          publisher: book.publisher || '',
+        };
+
+        // 추가 필드 적용 (any 타입 캐스팅 사용)
+        if (book.totalRatings !== undefined) {
+          (bookData as any).totalRatings = book.totalRatings;
+        }
+
+        if (book.isbn13) {
+          bookData.isbn13 = book.isbn13;
+        }
+
+        return (
+          <BookCard
+            key={book.id}
+            book={bookData as Book}
+            onClick={handleBookSelect}
+          />
+        );
+      })}
     </div>
   );
 }

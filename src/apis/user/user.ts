@@ -195,6 +195,9 @@ export const getUserBooks = async (
   }
 
   const response = await api.get(`/user/${userId}/books`, { params });
+
+  // 백엔드가 변경되어 items 내의 book 객체 형식이 바뀌었으므로
+  // 필요에 따라 반환 전에 데이터 변환 처리
   return response.data;
 };
 

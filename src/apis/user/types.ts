@@ -233,13 +233,16 @@ export interface FollowingListResponseDto {
  * 사용자 책 목록 응답 DTO
  */
 export interface UserBooksResponseDto {
-  items: ReadingStatusResponseDto[];
+  items: ExtendedReadingStatusResponseDto[];
   total: number;
   page: number;
   totalPages: number;
   hasNextPage: boolean;
 }
 
+/**
+ * 기존 ReadingStatusResponseDto는 계속 유지
+ */
 export interface ReadingStatusResponseDto {
   id: number;
   status: string; // 서버에서 "READ", "READING", "WANT_TO_READ" 형식으로 반환됨
@@ -256,4 +259,46 @@ export interface ReadingStatusResponseDto {
     coverImageUrl: string;
     isbn: string;
   };
+}
+
+/**
+ * 확장된 책 정보 DTO
+ */
+export interface ExtendedBookInfoDto {
+  id: number;
+  title: string;
+  author: string;
+  coverImage: string;
+  isbn: string;
+  publisher: string;
+  isbn13?: string;
+  translator?: string;
+  pageCount?: number;
+  publishDate?: Date;
+  rating?: number;
+  reviews?: number;
+  totalRatings?: number;
+  description?: string;
+  tags?: string[];
+  categoryId?: number;
+  subcategoryId?: number;
+  priceSales?: number;
+  priceStandard?: number;
+  isFeatured?: boolean;
+  isDiscovered?: boolean;
+}
+
+/**
+ * 확장된 독서 상태 응답 DTO
+ */
+export interface ExtendedReadingStatusResponseDto {
+  id: number;
+  status: string; // 서버에서 "READ", "READING", "WANT_TO_READ" 형식으로 반환됨
+  currentPage?: number;
+  startDate?: Date;
+  finishDate?: Date;
+  readingMemo?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  book: ExtendedBookInfoDto;
 }
