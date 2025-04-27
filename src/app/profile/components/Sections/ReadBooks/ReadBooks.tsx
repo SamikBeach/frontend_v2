@@ -159,7 +159,7 @@ export default function ReadBooks() {
             <button
               key={filter.id}
               className={cn(
-                'flex h-8 items-center rounded-full border px-3 text-[13px] font-medium transition-all',
+                'flex h-8 cursor-pointer items-center rounded-full border px-3 text-[13px] font-medium transition-all',
                 selectedStatus === filter.type
                   ? 'border-blue-200 bg-blue-50 text-blue-600'
                   : 'border-gray-200 text-gray-700 hover:bg-gray-50'

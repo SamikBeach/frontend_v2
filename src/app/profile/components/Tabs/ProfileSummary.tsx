@@ -24,8 +24,7 @@ export default function ProfileSummary({
   const { profileData } = useUserProfile(userId);
 
   // API에서 가져온 데이터 사용
-  const { libraryCount, readCount, subscribedLibraryCount, reviewCount } =
-    profileData;
+  const { libraryCount, readCount, subscribedLibraryCount } = profileData;
 
   // 평균 별점 (실제로는 API에서 받아와야 함)
   const averageRating = 4.2;
@@ -104,17 +103,7 @@ export default function ProfileSummary({
             />
           </div>
           <div className="mt-2 text-center">
-            <div className="flex flex-col items-center">
-              <span
-                className={cn(
-                  'text-sm font-medium',
-                  selectedSection === 'reviews'
-                    ? 'text-amber-600'
-                    : 'text-amber-500'
-                )}
-              >
-                ★{averageRating.toFixed(1)}
-              </span>
+            <div className="flex items-center justify-center">
               <span
                 className={cn(
                   'text-xl font-bold',
@@ -124,6 +113,16 @@ export default function ProfileSummary({
                 )}
               >
                 {profileData.reviewCount.review}
+              </span>
+              <span
+                className={cn(
+                  'ml-1 text-sm font-medium',
+                  selectedSection === 'reviews'
+                    ? 'text-amber-600'
+                    : 'text-amber-500'
+                )}
+              >
+                ★{averageRating.toFixed(1)}
               </span>
             </div>
             <span

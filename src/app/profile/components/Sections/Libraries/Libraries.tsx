@@ -45,11 +45,12 @@ export default function Libraries() {
   const pageSize = 6;
 
   // 서재 목록 가져오기 (무한 스크롤)
-  const { libraries, totalLibraries, fetchNextPage, hasNextPage, isLoading } =
-    useUserLibraries({
+  const { libraries, fetchNextPage, hasNextPage, isLoading } = useUserLibraries(
+    {
       userId,
       pageSize,
-    });
+    }
+  );
 
   // 태그 리스트 생성
   const tags = formatLibraryTags(libraries);
@@ -133,43 +134,9 @@ export default function Libraries() {
     );
   }
 
-  // 전체 책 수 계산
-  const totalBooks = libraries.reduce(
-    (sum, library) => sum + (library.bookCount || 0),
-    0
-  );
-
-  // 전체 구독자 수 계산
-  const totalFollowers = libraries.reduce(
-    (sum, library) => sum + (library.subscriberCount || 0),
-    0
-  );
-
   return (
     <>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex flex-wrap gap-3">
-            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5 select-none">
-              <span className="text-xs font-medium text-gray-500">서재</span>
-              <span className="text-sm font-semibold text-gray-900">
-                {totalLibraries}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5 select-none">
-              <span className="text-xs font-medium text-gray-500">책</span>
-              <span className="text-sm font-semibold text-gray-900">
-                {totalBooks}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5 select-none">
-              <span className="text-xs font-medium text-gray-500">구독자</span>
-              <span className="text-sm font-semibold text-gray-900">
-                {totalFollowers}
-              </span>
-            </div>
-          </div>
-        </div>
         {isMyProfile && (
           <Button
             onClick={handleCreateLibrary}

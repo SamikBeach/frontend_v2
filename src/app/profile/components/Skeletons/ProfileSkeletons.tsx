@@ -32,22 +32,6 @@ export function LibrariesSkeleton() {
   return (
     <>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex flex-wrap gap-3">
-            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5">
-              <Skeleton className="h-4 w-8 rounded" />
-              <Skeleton className="ml-1 h-[18px] w-5 rounded" />
-            </div>
-            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5">
-              <Skeleton className="h-4 w-8 rounded" />
-              <Skeleton className="ml-1 h-[18px] w-5 rounded" />
-            </div>
-            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5">
-              <Skeleton className="h-4 w-14 rounded" />
-              <Skeleton className="ml-1 h-[18px] w-5 rounded" />
-            </div>
-          </div>
-        </div>
         <div className="flex h-9 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2">
           <Skeleton className="h-4 w-4 rounded-full" />
           <Skeleton className="h-4 w-[90px]" />
