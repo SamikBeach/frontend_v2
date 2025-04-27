@@ -120,7 +120,7 @@ export function ReviewHeader({
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-              className="cursor-pointer rounded-lg py-2 text-red-500 hover:bg-red-50 hover:text-red-500"
+              className="cursor-pointer rounded-lg py-2 text-red-500 hover:bg-red-50 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
               onSelect={() => {
                 onDelete();
                 setIsDropdownOpen(false);

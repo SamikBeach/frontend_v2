@@ -23,7 +23,7 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
-import { invalidateUserProfileQueries } from '@/utils/query';
+import { isCurrentUserProfilePage } from '@/utils/query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -130,21 +130,20 @@ export function ReviewCard({ review }: ReviewCardProps) {
       type,
       bookId,
       isbn,
-      rating,
     }: {
       id: number;
       content: string;
       type: ReviewType;
       bookId?: number;
       isbn?: string;
-      rating?: number;
+      rating?: number; // 타입 정의는 유지 (기존 코드 호환성)
     }) => {
       return updateReview(id, {
         content,
         type,
         ...(bookId ? { bookId } : {}),
         ...(isbn ? { isbn } : {}),
-        ...(rating ? { rating } : {}),
+        // rating은 전달하지 않음
       });
     },
     onSuccess: (_, variables) => {
@@ -178,6 +177,26 @@ export function ReviewCard({ review }: ReviewCardProps) {
         });
       }
 
+      // 프로필 페이지 관련 쿼리 선택적 무효화
+      if (isCurrentUserProfilePage(pathname, currentUser?.id)) {
+        // 리뷰 및 활동 목록 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['user-reviews-infinite', currentUser?.id],
+          exact: false,
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ['user-activity-infinite', currentUser?.id],
+          exact: false,
+        });
+
+        // 리뷰 타입 카운트 갱신
+        queryClient.invalidateQueries({
+          queryKey: ['user-review-type-counts', currentUser?.id],
+          exact: true,
+        });
+      }
+
       toast.success('리뷰가 수정되었습니다.');
       setIsEditMode(false);
       setReviewDialogOpen(false);
@@ -204,8 +223,25 @@ export function ReviewCard({ review }: ReviewCardProps) {
         exact: false,
       });
 
-      // 프로필 페이지 관련 쿼리 무효화
-      invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
+      // 프로필 페이지에서 필요한 쿼리만 선택적 무효화
+      if (isCurrentUserProfilePage(pathname, currentUser?.id)) {
+        // 리뷰 및 활동 목록 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['user-reviews-infinite', currentUser?.id],
+          exact: false,
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ['user-activity-infinite', currentUser?.id],
+          exact: false,
+        });
+
+        // 리뷰 타입 카운트 갱신
+        queryClient.invalidateQueries({
+          queryKey: ['user-review-type-counts', currentUser?.id],
+          exact: true,
+        });
+      }
 
       toast.success('리뷰가 삭제되었습니다.');
     },
@@ -223,8 +259,25 @@ export function ReviewCard({ review }: ReviewCardProps) {
         exact: false,
       });
 
-      // 프로필 페이지 관련 쿼리 무효화
-      invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
+      // 프로필 페이지에서 필요한 쿼리만 선택적 무효화
+      if (isCurrentUserProfilePage(pathname, currentUser?.id)) {
+        // 리뷰, 활동, 별점 목록 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['user-ratings-infinite', currentUser?.id],
+          exact: false,
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ['user-activity-infinite', currentUser?.id],
+          exact: false,
+        });
+
+        // 리뷰 타입 카운트 갱신
+        queryClient.invalidateQueries({
+          queryKey: ['user-review-type-counts', currentUser?.id],
+          exact: true,
+        });
+      }
 
       toast.success('별점이 삭제되었습니다.');
     },
@@ -303,7 +356,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
         );
       }
 
-      // 2. 리뷰 업데이트 호출
+      // 2. 리뷰 업데이트 호출 (rating 속성은 전달하지 않음)
       await updateReviewMutation.mutateAsync({
         id: review.id,
         content,
@@ -315,7 +368,6 @@ export function ReviewCard({ review }: ReviewCardProps) {
                 Number(selectedBook.id) < 0
                   ? selectedBook.isbn13 || selectedBook.isbn || ''
                   : undefined,
-              rating,
             }
           : {}),
       });
@@ -561,7 +613,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
         )}
       </CardContent>
       <Separator className="bg-gray-100" />
-      {!isEditMode && (
+      {!isEditMode && extendedReview.activityType !== 'rating' && (
         <CardFooter className="flex flex-col gap-4 px-5 py-3">
           <ReviewActions
             isLiked={isLiked || false}
@@ -627,9 +679,11 @@ export function ReviewCard({ review }: ReviewCardProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer rounded-xl">
+              취소
+            </AlertDialogCancel>
             <AlertDialogAction
-              className="rounded-xl bg-red-500 hover:bg-red-600"
+              className="cursor-pointer rounded-xl bg-red-500 hover:bg-red-600"
               onClick={handleDeleteReview}
             >
               삭제
@@ -646,7 +700,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
             <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogAction className="rounded-lg bg-gray-900 hover:bg-gray-800">
+            <AlertDialogAction className="cursor-pointer rounded-lg bg-gray-900 hover:bg-gray-800">
               확인
             </AlertDialogAction>
           </AlertDialogFooter>

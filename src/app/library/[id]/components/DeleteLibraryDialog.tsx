@@ -1,5 +1,3 @@
-'use client';
-
 import { Library, deleteLibrary } from '@/apis/library';
 import {
   AlertDialog,

@@ -63,6 +63,12 @@ export function invalidateUserProfileQueries(
     exact: false,
   });
 
+  // 사용자 서재 목록 쿼리 무효화
+  queryClient.invalidateQueries({
+    queryKey: ['user-libraries-infinite', currentUserId],
+    exact: false,
+  });
+
   // 리뷰 타입 카운트 쿼리 무효화
   queryClient.invalidateQueries({
     queryKey: ['user-review-type-counts', currentUserId],
