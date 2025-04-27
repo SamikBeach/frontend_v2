@@ -1,8 +1,8 @@
+import { Book } from '@/apis';
 import {
   Comment as ApiComment,
   ReviewResponseDto,
   ReviewUser,
-  UserRating,
 } from '@/apis/review/types';
 
 // 읽기 통계 정보 인터페이스
@@ -17,24 +17,10 @@ export interface ReadingStats {
   };
 }
 
-// Extend the ReviewBook interface to add the missing properties
-export interface ExtendedReviewBook {
-  id: number;
-  title: string;
-  author: string;
-  coverImage: string;
-  isbn: string;
-  publisher: string;
-  rating: number;
-  reviews: number;
-  userRating?: UserRating;
-  readingStats?: ReadingStats;
-}
-
 // Extend the ReviewResponseDto to include rating property
 export interface ExtendedReviewResponseDto
   extends Omit<ReviewResponseDto, 'likeCount' | 'commentCount' | 'isLiked'> {
-  book?: ExtendedReviewBook;
+  book?: Book;
   comments?: Comment[];
   rating?: number;
   mentions?: ReviewUser[];

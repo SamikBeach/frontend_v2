@@ -1,48 +1,44 @@
+import { Book } from '@/apis';
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { BookOpen, CheckCircle2, Clock, MessageCircle } from 'lucide-react';
-import { ExtendedReviewBook } from '../types';
 import { renderStarRating } from '../utils';
 
 interface BookPreviewProps {
-  book: ExtendedReviewBook;
+  book: Book;
   onClick: () => void;
 }
 
 export function BookPreview({ book, onClick }: BookPreviewProps) {
   // 책의 평점과 리뷰 수 표시
-  const renderRatingAndReviews = (book: ExtendedReviewBook) => {
-    const hasRating = book.rating !== undefined && book.rating > 0;
+  const renderRatingAndReviews = (book: Book) => {
     const hasReviews = book.reviews !== undefined && book.reviews > 0;
     const hasTotalRatings =
       book.totalRatings !== undefined && book.totalRatings > 0;
 
-    if (!hasRating && !hasReviews) return null;
-
     // rating이 숫자가 아닐 경우 숫자로 변환
-    const ratingValue = hasRating
-      ? typeof book.rating === 'number'
-        ? book.rating
-        : typeof book.rating === 'string'
-          ? parseFloat(book.rating)
-          : 0
-      : 0;
+    const ratingValue =
+      book.rating !== undefined
+        ? typeof book.rating === 'number'
+          ? book.rating
+          : typeof book.rating === 'string'
+            ? parseFloat(book.rating)
+            : 0
+        : 0;
 
     return (
       <div className="mt-1.5 flex items-center gap-2">
-        {/* 별점 */}
-        {hasRating && (
-          <div className="flex items-center">
-            {renderStarRating(ratingValue)}
-            <span className="ml-1 text-xs font-medium text-gray-800">
-              {ratingValue.toFixed(1)}
+        {/* 별점 - 항상 표시 (0점이어도 표시) */}
+        <div className="flex items-center">
+          {renderStarRating(ratingValue)}
+          <span className="ml-1 text-xs font-medium text-gray-800">
+            {ratingValue.toFixed(1)}
+          </span>
+          {hasTotalRatings && (
+            <span className="ml-0.5 text-xs text-gray-500">
+              ({book.totalRatings})
             </span>
-            {hasTotalRatings && (
-              <span className="ml-0.5 text-xs text-gray-500">
-                ({book.totalRatings})
-              </span>
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
         {/* 리뷰 수 */}
         {hasReviews && (
@@ -60,7 +56,7 @@ export function BookPreview({ book, onClick }: BookPreviewProps) {
   };
 
   // 읽기 상태 표시 함수
-  const renderReadingStatus = (book: ExtendedReviewBook) => {
+  const renderReadingStatus = (book: Book) => {
     if (!book.userReadingStatus) return null;
 
     const statusConfig = {
@@ -129,7 +125,7 @@ export function BookPreview({ book, onClick }: BookPreviewProps) {
           <h4 className="text-sm font-medium text-gray-900">{book.title}</h4>
           <p className="text-xs text-gray-500">{book.author}</p>
 
-          {/* 별점 및 리뷰 수 */}
+          {/* 별점 및 리뷰 수 - 항상 표시 */}
           {renderRatingAndReviews(book)}
 
           {/* 읽기 상태 */}

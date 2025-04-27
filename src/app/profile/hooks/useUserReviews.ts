@@ -1,18 +1,18 @@
-import { ReviewType } from '@/apis/review/types';
+import { ReviewResponseDto, ReviewType } from '@/apis/review/types';
 import { getUserReviews } from '@/apis/user/user';
 import { useInfiniteQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 
 interface UseUserReviewsResult {
-  reviews: any[]; // Use any to match actual server response
+  reviews: ReviewResponseDto[];
   isLoading: boolean;
   error: Error | null;
   totalReviews: number;
   currentPage: number;
   totalPages: number;
-  fetchNextPage?: () => Promise<any>;
-  hasNextPage?: boolean;
-  isFetchingNextPage?: boolean;
+  fetchNextPage: () => Promise<any>;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
 }
 
 /**
@@ -21,7 +21,10 @@ interface UseUserReviewsResult {
 export function useUserReviews(
   page: number = 1,
   limit: number = 10
-): UseUserReviewsResult {
+): Omit<
+  UseUserReviewsResult,
+  'fetchNextPage' | 'hasNextPage' | 'isFetchingNextPage'
+> {
   const params = useParams();
   const userId = Number(params.id);
 
@@ -43,54 +46,13 @@ export function useUserReviews(
 }
 
 /**
- * 사용자의 특정 타입 리뷰만 로드하는 훅 (페이지네이션 방식)
- */
-export function useUserReviewsByType(
-  page: number = 1,
-  limit: number = 10,
-  reviewType: ReviewType | 'all'
-): UseUserReviewsResult {
-  const params = useParams();
-  const userId = Number(params.id);
-
-  const { data, isLoading, error } = useSuspenseQuery({
-    queryKey: ['user-reviews-by-type', userId, page, limit, reviewType],
-    queryFn: async () => {
-      const result = await getUserReviews(userId, page, limit);
-
-      // 'all'이 아닌 경우에만 프론트엔드에서 필터링
-      if (reviewType !== 'all') {
-        const filteredReviews = result.reviews.filter(
-          review => review.type === reviewType
-        );
-        return {
-          ...result,
-          reviews: filteredReviews,
-          total: filteredReviews.length,
-          totalPages: Math.ceil(filteredReviews.length / limit) || 1,
-        };
-      }
-
-      return result;
-    },
-  });
-
-  return {
-    reviews: data?.reviews || [],
-    isLoading,
-    error: error as Error | null,
-    totalReviews: data?.total || 0,
-    currentPage: page,
-    totalPages: data?.totalPages || 0,
-  };
-}
-
-/**
- * 사용자의 특정 타입 리뷰만 로드하는 훅 (무한 스크롤 방식)
+ * 사용자의 리뷰를 로드하는 훅 (무한 스크롤 방식)
+ * @param limit 페이지당 항목 수
+ * @param reviewTypes 리뷰 타입 배열 (비어있을 경우 모든 타입 반환)
  */
 export function useUserReviewsInfinite(
   limit: number = 10,
-  reviewType: ReviewType | 'all' = 'all'
+  reviewTypes?: ReviewType[]
 ): UseUserReviewsResult {
   const params = useParams();
   const userId = Number(params.id);
@@ -103,21 +65,25 @@ export function useUserReviewsInfinite(
     status,
     error,
   } = useInfiniteQuery({
-    queryKey: ['user-reviews-infinite', userId, limit, reviewType],
+    queryKey: ['user-reviews-infinite', userId, limit, reviewTypes],
     queryFn: async ({ pageParam = 1 }) => {
-      const result = await getUserReviews(userId, pageParam, limit);
+      // API 호출: reviewTypes가 있으면 배열로 전달, 없으면 전체 조회
+      const result = await getUserReviews(
+        userId,
+        pageParam,
+        limit,
+        reviewTypes
+      );
 
-      // 리뷰 데이터 필터링 (프론트엔드에서)
-      let filtered = result.reviews;
-      if (reviewType !== 'all') {
-        filtered = result.reviews.filter(review => review.type === reviewType);
-      }
+      // 페이지 정보 계산
+      const totalPages = result.totalPages || Math.ceil(result.total / limit);
+      const hasMore = pageParam < totalPages && result.reviews.length > 0;
 
       return {
         ...result,
-        reviews: filtered,
+        reviews: result.reviews,
         page: pageParam,
-        hasNextPage: pageParam < result.totalPages,
+        hasNextPage: hasMore,
       };
     },
     getNextPageParam: lastPage => {

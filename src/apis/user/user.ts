@@ -210,14 +210,44 @@ export const getUserBooks = async (
  * @param userId 사용자 ID
  * @param page 페이지 번호 (기본값: 1)
  * @param limit 페이지당 항목 수 (기본값: 10)
+ * @param type 리뷰 타입 필터 (선택 사항, 문자열 또는 문자열 배열)
+ * @param filter 정렬 필터 (선택 사항, 'popular' 또는 'recent')
  */
 export const getUserReviews = async (
   userId: number,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  type?: string | string[],
+  filter: 'popular' | 'recent' = 'recent'
 ): Promise<UserReviewsResponseDto> => {
+  // 파라미터 객체 생성
+  const params: Record<string, any> = { page, limit, filter };
+
+  // type 파라미터가 있는 경우 추가
+  if (type) {
+    // 배열인 경우 각 타입을 개별 파라미터로 추가
+    if (Array.isArray(type)) {
+      // URLSearchParams에서 처리 가능한 형태로 변환
+      type.forEach(t => {
+        // 기존에 type 파라미터가 있으면 overwrite 방지
+        if (!('type' in params)) {
+          params.type = t;
+        } else {
+          // URLSearchParams는 동일 키에 여러 값 추가 가능
+          // axios가 자동으로 처리해줌 (type=value1&type=value2 형태로)
+          if (!Array.isArray(params.type)) {
+            params.type = [params.type];
+          }
+          params.type.push(t);
+        }
+      });
+    } else {
+      params.type = type;
+    }
+  }
+
   const response = await api.get(`/user/${userId}/reviews`, {
-    params: { page, limit },
+    params,
   });
   return response.data;
 };

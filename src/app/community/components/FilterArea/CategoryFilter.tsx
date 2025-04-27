@@ -11,12 +11,11 @@ export function CategoryFilter({
   selectedCategory,
   onCategoryClick,
 }: CategoryFilterProps) {
-  // 카테고리 목록 생성
+  // 카테고리 목록 생성 - 'review' 타입 제외
   const mainCategories = [
     { id: 'all', name: '전체' },
     { id: 'general', name: '일반' },
     { id: 'discussion', name: '토론' },
-    { id: 'review', name: '리뷰' },
     { id: 'question', name: '질문' },
     { id: 'meetup', name: '모임' },
   ];

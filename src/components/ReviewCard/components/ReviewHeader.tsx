@@ -39,6 +39,18 @@ export function ReviewHeader({
   const author = review.author as ReviewUser;
   const avatarSrc = author.profileImage ?? undefined;
 
+  // 별점이 있는지 확인 (userRating이나 rating이 있고 0보다 큰 경우)
+  const hasRating =
+    (review.userRating && review.userRating.rating > 0) ||
+    (review.rating && review.rating > 0);
+
+  // 별점 값 계산
+  const rating = review.userRating
+    ? review.userRating.rating
+    : review.rating && review.rating > 0
+      ? review.rating
+      : 0;
+
   return (
     <div className="flex items-start justify-between">
       <div className="flex items-center gap-3">
@@ -62,24 +74,14 @@ export function ReviewHeader({
             </Link>
             <TagName type={review.type} />
 
-            {/* 별점 표시 - 리뷰 태그 우측에 위치 */}
-            {review.userRating && (
+            {/* 별점 표시 - 별점이 있을 때만 표시 */}
+            {hasRating && (
               <div className="flex items-center rounded-full bg-yellow-50 px-2 py-0.5">
-                {renderStarRating(review.userRating.rating)}
+                {renderStarRating(rating)}
                 <span className="ml-0.5 text-xs font-medium text-yellow-700">
-                  {typeof review.userRating.rating === 'number'
-                    ? review.userRating.rating.toFixed(1)
-                    : parseFloat(String(review.userRating.rating)).toFixed(1)}
-                </span>
-              </div>
-            )}
-            {!review.userRating && review.rating && review.rating > 0 && (
-              <div className="flex items-center rounded-full bg-yellow-50 px-2 py-0.5">
-                {renderStarRating(review.rating)}
-                <span className="ml-0.5 text-xs font-medium text-yellow-700">
-                  {typeof review.rating === 'number'
-                    ? review.rating.toFixed(1)
-                    : parseFloat(String(review.rating)).toFixed(1)}
+                  {typeof rating === 'number'
+                    ? rating.toFixed(1)
+                    : parseFloat(String(rating)).toFixed(1)}
                 </span>
               </div>
             )}
