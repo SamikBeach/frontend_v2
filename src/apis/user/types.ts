@@ -188,6 +188,7 @@ export interface UserDetailResponseDto {
   libraries?: LibraryPreviewDto[];
   averageRating?: number | null;
   ratingCount: number;
+  reviewAndRatingCount?: number;
 }
 
 /**

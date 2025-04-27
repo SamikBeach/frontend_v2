@@ -38,10 +38,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { invalidateUserProfileQueries } from '@/utils/query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { usePathname } from 'next/navigation';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
-import { BookReviewsSkeleton } from './components/common';
+import { BookReviewsSkeleton } from './components/common/Skeletons';
 import { useBookDetails, useBookReviews, useReviewDialog } from './hooks';
 import { useReviewComments } from './hooks/useReviewComments';
 
@@ -427,6 +429,7 @@ function ReviewsList({
     handleReviewSubmit,
     isSubmitting,
   } = useReviewDialog();
+  const pathname = usePathname();
 
   const {
     reviews,
@@ -462,6 +465,10 @@ function ReviewsList({
     onSuccess: () => {
       // 리뷰 목록 갱신
       queryClient.invalidateQueries({ queryKey: ['book-reviews'] });
+
+      // 프로필 페이지 관련 쿼리 무효화
+      invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
+
       toast.success('리뷰가 삭제되었습니다');
     },
     onError: error => {

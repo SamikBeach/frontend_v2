@@ -24,7 +24,8 @@ export default function ProfileSummary({
   const { profileData } = useUserProfile(userId);
 
   // API에서 가져온 데이터 사용
-  const { libraryCount, readCount, subscribedLibraryCount } = profileData;
+  const { libraryCount, readCount, subscribedLibraryCount, ratingCount } =
+    profileData;
 
   // 평균 별점 API에서 가져오기 (null인 경우 0으로 처리)
   const averageRating = profileData.averageRating ?? 0;
@@ -112,7 +113,8 @@ export default function ProfileSummary({
                     : 'text-gray-800'
                 )}
               >
-                {profileData.reviewCount.review}
+                {profileData.reviewAndRatingCount ||
+                  profileData.reviewCount.review + ratingCount}
               </span>
               <span
                 className={cn(

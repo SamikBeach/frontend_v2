@@ -2,10 +2,13 @@ import { createOrUpdateRating } from '@/apis/rating/rating';
 import { createReview, updateReview } from '@/apis/review/review';
 import { Review } from '@/apis/review/types';
 import { bookReviewSortAtom } from '@/atoms/book';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { invalidateUserProfileQueries } from '@/utils/query';
 import { updateBookRating } from '@/utils/rating';
 import { BookWithRating } from '@/utils/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
+import { usePathname } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
@@ -13,6 +16,8 @@ import { useBookDetails } from './useBookDetails';
 export function useReviewDialog() {
   const { book, isbn, userRating: userRatingData } = useBookDetails();
   const queryClient = useQueryClient();
+  const currentUser = useCurrentUser();
+  const pathname = usePathname();
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
   const sort = useAtomValue(bookReviewSortAtom);
 
@@ -21,50 +26,42 @@ export function useReviewDialog() {
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [initialContent, setInitialContent] = useState('');
 
-  // 리뷰 제출 뮤테이션
+  // 리뷰 제출 뮤테이션 (생성/수정/별점 모두 처리)
   const mutation = useMutation({
-    mutationFn: async ({
-      rating,
-      content,
-    }: {
+    mutationFn: async (params: {
       rating: number;
       content: string;
-    }) => {
+    }): Promise<any> => {
+      const { rating, content } = params;
+
+      // 책 ID 확인
       if (!book?.id) {
-        throw new Error('책 정보를 찾을 수 없습니다.');
+        throw new Error('책 정보가 없습니다.');
       }
 
-      // ISBN 정보 확인
-      const bookIsbn = book.isbn13 || book.isbn;
-      const isNegativeBookId = book.id < 0;
+      // 별점만 등록(또는 업데이트)하는 경우
+      if (!content.trim()) {
+        return await createOrUpdateRating(
+          book.id,
+          { rating, comment: content },
+          book.id < 0 ? isbn : undefined
+        );
+      }
 
-      // 항상 평점 등록 (comment 없이)
-      const ratingResult = await createOrUpdateRating(
-        book.id,
-        { rating },
-        isNegativeBookId ? bookIsbn : undefined
-      );
-
-      // 수정 모드인 경우 리뷰 업데이트
+      // 리뷰 수정 모드
       if (isEditMode && editingReview) {
-        await updateReview(editingReview.id, {
-          content: content.trim(),
-          type: 'review',
-          bookId: parseInt(String(book.id), 10),
-          isbn: isNegativeBookId ? bookIsbn : undefined,
-        });
-      }
-      // 새 리뷰 작성 (내용이 있는 경우)
-      else if (content.trim()) {
-        await createReview({
-          content: content.trim(),
-          type: 'review',
-          bookId: parseInt(String(book.id), 10),
-          isbn: isNegativeBookId ? bookIsbn : undefined,
+        return await updateReview(editingReview.id, {
+          content,
+          bookId: book.id,
         });
       }
 
-      return ratingResult;
+      // 새 리뷰 생성
+      return await createReview({
+        content,
+        type: 'review',
+        bookId: book.id,
+      });
     },
     onSuccess: data => {
       // 직접 book-detail 캐시 업데이트 (별점 즉시 반영)
@@ -78,6 +75,18 @@ export function useReviewDialog() {
         if (book?.id) {
           queryClient.setQueryData(['user-book-rating', book.id], data);
         }
+
+        // book-reviews 쿼리 무효화하여 리뷰 목록 갱신
+        queryClient.invalidateQueries({
+          queryKey: ['book-reviews', book.id],
+          refetchType: 'active',
+        });
+
+        // 추가적으로 정렬 상태를 고려하여 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['book-reviews', book.id, sort],
+          refetchType: 'active',
+        });
 
         // book-reviews 쿼리 데이터 업데이트하여 별점 즉시 반영
         queryClient.setQueryData(['book-reviews', book.id], (oldData: any) => {
@@ -113,6 +122,9 @@ export function useReviewDialog() {
         });
       }
 
+      // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
+      invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
+
       // 다이얼로그 닫기
       setReviewDialogOpen(false);
 
@@ -124,51 +136,28 @@ export function useReviewDialog() {
           ? '리뷰가 수정되었습니다.'
           : '리뷰가 성공적으로 저장되었습니다.'
       );
-
-      // 필요한 데이터만 선택적으로 무효화
-      if (book?.id) {
-        // 정확한 쿼리 키로 무효화하고 refetchType을 active로 변경
-        queryClient.invalidateQueries({
-          queryKey: ['book-reviews', book.id, sort, isbn],
-          refetchType: 'active',
-        });
-      }
-
-      // ISBN이 있고 북ID가 -1 또는 음수인 경우에도 무효화
-      if (isbn && (!book?.id || book.id <= 0)) {
-        queryClient.invalidateQueries({
-          queryKey: ['book-reviews', -1],
-          refetchType: 'active',
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ['book-reviews', 0],
-          refetchType: 'active',
-        });
-      }
-
-      return data?.rating;
     },
-    onError: () => {
-      toast.error('리뷰 저장 중 오류가 발생했습니다. 다시 시도해주세요.');
+    onError: error => {
+      console.error('리뷰 저장 오류:', error);
+      toast.error(
+        isEditMode ? '리뷰 수정에 실패했습니다.' : '리뷰 저장에 실패했습니다.'
+      );
     },
   });
 
-  // 수정 모드 초기화
+  // 리뷰 다이얼로그 열기 핸들러
+  const handleOpenReviewDialog = useCallback(() => {
+    // 열 때 수정 모드 초기화
+    resetEditMode();
+    setReviewDialogOpen(true);
+  }, []);
+
+  // 리뷰 수정 모드 초기화
   const resetEditMode = useCallback(() => {
     setIsEditMode(false);
     setEditingReview(null);
     setInitialContent('');
   }, []);
-
-  // 현재 사용자의 별점 가져오기
-  const userRating = userRatingData?.rating || 0;
-
-  // 리뷰 다이얼로그 열기 핸들러 (새 리뷰 작성)
-  const handleOpenReviewDialog = useCallback(() => {
-    resetEditMode();
-    setReviewDialogOpen(true);
-  }, [resetEditMode]);
 
   // 리뷰 수정 다이얼로그 열기 핸들러
   const handleOpenEditReviewDialog = useCallback((review: Review) => {
@@ -178,9 +167,15 @@ export function useReviewDialog() {
     setReviewDialogOpen(true);
   }, []);
 
-  // 리뷰 제출 처리
+  // 리뷰 제출 핸들러
   const handleReviewSubmit = useCallback(
     (rating: number, content: string) => {
+      if (!book) {
+        toast.error('책 정보가 없습니다.');
+        return;
+      }
+
+      // 삭제 기능이 아니라면 별점 필수
       if (rating === 0) {
         toast.error('별점을 선택해주세요.');
         return;
@@ -188,8 +183,11 @@ export function useReviewDialog() {
 
       mutation.mutate({ rating, content });
     },
-    [mutation]
+    [book, mutation]
   );
+
+  // 사용자의 현재 별점 (없으면 0)
+  const userRating = userRatingData?.rating || 0;
 
   return {
     reviewDialogOpen,

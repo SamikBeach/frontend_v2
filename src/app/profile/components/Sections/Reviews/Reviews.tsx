@@ -242,11 +242,16 @@ function AllList() {
 }
 
 // 선택된 탭에 따라 콘텐츠를 표시하는 컴포넌트
-function ReviewContent({ selectedTab }: { selectedTab: 'all' | 'reviews' }) {
+function ReviewContent({
+  selectedTab,
+}: {
+  selectedTab: 'all' | 'reviews' | 'ratings';
+}) {
   return (
     <>
       {selectedTab === 'all' && <AllList />}
       {selectedTab === 'reviews' && <ReviewList />}
+      {selectedTab === 'ratings' && <RatingList />}
     </>
   );
 }
@@ -256,8 +261,8 @@ function FilterMenu({
   selectedTab,
   setSelectedTab,
 }: {
-  selectedTab: 'all' | 'reviews';
-  setSelectedTab: (tab: 'all' | 'reviews') => void;
+  selectedTab: 'all' | 'reviews' | 'ratings';
+  setSelectedTab: (tab: 'all' | 'reviews' | 'ratings') => void;
 }) {
   const params = useParams();
   const userId = Number(params.id);
@@ -266,7 +271,9 @@ function FilterMenu({
   // 리뷰 카운트 가져오기
   const reviewCount = profileData.reviewCount.review || 0;
   const ratingCount = profileData.ratingCount || 0;
-  const totalCount = reviewCount + ratingCount;
+  const totalCount =
+    profileData.reviewAndRatingCount ||
+    profileData.reviewCount.total + profileData.ratingCount;
 
   return (
     <div className="mb-6 flex flex-wrap gap-3">
@@ -284,13 +291,22 @@ function FilterMenu({
         isSelected={selectedTab === 'reviews'}
         onClick={() => setSelectedTab('reviews')}
       />
+      <MenuItem
+        id="ratings"
+        name="별점만"
+        count={ratingCount}
+        isSelected={selectedTab === 'ratings'}
+        onClick={() => setSelectedTab('ratings')}
+      />
     </div>
   );
 }
 
 // 메인 컴포넌트
 export default function Reviews() {
-  const [selectedTab, setSelectedTab] = useState<'all' | 'reviews'>('all');
+  const [selectedTab, setSelectedTab] = useState<'all' | 'reviews' | 'ratings'>(
+    'all'
+  );
 
   return (
     <div>

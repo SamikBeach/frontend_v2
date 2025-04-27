@@ -1,4 +1,4 @@
-import { createOrUpdateRating } from '@/apis/rating/rating';
+import { createOrUpdateRating, deleteRating } from '@/apis/rating/rating';
 import { deleteReview, updateReview } from '@/apis/review/review';
 import { ReviewType } from '@/apis/review/types';
 import { SearchResult } from '@/apis/search/types';
@@ -23,7 +23,9 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
+import { invalidateUserProfileQueries } from '@/utils/query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { CommentSection } from './components';
@@ -41,18 +43,19 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
   // 현재 사용자 정보 가져오기
   const currentUser = useCurrentUser();
+  const queryClient = useQueryClient();
+  const pathname = usePathname();
 
   const [expanded, setExpanded] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
-  const queryClient = useQueryClient();
 
   // Review 수정 관련 상태
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [editedContent, setEditedContent] = useState(review.content);
-  const [editedType, setEditedType] = useState<ReviewType>(review.type);
+  const [editedContent, setEditedContent] = useState(extendedReview.content);
+  const [editedType, setEditedType] = useState(extendedReview.type);
   const [editedRating, setEditedRating] = useState<number>(
     extendedReview.rating ||
       (extendedReview.userRating
@@ -83,8 +86,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
   // Review 좋아요 관련 훅
   const { handleLikeToggle, isLoading: isLikeLoading } = useReviewLike();
-  const [isLiked, setIsLiked] = useState(review.isLiked);
-  const [likesCount, setLikesCount] = useState(review.likeCount);
+  const [isLiked, setIsLiked] = useState(extendedReview.isLiked);
+  const [likeCount, setLikeCount] = useState(extendedReview.likeCount);
 
   // 댓글 좋아요 관련 훅
   const { handleLikeToggle: handleCommentLikeToggle } = useCommentLike();
@@ -108,8 +111,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
   // 초기 수정 상태 설정
   useEffect(() => {
     if (review) {
-      setEditedContent(review.content);
-      setEditedType(review.type);
+      setEditedContent(extendedReview.content);
+      setEditedType(extendedReview.type);
       setEditedRating(
         extendedReview.rating ||
           (extendedReview.userRating
@@ -200,10 +203,33 @@ export function ReviewCard({ review }: ReviewCardProps) {
         queryKey: ['communityReviews'],
         exact: false,
       });
+
+      // 프로필 페이지 관련 쿼리 무효화
+      invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
+
       toast.success('리뷰가 삭제되었습니다.');
     },
     onError: () => {
       toast.error('리뷰 삭제 중 오류가 발생했습니다.');
+    },
+  });
+
+  // 별점 삭제 mutation
+  const deleteRatingMutation = useMutation({
+    mutationFn: (id: number) => deleteRating(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['communityReviews'],
+        exact: false,
+      });
+
+      // 프로필 페이지 관련 쿼리 무효화
+      invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
+
+      toast.success('별점이 삭제되었습니다.');
+    },
+    onError: () => {
+      toast.error('별점 삭제 중 오류가 발생했습니다.');
     },
   });
 
@@ -248,8 +274,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
     } else {
       setIsEditMode(true);
     }
-    setEditedContent(review.content);
-    setEditedType(review.type);
+    setEditedContent(extendedReview.content);
+    setEditedType(extendedReview.type);
     setEditedRating(
       extendedReview.rating ||
         (extendedReview.userRating
@@ -371,8 +397,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
   const handleCancelEdit = () => {
     setIsEditMode(false);
-    setEditedContent(review.content);
-    setEditedType(review.type);
+    setEditedContent(extendedReview.content);
+    setEditedType(extendedReview.type);
     setEditedRating(
       extendedReview.rating ||
         (extendedReview.userRating
@@ -383,7 +409,13 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
   // 리뷰 삭제 핸들러
   const handleDeleteReview = () => {
-    deleteReviewMutation.mutate(review.id);
+    if (extendedReview.activityType === 'rating') {
+      // 별점인 경우 deleteRating API 호출
+      deleteRatingMutation.mutate(review.id);
+    } else {
+      // 일반 리뷰인 경우 deleteReview API 호출
+      deleteReviewMutation.mutate(review.id);
+    }
     setDeleteDialogOpen(false);
   };
 
@@ -397,7 +429,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
     // 낙관적 UI 업데이트
     setIsLiked(!isLiked);
-    setLikesCount(prev => (isLiked ? (prev || 0) - 1 : (prev || 0) + 1));
+    setLikeCount(prev => (isLiked ? (prev || 0) - 1 : (prev || 0) + 1));
 
     try {
       // API 호출
@@ -405,7 +437,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
     } catch (error) {
       // 에러 발생 시 UI 되돌리기
       setIsLiked(isLiked);
-      setLikesCount(likesCount);
+      setLikeCount(likeCount);
       console.error('좋아요 처리 중 오류:', error);
     }
   };
@@ -418,11 +450,11 @@ export function ReviewCard({ review }: ReviewCardProps) {
   };
 
   // 텍스트가 길면 접어두기
-  const isLongContent = review.content.length > 300;
+  const isLongContent = extendedReview.content.length > 300;
   const displayContent =
     isLongContent && !expanded
-      ? review.content.substring(0, 300) + '...'
-      : review.content;
+      ? extendedReview.content.substring(0, 300) + '...'
+      : extendedReview.content;
 
   // Book dialog 열기 핸들러
   const handleBookClick = () => {
@@ -533,7 +565,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
         <CardFooter className="flex flex-col gap-4 px-5 py-3">
           <ReviewActions
             isLiked={isLiked || false}
-            likesCount={likesCount || 0}
+            likesCount={likeCount || 0}
             commentCount={review.commentCount || 0}
             showComments={showComments}
             isLikeLoading={isLikeLoading}
@@ -583,9 +615,15 @@ export function ReviewCard({ review }: ReviewCardProps) {
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent className="max-w-md rounded-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>리뷰 삭제</AlertDialogTitle>
+            <AlertDialogTitle>
+              {extendedReview.activityType === 'rating'
+                ? '별점 삭제'
+                : '리뷰 삭제'}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              이 리뷰를 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
+              {extendedReview.activityType === 'rating'
+                ? '이 별점을 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.'
+                : '이 리뷰를 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

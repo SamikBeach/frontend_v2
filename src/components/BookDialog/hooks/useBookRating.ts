@@ -1,7 +1,10 @@
 import { RatingDto, createOrUpdateRating, deleteRating } from '@/apis/rating';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { invalidateUserProfileQueries } from '@/utils/query';
 import { removeBookRating, updateBookRating } from '@/utils/rating';
 import { BookWithRating } from '@/utils/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { usePathname } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
@@ -10,6 +13,8 @@ import { useBookDetails } from './useBookDetails';
 export function useBookRating() {
   const queryClient = useQueryClient();
   const { book, isbn, userRating: userRatingData } = useBookDetails();
+  const currentUser = useCurrentUser();
+  const pathname = usePathname();
 
   // UI 관련 상태만 로컬로 유지 (호버 효과 등)
   const [isRatingHovered, setIsRatingHovered] = useState(false);
@@ -46,6 +51,9 @@ export function useBookRating() {
         });
       }
 
+      // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
+      invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
+
       toast.success('평점이 등록되었습니다.');
     },
     onError: () => {
@@ -69,6 +77,9 @@ export function useBookRating() {
           return removeBookRating(oldData as BookWithRating);
         });
       }
+
+      // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
+      invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
 
       toast.success('평점이 삭제되었습니다.');
     },
