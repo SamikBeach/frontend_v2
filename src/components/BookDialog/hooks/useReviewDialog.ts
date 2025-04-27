@@ -4,7 +4,6 @@ import { Review } from '@/apis/review/types';
 import { bookReviewSortAtom } from '@/atoms/book';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { invalidateUserProfileQueries } from '@/utils/query';
-import { updateBookRating } from '@/utils/rating';
 import { BookWithRating } from '@/utils/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
@@ -39,41 +38,141 @@ export function useReviewDialog() {
         throw new Error('책 정보가 없습니다.');
       }
 
+      // 리뷰 수정 모드
+      if (isEditMode && editingReview) {
+        // 리뷰 수정 시에도 별점 업데이트 필요
+        // 먼저 별점 업데이트 - comment 없이 rating만 전송
+        const ratingResponse = await createOrUpdateRating(
+          book.id,
+          { rating },
+          book.id < 0 ? isbn : undefined
+        );
+
+        // 그 다음 리뷰 내용 업데이트
+        const reviewResponse = await updateReview(editingReview.id, {
+          content,
+          bookId: book.id,
+        });
+
+        // 별점과 리뷰 응답을 합쳐서 반환
+        return {
+          ...reviewResponse,
+          rating: ratingResponse.rating,
+          ratingId: ratingResponse.id,
+        };
+      }
+
       // 별점만 등록(또는 업데이트)하는 경우
       if (!content.trim()) {
         return await createOrUpdateRating(
           book.id,
-          { rating, comment: content },
+          { rating },
           book.id < 0 ? isbn : undefined
         );
       }
 
-      // 리뷰 수정 모드
-      if (isEditMode && editingReview) {
-        return await updateReview(editingReview.id, {
-          content,
-          bookId: book.id,
-        });
-      }
+      // 새 리뷰 생성 - 별점과 리뷰를 따로 처리
+      // 먼저 별점 업데이트 - comment 없이 rating만 전송
+      const ratingResponse = await createOrUpdateRating(
+        book.id,
+        { rating },
+        book.id < 0 ? isbn : undefined
+      );
 
-      // 새 리뷰 생성
-      return await createReview({
+      // 그 다음 리뷰 생성
+      const reviewResponse = await createReview({
         content,
         type: 'review',
         bookId: book.id,
       });
+
+      // 별점과 리뷰 응답을 합쳐서 반환
+      return {
+        ...reviewResponse,
+        rating: ratingResponse.rating,
+        ratingId: ratingResponse.id,
+      };
     },
     onSuccess: data => {
       // 직접 book-detail 캐시 업데이트 (별점 즉시 반영)
       if (book && isbn) {
+        // 별점 표시를 위한 userRating 데이터 구성
+        const userRatingData = {
+          id: data.ratingId || data.id,
+          rating: data.rating,
+          bookId: book.id,
+          comment: data.comment || '',
+        };
+
         // book-detail 쿼리 데이터 직접 업데이트
         queryClient.setQueryData(['book-detail', isbn], (oldData: unknown) => {
-          return updateBookRating(oldData as BookWithRating, data);
+          if (!oldData) return oldData;
+
+          const typedOldData = oldData as BookWithRating;
+
+          // 평균 별점 업데이트 계산
+          let newRatingValue = typedOldData.rating || 0;
+          let newTotalRatings = typedOldData.totalRatings || 0;
+
+          // 기존에 userRating이 있는지 확인
+          const hadPreviousRating = !!typedOldData.userRating;
+          const oldRating = typedOldData.userRating?.rating || 0;
+          const newRating = data.rating;
+
+          if (!hadPreviousRating) {
+            // 새 평점 추가 - 총합에 새 평점 추가하고 카운트 증가
+            const totalRatingSum = newRatingValue * newTotalRatings + newRating;
+            newTotalRatings += 1;
+            newRatingValue =
+              newTotalRatings > 0 ? totalRatingSum / newTotalRatings : 0;
+          } else if (oldRating !== newRating) {
+            // 평점 변경 - 총합에서 이전 평점 제거하고 새 평점 추가
+            const totalRatingSum =
+              newRatingValue * newTotalRatings - oldRating + newRating;
+            newRatingValue =
+              newTotalRatings > 0 ? totalRatingSum / newTotalRatings : 0;
+          }
+
+          // 업데이트된 데이터 반환
+          return {
+            ...typedOldData,
+            userRating: userRatingData,
+            rating: newRatingValue,
+            totalRatings: newTotalRatings,
+          };
         });
 
         // user-book-rating 캐시 직접 업데이트
         if (book?.id) {
-          queryClient.setQueryData(['user-book-rating', book.id], data);
+          queryClient.setQueryData(
+            ['user-book-rating', book.id],
+            userRatingData
+          );
+        }
+
+        // 평균 별점 정보 계산 (book-reviews 업데이트에 사용)
+        let updatedRating = book.rating || 0;
+        let updatedTotalRatings = book.totalRatings || 0;
+
+        // 기존에 userRating이 있는지 확인
+        const hadUserRating = !!book.userRating;
+        const previousRating = book.userRating?.rating || 0;
+        const currentRating = data.rating;
+
+        if (!hadUserRating) {
+          // 새 평점 추가
+          const sum = updatedRating * updatedTotalRatings + currentRating;
+          updatedTotalRatings += 1;
+          updatedRating =
+            updatedTotalRatings > 0 ? sum / updatedTotalRatings : 0;
+        } else if (previousRating !== currentRating) {
+          // 평점 변경
+          const sum =
+            updatedRating * updatedTotalRatings -
+            previousRating +
+            currentRating;
+          updatedRating =
+            updatedTotalRatings > 0 ? sum / updatedTotalRatings : 0;
         }
 
         // book-reviews 쿼리 무효화하여 리뷰 목록 갱신
@@ -105,13 +204,19 @@ export function useReviewDialog() {
                   const isMatchingBook = review.book?.id === book.id;
 
                   if (isMatchingBook) {
+                    // 리뷰의 책 정보에도 새로운 평균 평점 반영
+                    const updatedBook = review.book
+                      ? {
+                          ...review.book,
+                          rating: updatedRating,
+                          totalRatings: updatedTotalRatings,
+                        }
+                      : review.book;
+
                     return {
                       ...review,
-                      userRating: {
-                        bookId: book.id,
-                        rating: data.rating,
-                        comment: data.comment || '',
-                      },
+                      userRating: userRatingData,
+                      book: updatedBook,
                     };
                   }
                   return review;
