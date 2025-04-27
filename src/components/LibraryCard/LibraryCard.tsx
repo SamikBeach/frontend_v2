@@ -6,6 +6,7 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Tag } from '@/utils/tags';
 import { BookOpen, Users } from 'lucide-react';
 import Link from 'next/link';
@@ -17,6 +18,12 @@ export interface LibraryCardProps {
 }
 
 export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
+  // 현재 사용자 정보 가져오기
+  const currentUser = useCurrentUser();
+
+  // 사용자가 서재의 소유자인지 확인
+  const isOwner = currentUser?.id === library.owner?.id;
+
   // 서재에 연결된 태그 목록 표시
   const libraryTags = useMemo(() => {
     if (!library.tags || !tags.length) return [];
@@ -45,8 +52,8 @@ export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
     <Link href={`/library/${library.id}`} className="block w-full">
       <Card className="group flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-none transition-all duration-200 hover:border-gray-300">
         <CardHeader className="p-5 pb-3">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border border-gray-50">
+          <div className="flex items-start gap-3">
+            <Avatar className="h-10 w-10 flex-shrink-0 border border-gray-50">
               <AvatarImage
                 src={ownerAvatar}
                 alt={ownerName}
@@ -56,9 +63,9 @@ export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
                 {ownerName[0] || '?'}
               </AvatarFallback>
             </Avatar>
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h3 className="text-base font-medium text-gray-900 transition-colors duration-150 group-hover:text-[#3182F6]">
+                <h3 className="max-w-full truncate text-base font-medium text-gray-900 transition-colors duration-150 group-hover:text-[#3182F6]">
                   {library.name}
                 </h3>
 
@@ -68,7 +75,7 @@ export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
                     libraryTags.map(libTag => (
                       <span
                         key={libTag.id}
-                        className="rounded-full px-2 py-0.5 text-xs font-medium text-gray-700"
+                        className="flex-shrink-0 rounded-full px-2 py-0.5 text-xs font-medium text-gray-700"
                         style={{
                           backgroundColor: libTag.color,
                         }}
@@ -76,10 +83,17 @@ export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
                         {libTag.name}
                       </span>
                     ))}
+
+                  {/* 공개/비공개 태그 표시 (내 서재인 경우만) - 태그 목록 이후에 표시 */}
+                  {isOwner && (
+                    <span className="flex-shrink-0 rounded-full border border-gray-300 bg-white px-2 py-0.5 text-xs font-medium text-gray-500">
+                      {library.isPublic ? '공개' : '비공개'}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className="mt-1">
-                <p className="text-sm text-gray-500">{ownerName}</p>
+                <p className="truncate text-sm text-gray-500">{ownerName}</p>
               </div>
             </div>
           </div>

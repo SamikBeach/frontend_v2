@@ -440,7 +440,6 @@ function ReviewsList({
     handleLoadMore,
     isLoading,
     meta,
-    sort,
   } = useBookReviews();
   const queryClient = useQueryClient();
 
@@ -471,7 +470,7 @@ function ReviewsList({
 
       toast.success('리뷰가 삭제되었습니다');
     },
-    onError: error => {
+    onError: () => {
       toast.error('리뷰 삭제 중 오류가 발생했습니다');
     },
   });

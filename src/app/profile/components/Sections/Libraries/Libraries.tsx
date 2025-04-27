@@ -4,10 +4,11 @@ import { LibraryPreviewDto } from '@/apis/user/types';
 import { LibraryDialog } from '@/components/Library';
 import { LibraryCard } from '@/components/LibraryCard';
 import { Button } from '@/components/ui/button';
+import { invalidateUserProfileQueries } from '@/utils/query';
 import { Tag, getTagColor } from '@/utils/tags';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { toast } from 'sonner';
@@ -38,6 +39,7 @@ function formatLibraryTags(libraries: LibraryPreviewDto[]): Tag[] {
 
 export default function Libraries() {
   const params = useParams();
+  const pathname = usePathname();
   const userId = Number(params.id as string);
   const isMyProfile = useIsMyProfile();
   const queryClient = useQueryClient();
@@ -59,9 +61,13 @@ export default function Libraries() {
   const { mutateAsync: createLibraryMutation } = useMutation({
     mutationFn: (data: CreateLibraryDto) => createLibrary(data),
     onSuccess: () => {
+      // 서재 목록 쿼리 invalidate
       queryClient.invalidateQueries({
         queryKey: ['user-libraries-infinite', userId],
       });
+
+      // 프로필 정보 invalidate
+      invalidateUserProfileQueries(queryClient, pathname, userId);
 
       toast.success('새 서재가 생성되었습니다.');
 
