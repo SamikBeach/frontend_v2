@@ -2,12 +2,6 @@
 
 import { LibraryCardSkeleton } from '@/components/LibraryCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BooksListSkeleton } from '../Sections/ReadBooks';
-
-// 섹션 스켈레톤 - 읽은 책 스켈레톤을 기본으로 사용
-export function SectionSkeleton() {
-  return <BooksListSkeleton />;
-}
 
 // 헤더 스켈레톤
 export function HeaderSkeleton() {
@@ -112,7 +106,7 @@ export function PageSkeleton() {
       <HeaderSkeleton />
       <SummarySkeleton />
       <div className="mx-auto w-full px-4">
-        <SectionSkeleton />
+        {/* 각 섹션의 스켈레톤은 해당 페이지에서 직접 import하여 사용 */}
       </div>
     </div>
   );

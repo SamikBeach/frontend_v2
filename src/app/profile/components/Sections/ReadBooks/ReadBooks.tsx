@@ -12,6 +12,7 @@ import { useAtom } from 'jotai';
 import { useParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { BooksGridSkeleton, FilterMenuSkeleton } from './ReadBooksSkeleton';
 
 // 독서 상태 필터 매핑 - 순서 변경: 전체, 읽고 싶어요, 읽는중, 읽었어요
 const readingStatusFilters = [
@@ -54,7 +55,7 @@ function BooksList({ status }: { status: ReadingStatusType | undefined }) {
 
   // 로딩 중 상태
   if (isLoading) {
-    return <BooksListSkeleton />;
+    return <BooksGridSkeleton />;
   }
 
   // 데이터가 없는 경우
@@ -117,51 +118,6 @@ function BooksList({ status }: { status: ReadingStatusType | undefined }) {
   );
 }
 
-// 스켈레톤 컴포넌트 (BookList가 로딩 중일 때 표시)
-export function BooksListSkeleton() {
-  return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-      {Array.from({ length: 12 }).map((_, index) => (
-        <div key={index} className="flex h-full w-full flex-col">
-          <div className="h-full w-full">
-            <div className="relative aspect-[3/4.5] w-full overflow-hidden rounded-lg bg-gray-100">
-              <div className="h-full w-full animate-pulse bg-gray-200" />
-            </div>
-            <div className="mt-2.5 space-y-1.5">
-              <div className="h-[15px] w-full animate-pulse rounded bg-gray-200" />
-              <div className="h-[13px] w-[70%] animate-pulse rounded bg-gray-200" />
-              <div className="mt-1.5 flex items-center gap-2">
-                <div className="flex items-center gap-1">
-                  <div className="h-3.5 w-3.5 animate-pulse rounded-full bg-gray-200" />
-                  <div className="h-[13px] w-12 animate-pulse rounded bg-gray-200" />
-                </div>
-                <div className="flex items-center gap-1">
-                  <div className="h-3.5 w-3.5 animate-pulse rounded-full bg-gray-200" />
-                  <div className="h-[13px] w-8 animate-pulse rounded bg-gray-200" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// 필터 메뉴 스켈레톤 컴포넌트
-export function FilterMenuSkeleton() {
-  return (
-    <div className="mb-6 flex flex-wrap gap-3">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div
-          key={index}
-          className="h-8 w-32 animate-pulse rounded-full bg-gray-200"
-        />
-      ))}
-    </div>
-  );
-}
-
 // 메인 컴포넌트 - 필터 탭 포함
 export default function ReadBooks() {
   const params = useParams();
@@ -199,28 +155,28 @@ export default function ReadBooks() {
         <FilterMenuSkeleton />
       ) : (
         <div className="mb-6 flex flex-wrap gap-3">
-          {readingStatusFilters.map(status => (
+          {readingStatusFilters.map(filter => (
             <button
-              key={status.id}
+              key={filter.id}
               className={cn(
-                'flex h-8 cursor-pointer items-center rounded-full border px-3 text-[13px] font-medium transition-all',
-                selectedStatus === status.type
+                'flex h-8 items-center rounded-full border px-3 text-[13px] font-medium transition-all',
+                selectedStatus === filter.type
                   ? 'border-blue-200 bg-blue-50 text-blue-600'
                   : 'border-gray-200 text-gray-700 hover:bg-gray-50'
               )}
-              onClick={() => handleStatusChange(status.type)}
+              onClick={() => handleStatusChange(filter.type)}
             >
-              <span>{status.name}</span>
+              <span>{filter.name}</span>
               <span className="ml-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-gray-100 px-1 text-[11px] text-gray-600">
-                {getCountForStatus(status.type)}
+                {getCountForStatus(filter.type)}
               </span>
             </button>
           ))}
         </div>
       )}
 
-      {/* 책 목록 컴포넌트 */}
-      <Suspense fallback={<BooksListSkeleton />}>
+      {/* 책 목록 섹션 - 필터 선택에 따라 이 부분만 다시 로드됨 */}
+      <Suspense fallback={<BooksGridSkeleton />}>
         <BooksList status={selectedStatus} />
       </Suspense>
     </div>

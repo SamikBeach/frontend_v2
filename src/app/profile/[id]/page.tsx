@@ -1,13 +1,14 @@
 'use client';
 
 import { useQueryParams } from '@/hooks';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
 import { authUtils } from '@/apis/axios';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import {
   Community,
+  CommunitySkeleton,
   ErrorBoundary,
   ErrorView,
   HeaderSkeleton,
@@ -17,15 +18,16 @@ import {
   ProfileHeader,
   ProfileSummary,
   ReadBooks,
+  ReadBooksSkeleton,
   Reviews,
-  SectionSkeleton,
+  ReviewsSkeleton,
   Stats,
+  StatsSkeleton,
   SubscribedLibraries,
   SummarySkeleton,
 } from '../components';
 
 export default function ProfilePage() {
-  const params = useParams();
   const { getQueryParam, updateQueryParams } = useQueryParams();
   const activeSection = getQueryParam('section') || 'read';
   const router = useRouter();
@@ -95,13 +97,13 @@ export default function ProfilePage() {
     switch (selectedSection) {
       case 'read':
         return (
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={<ReadBooksSkeleton />}>
             <ReadBooks />
           </Suspense>
         );
       case 'reviews':
         return (
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={<ReviewsSkeleton />}>
             <Reviews />
           </Suspense>
         );
@@ -113,7 +115,7 @@ export default function ProfilePage() {
         );
       case 'community':
         return (
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={<CommunitySkeleton />}>
             <Community />
           </Suspense>
         );
@@ -125,13 +127,13 @@ export default function ProfilePage() {
         );
       case 'stats':
         return (
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={<StatsSkeleton />}>
             <Stats />
           </Suspense>
         );
       default:
         return (
-          <Suspense fallback={<SectionSkeleton />}>
+          <Suspense fallback={<ReadBooksSkeleton />}>
             <ReadBooks />
           </Suspense>
         );

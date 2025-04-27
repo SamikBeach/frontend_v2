@@ -2,7 +2,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function ReviewsSkeleton() {
   return (
-    <div className="mt-8">
+    <div>
+      {/* 리뷰 카드 스켈레톤 */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {Array.from({ length: 6 }).map((_, index) => (
           <div

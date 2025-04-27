@@ -207,13 +207,6 @@ export default function Community() {
 
   return (
     <div>
-      {/* 헤더 영역 */}
-      <div className="mt-2 mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">
-          커뮤니티 활동 ({communityTotal})
-        </h2>
-      </div>
-
       {/* 필터 메뉴 영역 */}
       <FilterMenu
         counts={countsForFilter}

@@ -6,7 +6,7 @@ import { LibraryCard } from '@/components/LibraryCard';
 import { Button } from '@/components/ui/button';
 import { Tag, getTagColor } from '@/utils/tags';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { BookOpen, Plus } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -111,9 +111,6 @@ export default function Libraries() {
         </div>
 
         <div className="flex h-64 w-full flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-10">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-            <BookOpen className="h-8 w-8 text-gray-400" />
-          </div>
           <p className="mt-4 text-base font-medium text-gray-600">
             서재가 없습니다
           </p>

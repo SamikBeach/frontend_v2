@@ -1,6 +1,7 @@
 export {
-  BooksListSkeleton,
+  BooksGridSkeleton,
   FilterMenuSkeleton,
-  default as ReadBooks,
-  default,
-} from './ReadBooks';
+  ReadBooksSkeleton,
+} from './ReadBooksSkeleton';
+
+export { default as ReadBooks } from './ReadBooks';

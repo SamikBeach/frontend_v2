@@ -2,7 +2,15 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function CommunitySkeleton() {
   return (
-    <div className="mt-8">
+    <div>
+      {/* 필터 메뉴 스켈레톤 */}
+      <div className="mb-6 flex flex-wrap gap-3">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Skeleton key={index} className="h-8 w-32 rounded-full" />
+        ))}
+      </div>
+
+      {/* 리뷰 카드 스켈레톤 */}
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {Array.from({ length: 6 }).map((_, index) => (
           <div

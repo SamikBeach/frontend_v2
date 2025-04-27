@@ -44,13 +44,6 @@ export default function Reviews() {
 
   return (
     <div>
-      {/* 리뷰 개수 표시 헤더 */}
-      <div className="mt-2 mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">
-          책 리뷰 ({profileData.reviewCount.review})
-        </h2>
-      </div>
-
       <InfiniteScroll
         dataLength={reviews.length}
         next={handleFetchNextPage}
