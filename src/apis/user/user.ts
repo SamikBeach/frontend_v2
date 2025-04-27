@@ -281,7 +281,7 @@ export const getUserRatings = async (
 };
 
 /**
- * 사용자의 활동(리뷰 및 별점) 목록을 조회합니다.
+ * 사용자의 활동(리뷰와 별점) 목록을 조회합니다.
  * @param userId 사용자 ID
  * @param page 페이지 번호 (기본값: 1)
  * @param limit 페이지당 항목 수 (기본값: 10)

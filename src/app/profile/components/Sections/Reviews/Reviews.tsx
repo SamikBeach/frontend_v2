@@ -45,6 +45,23 @@ function EmptyRatingState() {
   );
 }
 
+// 빈 상태 컴포넌트 - 전체(리뷰와 별점)
+function EmptyAllState() {
+  return (
+    <div className="mt-8 flex items-center justify-center rounded-lg bg-gray-50 py-16">
+      <div className="text-center">
+        <h3 className="text-lg font-medium text-gray-900">
+          작성한 리뷰와 별점이 없습니다
+        </h3>
+        <p className="mt-2 text-sm text-gray-500">
+          아직 작성한 리뷰와 별점이 없습니다. 책을 읽고 리뷰나 별점을
+          남겨보세요.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // 필터 메뉴 항목 컴포넌트
 function MenuItem({
   id,
@@ -181,7 +198,7 @@ function AllList() {
     useUserActivityInfinite(pageSize);
 
   if (activities.length === 0) {
-    return <EmptyReviewState />;
+    return <EmptyAllState />;
   }
 
   return (
