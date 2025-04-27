@@ -7,14 +7,6 @@ import {
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 
-// 'review'를 제외한 모든 리뷰 타입
-const ALL_COMMUNITY_TYPES: ReviewType[] = [
-  'general',
-  'discussion',
-  'question',
-  'meetup',
-];
-
 /**
  * 커뮤니티 리뷰를 무한 스크롤로 불러오는 훅
  */
@@ -33,22 +25,15 @@ export const useCommunityReviews = (limit: number = 10) => {
   } = useInfiniteQuery({
     queryKey: ['communityReviews', sortOption, typeFilter, limit],
     queryFn: async ({ pageParam = 1 }) => {
-      // 타입 필터 처리
-      let typeParam: ReviewType | ReviewType[] | undefined;
-
-      if (typeFilter === 'all') {
-        // '전체' 선택 시 'review'를 제외한 모든 타입 전달
-        typeParam = ALL_COMMUNITY_TYPES;
-      } else {
-        // 특정 타입 선택 시 해당 타입만 전달
-        typeParam = typeFilter as ReviewType;
-      }
+      // 타입이 'all'이면 백엔드에 전달하지 않음
+      const type =
+        typeFilter !== 'all' ? (typeFilter as ReviewType) : undefined;
 
       // filter 값을 백엔드에 전달 (recent, popular, following)
       const filter = sortOption === 'latest' ? 'recent' : sortOption;
 
       // getReviews 함수 사용
-      const result = await getReviews(pageParam, limit, filter, typeParam);
+      const result = await getReviews(pageParam, limit, filter, type);
 
       return {
         ...result,

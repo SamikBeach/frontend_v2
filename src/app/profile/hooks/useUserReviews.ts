@@ -67,7 +67,7 @@ export function useUserReviewsInfinite(
   } = useInfiniteQuery({
     queryKey: ['user-reviews-infinite', userId, limit, reviewTypes],
     queryFn: async ({ pageParam = 1 }) => {
-      // API 호출: reviewTypes가 있으면 배열로 전달, 없으면 전체 조회
+      // API 호출 - reviewTypes 그대로 전달
       const result = await getUserReviews(
         userId,
         pageParam,

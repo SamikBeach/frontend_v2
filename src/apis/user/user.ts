@@ -12,6 +12,8 @@ import {
   User,
   UserBooksResponseDto,
   UserDetailResponseDto,
+  UserReadingStatusCountsDto,
+  UserReviewTypeCountsDto,
   UserReviewsResponseDto,
 } from './types';
 
@@ -225,29 +227,33 @@ export const getUserReviews = async (
 
   // type 파라미터가 있는 경우 추가
   if (type) {
-    // 배열인 경우 각 타입을 개별 파라미터로 추가
-    if (Array.isArray(type)) {
-      // URLSearchParams에서 처리 가능한 형태로 변환
-      type.forEach(t => {
-        // 기존에 type 파라미터가 있으면 overwrite 방지
-        if (!('type' in params)) {
-          params.type = t;
-        } else {
-          // URLSearchParams는 동일 키에 여러 값 추가 가능
-          // axios가 자동으로 처리해줌 (type=value1&type=value2 형태로)
-          if (!Array.isArray(params.type)) {
-            params.type = [params.type];
-          }
-          params.type.push(t);
-        }
-      });
-    } else {
-      params.type = type;
-    }
+    params.type = type;
   }
 
   const response = await api.get(`/user/${userId}/reviews`, {
     params,
   });
+  return response.data;
+};
+
+/**
+ * 사용자의 읽기 상태별 책 수를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getUserReadingStatusCounts = async (
+  userId: number
+): Promise<UserReadingStatusCountsDto> => {
+  const response = await api.get(`/user/${userId}/reading-status-counts`);
+  return response.data;
+};
+
+/**
+ * 사용자의 리뷰 타입별 수를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getUserReviewTypeCounts = async (
+  userId: number
+): Promise<UserReviewTypeCountsDto> => {
+  const response = await api.get(`/user/${userId}/review-type-counts`);
   return response.data;
 };

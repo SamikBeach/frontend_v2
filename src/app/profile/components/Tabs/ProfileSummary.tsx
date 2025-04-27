@@ -123,7 +123,7 @@ export default function ProfileSummary({
                     : 'text-gray-800'
                 )}
               >
-                {reviewCount}
+                {profileData.reviewCount.review}
               </span>
             </div>
             <span
@@ -222,7 +222,11 @@ export default function ProfileSummary({
                   : 'text-gray-800'
               )}
             >
-              {/* 커뮤니티 활동 수 (API에서 가져와야 함) */}0
+              {/* 커뮤니티 활동 수 - 일반, 토론, 질문, 모임 리뷰의 합계 */}
+              {profileData.reviewCount.general +
+                profileData.reviewCount.discussion +
+                profileData.reviewCount.question +
+                profileData.reviewCount.meetup}
             </span>
             <span
               className={cn(

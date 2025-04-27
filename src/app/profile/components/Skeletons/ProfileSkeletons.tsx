@@ -2,11 +2,11 @@
 
 import { LibraryCardSkeleton } from '@/components/LibraryCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ReadBooksSkeleton } from '../Sections/ReadBooks';
+import { BooksListSkeleton } from '../Sections/ReadBooks';
 
 // 섹션 스켈레톤 - 읽은 책 스켈레톤을 기본으로 사용
 export function SectionSkeleton() {
-  return <ReadBooksSkeleton />;
+  return <BooksListSkeleton />;
 }
 
 // 헤더 스켈레톤

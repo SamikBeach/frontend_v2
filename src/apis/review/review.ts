@@ -266,11 +266,11 @@ export const getReviews = async (
   page: number = 1,
   limit: number = 10,
   filter: 'popular' | 'recent' | 'following' = 'recent',
-  type?: ReviewType | ReviewType[] | string | string[],
+  type?: ReviewType,
   additionalParams?: Record<string, string | number>
 ): Promise<ReviewsResponse> => {
   // API 요청 파라미터 설정
-  const params: Record<string, any> = {
+  const params: Record<string, string | number> = {
     page,
     limit,
     filter, // 백엔드 API에서 filter 파라미터로 정렬 방식 지정
@@ -278,25 +278,7 @@ export const getReviews = async (
 
   // 특정 리뷰 타입 필터링
   if (type) {
-    // 배열인 경우 각 타입을 개별 파라미터로 추가 (URLSearchParams 처리용)
-    if (Array.isArray(type)) {
-      // URLSearchParams에서 처리 가능한 형태로 변환
-      type.forEach(t => {
-        // 기존에 type 파라미터가 있으면 overwrite 방지
-        if (!('type' in params)) {
-          params.type = t;
-        } else {
-          // URLSearchParams는 동일 키에 여러 값 추가 가능
-          // axios가 자동으로 처리해줌 (type=value1&type=value2 형태로)
-          if (!Array.isArray(params.type)) {
-            params.type = [params.type];
-          }
-          params.type.push(t);
-        }
-      });
-    } else {
-      params.type = type;
-    }
+    params.type = type;
   }
 
   // 추가 파라미터 병합

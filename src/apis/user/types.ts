@@ -161,6 +161,18 @@ export interface ReadingCategoryStatDto {
 }
 
 /**
+ * 리뷰 카운트 DTO
+ */
+export interface ReviewCountsDto {
+  total: number;
+  general: number;
+  discussion: number;
+  review: number;
+  question: number;
+  meetup: number;
+}
+
+/**
  * 사용자 상세 정보 응답 DTO
  */
 export interface UserDetailResponseDto {
@@ -168,7 +180,7 @@ export interface UserDetailResponseDto {
   libraryCount: number;
   readCount: number;
   subscribedLibraryCount: number;
-  reviewCount: number;
+  reviewCount: ReviewCountsDto;
   followers: number;
   following: number;
   isEditable: boolean;
@@ -299,4 +311,26 @@ export interface ExtendedReadingStatusResponseDto {
   createdAt: Date;
   updatedAt: Date;
   book: ExtendedBookInfoDto;
+}
+
+/**
+ * 사용자의 읽기 상태별 책 수 응답 타입
+ */
+export interface UserReadingStatusCountsDto {
+  WANT_TO_READ: number;
+  READING: number;
+  READ: number;
+  total: number;
+}
+
+/**
+ * 사용자의 리뷰 타입별 수 응답 타입
+ */
+export interface UserReviewTypeCountsDto {
+  general: number;
+  discussion: number;
+  review: number;
+  question: number;
+  meetup: number;
+  total: number;
 }
