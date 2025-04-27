@@ -1,10 +1,23 @@
-export { Community } from './Community';
-export { Libraries } from './Libraries';
-export { ReadBooks, ReadBooksSkeleton } from './ReadBooks';
-export { Reviews } from './Reviews';
-export { Stats } from './Stats';
-export { SubscribedLibraries } from './SubscribedLibraries';
+import Community from './Community';
+import Libraries from './Libraries';
+import { ReadBooks, ReadBooksSkeleton } from './ReadBooks';
+import Reviews from './Reviews';
+import { Stats } from './Stats';
+import { SubscribedLibraries } from './SubscribedLibraries';
 
-export { CommunitySkeleton } from './Community';
-export { ReviewsSkeleton } from './Reviews';
-export { StatsSkeleton } from './Stats';
+import { CommunitySkeleton } from './Community';
+import { ReviewsSkeleton } from './Reviews';
+import { StatsSkeleton } from './Stats';
+
+export {
+  Community,
+  CommunitySkeleton,
+  Libraries,
+  ReadBooks,
+  ReadBooksSkeleton,
+  Reviews,
+  ReviewsSkeleton,
+  Stats,
+  StatsSkeleton,
+  SubscribedLibraries,
+};
