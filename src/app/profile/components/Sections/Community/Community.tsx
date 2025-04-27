@@ -125,8 +125,15 @@ function MenuItem({
   // 필터 타입의 키 (all 또는 타입 이름)
   const filterKey = filter.id === 'all' ? 'total' : filter.id;
 
-  // 해당 타입의 카운트 (없으면 0)
-  const count = counts[filterKey as keyof UserReviewTypeCountsDto] || 0;
+  // 해당 타입의 카운트 계산 (all인 경우 total에서 review 타입 제외)
+  let count = 0;
+  if (filter.id === 'all') {
+    // 전체 카운트 = 총합에서 review 타입 제외
+    count = (counts.total || 0) - (counts.review || 0);
+  } else {
+    // 개별 타입 카운트
+    count = counts[filterKey as keyof UserReviewTypeCountsDto] || 0;
+  }
 
   return (
     <button
