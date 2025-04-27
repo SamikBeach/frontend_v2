@@ -1,2 +1,2 @@
-export { default as Community } from './Community';
-export { CommunitySkeleton } from './CommunitySkeleton'; 
+export { default } from './Community';
+export * from './CommunitySkeleton';
