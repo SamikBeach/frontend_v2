@@ -1,16 +1,15 @@
 import { ReviewResponseDto, ReviewType } from '@/apis/review/types';
 import { UserReviewTypeCountsDto } from '@/apis/user/types';
 import { getUserReviewTypeCounts } from '@/apis/user/user';
-import { useUserProfile, useUserReviewsInfinite } from '@/app/profile/hooks';
+import { useUserReviewsInfinite } from '@/app/profile/hooks';
 import { ReviewCard } from '@/components/ReviewCard';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
-import { CommunitySkeleton } from './CommunitySkeleton';
+import { CommunityContentSkeleton } from './CommunitySkeleton';
 
 // 리뷰 타입 필터 정의 (review 타입 제외)
 const reviewTypeFilters = [
@@ -29,13 +28,19 @@ const allReviewTypes = [
   'meetup',
 ] as ReviewType[];
 
-// 필터 메뉴 스켈레톤 컴포넌트
-function FilterMenuSkeleton() {
+// 빈 상태 컴포넌트
+function EmptyState() {
   return (
-    <div className="mb-6 flex flex-wrap gap-3">
-      {Array.from({ length: 5 }).map((_, index) => (
-        <Skeleton key={index} className="h-8 w-32 rounded-full" />
-      ))}
+    <div className="mt-8 flex items-center justify-center rounded-lg bg-gray-50 py-16">
+      <div className="text-center">
+        <h3 className="text-lg font-medium text-gray-900">
+          커뮤니티 활동이 없습니다
+        </h3>
+        <p className="mt-2 text-sm text-gray-500">
+          아직 커뮤니티 활동이 없습니다. 독서방에 참여하고 다양한 활동을
+          해보세요.
+        </p>
+      </div>
     </div>
   );
 }
@@ -53,27 +58,11 @@ function ReviewList({
   const reviewTypes = selectedType ? [selectedType] : allReviewTypes;
 
   // 선택된 타입에 따라 리뷰 가져오기
-  const { reviews, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+  const { reviews, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useUserReviewsInfinite(pageSize, reviewTypes);
 
-  if (isLoading) {
-    return <CommunitySkeleton />;
-  }
-
   if (reviews.length === 0) {
-    return (
-      <div className="mt-8 flex items-center justify-center rounded-lg bg-gray-50 py-16">
-        <div className="text-center">
-          <h3 className="text-lg font-medium text-gray-900">
-            커뮤니티 활동이 없습니다
-          </h3>
-          <p className="mt-2 text-sm text-gray-500">
-            아직 커뮤니티 활동이 없습니다. 독서방에 참여하고 다양한 활동을
-            해보세요.
-          </p>
-        </div>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   return (
@@ -109,7 +98,7 @@ function MenuItem({
   onSelectType,
 }: {
   filter: (typeof reviewTypeFilters)[0];
-  counts: Record<string, number>;
+  counts: UserReviewTypeCountsDto;
   selectedType: ReviewType | undefined;
   onSelectType: (type: ReviewType | undefined) => void;
 }) {
@@ -119,7 +108,7 @@ function MenuItem({
   const filterKey = filter.id === 'all' ? 'total' : filter.id;
 
   // 해당 타입의 카운트 (없으면 0)
-  const count = counts[filterKey] || 0;
+  const count = counts[filterKey as keyof UserReviewTypeCountsDto] || 0;
 
   return (
     <button
@@ -144,17 +133,11 @@ function FilterMenu({
   counts,
   selectedType,
   onSelectType,
-  isLoading,
 }: {
-  counts: Record<string, number>;
+  counts: UserReviewTypeCountsDto;
   selectedType: ReviewType | undefined;
   onSelectType: (type: ReviewType | undefined) => void;
-  isLoading: boolean;
 }) {
-  if (isLoading) {
-    return <FilterMenuSkeleton />;
-  }
-
   return (
     <div className="mb-6 flex flex-wrap gap-3">
       {reviewTypeFilters.map(filter => (
@@ -170,53 +153,45 @@ function FilterMenu({
   );
 }
 
+// 타입 카운트 로더 컴포넌트
+function TypeCountsLoader() {
+  const params = useParams();
+  const userId = Number(params.id);
+
+  // 리뷰 타입별 카운트 직접 쿼리
+  const { data: typeCounts } = useSuspenseQuery<UserReviewTypeCountsDto>({
+    queryKey: ['user-review-type-counts', userId],
+    queryFn: () => getUserReviewTypeCounts(userId),
+  });
+
+  return typeCounts;
+}
+
 // 메인 컴포넌트
 export default function Community() {
+  return <FilterAndContentLoader />;
+}
+
+// 필터와 콘텐츠를 함께 로드하는 컴포넌트
+function FilterAndContentLoader() {
   const [selectedType, setSelectedType] = useState<ReviewType | undefined>(
     undefined
   );
-  const params = useParams();
-  const userId = Number(params.id);
-  const { profileData } = useUserProfile(userId);
 
-  // 리뷰 타입별 카운트 직접 쿼리
-  const { data: typeCounts, isLoading } =
-    useSuspenseQuery<UserReviewTypeCountsDto>({
-      queryKey: ['user-review-type-counts', userId],
-      queryFn: () => getUserReviewTypeCounts(userId),
-    });
-
-  // 쿼리 결과를 필터 컴포넌트에 전달할 형태로 변환
-  const countsForFilter: Record<string, number> = typeCounts
-    ? {
-        general: typeCounts.general,
-        discussion: typeCounts.discussion,
-        question: typeCounts.question,
-        meetup: typeCounts.meetup,
-        total: typeCounts.total,
-        review: typeCounts.review,
-      }
-    : {};
-
-  // 커뮤니티 활동 총 개수 (토론, 일반, 질문, 모임 리뷰의 합)
-  const communityTotal =
-    profileData.reviewCount.general +
-    profileData.reviewCount.discussion +
-    profileData.reviewCount.question +
-    profileData.reviewCount.meetup;
+  // 타입 카운트 로드
+  const typeCounts = TypeCountsLoader();
 
   return (
     <div>
-      {/* 필터 메뉴 영역 */}
+      {/* 필터 메뉴 */}
       <FilterMenu
-        counts={countsForFilter}
+        counts={typeCounts}
         selectedType={selectedType}
         onSelectType={setSelectedType}
-        isLoading={isLoading}
       />
 
       {/* 리뷰 리스트 영역 - 메뉴 선택에 따라 이 부분만 다시 로드됨 */}
-      <Suspense fallback={<CommunitySkeleton />}>
+      <Suspense fallback={<CommunityContentSkeleton />}>
         <ReviewList selectedType={selectedType} />
       </Suspense>
     </div>
