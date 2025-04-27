@@ -1,7 +1,9 @@
 export * from './types';
 export * from './useIsMyProfile';
+export * from './useReadingStatusCounts';
 export { useUserActivity, useUserActivityInfinite } from './useUserActivity';
 export * from './useUserBooks';
+export * from './useUserBooksSuspense';
 export * from './useUserFollow';
 export * from './useUserFollowList';
 export * from './useUserLibraries';

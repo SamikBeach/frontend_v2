@@ -52,7 +52,6 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
     hasNextPage,
     isFetchingNextPage,
     handleLoadMore,
-    meta,
   } = useBookLibraries(book?.id, 5, effectiveSortOption);
   const currentUser = useCurrentUser();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);

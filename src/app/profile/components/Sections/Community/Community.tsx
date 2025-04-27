@@ -69,7 +69,6 @@ function ReviewList({
 }: {
   selectedType: ReviewType | undefined;
 }) {
-  const params = useParams();
   const pageSize = 6;
 
   // 선택된 타입에 따라 API 호출에 전달할 타입 배열 생성
