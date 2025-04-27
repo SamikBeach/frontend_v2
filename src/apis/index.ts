@@ -46,8 +46,18 @@ export {
 
 export * from './library';
 export * from './notification';
-export * from './rating';
-export * from './reading-status';
-export * from './review';
+
+// Import and re-export rating module explicitly to resolve naming conflicts
+import * as ratingModule from './rating';
+export { ratingModule };
+
+// Import and re-export reading-status module explicitly to resolve naming conflicts
+import * as readingStatusModule from './reading-status';
+export { readingStatusModule };
+
+// Import and re-export review module explicitly to resolve naming conflicts
+import * as reviewModule from './review';
+export { reviewModule };
+
 export * from './search';
 export * from './user';
