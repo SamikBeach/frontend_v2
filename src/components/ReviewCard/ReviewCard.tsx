@@ -23,7 +23,10 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
-import { isCurrentUserProfilePage } from '@/utils/query';
+import {
+  invalidateUserProfileQueries,
+  isCurrentUserProfilePage,
+} from '@/utils/query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -179,22 +182,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
       // 프로필 페이지 관련 쿼리 선택적 무효화
       if (isCurrentUserProfilePage(pathname, currentUser?.id)) {
-        // 리뷰 및 활동 목록 쿼리 무효화
-        queryClient.invalidateQueries({
-          queryKey: ['user-reviews-infinite', currentUser?.id],
-          exact: false,
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ['user-activity-infinite', currentUser?.id],
-          exact: false,
-        });
-
-        // 리뷰 타입 카운트 갱신
-        queryClient.invalidateQueries({
-          queryKey: ['user-review-type-counts', currentUser?.id],
-          exact: true,
-        });
+        // 유저 프로필 관련 쿼리 일괄 무효화
+        invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
       }
 
       toast.success('리뷰가 수정되었습니다.');
@@ -218,29 +207,16 @@ export function ReviewCard({ review }: ReviewCardProps) {
   const deleteReviewMutation = useMutation({
     mutationFn: (id: number) => deleteReview(id),
     onSuccess: () => {
+      // 커뮤니티 리뷰 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: ['communityReviews'],
         exact: false,
       });
 
-      // 프로필 페이지에서 필요한 쿼리만 선택적 무효화
+      // 프로필 페이지에서 필요한 쿼리 무효화
       if (isCurrentUserProfilePage(pathname, currentUser?.id)) {
-        // 리뷰 및 활동 목록 쿼리 무효화
-        queryClient.invalidateQueries({
-          queryKey: ['user-reviews-infinite', currentUser?.id],
-          exact: false,
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ['user-activity-infinite', currentUser?.id],
-          exact: false,
-        });
-
-        // 리뷰 타입 카운트 갱신
-        queryClient.invalidateQueries({
-          queryKey: ['user-review-type-counts', currentUser?.id],
-          exact: true,
-        });
+        // 유저 프로필 관련 쿼리 일괄 무효화
+        invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
       }
 
       toast.success('리뷰가 삭제되었습니다.');
@@ -254,29 +230,16 @@ export function ReviewCard({ review }: ReviewCardProps) {
   const deleteRatingMutation = useMutation({
     mutationFn: (id: number) => deleteRating(id),
     onSuccess: () => {
+      // 커뮤니티 리뷰 쿼리 무효화
       queryClient.invalidateQueries({
         queryKey: ['communityReviews'],
         exact: false,
       });
 
-      // 프로필 페이지에서 필요한 쿼리만 선택적 무효화
+      // 프로필 페이지에서 필요한 쿼리 무효화
       if (isCurrentUserProfilePage(pathname, currentUser?.id)) {
-        // 리뷰, 활동, 별점 목록 쿼리 무효화
-        queryClient.invalidateQueries({
-          queryKey: ['user-ratings-infinite', currentUser?.id],
-          exact: false,
-        });
-
-        queryClient.invalidateQueries({
-          queryKey: ['user-activity-infinite', currentUser?.id],
-          exact: false,
-        });
-
-        // 리뷰 타입 카운트 갱신
-        queryClient.invalidateQueries({
-          queryKey: ['user-review-type-counts', currentUser?.id],
-          exact: true,
-        });
+        // 유저 프로필 관련 쿼리 일괄 무효화
+        invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
       }
 
       toast.success('별점이 삭제되었습니다.');
