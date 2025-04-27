@@ -26,8 +26,8 @@ export default function ProfileSummary({
   // API에서 가져온 데이터 사용
   const { libraryCount, readCount, subscribedLibraryCount } = profileData;
 
-  // 평균 별점 (실제로는 API에서 받아와야 함)
-  const averageRating = 4.2;
+  // 평균 별점 API에서 가져오기 (null인 경우 0으로 처리)
+  const averageRating = profileData.averageRating ?? 0;
 
   return (
     <div className="mx-auto w-full px-4 py-6">

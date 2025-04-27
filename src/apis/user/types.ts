@@ -186,6 +186,7 @@ export interface UserDetailResponseDto {
   isEditable: boolean;
   isFollowing?: boolean;
   libraries?: LibraryPreviewDto[];
+  averageRating?: number | null;
 }
 
 /**
