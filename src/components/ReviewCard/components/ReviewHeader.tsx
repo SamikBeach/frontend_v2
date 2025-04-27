@@ -72,7 +72,7 @@ export function ReviewHeader({
             >
               {review.author.username}
             </Link>
-            <TagName type={review.type} />
+            <TagName type={review.type} activityType={review.activityType} />
 
             {/* 별점 표시 - 별점이 있을 때만 표시 */}
             {hasRating && (

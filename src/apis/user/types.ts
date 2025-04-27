@@ -187,6 +187,7 @@ export interface UserDetailResponseDto {
   isFollowing?: boolean;
   libraries?: LibraryPreviewDto[];
   averageRating?: number | null;
+  ratingCount: number;
 }
 
 /**

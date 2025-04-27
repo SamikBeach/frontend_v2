@@ -257,3 +257,49 @@ export const getUserReviewTypeCounts = async (
   const response = await api.get(`/user/${userId}/review-type-counts`);
   return response.data;
 };
+
+/**
+ * 사용자의 평점 목록을 조회합니다.
+ * @param userId 사용자 ID
+ * @param page 페이지 번호 (기본값: 1)
+ * @param limit 페이지당 항목 수 (기본값: 10)
+ */
+export const getUserRatings = async (
+  userId: number,
+  page: number = 1,
+  limit: number = 10
+): Promise<{
+  ratings: any[];
+  total: number;
+  page: number;
+  totalPages: number;
+}> => {
+  const response = await api.get(`/user/${userId}/ratings`, {
+    params: { page, limit },
+  });
+  return response.data;
+};
+
+/**
+ * 사용자의 활동(리뷰 및 별점) 목록을 조회합니다.
+ * @param userId 사용자 ID
+ * @param page 페이지 번호 (기본값: 1)
+ * @param limit 페이지당 항목 수 (기본값: 10)
+ * @param filter 정렬 필터 (선택 사항, 'popular' 또는 'recent')
+ */
+export const getUserActivity = async (
+  userId: number,
+  page: number = 1,
+  limit: number = 10,
+  filter: 'popular' | 'recent' = 'recent'
+): Promise<{
+  activities: any[];
+  total: number;
+  page: number;
+  totalPages: number;
+}> => {
+  const response = await api.get(`/user/${userId}/activity`, {
+    params: { page, limit, filter },
+  });
+  return response.data;
+};

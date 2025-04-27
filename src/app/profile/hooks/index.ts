@@ -1,8 +1,10 @@
 export * from './types';
 export * from './useIsMyProfile';
+export { useUserActivity, useUserActivityInfinite } from './useUserActivity';
 export * from './useUserBooks';
 export * from './useUserFollow';
 export * from './useUserFollowList';
 export * from './useUserLibraries';
-export * from './useUserProfile';
+export { useUserProfile } from './useUserProfile';
+export { useUserRatings, useUserRatingsInfinite } from './useUserRatings';
 export * from './useUserReviews';

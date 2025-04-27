@@ -133,7 +133,7 @@ export default function ProfileSummary({
                   : 'text-gray-700'
               )}
             >
-              리뷰
+              리뷰 및 별점
             </span>
           </div>
         </button>

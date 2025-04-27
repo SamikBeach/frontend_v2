@@ -3,9 +3,14 @@ import { communityCategoryColors } from '@/atoms/community';
 
 interface TagNameProps {
   type: ReviewType | string;
+  activityType?: string;
 }
 
-export function TagName({ type }: TagNameProps) {
+export function TagName({ type, activityType }: TagNameProps) {
+  if (activityType === 'rating') {
+    return null;
+  }
+
   const getTagName = (tagType: string) => {
     switch (tagType) {
       case 'discussion':

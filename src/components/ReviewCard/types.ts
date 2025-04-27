@@ -30,6 +30,7 @@ export interface ExtendedReviewResponseDto
   commentsCount?: number;
   userLiked?: boolean;
   isLiked: boolean;
+  activityType?: string;
 }
 
 // 로컬에서 사용할 Comment 인터페이스 정의
