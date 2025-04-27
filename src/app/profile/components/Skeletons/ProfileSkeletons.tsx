@@ -32,10 +32,7 @@ export function LibrariesSkeleton() {
   return (
     <>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex h-9 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2">
-          <Skeleton className="h-4 w-4 rounded-full" />
-          <Skeleton className="h-4 w-[90px]" />
-        </div>
+        <Skeleton className="h-9 w-[140px] rounded-full" />
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
