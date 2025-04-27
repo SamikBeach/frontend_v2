@@ -41,7 +41,7 @@ export function ReviewHeader({
 
   return (
     <div className="flex items-start justify-between">
-      <div className="flex gap-3">
+      <div className="flex items-center gap-3">
         <Avatar
           className="h-8 w-8 cursor-pointer"
           onClick={() => onUserClick && onUserClick(review.author.id)}
@@ -51,7 +51,7 @@ export function ReviewHeader({
             {getNameInitial(review.author.username)}
           </AvatarFallback>
         </Avatar>
-        <div>
+        <div className="flex flex-col gap-0">
           <div className="flex items-center gap-2">
             <Link
               href={`/profile/${review.author.id}`}
