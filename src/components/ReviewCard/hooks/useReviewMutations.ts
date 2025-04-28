@@ -373,10 +373,11 @@ export function useReviewMutations({
       return;
     }
 
-    console.log({ review });
-    // book 객체에서 bookId와 isbn 가져오기
-    const bookId = review.book?.id ? Number(review.book.id) : -1;
-    const bookIsbn = review.book?.isbn || review.book?.isbn13 || '';
+    // books 배열에서 첫 번째 책 정보 가져오기 (없으면 기본값 설정)
+    const firstBook =
+      review.books && review.books.length > 0 ? review.books[0] : null;
+    const bookId = firstBook ? Number(firstBook.id) : -1;
+    const bookIsbn = firstBook?.isbn || firstBook?.isbn13 || '';
     const isNegativeBookId = bookId < 0;
 
     // 별점과 리뷰 둘 다 변경되었는지 여부

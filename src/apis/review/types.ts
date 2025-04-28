@@ -27,6 +27,8 @@ export interface ReviewBook {
   author: string;
   coverImage: string;
   publisher: string;
+  isbn?: string;
+  isbn13?: string;
 }
 
 export interface ReviewResponseDto {

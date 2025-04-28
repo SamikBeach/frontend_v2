@@ -1,4 +1,3 @@
-import { Book } from '@/apis';
 import {
   Comment as ApiComment,
   ReviewResponseDto,
@@ -20,7 +19,6 @@ export interface ReadingStats {
 // Extend the ReviewResponseDto to include rating property
 export interface ExtendedReviewResponseDto
   extends Omit<ReviewResponseDto, 'likeCount' | 'commentCount' | 'isLiked'> {
-  book?: Book;
   comments?: Comment[];
   rating?: number;
   mentions?: ReviewUser[];
