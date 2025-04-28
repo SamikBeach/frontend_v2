@@ -67,21 +67,98 @@ export function useReviewComments(
     mutationFn: async () => {
       return apiCreateComment(reviewId, {
         content: commentText,
-        ...(replyToCommentId ? { parentCommentId: replyToCommentId } : {}),
+        parentId: replyToCommentId || undefined,
       });
     },
+    onMutate: async () => {
+      // 낙관적 업데이트를 위해 기존 데이터 저장
+      await queryClient.cancelQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+      const previousComments = queryClient.getQueryData([
+        'review-comments',
+        reviewId,
+      ]);
+
+      // 낙관적 업데이트: 댓글 수 증가
+      queryClient.setQueryData(['review-comments', reviewId], (old: any) => {
+        if (!old || !old.comments) return old;
+        return {
+          ...old,
+          comments: [
+            ...old.comments,
+            {
+              id: Date.now(), // 임시 ID
+              content: commentText,
+              author: {
+                id: currentUser?.id || 0,
+                username: currentUser?.username || '',
+              },
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              likeCount: 0,
+              isLiked: false,
+            },
+          ],
+        };
+      });
+
+      // 커뮤니티 리뷰의 댓글 수도 업데이트
+      const queryKeys = queryClient.getQueryCache().findAll({
+        queryKey: ['communityReviews'],
+      });
+
+      const previousReviews: Record<string, unknown> = {};
+
+      queryKeys.forEach(query => {
+        const previousData = queryClient.getQueryData(query.queryKey);
+        previousReviews[query.queryKey.join('/')] = previousData;
+
+        queryClient.setQueryData(query.queryKey, (old: any) => {
+          if (!old || !old.pages) return old;
+
+          return {
+            ...old,
+            pages: old.pages.map((page: any) => ({
+              ...page,
+              reviews: page.reviews.map((review: any) =>
+                review.id === reviewId
+                  ? {
+                      ...review,
+                      commentsCount: (review.commentsCount || 0) + 1,
+                    }
+                  : review
+              ),
+            })),
+          };
+        });
+      });
+
+      return { previousComments, previousReviews };
+    },
     onSuccess: () => {
+      // 댓글 목록 새로고침
       queryClient.invalidateQueries({
         queryKey: ['review-comments', reviewId],
       });
-      // 게시물 데이터의 댓글 수도 업데이트
-      queryClient.invalidateQueries({
-        queryKey: ['communityReviews'],
-        exact: false,
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['review', reviewId],
-      });
+    },
+    onError: (_, __, context) => {
+      // 에러 발생 시 이전 상태로 복원
+      if (context?.previousComments) {
+        queryClient.setQueryData(
+          ['review-comments', reviewId],
+          context.previousComments
+        );
+      }
+
+      if (context?.previousReviews) {
+        Object.entries(context.previousReviews).forEach(([key, data]) => {
+          const queryKey = key.split('/');
+          queryClient.setQueryData(queryKey, data);
+        });
+      }
+
+      toast.error('댓글 작성에 실패했습니다.');
     },
   });
 
@@ -91,18 +168,86 @@ export function useReviewComments(
       mutationFn: async (commentId: number) => {
         return apiDeleteComment(commentId);
       },
+      onMutate: async commentId => {
+        // 낙관적 업데이트를 위해 기존 데이터 저장
+        await queryClient.cancelQueries({
+          queryKey: ['review-comments', reviewId],
+        });
+        const previousComments = queryClient.getQueryData([
+          'review-comments',
+          reviewId,
+        ]);
+
+        // 낙관적 업데이트: 댓글 삭제
+        queryClient.setQueryData(['review-comments', reviewId], (old: any) => {
+          if (!old || !old.comments) return old;
+          return {
+            ...old,
+            comments: old.comments.filter(
+              (comment: any) => comment.id !== commentId
+            ),
+          };
+        });
+
+        // 커뮤니티 리뷰의 댓글 수도 업데이트
+        const queryKeys = queryClient.getQueryCache().findAll({
+          queryKey: ['communityReviews'],
+        });
+
+        const previousReviews: Record<string, unknown> = {};
+
+        queryKeys.forEach(query => {
+          const previousData = queryClient.getQueryData(query.queryKey);
+          previousReviews[query.queryKey.join('/')] = previousData;
+
+          queryClient.setQueryData(query.queryKey, (old: any) => {
+            if (!old || !old.pages) return old;
+
+            return {
+              ...old,
+              pages: old.pages.map((page: any) => ({
+                ...page,
+                reviews: page.reviews.map((review: any) =>
+                  review.id === reviewId
+                    ? {
+                        ...review,
+                        commentsCount: Math.max(
+                          0,
+                          (review.commentsCount || 0) - 1
+                        ),
+                      }
+                    : review
+                ),
+              })),
+            };
+          });
+        });
+
+        return { previousComments, previousReviews };
+      },
       onSuccess: () => {
+        // 댓글 목록 새로고침
         queryClient.invalidateQueries({
           queryKey: ['review-comments', reviewId],
         });
-        // 게시물 데이터의 댓글 수도 업데이트
-        queryClient.invalidateQueries({
-          queryKey: ['communityReviews'],
-          exact: false,
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['review', reviewId],
-        });
+      },
+      onError: (_, __, context) => {
+        // 에러 발생 시 이전 상태로 복원
+        if (context?.previousComments) {
+          queryClient.setQueryData(
+            ['review-comments', reviewId],
+            context.previousComments
+          );
+        }
+
+        if (context?.previousReviews) {
+          Object.entries(context.previousReviews).forEach(([key, data]) => {
+            const queryKey = key.split('/');
+            queryClient.setQueryData(queryKey, data);
+          });
+        }
+
+        toast.error('댓글 삭제에 실패했습니다.');
       },
     });
 
