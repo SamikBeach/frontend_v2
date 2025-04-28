@@ -142,6 +142,8 @@ export function useReviewDialog() {
           };
         });
 
+        console.log('book.id', book.id);
+
         // user-book-rating 캐시 직접 업데이트
         if (book?.id) {
           queryClient.setQueryData(
@@ -175,56 +177,50 @@ export function useReviewDialog() {
             updatedTotalRatings > 0 ? sum / updatedTotalRatings : 0;
         }
 
-        // book-reviews 쿼리 무효화하여 리뷰 목록 갱신
-        queryClient.invalidateQueries({
-          queryKey: ['book-reviews', book.id],
-          refetchType: 'active',
-        });
-
         // 추가적으로 정렬 상태를 고려하여 무효화
         queryClient.invalidateQueries({
-          queryKey: ['book-reviews', book.id, sort],
+          queryKey: ['book-reviews', book.id, sort, isbn],
           refetchType: 'active',
         });
 
         // book-reviews 쿼리 데이터 업데이트하여 별점 즉시 반영
-        queryClient.setQueryData(['book-reviews', book.id], (oldData: any) => {
-          if (!oldData || !oldData.pages) return oldData;
+        // queryClient.setQueryData(['book-reviews', book.id], (oldData: any) => {
+        //   if (!oldData || !oldData.pages) return oldData;
 
-          // 해당 책에 대한 모든 리뷰에 새로운 별점 정보 추가
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page: any) => {
-              if (!page || !page.data) return page;
+        //   // 해당 책에 대한 모든 리뷰에 새로운 별점 정보 추가
+        //   return {
+        //     ...oldData,
+        //     pages: oldData.pages.map((page: any) => {
+        //       if (!page || !page.data) return page;
 
-              return {
-                ...page,
-                data: page.data.map((review: any) => {
-                  // 리뷰 내부의 book ID가 현재 책 ID와 일치하는지 확인
-                  const isMatchingBook = review.book?.id === book.id;
+        //       return {
+        //         ...page,
+        //         data: page.data.map((review: any) => {
+        //           // 리뷰 내부의 book ID가 현재 책 ID와 일치하는지 확인
+        //           const isMatchingBook = review.book?.id === book.id;
 
-                  if (isMatchingBook) {
-                    // 리뷰의 책 정보에도 새로운 평균 평점 반영
-                    const updatedBook = review.book
-                      ? {
-                          ...review.book,
-                          rating: updatedRating,
-                          totalRatings: updatedTotalRatings,
-                        }
-                      : review.book;
+        //           if (isMatchingBook) {
+        //             // 리뷰의 책 정보에도 새로운 평균 평점 반영
+        //             const updatedBook = review.book
+        //               ? {
+        //                   ...review.book,
+        //                   rating: updatedRating,
+        //                   totalRatings: updatedTotalRatings,
+        //                 }
+        //               : review.book;
 
-                    return {
-                      ...review,
-                      userRating: userRatingData,
-                      book: updatedBook,
-                    };
-                  }
-                  return review;
-                }),
-              };
-            }),
-          };
-        });
+        //             return {
+        //               ...review,
+        //               userRating: userRatingData,
+        //               book: updatedBook,
+        //             };
+        //           }
+        //           return review;
+        //         }),
+        //       };
+        //     }),
+        //   };
+        // });
       }
 
       // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
