@@ -48,7 +48,7 @@ export function useReviewMutations({
     },
     onSuccess: (_, variables) => {
       // skipInvalidate가 true인 경우 무효화를 건너뜀 (리뷰와 함께 업데이트하는 경우)
-      if ((variables as any).skipInvalidate === true) {
+      if (variables.skipInvalidate === true) {
         return;
       }
 
@@ -57,6 +57,12 @@ export function useReviewMutations({
         // 사용자 별점 관련 쿼리만 무효화
         invalidateUserRatingQueries(queryClient, pathname, currentUserId);
       }
+
+      // 커뮤니티 페이지 리뷰 목록 무효화 (프로필 페이지가 아닌 경우에도 실행)
+      queryClient.invalidateQueries({
+        queryKey: ['communityReviews'],
+        exact: false,
+      });
     },
     onError: (error: any) => {
       console.error('별점 업데이트 실패:', error);
@@ -147,7 +153,7 @@ export function useReviewMutations({
     onSuccess: (_, variables) => {
       // 별점과 함께 업데이트된 경우 여기서는 무효화를 건너뜀
       // handleEditReview에서 skipInvalidate context가 true로 설정된 경우
-      if ((variables as any).skipInvalidate === true) {
+      if (variables.skipInvalidate === true) {
         return;
       }
 
@@ -416,12 +422,6 @@ export function useReviewMutations({
         // 한 번에 무효화 처리
         invalidateReviewAndRatingQueries(queryClient, pathname, currentUserId);
 
-        // 커뮤니티 페이지 리뷰 목록 무효화 (프로필 페이지가 아닌 경우에도 실행)
-        queryClient.invalidateQueries({
-          queryKey: ['communityReviews'],
-          exact: false,
-        });
-
         // 책 상세 정보 쿼리 무효화 (필요한 경우)
         if (bookIsbn || selectedBook?.isbn || selectedBook?.isbn13) {
           queryClient.invalidateQueries({
@@ -463,14 +463,6 @@ export function useReviewMutations({
         });
 
         toast.success('별점이 수정되었습니다.');
-      }
-
-      // 커뮤니티 리뷰 목록 무효화는 항상 수행 (별도 무효화가 발생하지 않은 경우를 대비)
-      if (!updateBoth) {
-        queryClient.invalidateQueries({
-          queryKey: ['communityReviews'],
-          exact: false,
-        });
       }
 
       // 6. 성공 callback 호출
