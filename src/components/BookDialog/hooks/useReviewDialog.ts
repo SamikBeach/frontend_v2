@@ -221,6 +221,14 @@ export function useReviewDialog() {
           refetchType: 'active',
         });
 
+        // 별점이 변경된 경우 커뮤니티 리뷰 관련 쿼리 무효화
+        if (data.ratingChanged) {
+          queryClient.invalidateQueries({
+            queryKey: ['communityReviews'],
+            refetchType: 'active',
+          });
+        }
+
         // book-reviews 쿼리 데이터 업데이트하여 별점 즉시 반영
         queryClient.setQueryData(['book-reviews', book.id], (oldData: any) => {
           if (!oldData || !oldData.pages) return oldData;

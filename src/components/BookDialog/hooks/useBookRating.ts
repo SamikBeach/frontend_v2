@@ -87,6 +87,20 @@ export function useBookRating() {
       // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
       invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
 
+      // 커뮤니티 리뷰 관련 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['communityReviews'],
+        refetchType: 'active',
+      });
+
+      // book-reviews 쿼리 무효화 (BookDialog 우측 리뷰 목록 업데이트)
+      if (book?.id) {
+        queryClient.invalidateQueries({
+          queryKey: ['book-reviews', book.id, isbn],
+          refetchType: 'active',
+        });
+      }
+
       toast.success('평점이 등록되었습니다.');
     },
     onError: () => {
@@ -142,6 +156,20 @@ export function useBookRating() {
 
       // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
       invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
+
+      // 커뮤니티 리뷰 관련 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['communityReviews'],
+        refetchType: 'active',
+      });
+
+      // book-reviews 쿼리 무효화 (BookDialog 우측 리뷰 목록 업데이트)
+      if (book?.id) {
+        queryClient.invalidateQueries({
+          queryKey: ['book-reviews', book.id, isbn],
+          refetchType: 'active',
+        });
+      }
 
       toast.success('평점이 삭제되었습니다.');
     },
