@@ -92,8 +92,12 @@ export function useCreateReview(): UseCreateReviewResult {
           isbn: isNegativeBookId ? bookIsbn : undefined,
         };
 
-        // 책이 선택되었고 별점이 있는 경우, 별점을 먼저 등록
-        if (selectedBook && rating > 0 && bookId !== undefined) {
+        // rating API가 필요한지 확인
+        const shouldCallRatingAPI =
+          selectedBook && rating > 0 && bookId !== undefined;
+
+        // 별점이 있는 경우에만 별점 API 호출 - rating이 0인 경우 호출 안함
+        if (shouldCallRatingAPI) {
           // 별점 등록 API 호출 - isbn 항상 전송
           await createOrUpdateRating(
             bookId,

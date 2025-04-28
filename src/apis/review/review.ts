@@ -109,13 +109,21 @@ export const updateReview = async (
   data: UpdateReviewDto
 ): Promise<ReviewResponseDto> => {
   // 요청 본문 준비
-  const payload = { ...data };
+  const payload: Record<string, any> = {};
 
-  // bookId가 음수이고 isbn이 제공된 경우를 처리
-  if (data.bookId && data.bookId < 0 && data.isbn) {
-    // ISBN을 포함하여 전송
+  // 필수 필드 복사
+  if (data.content !== undefined) payload.content = data.content;
+  if (data.type !== undefined) payload.type = data.type;
+
+  // bookId 처리
+  if (data.bookId !== undefined) {
     payload.bookId = data.bookId;
-    payload.isbn = data.isbn;
+
+    // bookId가 음수인 경우에만 isbn 포함
+    if (data.bookId < 0 && data.isbn) {
+      payload.isbn = data.isbn;
+    }
+    // 양수인 경우 isbn 속성 제외
   }
 
   const response = await api.put<ReviewResponseDto>(`/review/${id}`, payload);

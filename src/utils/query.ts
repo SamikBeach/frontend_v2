@@ -81,3 +81,105 @@ export function invalidateUserProfileQueries(
     exact: true,
   });
 }
+
+/**
+ * 사용자 별점과 관련된 쿼리만 무효화하는 함수
+ * @param queryClient React Query 클라이언트
+ * @param pathname 현재 경로
+ * @param currentUserId 현재 사용자 ID
+ */
+export function invalidateUserRatingQueries(
+  queryClient: QueryClient,
+  pathname: string,
+  currentUserId?: number | null
+): void {
+  // 자신의 프로필 페이지가 아니면 무효화하지 않음
+  if (!isCurrentUserProfilePage(pathname, currentUserId)) return;
+
+  // 사용자 별점 관련 쿼리 무효화
+  queryClient.invalidateQueries({
+    queryKey: ['user-ratings-infinite', currentUserId],
+    exact: false,
+  });
+
+  // 사용자 리뷰 관련 쿼리 무효화 - 별점만 변경했을 때도 리뷰 목록 갱신하기 위함
+  queryClient.invalidateQueries({
+    queryKey: ['user-reviews-infinite', currentUserId],
+    exact: false,
+  });
+
+  // 사용자 활동 관련 쿼리 무효화 - rating 변경될 때도 활동 목록을 갱신하기 위함
+  queryClient.invalidateQueries({
+    queryKey: ['user-activity-infinite', currentUserId],
+    exact: false,
+  });
+
+  // 커뮤니티 페이지에서도 갱신되도록 추가
+  queryClient.invalidateQueries({
+    queryKey: ['communityReviews'],
+    exact: false,
+  });
+}
+
+/**
+ * 리뷰와 별점을 함께 처리할 때 사용하는 무효화 함수
+ * 활동 쿼리를 한 번만 무효화하여 중복 API 호출 방지
+ * @param queryClient React Query 클라이언트
+ * @param pathname 현재 경로
+ * @param currentUserId 현재 사용자 ID
+ */
+export function invalidateReviewAndRatingQueries(
+  queryClient: QueryClient,
+  pathname: string,
+  currentUserId?: number | null
+): void {
+  // 자신의 프로필 페이지가 아니면 무효화하지 않음
+  if (!isCurrentUserProfilePage(pathname, currentUserId)) return;
+
+  // 프로필 데이터 쿼리 무효화
+  queryClient.invalidateQueries({
+    queryKey: ['profile', currentUserId],
+  });
+
+  // 사용자 책 목록 쿼리 무효화
+  queryClient.invalidateQueries({
+    queryKey: ['user-books', currentUserId],
+    exact: false,
+  });
+
+  // 사용자 리뷰 관련 쿼리 무효화
+  queryClient.invalidateQueries({
+    queryKey: ['user-reviews-infinite', currentUserId],
+    exact: false,
+  });
+
+  // 사용자 별점 관련 쿼리 무효화
+  queryClient.invalidateQueries({
+    queryKey: ['user-ratings-infinite', currentUserId],
+    exact: false,
+  });
+
+  // 사용자 활동 관련 쿼리 무효화 (한 번만 호출됨)
+  queryClient.invalidateQueries({
+    queryKey: ['user-activity-infinite', currentUserId],
+    exact: false,
+  });
+
+  // 사용자 서재 목록 쿼리 무효화
+  queryClient.invalidateQueries({
+    queryKey: ['user-libraries-infinite', currentUserId],
+    exact: false,
+  });
+
+  // 리뷰 타입 카운트 쿼리 무효화
+  queryClient.invalidateQueries({
+    queryKey: ['user-review-type-counts', currentUserId],
+    exact: true,
+  });
+
+  // 읽기 상태 카운트 쿼리 무효화
+  queryClient.invalidateQueries({
+    queryKey: ['user-reading-status-counts', currentUserId],
+    exact: true,
+  });
+}

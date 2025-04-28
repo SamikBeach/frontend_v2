@@ -1,4 +1,4 @@
-import { PenLine, Star, X } from 'lucide-react';
+import { PenLine, Star, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import {
@@ -46,6 +46,9 @@ export function ReviewDialog({
   const [rating, setRating] = useState(initialRating);
   const [content, setContent] = useState(initialContent);
   const isMobile = useIsMobile();
+  const [hasInitialContent] = useState(!!initialContent);
+  const isDeleteMode = isEditMode && hasInitialContent && !content.trim();
+  const isCreateMode = isEditMode && !hasInitialContent && content.trim();
 
   // 알림 다이얼로그 상태
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
@@ -91,6 +94,47 @@ export function ReviewDialog({
     setRating(0);
   };
 
+  // 다이얼로그 제목 결정
+  const getDialogTitle = () => {
+    if (isDeleteMode) {
+      return '리뷰 삭제하기';
+    } else if (isCreateMode) {
+      return '리뷰 작성하기';
+    } else if (isEditMode) {
+      return '리뷰 수정하기';
+    } else {
+      return '리뷰 작성하기';
+    }
+  };
+
+  // 다이얼로그 설명 결정
+  const getDialogDescription = () => {
+    if (isDeleteMode) {
+      return '리뷰를 삭제하시겠습니까?';
+    } else if (isCreateMode) {
+      return '리뷰를 작성해주세요';
+    } else if (isEditMode) {
+      return '리뷰를 수정해주세요';
+    } else {
+      return '리뷰를 남겨주세요';
+    }
+  };
+
+  // 버튼 텍스트 결정
+  const getButtonText = () => {
+    if (isSubmitting) {
+      return '처리 중...';
+    } else if (isDeleteMode) {
+      return '리뷰 삭제하기';
+    } else if (isCreateMode) {
+      return '리뷰 등록하기';
+    } else if (isEditMode) {
+      return '리뷰 수정하기';
+    } else {
+      return '리뷰 등록하기';
+    }
+  };
+
   return (
     <>
       <ResponsiveDialog
@@ -108,7 +152,7 @@ export function ReviewDialog({
               className="text-base font-medium"
               drawerClassName="text-base font-medium"
             >
-              {isEditMode ? '리뷰 수정하기' : '리뷰 작성하기'}
+              {getDialogTitle()}
             </ResponsiveDialogTitle>
             <Button
               variant="ghost"
@@ -127,7 +171,7 @@ export function ReviewDialog({
               drawerClassName="mb-6 text-sm text-gray-600"
             >
               <span className="font-medium text-gray-800">{bookTitle}</span>에
-              대한 {isEditMode ? '리뷰를 수정해주세요' : '리뷰를 남겨주세요'}
+              대한 {getDialogDescription()}
             </ResponsiveDialogDescription>
 
             <div className="mb-6 flex flex-col items-center space-y-3">
@@ -177,8 +221,18 @@ export function ReviewDialog({
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                placeholder="이 책에 대한 리뷰를 남겨주세요"
-                className="min-h-[150px] w-full resize-none rounded-2xl border-gray-200 bg-gray-50 p-4 text-sm placeholder:text-gray-400 focus:border-pink-200 focus:bg-white focus:ring-2 focus:ring-pink-100"
+                placeholder={
+                  isDeleteMode
+                    ? '내용을 비워두면 리뷰가 삭제됩니다'
+                    : '이 책에 대한 리뷰를 남겨주세요'
+                }
+                className={`min-h-[150px] w-full resize-none rounded-2xl border-gray-200 p-4 text-sm placeholder:text-gray-400 focus:border-pink-200 focus:bg-white focus:ring-2 focus:ring-pink-100 ${
+                  isDeleteMode
+                    ? 'bg-red-50'
+                    : isCreateMode
+                      ? 'bg-green-50'
+                      : 'bg-gray-50'
+                }`}
                 disabled={isSubmitting}
               />
             </div>
@@ -204,15 +258,21 @@ export function ReviewDialog({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!content.trim() || isSubmitting}
-              className="rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-200"
+              disabled={rating === 0 || isSubmitting}
+              className={`rounded-xl text-white ${
+                isDeleteMode
+                  ? 'bg-red-500 hover:bg-red-600'
+                  : isCreateMode
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-gray-900 hover:bg-gray-800'
+              } disabled:bg-gray-200`}
             >
-              <PenLine className="mr-1.5 h-4 w-4" />
-              {isSubmitting
-                ? '등록 중...'
-                : isEditMode
-                  ? '리뷰 수정하기'
-                  : '리뷰 등록하기'}
+              {isDeleteMode ? (
+                <Trash2 className="mr-1.5 h-4 w-4" />
+              ) : (
+                <PenLine className="mr-1.5 h-4 w-4" />
+              )}
+              {getButtonText()}
             </Button>
           </ResponsiveDialogFooter>
         </ResponsiveDialogContent>
