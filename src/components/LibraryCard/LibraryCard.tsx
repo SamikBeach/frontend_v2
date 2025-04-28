@@ -15,9 +15,14 @@ import { useMemo } from 'react';
 export interface LibraryCardProps {
   library: LibraryListItem | any; // Allow any for test data
   tags?: Tag[];
+  hidePublicTag?: boolean; // Add new prop to hide public/private tag
 }
 
-export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
+export function LibraryCard({
+  library,
+  tags = [],
+  hidePublicTag = false,
+}: LibraryCardProps) {
   // 현재 사용자 정보 가져오기
   const currentUser = useCurrentUser();
 
@@ -84,10 +89,50 @@ export function LibraryCard({ library, tags = [] }: LibraryCardProps) {
                       </span>
                     ))}
 
-                  {/* 공개/비공개 태그 표시 (내 서재인 경우만) - 태그 목록 이후에 표시 */}
-                  {isOwner && (
-                    <span className="flex-shrink-0 rounded-full border border-gray-300 bg-white px-2 py-0.5 text-xs font-medium text-gray-500">
-                      {library.isPublic ? '공개' : '비공개'}
+                  {/* 공개/비공개 태그 표시 - 내 서재(isOwner가 true)인 경우에만 표시하고, hidePublicTag가 true인 경우에는 표시하지 않음 */}
+                  {isOwner && !hidePublicTag && (
+                    <span className="flex flex-shrink-0 items-center rounded-full border border-gray-300 bg-white px-2 py-0.5 text-xs font-medium text-gray-500">
+                      {library.isPublic ? (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="mr-1"
+                          >
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+                            <circle cx="12" cy="12" r="3" />
+                          </svg>
+                          공개
+                        </>
+                      ) : (
+                        <>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="mr-1"
+                          >
+                            <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+                            <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+                            <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+                            <line x1="2" x2="22" y1="2" y2="22" />
+                          </svg>
+                          비공개
+                        </>
+                      )}
                     </span>
                   )}
                 </div>

@@ -10,3 +10,4 @@ export * from './useUserLibraries';
 export { useUserProfile } from './useUserProfile';
 export { useUserRatings, useUserRatingsInfinite } from './useUserRatings';
 export * from './useUserReviews';
+export * from './useUserSubscribedLibraries';

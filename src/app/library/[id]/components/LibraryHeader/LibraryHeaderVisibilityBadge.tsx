@@ -14,9 +14,7 @@ export const LibraryHeaderVisibilityBadge: FC<
       variant="outline"
       className={
         isPublic !== undefined
-          ? isPublic
-            ? 'border-green-200 bg-green-50 text-green-600'
-            : 'border-yellow-200 bg-yellow-50 text-yellow-600'
+          ? 'border-gray-300 bg-white text-gray-500'
           : 'h-6 border-gray-200 bg-gray-50 px-4'
       }
     >
