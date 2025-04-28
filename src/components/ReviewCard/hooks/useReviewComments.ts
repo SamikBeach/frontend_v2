@@ -5,6 +5,7 @@ import {
   unlikeComment as apiUnlikeComment,
   getReviewComments,
 } from '@/apis/review/review';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -44,6 +45,7 @@ export function useReviewComments(
   showComments: boolean = false
 ): UseReviewCommentsResult {
   const queryClient = useQueryClient();
+  const currentUser = useCurrentUser();
   const [commentText, setCommentText] = useState('');
   const [replyToCommentId, setReplyToCommentId] = useState<number | null>(null);
 
