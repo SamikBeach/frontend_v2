@@ -373,7 +373,10 @@ export function useReviewMutations({
       return;
     }
 
-    const bookId = Number(review.bookId);
+    console.log({ review });
+    // book 객체에서 bookId와 isbn 가져오기
+    const bookId = review.book?.id ? Number(review.book.id) : -1;
+    const bookIsbn = review.book?.isbn || review.book?.isbn13 || '';
     const isNegativeBookId = bookId < 0;
 
     // 별점과 리뷰 둘 다 변경되었는지 여부
@@ -393,8 +396,7 @@ export function useReviewMutations({
           ...((selectedBook && Number(selectedBook.id) < 0) ||
           (!selectedBook && isNegativeBookId)
             ? {
-                isbn:
-                  selectedBook?.isbn || selectedBook?.isbn13 || review.bookIsbn,
+                isbn: selectedBook?.isbn || selectedBook?.isbn13 || bookIsbn,
               }
             : {}),
           skipInvalidate: true, // 별점과 함께 업데이트하는 경우 개별 무효화 건너뜀
@@ -405,7 +407,7 @@ export function useReviewMutations({
           bookId: selectedBook ? Number(selectedBook.id) : bookId,
           rating,
           isbn: isNegativeBookId
-            ? selectedBook?.isbn || selectedBook?.isbn13 || review.bookIsbn
+            ? selectedBook?.isbn || selectedBook?.isbn13 || bookIsbn
             : undefined,
           skipInvalidate: true, // 별점도 개별 무효화 건너뜀
         });
@@ -414,11 +416,11 @@ export function useReviewMutations({
         invalidateReviewAndRatingQueries(queryClient, pathname, currentUserId);
 
         // 책 상세 정보 쿼리 무효화 (필요한 경우)
-        if (review.bookIsbn || selectedBook?.isbn || selectedBook?.isbn13) {
+        if (bookIsbn || selectedBook?.isbn || selectedBook?.isbn13) {
           queryClient.invalidateQueries({
             queryKey: [
               'book-detail',
-              selectedBook?.isbn || selectedBook?.isbn13 || review.bookIsbn,
+              selectedBook?.isbn || selectedBook?.isbn13 || bookIsbn,
             ],
           });
         }
@@ -436,8 +438,7 @@ export function useReviewMutations({
           ...((selectedBook && Number(selectedBook.id) < 0) ||
           (!selectedBook && isNegativeBookId)
             ? {
-                isbn:
-                  selectedBook?.isbn || selectedBook?.isbn13 || review.bookIsbn,
+                isbn: selectedBook?.isbn || selectedBook?.isbn13 || bookIsbn,
               }
             : {}),
         });
@@ -450,7 +451,7 @@ export function useReviewMutations({
           bookId: selectedBook ? Number(selectedBook.id) : bookId,
           rating,
           isbn: isNegativeBookId
-            ? selectedBook?.isbn || selectedBook?.isbn13 || review.bookIsbn
+            ? selectedBook?.isbn || selectedBook?.isbn13 || bookIsbn
             : undefined,
         });
 
