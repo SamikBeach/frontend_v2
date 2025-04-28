@@ -133,7 +133,13 @@ export function invalidateReviewAndRatingQueries(
   pathname: string,
   currentUserId?: number | null
 ): void {
-  // 자신의 프로필 페이지가 아니면 무효화하지 않음
+  // 커뮤니티 리뷰 목록 항상 무효화 (위치에 관계없이)
+  queryClient.invalidateQueries({
+    queryKey: ['communityReviews'],
+    exact: false,
+  });
+
+  // 자신의 프로필 페이지가 아니면 아래 프로필 관련 무효화를 건너뜀
   if (!isCurrentUserProfilePage(pathname, currentUserId)) return;
 
   // 프로필 데이터 쿼리 무효화

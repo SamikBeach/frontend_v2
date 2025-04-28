@@ -46,9 +46,10 @@ export function ReviewDialog({
   const [rating, setRating] = useState(initialRating);
   const [content, setContent] = useState(initialContent);
   const isMobile = useIsMobile();
-  const [hasInitialContent] = useState(!!initialContent);
-  const isDeleteMode = isEditMode && hasInitialContent && !content.trim();
-  const isCreateMode = isEditMode && !hasInitialContent && content.trim();
+
+  // 모드 결정 로직 수정
+  const isDeleteMode = isEditMode && initialContent && !content.trim();
+  const isCreateMode = !isEditMode || (isEditMode && !initialContent);
 
   // 알림 다이얼로그 상태
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);

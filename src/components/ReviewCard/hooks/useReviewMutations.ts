@@ -416,6 +416,12 @@ export function useReviewMutations({
         // 한 번에 무효화 처리
         invalidateReviewAndRatingQueries(queryClient, pathname, currentUserId);
 
+        // 커뮤니티 페이지 리뷰 목록 무효화 (프로필 페이지가 아닌 경우에도 실행)
+        queryClient.invalidateQueries({
+          queryKey: ['communityReviews'],
+          exact: false,
+        });
+
         // 책 상세 정보 쿼리 무효화 (필요한 경우)
         if (bookIsbn || selectedBook?.isbn || selectedBook?.isbn13) {
           queryClient.invalidateQueries({
@@ -457,6 +463,14 @@ export function useReviewMutations({
         });
 
         toast.success('별점이 수정되었습니다.');
+      }
+
+      // 커뮤니티 리뷰 목록 무효화는 항상 수행 (별도 무효화가 발생하지 않은 경우를 대비)
+      if (!updateBoth) {
+        queryClient.invalidateQueries({
+          queryKey: ['communityReviews'],
+          exact: false,
+        });
       }
 
       // 6. 성공 callback 호출

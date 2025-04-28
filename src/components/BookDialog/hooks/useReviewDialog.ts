@@ -1,5 +1,5 @@
 import { createOrUpdateRating } from '@/apis/rating/rating';
-import { createReview, updateReview } from '@/apis/review/review';
+import { createReview, deleteReview, updateReview } from '@/apis/review/review';
 import { Review } from '@/apis/review/types';
 import { bookReviewSortAtom } from '@/atoms/book';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -24,6 +24,7 @@ export function useReviewDialog() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [initialContent, setInitialContent] = useState('');
+  const [initialRating, setInitialRating] = useState(0);
 
   // 리뷰 제출 뮤테이션 (생성/수정/별점 모두 처리)
   const mutation = useMutation({
@@ -40,26 +41,50 @@ export function useReviewDialog() {
 
       // 리뷰 수정 모드
       if (isEditMode && editingReview) {
-        // 리뷰 수정 시에도 별점 업데이트 필요
-        // 먼저 별점 업데이트 - comment 없이 rating만 전송
-        const ratingResponse = await createOrUpdateRating(
-          book.id,
-          { rating },
-          book.id < 0 ? isbn : undefined
-        );
+        let ratingResponse = null;
+        let reviewResponse = null;
 
-        // 그 다음 리뷰 내용 업데이트
-        const reviewResponse = await updateReview(editingReview.id, {
-          content,
-          bookId: book.id,
-          isbn: book.id < 0 ? isbn : undefined,
-        });
+        // 별점이 변경된 경우에만 별점 API 호출
+        const ratingChanged = rating !== initialRating;
+
+        // 내용이 변경된 경우에만 리뷰 API 호출
+        const contentChanged = content !== initialContent;
+
+        // 내용이 완전히 삭제된 경우 (리뷰 삭제)
+        const contentDeleted = initialContent && !content.trim();
+
+        if (ratingChanged) {
+          // 별점 업데이트 - comment 없이 rating만 전송
+          ratingResponse = await createOrUpdateRating(
+            book.id,
+            { rating },
+            book.id < 0 ? isbn : undefined
+          );
+        }
+
+        if (contentDeleted) {
+          // 리뷰 삭제
+          await deleteReview(editingReview.id);
+          reviewResponse = null;
+        } else if (contentChanged) {
+          // 리뷰 내용 업데이트
+          reviewResponse = await updateReview(editingReview.id, {
+            content,
+            bookId: book.id,
+            isbn: book.id < 0 ? isbn : undefined,
+          });
+        }
 
         // 별점과 리뷰 응답을 합쳐서 반환
         return {
-          ...reviewResponse,
-          rating: ratingResponse.rating,
-          ratingId: ratingResponse.id,
+          ...(reviewResponse || editingReview),
+          rating: ratingResponse ? ratingResponse.rating : rating,
+          ratingId: ratingResponse
+            ? ratingResponse.id
+            : editingReview.userRating?.bookId || 0,
+          ratingChanged,
+          contentChanged,
+          contentDeleted,
         };
       }
 
@@ -73,12 +98,18 @@ export function useReviewDialog() {
       }
 
       // 새 리뷰 생성 - 별점과 리뷰를 따로 처리
-      // 먼저 별점 업데이트 - comment 없이 rating만 전송
-      const ratingResponse = await createOrUpdateRating(
-        book.id,
-        { rating },
-        book.id < 0 ? isbn : undefined
-      );
+      // 기존 별점과 비교하여 변경된 경우에만 별점 API 호출
+      const ratingChanged = rating !== userRatingData?.rating || 0;
+      let ratingResponse = null;
+
+      if (ratingChanged) {
+        // 먼저 별점 업데이트 - comment 없이 rating만 전송
+        ratingResponse = await createOrUpdateRating(
+          book.id,
+          { rating },
+          book.id < 0 ? isbn : undefined
+        );
+      }
 
       // 그 다음 리뷰 생성
       const reviewResponse = await createReview({
@@ -91,8 +122,9 @@ export function useReviewDialog() {
       // 별점과 리뷰 응답을 합쳐서 반환
       return {
         ...reviewResponse,
-        rating: ratingResponse.rating,
-        ratingId: ratingResponse.id,
+        rating: ratingResponse ? ratingResponse.rating : rating,
+        ratingId: ratingResponse ? ratingResponse.id : userRatingData?.id || 0,
+        ratingChanged,
       };
     },
     onSuccess: data => {
@@ -121,18 +153,22 @@ export function useReviewDialog() {
           const oldRating = typedOldData.userRating?.rating || 0;
           const newRating = data.rating;
 
-          if (!hadPreviousRating) {
-            // 새 평점 추가 - 총합에 새 평점 추가하고 카운트 증가
-            const totalRatingSum = newRatingValue * newTotalRatings + newRating;
-            newTotalRatings += 1;
-            newRatingValue =
-              newTotalRatings > 0 ? totalRatingSum / newTotalRatings : 0;
-          } else if (oldRating !== newRating) {
-            // 평점 변경 - 총합에서 이전 평점 제거하고 새 평점 추가
-            const totalRatingSum =
-              newRatingValue * newTotalRatings - oldRating + newRating;
-            newRatingValue =
-              newTotalRatings > 0 ? totalRatingSum / newTotalRatings : 0;
+          // 별점이 변경된 경우에만 평균 별점 업데이트
+          if (data.ratingChanged) {
+            if (!hadPreviousRating) {
+              // 새 평점 추가 - 총합에 새 평점 추가하고 카운트 증가
+              const totalRatingSum =
+                newRatingValue * newTotalRatings + newRating;
+              newTotalRatings += 1;
+              newRatingValue =
+                newTotalRatings > 0 ? totalRatingSum / newTotalRatings : 0;
+            } else if (oldRating !== newRating) {
+              // 평점 변경 - 총합에서 이전 평점 제거하고 새 평점 추가
+              const totalRatingSum =
+                newRatingValue * newTotalRatings - oldRating + newRating;
+              newRatingValue =
+                newTotalRatings > 0 ? totalRatingSum / newTotalRatings : 0;
+            }
           }
 
           // 업데이트된 데이터 반환
@@ -189,40 +225,122 @@ export function useReviewDialog() {
         queryClient.setQueryData(['book-reviews', book.id], (oldData: any) => {
           if (!oldData || !oldData.pages) return oldData;
 
-          // 해당 책에 대한 모든 리뷰에 새로운 별점 정보 추가
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page: any) => {
-              if (!page || !page.data) return page;
+          // 별점이 변경된 경우에만 리뷰 데이터 업데이트
+          if (data.ratingChanged) {
+            // 해당 책에 대한 모든 리뷰에 새로운 별점 정보 추가
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => {
+                if (!page || !page.data) return page;
 
-              return {
-                ...page,
-                data: page.data.map((review: any) => {
-                  // 리뷰 내부의 book ID가 현재 책 ID와 일치하는지 확인
-                  const isMatchingBook = review.book?.id === book.id;
+                return {
+                  ...page,
+                  data: page.data.map((review: any) => {
+                    // 리뷰 내부의 book ID가 현재 책 ID와 일치하는지 확인
+                    const isMatchingBook = review.book?.id === book.id;
 
-                  if (isMatchingBook) {
-                    // 리뷰의 책 정보에도 새로운 평균 평점 반영
-                    const updatedBook = review.book
-                      ? {
-                          ...review.book,
-                          rating: updatedRating,
-                          totalRatings: updatedTotalRatings,
-                        }
-                      : review.book;
+                    if (isMatchingBook) {
+                      // 리뷰의 책 정보에도 새로운 평균 평점 반영
+                      const updatedBook = review.book
+                        ? {
+                            ...review.book,
+                            rating: updatedRating,
+                            totalRatings: updatedTotalRatings,
+                          }
+                        : review.book;
 
-                    return {
-                      ...review,
-                      userRating: userRatingData,
-                      book: updatedBook,
-                    };
-                  }
-                  return review;
-                }),
-              };
-            }),
-          };
+                      return {
+                        ...review,
+                        userRating: userRatingData,
+                        book: updatedBook,
+                      };
+                    }
+                    return review;
+                  }),
+                };
+              }),
+            };
+          }
+
+          // 별점이 변경되지 않은 경우 원본 데이터 반환
+          return oldData;
         });
+
+        // 리뷰 내용이 변경된 경우에만 리뷰 관련 쿼리 무효화
+        if (data.contentChanged || data.contentDeleted) {
+          // 리뷰 내용이 변경되었거나 삭제된 경우 리뷰 관련 쿼리 무효화
+          // 별점이 변경된 경우에는 이미 위에서 직접 데이터를 업데이트했으므로 무효화하지 않음
+          if (!data.ratingChanged) {
+            // 리뷰 내용이 변경된 경우 직접 캐시 업데이트
+            if (data.contentChanged && !data.contentDeleted) {
+              queryClient.setQueryData(
+                ['book-reviews', book.id],
+                (oldData: any) => {
+                  if (!oldData || !oldData.pages) return oldData;
+
+                  return {
+                    ...oldData,
+                    pages: oldData.pages.map((page: any) => {
+                      if (!page || !page.data) return page;
+
+                      return {
+                        ...page,
+                        data: page.data.map((review: any) => {
+                          // 현재 수정 중인 리뷰인 경우 내용 업데이트
+                          if (review.id === editingReview?.id) {
+                            return {
+                              ...review,
+                              content: data.content,
+                            };
+                          }
+                          return review;
+                        }),
+                      };
+                    }),
+                  };
+                }
+              );
+            } else if (data.contentDeleted) {
+              // 리뷰가 삭제된 경우 직접 캐시 업데이트
+              queryClient.setQueryData(
+                ['book-reviews', book.id],
+                (oldData: any) => {
+                  if (!oldData || !oldData.pages) return oldData;
+
+                  return {
+                    ...oldData,
+                    pages: oldData.pages.map((page: any) => {
+                      if (!page || !page.data) return page;
+
+                      // 삭제된 리뷰를 필터링
+                      return {
+                        ...page,
+                        data: page.data.filter(
+                          (review: any) => review.id !== editingReview?.id
+                        ),
+                      };
+                    }),
+                  };
+                }
+              );
+            }
+          }
+
+          // 리뷰가 삭제된 경우 추가 쿼리 무효화
+          if (data.contentDeleted) {
+            // 사용자 리뷰 관련 쿼리 무효화
+            queryClient.invalidateQueries({
+              queryKey: ['user-reviews'],
+              refetchType: 'active',
+            });
+
+            // 커뮤니티 리뷰 관련 쿼리 무효화
+            queryClient.invalidateQueries({
+              queryKey: ['communityReviews'],
+              refetchType: 'active',
+            });
+          }
+        }
       }
 
       // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
@@ -234,11 +352,27 @@ export function useReviewDialog() {
       // 수정 모드 초기화
       resetEditMode();
 
-      toast.success(
-        isEditMode
-          ? '리뷰가 수정되었습니다.'
-          : '리뷰가 성공적으로 저장되었습니다.'
-      );
+      // 성공 메시지 표시 - 별점 변경 여부에 따라 다른 메시지 표시
+      if (isEditMode) {
+        if (data.contentDeleted) {
+          toast.success('리뷰가 삭제되었습니다.');
+        } else if (data.ratingChanged && data.contentChanged) {
+          toast.success('리뷰와 별점이 수정되었습니다.');
+        } else if (data.ratingChanged) {
+          toast.success('별점이 수정되었습니다.');
+        } else if (data.contentChanged) {
+          toast.success('리뷰가 수정되었습니다.');
+        } else {
+          toast.success('변경 사항이 없습니다.');
+        }
+      } else {
+        // 새 리뷰 생성 시 별점 변경 여부에 따라 다른 메시지 표시
+        if (data.ratingChanged) {
+          toast.success('리뷰와 별점이 성공적으로 저장되었습니다.');
+        } else {
+          toast.success('리뷰가 성공적으로 저장되었습니다.');
+        }
+      }
     },
     onError: error => {
       console.error('리뷰 저장 오류:', error);
@@ -260,6 +394,7 @@ export function useReviewDialog() {
     setIsEditMode(false);
     setEditingReview(null);
     setInitialContent('');
+    setInitialRating(0);
   }, []);
 
   // 리뷰 수정 다이얼로그 열기 핸들러
@@ -267,6 +402,7 @@ export function useReviewDialog() {
     setIsEditMode(true);
     setEditingReview(review);
     setInitialContent(review.content);
+    setInitialRating(review.userRating?.rating || 0);
     setReviewDialogOpen(true);
   }, []);
 
