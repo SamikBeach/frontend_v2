@@ -3,6 +3,8 @@ import { SearchResult } from '@/apis/search/types';
 import { ExtendedReviewResponseDto } from '../types';
 import { BookPreview } from './BookPreview';
 import { ReviewEditForm } from './ReviewEditForm';
+import { ReviewImage } from './ReviewImage';
+import { ReviewText } from './ReviewText';
 
 interface ReviewContentProps {
   review: ExtendedReviewResponseDto;
@@ -75,27 +77,16 @@ export function ReviewContent({
   return (
     <>
       {/* 본문 내용 */}
-      <p className="text-[15px] leading-relaxed whitespace-pre-line text-gray-800">
-        {displayContent}
-        {isLongContent && (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="ml-1 font-medium text-gray-500 hover:text-gray-700"
-          >
-            {expanded ? '접기' : '더보기'}
-          </button>
-        )}
-      </p>
+      <ReviewText
+        content={displayContent}
+        isLongContent={isLongContent}
+        expanded={expanded}
+        setExpanded={setExpanded}
+      />
 
       {/* 이미지가 있는 경우 */}
       {review.images && review.images.length > 0 && (
-        <div className="overflow-hidden rounded-xl">
-          <img
-            src={review.images[0].url}
-            alt="Review image"
-            className="h-auto w-full object-cover"
-          />
-        </div>
+        <ReviewImage imageUrl={review.images[0].url} onClick={() => {}} />
       )}
 
       {/* 책 정보가 있는 경우 */}

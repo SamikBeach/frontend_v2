@@ -1,15 +1,5 @@
 import { PenLine, Star, Trash2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
   ResponsiveDialog,
@@ -19,6 +9,8 @@ import {
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { ReviewAlertDialog } from './components/ReviewAlertDialog';
+import { useReviewDialogState } from './hooks/useReviewDialogState';
 
 interface ReviewDialogProps {
   open: boolean;
@@ -43,40 +35,27 @@ export function ReviewDialog({
   isSubmitting = false,
   onCancel,
 }: ReviewDialogProps) {
-  const [rating, setRating] = useState(initialRating);
-  const [content, setContent] = useState(initialContent);
   const isMobile = useIsMobile();
-
-  // 모드 결정 로직 수정
-  const isDeleteMode = isEditMode && initialContent && !content.trim();
-  const isCreateMode = !isEditMode || (isEditMode && !initialContent);
-
-  // 알림 다이얼로그 상태
-  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-
-  // 모달이 열릴 때 초기 데이터 설정
-  useEffect(() => {
-    // 다이얼로그가 열려있는 상태에서도 initialRating이 변경되면 업데이트
-    setRating(initialRating);
-  }, [initialRating]);
-
-  // 수정 모드일 때 초기 콘텐츠 설정
-  useEffect(() => {
-    if (isEditMode && initialContent) {
-      setContent(initialContent);
-    }
-  }, [isEditMode, initialContent, open]);
-
-  // Dialog가 닫힐 때 상태 초기화
-  useEffect(() => {
-    if (!open) {
-      // 수정 모드가 아닐 때만 내용 초기화
-      if (!isEditMode) {
-        setContent('');
-      }
-    }
-  }, [open, isEditMode]);
+  const {
+    rating,
+    setRating,
+    content,
+    setContent,
+    alertDialogOpen,
+    setAlertDialogOpen,
+    alertMessage,
+    setAlertMessage,
+    isDeleteMode,
+    isCreateMode,
+    handleResetRating,
+    getDialogTitle,
+    getDialogDescription,
+  } = useReviewDialogState({
+    initialRating,
+    initialContent,
+    isEditMode,
+    open,
+  });
 
   const handleSubmit = () => {
     // 별점이 입력되지 않은 경우 경고 표시
@@ -88,37 +67,6 @@ export function ReviewDialog({
 
     // 유효성 검사 통과 시 제출
     onSubmit(rating, content);
-  };
-
-  // 별점 취소 핸들러
-  const handleResetRating = () => {
-    setRating(0);
-  };
-
-  // 다이얼로그 제목 결정
-  const getDialogTitle = () => {
-    if (isDeleteMode) {
-      return '리뷰 삭제하기';
-    } else if (isCreateMode) {
-      return '리뷰 작성하기';
-    } else if (isEditMode) {
-      return '리뷰 수정하기';
-    } else {
-      return '리뷰 작성하기';
-    }
-  };
-
-  // 다이얼로그 설명 결정
-  const getDialogDescription = () => {
-    if (isDeleteMode) {
-      return '리뷰를 삭제하시겠습니까?';
-    } else if (isCreateMode) {
-      return '리뷰를 작성해주세요';
-    } else if (isEditMode) {
-      return '리뷰를 수정해주세요';
-    } else {
-      return '리뷰를 남겨주세요';
-    }
   };
 
   // 버튼 텍스트 결정
@@ -279,23 +227,12 @@ export function ReviewDialog({
         </ResponsiveDialogContent>
       </ResponsiveDialog>
 
-      {/* 별점 알림 다이얼로그 */}
-      <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
-        <AlertDialogContent className="max-w-md rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>별점을 입력해주세요</AlertDialogTitle>
-            <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction
-              className="rounded-xl bg-gray-900 text-white hover:bg-gray-800"
-              onClick={() => setAlertDialogOpen(false)}
-            >
-              확인
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ReviewAlertDialog
+        open={alertDialogOpen}
+        onOpenChange={setAlertDialogOpen}
+        title="별점 필요"
+        message={alertMessage}
+      />
     </>
   );
 }
