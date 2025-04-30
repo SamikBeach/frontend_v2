@@ -2,16 +2,37 @@ import api from '../axios';
 import { ReadingStatusType } from '../reading-status/types';
 import {
   AccountActionResponse,
+  ActivityFrequencyResponse,
+  AmountStatsResponse,
+  AuthorPublisherStatsResponse,
+  BookMetadataStatsResponse,
   ChangePasswordRequest,
   ChangePasswordResponse,
+  CommentActivityResponse,
+  FollowerStatsResponse,
   FollowersListResponseDto,
   FollowingListResponseDto,
+  GenreAnalysisResponse,
+  LibraryCompositionResponse,
+  LibraryDiversityResponse,
+  LibraryPopularityResponse,
+  LibraryUpdatePatternResponse,
+  RatingHabitsResponse,
+  RatingStatsResponse,
+  ReadingStatusByPeriodResponse,
+  ReadingStatusStatsResponse,
+  ReviewInfluenceResponse,
+  ReviewStatsResponse,
+  SearchActivityResponse,
+  StatisticsSettingResponse,
+  UpdateStatisticsSettingRequest,
   UpdateUserInfoRequest,
   UpdateUserInfoResponse,
   UploadProfileImageResponse,
   User,
   UserBooksResponseDto,
   UserDetailResponseDto,
+  UserInteractionResponse,
   UserReadingStatusCountsDto,
   UserReviewTypeCountsDto,
   UserReviewsResponseDto,
@@ -301,5 +322,250 @@ export const getUserActivity = async (
   const response = await api.get(`/user/${userId}/activity`, {
     params: { page, limit, filter },
   });
+  return response.data;
+};
+
+/**
+ * 사용자의 통계 설정을 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getUserStatisticsSettings = async (
+  userId: number
+): Promise<StatisticsSettingResponse> => {
+  const response = await api.get(`/user/${userId}/statistics-settings`);
+  return response.data;
+};
+
+/**
+ * 사용자의 통계 설정을 업데이트합니다.
+ * @param userId 사용자 ID
+ * @param data 업데이트할 설정 정보
+ */
+export const updateUserStatisticsSettings = async (
+  userId: number,
+  data: UpdateStatisticsSettingRequest
+): Promise<StatisticsSettingResponse> => {
+  const response = await api.patch(`/user/${userId}/statistics-settings`, data);
+  return response.data;
+};
+
+/**
+ * 독서 상태별 도서 수 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getReadingStatusStats = async (
+  userId: number
+): Promise<ReadingStatusStatsResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/reading-status`);
+  return response.data;
+};
+
+/**
+ * 기간별 독서 상태 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getReadingStatusByPeriod = async (
+  userId: number
+): Promise<ReadingStatusByPeriodResponse> => {
+  const response = await api.get(
+    `/user/${userId}/statistics/reading-status-by-period`
+  );
+  return response.data;
+};
+
+/**
+ * 장르/카테고리 분석 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getGenreAnalysis = async (
+  userId: number
+): Promise<GenreAnalysisResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/genre-analysis`);
+  return response.data;
+};
+
+/**
+ * 저자/출판사 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getAuthorPublisherStats = async (
+  userId: number
+): Promise<AuthorPublisherStatsResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/author-publisher`);
+  return response.data;
+};
+
+/**
+ * 리뷰 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getReviewStats = async (
+  userId: number
+): Promise<ReviewStatsResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/reviews`);
+  return response.data;
+};
+
+/**
+ * 평점 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getRatingStats = async (
+  userId: number
+): Promise<RatingStatsResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/ratings`);
+  return response.data;
+};
+
+/**
+ * 액티비티 빈도 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getActivityFrequency = async (
+  userId: number
+): Promise<ActivityFrequencyResponse> => {
+  const response = await api.get(
+    `/user/${userId}/statistics/activity-frequency`
+  );
+  return response.data;
+};
+
+/**
+ * 평가 습관 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getRatingHabits = async (
+  userId: number
+): Promise<RatingHabitsResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/rating-habits`);
+  return response.data;
+};
+
+/**
+ * 사용자 상호작용 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getUserInteraction = async (
+  userId: number
+): Promise<UserInteractionResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/user-interaction`);
+  return response.data;
+};
+
+/**
+ * 팔로워/팔로잉 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getFollowerStats = async (
+  userId: number
+): Promise<FollowerStatsResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/follower`);
+  return response.data;
+};
+
+/**
+ * 댓글 활동 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getCommentActivity = async (
+  userId: number
+): Promise<CommentActivityResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/comment-activity`);
+  return response.data;
+};
+
+/**
+ * 리뷰 영향력 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getReviewInfluence = async (
+  userId: number
+): Promise<ReviewInfluenceResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/review-influence`);
+  return response.data;
+};
+
+/**
+ * 서재 구성 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getLibraryComposition = async (
+  userId: number
+): Promise<LibraryCompositionResponse> => {
+  const response = await api.get(
+    `/user/${userId}/statistics/library-composition`
+  );
+  return response.data;
+};
+
+/**
+ * 서재 인기도 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getLibraryPopularity = async (
+  userId: number
+): Promise<LibraryPopularityResponse> => {
+  const response = await api.get(
+    `/user/${userId}/statistics/library-popularity`
+  );
+  return response.data;
+};
+
+/**
+ * 서재 업데이트 패턴 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getLibraryUpdatePattern = async (
+  userId: number
+): Promise<LibraryUpdatePatternResponse> => {
+  const response = await api.get(
+    `/user/${userId}/statistics/library-update-pattern`
+  );
+  return response.data;
+};
+
+/**
+ * 서재 다양성 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getLibraryDiversity = async (
+  userId: number
+): Promise<LibraryDiversityResponse> => {
+  const response = await api.get(
+    `/user/${userId}/statistics/library-diversity`
+  );
+  return response.data;
+};
+
+/**
+ * 금액 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getAmountStats = async (
+  userId: number
+): Promise<AmountStatsResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/amount`);
+  return response.data;
+};
+
+/**
+ * 검색 활동 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getSearchActivity = async (
+  userId: number
+): Promise<SearchActivityResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/search-activity`);
+  return response.data;
+};
+
+/**
+ * 도서 메타데이터 통계를 조회합니다.
+ * @param userId 사용자 ID
+ */
+export const getBookMetadataStats = async (
+  userId: number
+): Promise<BookMetadataStatsResponse> => {
+  const response = await api.get(`/user/${userId}/statistics/book-metadata`);
   return response.data;
 };

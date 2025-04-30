@@ -337,3 +337,305 @@ export interface UserReviewTypeCountsDto {
   meetup: number;
   total: number;
 }
+
+/**
+ * 통계 설정 업데이트 요청 인터페이스
+ */
+export interface UpdateStatisticsSettingRequest {
+  isReadingStatusPublic?: boolean;
+  isReadingTimePatternPublic?: boolean;
+  isReadingStatusByPeriodPublic?: boolean;
+  isGenreAnalysisPublic?: boolean;
+  isAuthorPublisherStatsPublic?: boolean;
+  isReviewStatsPublic?: boolean;
+  isRatingStatsPublic?: boolean;
+  isActivityFrequencyPublic?: boolean;
+  isRatingHabitsPublic?: boolean;
+  isUserInteractionPublic?: boolean;
+  isFollowerStatsPublic?: boolean;
+  isCommentActivityPublic?: boolean;
+  isReviewInfluencePublic?: boolean;
+  isLibraryCompositionPublic?: boolean;
+  isLibraryPopularityPublic?: boolean;
+  isLibraryUpdatePatternPublic?: boolean;
+  isLibraryDiversityPublic?: boolean;
+  isAmountStatsPublic?: boolean;
+  isSearchActivityPublic?: boolean;
+  isBookMetadataStatsPublic?: boolean;
+}
+
+/**
+ * 통계 설정 응답 인터페이스
+ */
+export interface StatisticsSettingResponse {
+  isReadingStatusPublic: boolean;
+  isReadingTimePatternPublic: boolean;
+  isReadingStatusByPeriodPublic: boolean;
+  isGenreAnalysisPublic: boolean;
+  isAuthorPublisherStatsPublic: boolean;
+  isReviewStatsPublic: boolean;
+  isRatingStatsPublic: boolean;
+  isActivityFrequencyPublic: boolean;
+  isRatingHabitsPublic: boolean;
+  isUserInteractionPublic: boolean;
+  isFollowerStatsPublic: boolean;
+  isCommentActivityPublic: boolean;
+  isReviewInfluencePublic: boolean;
+  isLibraryCompositionPublic: boolean;
+  isLibraryPopularityPublic: boolean;
+  isLibraryUpdatePatternPublic: boolean;
+  isLibraryDiversityPublic: boolean;
+  isAmountStatsPublic: boolean;
+  isSearchActivityPublic: boolean;
+  isBookMetadataStatsPublic: boolean;
+}
+
+/**
+ * 독서 상태별 도서 수 통계 응답
+ */
+export interface ReadingStatusStatsResponse {
+  wantToReadCount: number;
+  readingCount: number;
+  readCount: number;
+  completionRate: number;
+  isPublic: boolean;
+}
+
+/**
+ * 기간별 독서 상태 통계 응답
+ */
+export interface ReadingStatusByPeriodResponse {
+  yearly: {
+    year: string;
+    wantToReadCount: number;
+    readingCount: number;
+    readCount: number;
+  }[];
+  monthly: {
+    month: string;
+    wantToReadCount: number;
+    readingCount: number;
+    readCount: number;
+  }[];
+  weekly: {
+    week: string;
+    wantToReadCount: number;
+    readingCount: number;
+    readCount: number;
+  }[];
+  daily: {
+    date: string;
+    wantToReadCount: number;
+    readingCount: number;
+    readCount: number;
+  }[];
+  isPublic: boolean;
+}
+
+/**
+ * 장르/카테고리 분석 통계 응답
+ */
+export interface GenreAnalysisResponse {
+  categoryCounts: { category: string; count: number }[];
+  subCategoryCounts: { subCategory: string; count: number }[];
+  mostReadCategory: string;
+  yearly: {
+    year: string;
+    categories: { category: string; count: number }[];
+    subCategories: { subCategory: string; count: number }[];
+  }[];
+  monthly: {
+    month: string;
+    categories: { category: string; count: number }[];
+    subCategories: { subCategory: string; count: number }[];
+  }[];
+  weekly: {
+    week: string;
+    categories: { category: string; count: number }[];
+    subCategories: { subCategory: string; count: number }[];
+  }[];
+  daily: {
+    date: string;
+    categories: { category: string; count: number }[];
+    subCategories: { subCategory: string; count: number }[];
+  }[];
+  isPublic: boolean;
+}
+
+/**
+ * 저자/출판사 통계 응답
+ */
+export interface AuthorPublisherStatsResponse {
+  topAuthors: { author: string; count: number }[];
+  topPublishers: { publisher: string; count: number }[];
+  publishYearDistribution: { year: string; count: number }[];
+  isPublic: boolean;
+}
+
+/**
+ * 리뷰 통계 응답
+ */
+export interface ReviewStatsResponse {
+  totalReviews: number;
+  monthlyReviewCounts: { month: string; count: number }[];
+  reviewTypeDistribution: { type: string; percentage: number }[];
+  averageReviewLength: number;
+  isPublic: boolean;
+}
+
+/**
+ * 평점 통계 응답
+ */
+export interface RatingStatsResponse {
+  averageRating: number;
+  ratingDistribution: { rating: number; count: number }[];
+  categoryRatings: { category: string; averageRating: number }[];
+  monthlyAverageRatings: { month: string; averageRating: number }[];
+  isPublic: boolean;
+}
+
+/**
+ * 액티비티 빈도 통계 응답
+ */
+export interface ActivityFrequencyResponse {
+  averageReviewInterval: number;
+  averageRatingInterval: number;
+  mostActiveHour: string;
+  mostActiveDay: string;
+  isPublic: boolean;
+}
+
+/**
+ * 평가 습관 통계 응답
+ */
+export interface RatingHabitsResponse {
+  highestRatedBooks: { title: string; author: string; rating: number }[];
+  lowestRatedBooks: { title: string; author: string; rating: number }[];
+  ratingLengthCorrelation: { rating: number; averageLength: number }[];
+  isPublic: boolean;
+}
+
+/**
+ * 사용자 상호작용 통계 응답
+ */
+export interface UserInteractionResponse {
+  totalLikesReceived: number;
+  totalCommentsReceived: number;
+  engagementRate: number;
+  monthlyLikes: { month: string; count: number }[];
+  isPublic: boolean;
+}
+
+/**
+ * 팔로워/팔로잉 통계 응답
+ */
+export interface FollowerStatsResponse {
+  followersCount: number;
+  followingCount: number;
+  followerGrowth: { date: string; count: number }[];
+  isPublic: boolean;
+}
+
+/**
+ * 댓글 활동 통계 응답
+ */
+export interface CommentActivityResponse {
+  totalComments: number;
+  commentsPerWeek: number;
+  commentsPerReview: { range: string; count: number }[];
+  isPublic: boolean;
+}
+
+/**
+ * 리뷰 영향력 통계 응답
+ */
+export interface ReviewInfluenceResponse {
+  averageLikesPerReview: number;
+  popularReviews: { id: number; content: string; likes: number }[];
+  communityContributionScore: number;
+  isPublic: boolean;
+}
+
+/**
+ * 서재 구성 통계 응답
+ */
+export interface LibraryCompositionResponse {
+  totalLibraries: number;
+  booksPerLibrary: { name: string; count: number }[];
+  tagsDistribution: {
+    library: string;
+    tags: { tag: string; count: number }[];
+  }[];
+  isPublic: boolean;
+}
+
+/**
+ * 서재 인기도 통계 응답
+ */
+export interface LibraryPopularityResponse {
+  subscribersPerLibrary: { library: string; subscribers: number }[];
+  mostPopularLibrary: string;
+  popularityTrend: {
+    library: string;
+    trend: { date: string; subscribers: number }[];
+  }[];
+  isPublic: boolean;
+}
+
+/**
+ * 서재 업데이트 패턴 통계 응답
+ */
+export interface LibraryUpdatePatternResponse {
+  updateFrequency: { library: string; updatesPerMonth: number }[];
+  mostActiveLibrary: string;
+  weekdayActivity: { day: string; count: number }[];
+  isPublic: boolean;
+}
+
+/**
+ * 서재 다양성 통계 응답
+ */
+export interface LibraryDiversityResponse {
+  genreDiversityIndex: { library: string; index: number }[];
+  mostSpecializedLibrary: string;
+  mostDiverseLibrary: string;
+  isPublic: boolean;
+}
+
+/**
+ * 금액 통계 응답
+ */
+export interface AmountStatsResponse {
+  estimatedTotalSpent: number;
+  monthlySpending: { month: string; amount: number }[];
+  categoryPriceAverage: { category: string; averagePrice: number }[];
+  isPublic: boolean;
+}
+
+/**
+ * 검색 활동 통계 응답
+ */
+export interface SearchActivityResponse {
+  searchCount: number;
+  topSearchTerms: { term: string; count: number }[];
+  searchPattern: string;
+  isPublic: boolean;
+}
+
+/**
+ * 도서 메타데이터 통계 응답
+ */
+export interface BookMetadataStatsResponse {
+  averageBookAge: number;
+  translationRatio: number;
+  publicationYearDistribution: { year: string; count: number }[];
+  isPublic: boolean;
+}
+
+/**
+ * 인기 검색어 통계 응답
+ */
+export interface RecentPopularSearchResponse {
+  term: string;
+  count: number;
+}

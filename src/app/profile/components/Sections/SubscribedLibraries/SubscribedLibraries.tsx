@@ -1,8 +1,8 @@
 import { useParams } from 'next/navigation';
 import { SubscribedLibrariesSkeleton } from '../../../components/Skeletons';
-import { useIsMyProfile, useUserSubscribedLibraries } from '../../../hooks';
+import { useIsMyProfile } from '../../../hooks';
 import { EmptyState, LibraryList } from './components';
-import { useLibraryTags } from './hooks';
+import { useLibraryTags, useUserSubscribedLibraries } from './hooks';
 
 export default function SubscribedLibraries() {
   const { id } = useParams();

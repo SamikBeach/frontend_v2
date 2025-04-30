@@ -2,14 +2,14 @@ import { CreateLibraryDto } from '@/apis/library/types';
 import { LibraryDialog } from '@/components/Library';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import { useIsMyProfile, useUserLibraries } from '../../../hooks';
+import { useIsMyProfile } from '../../../hooks';
 import { LibrariesSkeleton } from '../../Skeletons';
 import {
   CreateLibraryButton,
   EmptyLibraryState,
   LibraryList,
 } from './components';
-import { useCreateLibrary, useLibraryTags } from './hooks';
+import { useCreateLibrary, useLibraryTags, useUserLibraries } from './hooks';
 
 export default function Libraries() {
   const params = useParams();

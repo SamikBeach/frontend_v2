@@ -1,8 +1,8 @@
 import { ReviewResponseDto, ReviewType } from '@/apis/review/types';
-import { useUserReviewsInfinite } from '@/app/profile/hooks';
 import { ReviewCard } from '@/components/ReviewCard';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useUserReviewsInfinite } from '../../Reviews/hooks';
 import { allReviewTypes } from '../constants';
 import { EmptyState } from './EmptyState';
 
