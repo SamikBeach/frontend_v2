@@ -17,7 +17,7 @@ export interface BookReadingStatsDto {
   bookId: number;
   title: string;
   author: string;
-  coverImageUrl: string;
+  coverImage: string;
   readingStatusCounts: Record<ReadingStatusType, number>;
   userReadingStatus?: ReadingStatusType;
   currentReaders: number;
@@ -39,7 +39,7 @@ export interface ReadingStatusResponseDto {
     id: number;
     title: string;
     author: string;
-    coverImageUrl: string;
+    coverImage: string;
     isbn: string;
   };
 }

@@ -1,15 +1,5 @@
-import { PenLine, Star, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { PenLine, Star, Trash2, X } from 'lucide-react';
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
   ResponsiveDialog,
@@ -19,6 +9,8 @@ import {
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { ReviewAlertDialog } from './components/ReviewAlertDialog';
+import { useReviewDialogState } from './hooks/useReviewDialogState';
 
 interface ReviewDialogProps {
   open: boolean;
@@ -43,36 +35,27 @@ export function ReviewDialog({
   isSubmitting = false,
   onCancel,
 }: ReviewDialogProps) {
-  const [rating, setRating] = useState(initialRating);
-  const [content, setContent] = useState(initialContent);
   const isMobile = useIsMobile();
-
-  // 알림 다이얼로그 상태
-  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-
-  // 모달이 열릴 때 초기 데이터 설정
-  useEffect(() => {
-    // 다이얼로그가 열려있는 상태에서도 initialRating이 변경되면 업데이트
-    setRating(initialRating);
-  }, [initialRating]);
-
-  // 수정 모드일 때 초기 콘텐츠 설정
-  useEffect(() => {
-    if (isEditMode && initialContent) {
-      setContent(initialContent);
-    }
-  }, [isEditMode, initialContent, open]);
-
-  // Dialog가 닫힐 때 상태 초기화
-  useEffect(() => {
-    if (!open) {
-      // 수정 모드가 아닐 때만 내용 초기화
-      if (!isEditMode) {
-        setContent('');
-      }
-    }
-  }, [open, isEditMode]);
+  const {
+    rating,
+    setRating,
+    content,
+    setContent,
+    alertDialogOpen,
+    setAlertDialogOpen,
+    alertMessage,
+    setAlertMessage,
+    isDeleteMode,
+    isCreateMode,
+    handleResetRating,
+    getDialogTitle,
+    getDialogDescription,
+  } = useReviewDialogState({
+    initialRating,
+    initialContent,
+    isEditMode,
+    open,
+  });
 
   const handleSubmit = () => {
     // 별점이 입력되지 않은 경우 경고 표시
@@ -86,9 +69,19 @@ export function ReviewDialog({
     onSubmit(rating, content);
   };
 
-  // 별점 취소 핸들러
-  const handleResetRating = () => {
-    setRating(0);
+  // 버튼 텍스트 결정
+  const getButtonText = () => {
+    if (isSubmitting) {
+      return '처리 중...';
+    } else if (isDeleteMode) {
+      return '리뷰 삭제하기';
+    } else if (isCreateMode) {
+      return '리뷰 등록하기';
+    } else if (isEditMode) {
+      return '리뷰 수정하기';
+    } else {
+      return '리뷰 등록하기';
+    }
   };
 
   return (
@@ -108,7 +101,7 @@ export function ReviewDialog({
               className="text-base font-medium"
               drawerClassName="text-base font-medium"
             >
-              {isEditMode ? '리뷰 수정하기' : '리뷰 작성하기'}
+              {getDialogTitle()}
             </ResponsiveDialogTitle>
             <Button
               variant="ghost"
@@ -127,7 +120,7 @@ export function ReviewDialog({
               drawerClassName="mb-6 text-sm text-gray-600"
             >
               <span className="font-medium text-gray-800">{bookTitle}</span>에
-              대한 {isEditMode ? '리뷰를 수정해주세요' : '리뷰를 남겨주세요'}
+              대한 {getDialogDescription()}
             </ResponsiveDialogDescription>
 
             <div className="mb-6 flex flex-col items-center space-y-3">
@@ -177,8 +170,18 @@ export function ReviewDialog({
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}
-                placeholder="이 책에 대한 리뷰를 남겨주세요"
-                className="min-h-[150px] w-full resize-none rounded-2xl border-gray-200 bg-gray-50 p-4 text-sm placeholder:text-gray-400 focus:border-pink-200 focus:bg-white focus:ring-2 focus:ring-pink-100"
+                placeholder={
+                  isDeleteMode
+                    ? '내용을 비워두면 리뷰가 삭제됩니다'
+                    : '이 책에 대한 리뷰를 남겨주세요'
+                }
+                className={`min-h-[150px] w-full resize-none rounded-2xl border-gray-200 p-4 text-sm placeholder:text-gray-400 focus:border-pink-200 focus:bg-white focus:ring-2 focus:ring-pink-100 ${
+                  isDeleteMode
+                    ? 'bg-red-50'
+                    : isCreateMode
+                      ? 'bg-green-50'
+                      : 'bg-gray-50'
+                }`}
                 disabled={isSubmitting}
               />
             </div>
@@ -204,37 +207,32 @@ export function ReviewDialog({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={!content.trim() || isSubmitting}
-              className="rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-200"
+              disabled={rating === 0 || isSubmitting}
+              className={`rounded-xl text-white ${
+                isDeleteMode
+                  ? 'bg-red-500 hover:bg-red-600'
+                  : isCreateMode
+                    ? 'bg-green-600 hover:bg-green-700'
+                    : 'bg-gray-900 hover:bg-gray-800'
+              } disabled:bg-gray-200`}
             >
-              <PenLine className="mr-1.5 h-4 w-4" />
-              {isSubmitting
-                ? '등록 중...'
-                : isEditMode
-                  ? '리뷰 수정하기'
-                  : '리뷰 등록하기'}
+              {isDeleteMode ? (
+                <Trash2 className="mr-1.5 h-4 w-4" />
+              ) : (
+                <PenLine className="mr-1.5 h-4 w-4" />
+              )}
+              {getButtonText()}
             </Button>
           </ResponsiveDialogFooter>
         </ResponsiveDialogContent>
       </ResponsiveDialog>
 
-      {/* 별점 알림 다이얼로그 */}
-      <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
-        <AlertDialogContent className="max-w-md rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>별점을 입력해주세요</AlertDialogTitle>
-            <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction
-              className="rounded-xl bg-gray-900 text-white hover:bg-gray-800"
-              onClick={() => setAlertDialogOpen(false)}
-            >
-              확인
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ReviewAlertDialog
+        open={alertDialogOpen}
+        onOpenChange={setAlertDialogOpen}
+        title="별점 필요"
+        message={alertMessage}
+      />
     </>
   );
 }

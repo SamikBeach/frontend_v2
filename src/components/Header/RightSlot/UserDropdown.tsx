@@ -53,17 +53,16 @@ export function UserDropdown({ user }: UserDropdownProps) {
   };
 
   // 사용자 표시 정보 설정
-  const displayName = user.name || user.username || user.email.split('@')[0];
+  const displayName = user.username || user.email.split('@')[0];
   const initial = displayName.charAt(0).toUpperCase();
-  const avatarUrl =
-    user.profileImage || `https://i.pravatar.cc/150?u=${user.id}`;
+  const avatarUrl = user.profileImage || null;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar className="h-8 w-8 cursor-pointer">
-            <AvatarImage src={avatarUrl} alt={displayName} />
+            <AvatarImage src={avatarUrl || undefined} alt={displayName} />
             <AvatarFallback className="bg-gray-200 text-gray-700">
               {initial}
             </AvatarFallback>
@@ -73,7 +72,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
       <DropdownMenuContent align="end" className="w-56">
         <div className="flex items-center gap-2 p-2">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={avatarUrl} alt={displayName} />
+            <AvatarImage src={avatarUrl || undefined} alt={displayName} />
             <AvatarFallback className="bg-gray-200 text-gray-700">
               {initial}
             </AvatarFallback>

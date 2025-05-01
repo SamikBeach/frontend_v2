@@ -6,12 +6,11 @@ import {
   communityTypeFilterAtom,
 } from '@/atoms/community';
 import { ReviewCard } from '@/components/ReviewCard';
-import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
-import { Suspense } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { CreateReviewCard, FilterArea } from './components';
 import { useCommunityReviews } from './hooks';
 
@@ -43,64 +42,50 @@ function EmptyState({ selectedSort }: { selectedSort: string }) {
   );
 }
 
-// 커뮤니티 게시물 컴포넌트 (Suspense로 감싸기 위해 분리)
+// 커뮤니티 게시물 컴포넌트
 function ReviewsList() {
-  const { reviews, totalPages, currentPage, sortOption, setCurrentPage } =
-    useCommunityReviews();
+  // 무한 스크롤 훅 사용
+  const {
+    reviews,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    sortOption,
+  } = useCommunityReviews(10);
 
-  // 현재 사용자 가져오기 (없으면 기본값 사용)
-  const user = useCurrentUser();
-  const currentUser = user
-    ? {
-        id: user.id,
-        username: user.username || 'guest',
-        name: user.username || '게스트',
-        avatar: `https://i.pravatar.cc/150?u=${user.id || 'guest'}`,
-      }
-    : {
-        id: 0,
-        username: 'guest',
-        name: '게스트',
-        avatar: 'https://i.pravatar.cc/150?u=guest',
-      };
+  if (isLoading) {
+    return <ReviewsLoading />;
+  }
 
   if (reviews.length === 0) {
     return <EmptyState selectedSort={sortOption} />;
   }
 
-  return (
-    <>
-      {reviews.map(review => (
-        <ReviewCard key={review.id} review={review} currentUser={currentUser} />
-      ))}
+  const handleLoadMore = () => {
+    if (fetchNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
-      {/* 페이지네이션 */}
-      {totalPages > 1 && (
-        <div className="mt-4 flex justify-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-          >
-            이전
-          </Button>
-          <span className="flex h-9 items-center px-2">
-            {currentPage} / {totalPages}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() =>
-              setCurrentPage(Math.min(totalPages, currentPage + 1))
-            }
-            disabled={currentPage === totalPages}
-          >
-            다음
-          </Button>
+  return (
+    <InfiniteScroll
+      dataLength={reviews.length}
+      next={handleLoadMore}
+      hasMore={!!hasNextPage}
+      loader={
+        <div className="mt-6 flex justify-center py-4">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600"></div>
         </div>
-      )}
-    </>
+      }
+      scrollThreshold={0.9}
+      className="space-y-4"
+      style={{ overflow: 'visible' }} // 스크롤바 숨기기
+    >
+      {reviews.map(review => (
+        <ReviewCard key={review.id} review={review} />
+      ))}
+    </InfiniteScroll>
   );
 }
 
@@ -112,19 +97,7 @@ function CommunityContent() {
 
   // 현재 사용자 가져오기 (CreateReviewCard 위해 필요)
   const user = useCurrentUser();
-  const currentUser = user
-    ? {
-        id: user.id,
-        username: user.username || 'guest',
-        name: user.username || '게스트',
-        avatar: `https://i.pravatar.cc/150?u=${user.id || 'guest'}`,
-      }
-    : {
-        id: 0,
-        username: 'guest',
-        name: '게스트',
-        avatar: 'https://i.pravatar.cc/150?u=guest',
-      };
+  const currentUser = user;
 
   // 필터 변경 핸들러
   const handleTypeFilterChange = (type: ReviewType | 'all') => {
@@ -150,12 +123,10 @@ function CommunityContent() {
       {/* 메인 콘텐츠 */}
       <div className="pt-2">
         {/* 포스트 작성 */}
-        <CreateReviewCard user={currentUser} />
+        {currentUser && <CreateReviewCard user={currentUser} />}
 
-        {/* 포스트 목록 - Suspense로 감싸서 필터가 변경되어도 페이지는 유지 */}
-        <Suspense fallback={<ReviewsLoading />}>
-          <ReviewsList />
-        </Suspense>
+        {/* 포스트 목록 - 바로 사용 */}
+        <ReviewsList />
       </div>
     </div>
   );

@@ -22,10 +22,10 @@ export function SortFilter({ selectedSort, onSortClick }: SortFilterProps) {
           key={option.id}
           onClick={() => onSortClick(option.id as SortOption)}
           className={cn(
-            'flex h-9 cursor-pointer items-center rounded-full border px-4 text-[14px] font-medium transition-colors',
+            'flex h-8 cursor-pointer items-center rounded-full border px-3 text-[13px] font-medium transition-all',
             selectedSort === option.id
-              ? 'border-gray-300 bg-gray-100 text-gray-900'
-              : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+              ? 'border-blue-200 bg-blue-50 text-blue-600'
+              : 'border-gray-200 text-gray-700 hover:bg-gray-50'
           )}
         >
           {option.name}

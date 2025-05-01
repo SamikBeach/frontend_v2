@@ -2,12 +2,6 @@
 
 import { LibraryCardSkeleton } from '@/components/LibraryCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ReadBooksSkeleton } from '../Sections/ReadBooks';
-
-// 섹션 스켈레톤 - 읽은 책 스켈레톤을 기본으로 사용
-export function SectionSkeleton() {
-  return <ReadBooksSkeleton />;
-}
 
 // 헤더 스켈레톤
 export function HeaderSkeleton() {
@@ -38,26 +32,7 @@ export function LibrariesSkeleton() {
   return (
     <>
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex flex-wrap gap-3">
-            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5">
-              <Skeleton className="h-4 w-8 rounded" />
-              <Skeleton className="ml-1 h-[18px] w-5 rounded" />
-            </div>
-            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5">
-              <Skeleton className="h-4 w-8 rounded" />
-              <Skeleton className="ml-1 h-[18px] w-5 rounded" />
-            </div>
-            <div className="flex items-center gap-1.5 rounded-md bg-gray-50 px-3 py-1.5">
-              <Skeleton className="h-4 w-14 rounded" />
-              <Skeleton className="ml-1 h-[18px] w-5 rounded" />
-            </div>
-          </div>
-        </div>
-        <div className="flex h-9 items-center gap-1.5 rounded-full border border-gray-200 bg-white px-4 py-2">
-          <Skeleton className="h-4 w-4 rounded-full" />
-          <Skeleton className="h-4 w-[90px]" />
-        </div>
+        <Skeleton className="h-9 w-[140px] rounded-full" />
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -112,7 +87,7 @@ export function PageSkeleton() {
       <HeaderSkeleton />
       <SummarySkeleton />
       <div className="mx-auto w-full px-4">
-        <SectionSkeleton />
+        {/* 각 섹션의 스켈레톤은 해당 페이지에서 직접 import하여 사용 */}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { SearchResult } from '@/apis/search/types';
 import { AddBookDialog } from '@/app/library/[id]/components';
+import { communityTypeFilterAtom } from '@/atoms/community';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,7 +11,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent } from '@/components/ui/card';
-import { useState } from 'react';
+import { useAtomValue } from 'jotai';
+import { useEffect, useState } from 'react';
 import { useCreateReview } from '../../hooks';
 import { ReviewForm } from './components/ReviewForm';
 import { SelectedBook } from './components/SelectedBook';
@@ -18,9 +20,8 @@ import { UserAvatar } from './components/UserAvatar';
 
 export interface UserProfile {
   id: number;
-  name: string;
-  username: string;
-  avatar: string;
+  username?: string;
+  profileImage?: string;
 }
 
 interface CreateReviewCardProps {
@@ -32,6 +33,7 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
+  const typeFilter = useAtomValue(communityTypeFilterAtom);
 
   const {
     content,
@@ -45,6 +47,13 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
     rating,
     setRating,
   } = useCreateReview();
+
+  // typeFilter가 변경될 때마다 type 상태 업데이트
+  useEffect(() => {
+    if (typeFilter !== 'all') {
+      setType(typeFilter);
+    }
+  }, [typeFilter, setType]);
 
   // 책 선택 대화상자 열기 핸들러
   const handleBookDialogOpen = () => {

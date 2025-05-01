@@ -1,5 +1,3 @@
-'use client';
-
 import { Library, deleteLibrary } from '@/apis/library';
 import {
   AlertDialog,
@@ -34,7 +32,7 @@ export function DeleteLibraryDialog({
     mutationFn: (id: number) => deleteLibrary(id),
     onSuccess: () => {
       toast.success('서재가 삭제되었습니다.');
-      router.push('/libraries'); // 서재 목록 페이지로 이동
+      router.back(); // 이전 페이지로 이동
     },
     onError: (error: any) => {
       let errorMessage = '서재 삭제 중 오류가 발생했습니다.';

@@ -1,8 +1,38 @@
-export { useIsMyProfile } from './useIsMyProfile';
-export { useUserBooks } from './useUserBooks';
-export { useUserFollow } from './useUserFollow';
-export { useUserFollowList } from './useUserFollowList';
-export type { FollowListType } from './useUserFollowList';
-export { useUserLibraries } from './useUserLibraries';
+export * from './types';
+export * from './useIsMyProfile';
+export * from './useUserFollow';
+export * from './useUserFollowList';
 export { useUserProfile } from './useUserProfile';
-export { useUserReviews } from './useUserReviews';
+
+// Re-export hooks from sections
+export * from '../components/Sections/Statistics/hooks';
+
+// Reviews hooks
+export {
+  useUserActivity,
+  useUserActivityInfinite,
+  useUserRatings,
+  useUserRatingsInfinite,
+  useUserReviews,
+  useUserReviewsInfinite,
+} from '../components/Sections/Reviews/hooks';
+
+// ReadBooks hooks
+export {
+  useReadingStatusCounts,
+  useUserBooks,
+  useUserBooksSuspense,
+} from '../components/Sections/ReadBooks/hooks';
+
+// Libraries hooks
+export {
+  useCreateLibrary,
+  useLibraryTags as useLibrariesTags,
+  useUserLibraries,
+} from '../components/Sections/Libraries/hooks';
+
+// SubscribedLibraries hooks
+export {
+  useLibraryTags as useSubscribedLibrariesTags,
+  useUserSubscribedLibraries,
+} from '../components/Sections/SubscribedLibraries/hooks';

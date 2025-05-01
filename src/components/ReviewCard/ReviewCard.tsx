@@ -1,19 +1,3 @@
-import { createOrUpdateRating } from '@/apis/rating/rating';
-import { deleteReview, updateReview } from '@/apis/review/review';
-import { ReviewType } from '@/apis/review/types';
-import { SearchResult } from '@/apis/search/types';
-import { AddBookDialog } from '@/app/library/[id]/components';
-import { ReviewDialog } from '@/components/ReviewDialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import {
   Card,
   CardContent,
@@ -21,71 +5,44 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
-import { BookPreview } from './components/BookPreview';
-import { CommentSection } from './components/CommentSection';
+import { CommentSection } from './components';
 import { ReviewActions } from './components/ReviewActions';
-import { ReviewEditForm } from './components/ReviewEditForm';
+import { ReviewContent } from './components/ReviewContent';
+import { ReviewDialogHandler } from './components/ReviewDialogHandler';
 import { ReviewHeader } from './components/ReviewHeader';
-import { useCommentLike, useReviewComments, useReviewLike } from './hooks';
+import {
+  useCommentLike,
+  useReviewComments,
+  useReviewLike,
+  useReviewMutations,
+  useReviewState,
+} from './hooks';
 import { ExtendedReviewResponseDto, ReviewCardProps } from './types';
 import { formatDate } from './utils';
 
-export function ReviewCard({ review, currentUser }: ReviewCardProps) {
+export function ReviewCard({ review }: ReviewCardProps) {
   // Cast to our extended type
   const extendedReview = review as ExtendedReviewResponseDto;
 
-  const [expanded, setExpanded] = useState(false);
-  const [showComments, setShowComments] = useState(false);
+  // 현재 사용자 정보 가져오기
+  const currentUser = useCurrentUser();
+
+  // Book 다이얼로그 쿼리 사용
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
-  const queryClient = useQueryClient();
 
-  // Review 수정 관련 상태
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editedContent, setEditedContent] = useState(review.content);
-  const [editedType, setEditedType] = useState<ReviewType>(review.type);
-  const [editedRating, setEditedRating] = useState<number>(
-    extendedReview.rating ||
-      (extendedReview.authorRatings && extendedReview.authorRatings.length > 0
-        ? (extendedReview.authorRatings[0].rating as number)
-        : 0)
-  );
-  const [selectedBook, setSelectedBook] = useState<SearchResult | null>(
-    review.books && review.books.length > 0
-      ? {
-          id: review.books[0].id,
-          type: 'book',
-          isbn: (review.books[0] as any).isbn || '',
-          isbn13: (review.books[0] as any).isbn13 || '',
-          title: review.books[0].title,
-          author: review.books[0].author,
-          publisher: review.books[0].publisher,
-          image: review.books[0].coverImage,
-        }
-      : null
-  );
-  const [bookDialogOpen, setBookDialogOpen] = useState(false);
-  const [alertDialogOpen, setAlertDialogOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertTitle, setAlertTitle] = useState('');
+  // 현재 사용자가 리뷰 작성자인지 확인
+  const isAuthor = currentUser?.id === review.author.id;
 
-  // ReviewDialog 관련 상태
-  const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+  // 상태 관리 훅 사용 - 메인 컴포넌트에서만 사용
+  const reviewState = useReviewState(extendedReview);
 
   // Review 좋아요 관련 훅
   const { handleLikeToggle, isLoading: isLikeLoading } = useReviewLike();
-  const [isLiked, setIsLiked] = useState(review.isLiked);
-  const [likesCount, setLikesCount] = useState(review.likeCount);
 
   // 댓글 좋아요 관련 훅
   const { handleLikeToggle: handleCommentLikeToggle } = useCommentLike();
-
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // 댓글 관련 훅
   const {
@@ -96,315 +53,287 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
     handleDeleteComment,
     isLoading: isCommentLoading,
     refetch: refetchComments,
-  } = useReviewComments(review.id, showComments);
+  } = useReviewComments(review.id, reviewState.showComments);
 
-  // 현재 사용자가 리뷰 작성자인지 확인
-  const isAuthor = currentUser.id === review.author.id;
-
-  // 초기 수정 상태 설정
-  useEffect(() => {
-    if (review) {
-      setEditedContent(review.content);
-      setEditedType(review.type);
-      setEditedRating(
-        extendedReview.rating ||
-          (extendedReview.authorRatings &&
-          extendedReview.authorRatings.length > 0
-            ? (extendedReview.authorRatings[0].rating as number)
-            : 0)
-      );
-    }
-  }, [review, extendedReview.authorRatings]);
-
-  // 리뷰 수정 mutation
-  const updateReviewMutation = useMutation({
-    mutationFn: ({
-      id,
-      content,
-      type,
-      bookId,
-      isbn,
-      rating,
-    }: {
-      id: number;
-      content: string;
-      type: ReviewType;
-      bookId?: number;
-      isbn?: string;
-      rating?: number;
-    }) => {
-      return updateReview(id, {
-        content,
-        type,
-        ...(bookId ? { bookId } : {}),
-        ...(isbn ? { isbn } : {}),
-        ...(rating ? { rating } : {}),
-      });
+  // 뮤테이션 훅 사용
+  const {
+    handleEditReview,
+    handleDeleteReview,
+    handleCreateReview,
+    updateRatingMutation,
+  } = useReviewMutations({
+    review: extendedReview,
+    currentUserId: currentUser?.id,
+    onUpdateSuccess: () => {
+      reviewState.handleEditModeToggle(false);
+      reviewState.setReviewDialogOpen(false);
+      reviewState.setIsSubmitting(false);
     },
-    onSuccess: (_, variables) => {
-      // 모든 리뷰 쿼리 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['communityReviews'],
-        exact: false,
-      });
-
-      // 원본 타입과 수정된 타입이 다른 경우 두 타입 모두 무효화
-      if (review.type !== variables.type) {
-        queryClient.invalidateQueries({
-          queryKey: ['review', review.type],
-          exact: false,
-        });
-        queryClient.invalidateQueries({
-          queryKey: ['review', variables.type],
-          exact: false,
-        });
-      }
-
-      // 단일 리뷰 데이터도 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['review', review.id],
-      });
-
-      // 책 관련 데이터가 변경된 경우 책 데이터도 무효화
-      if (variables.isbn) {
-        queryClient.invalidateQueries({
-          queryKey: ['book-detail', variables.isbn],
-        });
-      }
-
-      toast.success('리뷰가 수정되었습니다.');
-      setIsEditMode(false);
-      setReviewDialogOpen(false);
+    onDeleteSuccess: () => {
+      reviewState.setDeleteDialogOpen(false);
     },
-    onError: (error: any) => {
-      console.error('리뷰 업데이트 실패:', error);
-      const errorMessage =
-        error.response?.data?.message || '리뷰 수정 중 오류가 발생했습니다.';
-      setAlertTitle('오류');
-      setAlertMessage(errorMessage);
-      setAlertDialogOpen(true);
-    },
-    onSettled: () => {
-      setIsSubmitting(false);
+    onCreateSuccess: () => {
+      reviewState.setReviewDialogOpen(false);
+      reviewState.setIsSubmitting(false);
     },
   });
 
-  // 리뷰 삭제 mutation
-  const deleteReviewMutation = useMutation({
-    mutationFn: (id: number) => deleteReview(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['communityReviews'],
-        exact: false,
-      });
-      toast.success('리뷰가 삭제되었습니다.');
-    },
-    onError: () => {
-      toast.error('리뷰 삭제 중 오류가 발생했습니다.');
-    },
-  });
-
-  // 책 선택 대화상자 열기 핸들러
-  const handleBookDialogOpen = () => {
-    if (editedType === 'review') {
-      setBookDialogOpen(true);
-    }
-  };
-
-  // 책 선택 핸들러
-  const handleBookSelect = (book: SearchResult) => {
-    setSelectedBook(book);
-    setBookDialogOpen(false);
-  };
-
-  // 책 선택 제거 핸들러
-  const handleRemoveSelectedBook = () => {
-    setSelectedBook(null);
-    setEditedRating(0);
-  };
-
-  // 별점 선택 핸들러
-  const handleRatingChange = (newRating: number) => {
-    setEditedRating(newRating);
-  };
-
-  // 태그 변경 핸들러
-  const handleTypeChange = (newType: ReviewType) => {
-    setEditedType(newType);
-    // 리뷰 태그가 아니면 책과 별점 초기화
-    if (newType !== 'review') {
-      setSelectedBook(null);
-      setEditedRating(0);
-    }
-  };
-
-  // 리뷰 수정 핸들러
-  const handleEditReview = () => {
+  // 리뷰 편집 모드 핸들러
+  const handleEditReviewClick = () => {
     if (review.type === 'review') {
-      setReviewDialogOpen(true);
+      reviewState.setReviewDialogOpen(true);
     } else {
-      setIsEditMode(true);
+      reviewState.handleEditModeToggle(true);
     }
-    setEditedContent(review.content);
-    setEditedType(review.type);
-    setEditedRating(
+    reviewState.setEditedContent(extendedReview.content);
+    reviewState.handleTypeChange(extendedReview.type);
+    reviewState.handleRatingChange(
       extendedReview.rating ||
-        (extendedReview.authorRatings && extendedReview.authorRatings.length > 0
-          ? (extendedReview.authorRatings[0].rating as number)
+        (extendedReview.userRating
+          ? (extendedReview.userRating.rating as number)
           : 0)
     );
   };
 
-  // ReviewDialog에서 리뷰 수정 제출 핸들러
+  // 리뷰 다이얼로그 제출 핸들러
   const handleReviewDialogSubmit = async (rating: number, content: string) => {
-    if (!content.trim()) return;
+    reviewState.setIsSubmitting(true);
 
     try {
-      setIsSubmitting(true);
-
-      // 선택된 책이 있는 경우
-      if (selectedBook) {
-        const bookId =
-          typeof selectedBook.id === 'number'
-            ? selectedBook.id
-            : parseInt(String(selectedBook.id), 10);
-        const bookIsbn = selectedBook.isbn || selectedBook.isbn13 || '';
-
-        // bookId가 없거나 음수인 경우 -1로 설정하고 반드시 ISBN 전달
-        const isNegativeBookId = bookId < 0;
-        const finalBookId = isNegativeBookId ? -1 : bookId;
-
-        // 1. 먼저 평점 업데이트
-        await createOrUpdateRating(
-          finalBookId,
-          { rating },
-          isNegativeBookId ? bookIsbn : undefined // bookId가 음수이거나 없는 경우 항상 ISBN 전달
+      // 별점 입력 확인 (필수)
+      if (rating <= 0) {
+        reviewState.showAlert(
+          '별점을 입력해주세요',
+          '별점은 필수 입력 항목입니다.'
         );
-
-        // 2. 그 다음 리뷰 업데이트
-        await updateReviewMutation.mutateAsync({
-          id: review.id,
-          content: content,
-          type: 'review',
-          bookId: finalBookId,
-          isbn: isNegativeBookId ? bookIsbn : undefined, // 항상 ISBN 전달
-        });
-      } else {
-        // 책이 없는 경우에는 일반적인 리뷰 업데이트만 수행
-        await updateReviewMutation.mutateAsync({
-          id: review.id,
-          content: content,
-          type: 'review',
-        });
+        reviewState.setIsSubmitting(false);
+        return;
       }
+
+      // 변경 사항이 있는지 확인
+      const originalRating =
+        extendedReview.rating ||
+        (extendedReview.userRating
+          ? (extendedReview.userRating.rating as number)
+          : 0);
+      const hasRatingChanged = rating !== originalRating;
+      const hasContentChanged = content !== extendedReview.content;
+
+      // 변경 사항이 없으면 API 호출 없이 바로 종료
+      if (!hasRatingChanged && !hasContentChanged) {
+        reviewState.setReviewDialogOpen(false);
+        reviewState.setIsSubmitting(false);
+        return;
+      }
+
+      // 1. 책이 선택된 경우
+      if (reviewState.selectedBook) {
+        const bookId = Number(reviewState.selectedBook.id);
+        const isNegativeBookId = bookId < 0;
+        const bookIsbn =
+          reviewState.selectedBook.isbn13 ||
+          reviewState.selectedBook.isbn ||
+          '';
+
+        // 리뷰 생성 모드 여부 확인
+        const isCreateMode = !extendedReview.content && content.trim();
+
+        if (isCreateMode) {
+          if (hasRatingChanged) {
+            // 별점이 변경되었을 때만 별점과 함께 리뷰 생성
+            await handleCreateReview({
+              content,
+              type: reviewState.editedType,
+              rating,
+              selectedBook: reviewState.selectedBook,
+            });
+          } else {
+            // 별점이 변경되지 않았다면 리뷰만 생성 (rating 파라미터 제외)
+            await handleCreateReview({
+              content,
+              type: reviewState.editedType,
+              selectedBook: reviewState.selectedBook,
+            });
+          }
+        } else if (hasRatingChanged && hasContentChanged) {
+          // 별점과 리뷰 모두 변경된 경우 - 두 API를 모두 호출하고 한 번만 무효화하는 함수 호출
+          await handleEditReview({
+            content,
+            type: reviewState.editedType,
+            rating, // 별점 변경 정보 전달
+            selectedBook: reviewState.selectedBook,
+          });
+        } else if (hasRatingChanged) {
+          // 별점만 변경된 경우 - handleEditReview를 사용하여 무효화 로직 일원화
+          await handleEditReview({
+            content,
+            type: reviewState.editedType,
+            rating,
+            selectedBook: reviewState.selectedBook,
+          });
+        } else if (extendedReview.content && !content.trim()) {
+          // 리뷰 내용을 지운 경우 (삭제)
+          await handleDeleteReview();
+        } else if (hasContentChanged) {
+          // 리뷰 내용만 변경된 경우
+          await handleEditReview({
+            content,
+            type: reviewState.editedType,
+            selectedBook: reviewState.selectedBook,
+          });
+        }
+      }
+
+      // 작업 완료 후 다이얼로그 닫기
+      reviewState.setReviewDialogOpen(false);
+      reviewState.setIsSubmitting(false);
     } catch (error) {
-      console.error('리뷰 업데이트 실패:', error);
-      toast.error('리뷰 수정 중 오류가 발생했습니다.');
-    } finally {
-      setIsSubmitting(false);
+      console.error('리뷰/별점 업데이트 실패:', error);
+      reviewState.setIsSubmitting(false);
     }
   };
 
   // 인라인 리뷰 수정 저장 핸들러
   const handleSaveEdit = async () => {
-    // 내용이 없으면 제출 안함
-    if (!editedContent.trim()) return;
-
-    // 리뷰 타입이면서 책이 선택되지 않았거나 별점이 없는 경우 알림 표시
-    if (editedType === 'review') {
-      if (!selectedBook) {
-        setAlertTitle('책을 선택해주세요');
-        setAlertMessage('리뷰를 작성하려면 책을 선택해야 합니다.');
-        setAlertDialogOpen(true);
+    // 리뷰 타입이면서 책이 선택되지 않은 경우 알림 표시
+    if (reviewState.editedType === 'review') {
+      if (!reviewState.selectedBook) {
+        reviewState.showAlert(
+          '책을 선택해주세요',
+          '리뷰를 작성하려면 책을 선택해야 합니다.'
+        );
         return;
       }
 
-      if (editedRating === 0) {
-        setAlertTitle('별점을 입력해주세요');
-        setAlertMessage('리뷰를 작성하려면 별점을 입력해야 합니다.');
-        setAlertDialogOpen(true);
+      // 별점 필수 입력 확인
+      if (reviewState.editedRating === 0) {
+        reviewState.showAlert(
+          '별점을 입력해주세요',
+          '별점은 필수 입력 항목입니다.'
+        );
         return;
       }
     }
 
+    // 변경 사항이 있는지 확인
+    const originalRating =
+      extendedReview.rating ||
+      (extendedReview.userRating
+        ? (extendedReview.userRating.rating as number)
+        : 0);
+    const hasRatingChanged = reviewState.editedRating !== originalRating;
+    const hasContentChanged =
+      reviewState.editedContent !== extendedReview.content;
+    const hasTypeChanged = reviewState.editedType !== extendedReview.type;
+
+    // 변경 사항이 없으면 API 호출 없이 바로 종료
+    if (!hasRatingChanged && !hasContentChanged && !hasTypeChanged) {
+      reviewState.handleEditModeToggle(false);
+      return;
+    }
+
+    reviewState.setIsSubmitting(true);
+
     try {
-      setIsSubmitting(true);
-
-      // 리뷰 타입이 'review'인 경우
-      if (editedType === 'review' && selectedBook) {
+      // 리뷰 타입인 경우
+      if (reviewState.editedType === 'review' && reviewState.selectedBook) {
         const bookId =
-          typeof selectedBook.id === 'number'
-            ? selectedBook.id
-            : parseInt(String(selectedBook.id), 10);
-        const bookIsbn = selectedBook.isbn || selectedBook.isbn13 || '';
-
-        // bookId가 없거나 음수인 경우 -1로 설정하고 반드시 ISBN 전달
+          typeof reviewState.selectedBook.id === 'number'
+            ? reviewState.selectedBook.id
+            : parseInt(String(reviewState.selectedBook.id), 10);
+        const bookIsbn =
+          reviewState.selectedBook.isbn ||
+          reviewState.selectedBook.isbn13 ||
+          '';
         const isNegativeBookId = bookId < 0;
         const finalBookId = isNegativeBookId ? -1 : bookId;
 
-        // 1. 먼저 평점 업데이트
-        await createOrUpdateRating(
-          finalBookId,
-          { rating: editedRating },
-          isNegativeBookId ? bookIsbn : undefined
-        );
-
-        // 2. 그 다음 리뷰 업데이트 (rating 제외)
-        await updateReviewMutation.mutateAsync({
-          id: review.id,
-          content: editedContent,
-          type: editedType,
-          bookId: finalBookId,
-          isbn: isNegativeBookId ? bookIsbn : undefined,
-        });
-      } else {
-        // 리뷰 타입이 'review'가 아닌 경우 일반 리뷰 업데이트만 수행
-        await updateReviewMutation.mutateAsync({
-          id: review.id,
-          content: editedContent,
-          type: editedType,
-        });
+        // 내용 변경과 별점 변경이 함께 이루어진 경우
+        if (hasRatingChanged && (hasContentChanged || hasTypeChanged)) {
+          // 별점과 리뷰 모두 변경된 경우 - 두 API를 모두 호출하고 한 번만 무효화하는 함수 호출
+          await handleEditReview({
+            content: reviewState.editedContent,
+            type: reviewState.editedType,
+            rating: reviewState.editedRating, // 별점 변경 정보 전달
+            selectedBook: reviewState.selectedBook,
+          });
+          reviewState.handleEditModeToggle(false);
+        } else if (hasRatingChanged) {
+          // 별점만 변경된 경우 - handleEditReview를 사용하여 무효화 로직 일원화
+          await handleEditReview({
+            content: reviewState.editedContent,
+            type: reviewState.editedType,
+            rating: reviewState.editedRating,
+            selectedBook: reviewState.selectedBook,
+          });
+          reviewState.handleEditModeToggle(false);
+        } else if (
+          extendedReview.content &&
+          !reviewState.editedContent.trim()
+        ) {
+          // 리뷰 내용을 지운 경우 (삭제)
+          await handleDeleteReview();
+          reviewState.handleEditModeToggle(false);
+        } else if (hasContentChanged || hasTypeChanged) {
+          // 리뷰 내용 또는 타입만 변경된 경우
+          await handleEditReview({
+            content: reviewState.editedContent,
+            type: reviewState.editedType,
+            selectedBook: reviewState.selectedBook,
+          });
+          reviewState.handleEditModeToggle(false);
+        } else {
+          // 내용이 없거나 변경 사항이 없으면 수정 모드만 종료
+          reviewState.handleEditModeToggle(false);
+        }
       }
-    } catch (error) {
-      console.error('리뷰 업데이트 실패:', error);
-      toast.error('리뷰 수정 중 오류가 발생했습니다.');
+      // 리뷰 타입이 아닌 경우 (일반 리뷰)
+      else if (
+        reviewState.editedContent.trim() &&
+        (hasContentChanged || hasTypeChanged)
+      ) {
+        // 내용이나 타입에 변경이 있는 경우에만 업데이트
+        await handleEditReview({
+          content: reviewState.editedContent,
+          type: reviewState.editedType,
+          selectedBook: reviewState.selectedBook,
+        });
+        reviewState.handleEditModeToggle(false);
+      }
+      // 기존에 내용이 있었는데 내용을 지운 경우 리뷰 삭제
+      else if (extendedReview.content && !reviewState.editedContent.trim()) {
+        await handleDeleteReview();
+        reviewState.handleEditModeToggle(false);
+      } else {
+        // 내용이 없거나 변경 사항이 없으면 수정 모드만 종료
+        reviewState.handleEditModeToggle(false);
+      }
     } finally {
-      setIsSubmitting(false);
+      reviewState.setIsSubmitting(false);
     }
-  };
-
-  const handleCancelEdit = () => {
-    setIsEditMode(false);
-    setEditedContent(review.content);
-    setEditedType(review.type);
-    setEditedRating(
-      extendedReview.rating ||
-        (extendedReview.authorRatings && extendedReview.authorRatings.length > 0
-          ? (extendedReview.authorRatings[0].rating as number)
-          : 0)
-    );
-  };
-
-  // 리뷰 삭제 핸들러
-  const handleDeleteReview = () => {
-    deleteReviewMutation.mutate(review.id);
-    setDeleteDialogOpen(false);
   };
 
   // 좋아요 핸들러 - 낙관적 UI 업데이트 적용
   const handleLike = async () => {
+    // 로그인하지 않은 경우 차단
+    if (!currentUser) {
+      return;
+    }
+
     // 낙관적 UI 업데이트
-    setIsLiked(!isLiked);
-    setLikesCount(prev => (isLiked ? prev - 1 : prev + 1));
+    reviewState.setIsLiked(!reviewState.isLiked);
+    reviewState.setLikeCount((prev: number) =>
+      reviewState.isLiked ? (prev || 0) - 1 : (prev || 0) + 1
+    );
 
     try {
       // API 호출
-      await handleLikeToggle(review.id, isLiked);
+      await handleLikeToggle(review.id, reviewState.isLiked || false);
     } catch (error) {
       // 에러 발생 시 UI 되돌리기
-      setIsLiked(isLiked);
-      setLikesCount(review.likeCount);
-      console.error('Failed to toggle like:', error);
+      reviewState.setIsLiked(reviewState.isLiked);
+      reviewState.setLikeCount(reviewState.likeCount);
+      console.error('좋아요 처리 중 오류:', error);
     }
   };
 
@@ -412,15 +341,8 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
   const handleSubmitComment = async () => {
     await handleAddComment();
     // 댓글 추가 후 댓글 목록 표시
-    setShowComments(true);
+    reviewState.setShowComments(true);
   };
-
-  // 텍스트가 길면 접어두기
-  const isLongContent = review.content.length > 300;
-  const displayContent =
-    isLongContent && !expanded
-      ? review.content.substring(0, 300) + '...'
-      : review.content;
 
   // Book dialog 열기 핸들러
   const handleBookClick = () => {
@@ -434,8 +356,7 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
 
   // 댓글 토글 핸들러
   const handleToggleComments = () => {
-    const newShowComments = !showComments;
-    setShowComments(newShowComments);
+    const newShowComments = reviewState.handleToggleComments();
 
     // 댓글 목록을 펼칠 때 데이터가 최신 상태인지 확인
     if (newShowComments) {
@@ -443,89 +364,78 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
     }
   };
 
+  // ReviewComments가 받는 currentUser 타입에 맞게 수정
+  const getUserForComments = () => {
+    if (!currentUser) {
+      return {
+        id: 0,
+        name: 'guest',
+        username: 'guest',
+        avatar: undefined,
+      };
+    }
+
+    return {
+      id: currentUser.id,
+      name: currentUser.username || 'guest',
+      username: currentUser.username || 'guest',
+      avatar: currentUser.profileImage || undefined,
+    };
+  };
+
   return (
-    <Card className="mb-6 overflow-hidden border-gray-200 shadow-none">
+    <Card className="overflow-hidden border-gray-200 shadow-none">
       <CardHeader className="p-5 pb-3">
         <ReviewHeader
           review={extendedReview}
           isAuthor={isAuthor}
-          isDropdownOpen={isDropdownOpen}
-          setIsDropdownOpen={setIsDropdownOpen}
-          onEdit={handleEditReview}
-          onDelete={() => setDeleteDialogOpen(true)}
+          isDropdownOpen={reviewState.isDropdownOpen}
+          setIsDropdownOpen={reviewState.setIsDropdownOpen}
+          onEdit={handleEditReviewClick}
+          onDelete={() => reviewState.setDeleteDialogOpen(true)}
         />
       </CardHeader>
       <CardContent className="space-y-4 px-5 pt-0 pb-4">
-        {!isEditMode ? (
-          <>
-            {/* 일반 모드: 본문 내용 */}
-            <p className="text-[15px] leading-relaxed whitespace-pre-line text-gray-800">
-              {displayContent}
-              {isLongContent && (
-                <button
-                  onClick={() => setExpanded(!expanded)}
-                  className="ml-1 font-medium text-gray-500 hover:text-gray-700"
-                >
-                  {expanded ? '접기' : '더보기'}
-                </button>
-              )}
-            </p>
-
-            {/* 이미지가 있는 경우 */}
-            {review.images && review.images.length > 0 && (
-              <div className="overflow-hidden rounded-xl">
-                <img
-                  src={review.images[0].url}
-                  alt="Review image"
-                  className="h-auto w-full object-cover"
-                />
-              </div>
-            )}
-
-            {/* 책 정보가 있는 경우 */}
-            {review.books && review.books.length > 0 && (
-              <BookPreview
-                book={review.books[0] as any}
-                onClick={handleBookClick}
-              />
-            )}
-          </>
-        ) : (
-          <ReviewEditForm
-            content={editedContent}
-            setContent={setEditedContent}
-            type={editedType}
-            setType={handleTypeChange}
-            selectedBook={selectedBook}
-            rating={editedRating}
-            setRating={handleRatingChange}
-            onSave={handleSaveEdit}
-            onCancel={handleCancelEdit}
-            onBookDialogOpen={handleBookDialogOpen}
-            onRemoveSelectedBook={handleRemoveSelectedBook}
-            originalType={review.type}
-          />
-        )}
+        <ReviewContent
+          review={extendedReview}
+          isEditMode={reviewState.isEditMode}
+          displayContent={reviewState.displayContent}
+          isLongContent={reviewState.isLongContent}
+          expanded={reviewState.expanded}
+          setExpanded={reviewState.setExpanded}
+          editedContent={reviewState.editedContent}
+          setEditedContent={reviewState.setEditedContent}
+          editedType={reviewState.editedType}
+          editedRating={reviewState.editedRating}
+          selectedBook={reviewState.selectedBook}
+          onTypeChange={reviewState.handleTypeChange}
+          onRatingChange={reviewState.handleRatingChange}
+          onSaveEdit={handleSaveEdit}
+          onCancelEdit={() => reviewState.handleEditModeToggle(false)}
+          onBookDialogOpen={reviewState.handleBookDialogOpen}
+          onRemoveSelectedBook={reviewState.handleRemoveSelectedBook}
+          onBookClick={handleBookClick}
+        />
       </CardContent>
       <Separator className="bg-gray-100" />
-      {!isEditMode && (
+      {!reviewState.isEditMode && extendedReview.activityType !== 'rating' && (
         <CardFooter className="flex flex-col gap-4 px-5 py-3">
           <ReviewActions
-            isLiked={isLiked}
-            likesCount={likesCount}
-            commentCount={review.commentCount}
-            showComments={showComments}
+            isLiked={reviewState.isLiked || false}
+            likesCount={reviewState.likeCount || 0}
+            commentCount={review.commentCount || 0}
+            showComments={reviewState.showComments}
             isLikeLoading={isLikeLoading}
             onLike={handleLike}
             onToggleComments={handleToggleComments}
           />
 
           {/* 댓글 섹션 */}
-          {showComments && (
+          {reviewState.showComments && comments && (
             <CommentSection
               comments={comments}
               formatDate={formatDate}
-              currentUser={currentUser}
+              currentUser={getUserForComments()}
               commentText={commentText}
               setCommentText={setCommentText}
               isCommentLoading={isCommentLoading}
@@ -537,62 +447,31 @@ export function ReviewCard({ review, currentUser }: ReviewCardProps) {
         </CardFooter>
       )}
 
-      {/* Book search dialog */}
-      <AddBookDialog
-        isOpen={bookDialogOpen}
-        onOpenChange={setBookDialogOpen}
-        libraryId={0} // Dummy value since we're just using for book selection
-        onBookSelect={handleBookSelect}
+      {/* 다이얼로그 핸들러 컴포넌트 */}
+      <ReviewDialogHandler
+        // 알림 다이얼로그
+        alertDialogOpen={reviewState.alertDialogOpen}
+        setAlertDialogOpen={reviewState.setAlertDialogOpen}
+        alertTitle={reviewState.alertTitle}
+        alertMessage={reviewState.alertMessage}
+        // 삭제 다이얼로그
+        deleteDialogOpen={reviewState.deleteDialogOpen}
+        setDeleteDialogOpen={reviewState.setDeleteDialogOpen}
+        onDeleteConfirm={handleDeleteReview}
+        isRatingActivity={extendedReview.activityType === 'rating'}
+        // 책 선택 다이얼로그
+        bookDialogOpen={reviewState.bookDialogOpen}
+        setBookDialogOpen={reviewState.setBookDialogOpen}
+        onBookSelect={reviewState.handleBookSelect}
+        // 리뷰 편집 다이얼로그
+        reviewDialogOpen={reviewState.reviewDialogOpen}
+        setReviewDialogOpen={reviewState.setReviewDialogOpen}
+        selectedBookTitle={reviewState.selectedBook?.title || '리뷰 수정'}
+        initialContent={reviewState.editedContent}
+        initialRating={reviewState.editedRating}
+        isSubmitting={reviewState.isSubmitting}
+        onReviewSubmit={handleReviewDialogSubmit}
       />
-
-      {/* ReviewDialog for editing reviews of type 'review' */}
-      <ReviewDialog
-        open={reviewDialogOpen}
-        onOpenChange={setReviewDialogOpen}
-        bookTitle={selectedBook?.title || '리뷰 수정'}
-        initialRating={editedRating}
-        initialContent={editedContent}
-        isEditMode={true}
-        isSubmitting={isSubmitting}
-        onSubmit={handleReviewDialogSubmit}
-        onCancel={() => setReviewDialogOpen(false)}
-      />
-
-      {/* 리뷰 삭제 확인 다이얼로그 */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent className="max-w-md rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>리뷰 삭제</AlertDialogTitle>
-            <AlertDialogDescription>
-              이 리뷰를 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel className="rounded-xl">취소</AlertDialogCancel>
-            <AlertDialogAction
-              className="rounded-xl bg-red-500 hover:bg-red-600"
-              onClick={handleDeleteReview}
-            >
-              삭제
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      {/* Alert Dialog for validation */}
-      <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
-        <AlertDialogContent className="rounded-xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>{alertTitle}</AlertDialogTitle>
-            <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction className="rounded-lg bg-gray-900 hover:bg-gray-800">
-              확인
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </Card>
   );
 }

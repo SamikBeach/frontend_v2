@@ -32,7 +32,7 @@ export function useBookReviews() {
     status,
     isLoading,
   } = useInfiniteQuery({
-    queryKey: ['book-reviews', bookId, sort, isbn], // sort 변경 시 자동으로 refetch
+    queryKey: ['book-reviews', bookId, isbn, sort], // sort 변경 시 자동으로 refetch
     queryFn: async ({ pageParam }) => {
       if (!bookId && !isbn) {
         return {
@@ -106,11 +106,11 @@ export function useBookReviews() {
     onMutate: async ({ reviewId, isLiked }) => {
       // 낙관적 업데이트 - 무한 쿼리 구조에 맞게 수정
       await queryClient.cancelQueries({
-        queryKey: ['book-reviews', bookId, sort, isbn],
+        queryKey: ['book-reviews', bookId, isbn, sort],
       });
 
       queryClient.setQueryData(
-        ['book-reviews', bookId, sort, isbn],
+        ['book-reviews', bookId, isbn, sort],
         (oldData: any) => {
           if (!oldData || !oldData.pages) return oldData;
 
@@ -139,7 +139,7 @@ export function useBookReviews() {
         }
       );
 
-      return { queryKey: ['book-reviews', bookId, sort, isbn] };
+      return { queryKey: ['book-reviews', bookId, isbn, sort] };
     },
     onError: (_, __, context) => {
       // 에러 발생시 쿼리 무효화하여 데이터 재조회

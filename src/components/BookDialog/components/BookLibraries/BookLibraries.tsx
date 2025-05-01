@@ -170,6 +170,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
                 name: tag.tagName,
                 color: getTagColor(index % 8),
               }))}
+              hidePublicTag={true}
             />
           </div>
         ))}

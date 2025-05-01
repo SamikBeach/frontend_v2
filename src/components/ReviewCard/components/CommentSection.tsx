@@ -1,3 +1,4 @@
+import { Comment as ApiComment } from '@/apis/review/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,9 +12,8 @@ interface CommentSectionProps {
   formatDate: (date: string | Date) => string;
   currentUser: {
     id: number;
-    name: string;
     username: string;
-    avatar: string;
+    avatar?: string;
   };
   commentText: string;
   setCommentText: (text: string) => void;
@@ -44,11 +44,11 @@ export function CommentSection({
         <Avatar className="mt-1 h-7 w-7 flex-shrink-0">
           <AvatarImage
             src={currentUser.avatar}
-            alt={currentUser.name}
+            alt={currentUser.username}
             className="object-cover"
           />
           <AvatarFallback className="bg-gray-200 text-gray-700">
-            {getNameInitial(currentUser.name)}
+            {getNameInitial(currentUser.username)}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1">
@@ -94,9 +94,15 @@ export function CommentSection({
           {comments.map(comment => (
             <CommentItem
               key={comment.id}
-              comment={comment}
+              comment={
+                comment as unknown as ApiComment & { replies?: ApiComment[] }
+              }
               formatDate={formatDate}
-              currentUser={currentUser}
+              currentUser={{
+                id: currentUser.id,
+                username: currentUser.username,
+                avatar: currentUser.avatar,
+              }}
               onDelete={handleDeleteComment}
               onLike={handleCommentLikeToggle}
             />

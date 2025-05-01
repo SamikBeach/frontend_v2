@@ -77,8 +77,11 @@ export function CommentItem({
     setEditedContent(comment.content);
   };
 
+  // 댓글 삭제 핸들러
   const handleDeleteComment = () => {
-    onDelete(comment.id);
+    if (onDelete) {
+      onDelete(comment.id);
+    }
     setIsDropdownOpen(false);
   };
 
@@ -86,11 +89,13 @@ export function CommentItem({
   const handleLikeToggle = async () => {
     // 낙관적 UI 업데이트
     setIsLiked(!isLiked);
-    setLikeCount(prev => prev + (isLiked ? -1 : 1));
+    setLikeCount((prev: number) => prev + (isLiked ? -1 : 1));
 
     try {
       // API 호출
-      await onLike(comment.id, isLiked);
+      if (onLike) {
+        await onLike(comment.id, isLiked);
+      }
     } catch (error) {
       // 에러 발생 시 UI 되돌리기
       setIsLiked(isLiked);
@@ -103,7 +108,7 @@ export function CommentItem({
     <div className="flex gap-2">
       <Avatar className="h-7 w-7 flex-shrink-0">
         <AvatarImage
-          src={`https://i.pravatar.cc/150?u=${comment.author.id}`}
+          src={comment.author.profileImage || `/images/avatars/placeholder.png`}
           alt={comment.author.username}
           className="object-cover"
         />

@@ -24,11 +24,11 @@ export default function ProfileSummary({
   const { profileData } = useUserProfile(userId);
 
   // API에서 가져온 데이터 사용
-  const { libraryCount, readCount, subscribedLibraryCount, reviewCount } =
+  const { libraryCount, readCount, subscribedLibraryCount, ratingCount } =
     profileData;
 
-  // 평균 별점 (실제로는 API에서 받아와야 함)
-  const averageRating = 4.2;
+  // 평균 별점 API에서 가져오기 (null인 경우 0으로 처리)
+  const averageRating = profileData.averageRating ?? 0;
 
   return (
     <div className="mx-auto w-full px-4 py-6">
@@ -107,17 +107,18 @@ export default function ProfileSummary({
             <div className="flex items-center justify-center">
               <span
                 className={cn(
-                  'block text-xl font-bold',
+                  'text-xl font-bold',
                   selectedSection === 'reviews'
                     ? 'text-gray-900'
                     : 'text-gray-800'
                 )}
               >
-                {reviewCount}
+                {profileData.reviewAndRatingCount ||
+                  profileData.reviewCount.review + ratingCount}
               </span>
               <span
                 className={cn(
-                  'ml-1 text-sm',
+                  'ml-1 text-sm font-medium',
                   selectedSection === 'reviews'
                     ? 'text-amber-600'
                     : 'text-amber-500'
@@ -134,7 +135,7 @@ export default function ProfileSummary({
                   : 'text-gray-700'
               )}
             >
-              리뷰
+              리뷰와 별점
             </span>
           </div>
         </button>
@@ -222,7 +223,11 @@ export default function ProfileSummary({
                   : 'text-gray-800'
               )}
             >
-              {/* 커뮤니티 활동 수 (API에서 가져와야 함) */}0
+              {/* 커뮤니티 활동 수 - 일반, 토론, 질문, 모임 리뷰의 합계 */}
+              {profileData.reviewCount.general +
+                profileData.reviewCount.discussion +
+                profileData.reviewCount.question +
+                profileData.reviewCount.meetup}
             </span>
             <span
               className={cn(

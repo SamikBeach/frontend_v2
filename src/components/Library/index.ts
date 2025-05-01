@@ -1,1 +1,3 @@
-export * from './LibraryDialog';
+import { LibraryDialog } from './LibraryDialog';
+
+export { LibraryDialog };

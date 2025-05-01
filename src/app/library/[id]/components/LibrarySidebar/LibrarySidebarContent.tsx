@@ -14,7 +14,7 @@ export const LibrarySidebarContent: FC<LibrarySidebarContentProps> = ({
   libraryId,
 }) => {
   // 서재 정보 가져오기
-  const { library } = useLibraryDetail(libraryId);
+  const { library, isSubscribed } = useLibraryDetail(libraryId);
 
   if (!library) {
     return null;
@@ -33,7 +33,12 @@ export const LibrarySidebarContent: FC<LibrarySidebarContentProps> = ({
   return (
     <div className="space-y-6">
       {/* 서재 소유자 정보 */}
-      <LibrarySidebarOwner owner={library.owner} />
+      <LibrarySidebarOwner
+        owner={{
+          ...library.owner,
+          isFollowing: isSubscribed,
+        }}
+      />
 
       {/* 서재 정보 */}
       <LibrarySidebarInfo

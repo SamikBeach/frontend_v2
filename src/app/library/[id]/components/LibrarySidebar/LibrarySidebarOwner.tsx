@@ -2,7 +2,7 @@ import { useUserFollow } from '@/app/profile/hooks';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { FC } from 'react';
+import { Check, FC } from 'lucide-react';
 
 interface LibrarySidebarOwnerProps {
   owner: {
@@ -65,7 +65,14 @@ export const LibrarySidebarOwner: FC<LibrarySidebarOwnerProps> = ({
             onClick={handleFollowClick}
             disabled={isLoading}
           >
-            {isFollowing ? '팔로잉' : '팔로우'}
+            {isFollowing ? (
+              <span className="flex items-center gap-1">
+                <Check className="h-3 w-3" />
+                팔로잉
+              </span>
+            ) : (
+              '팔로우'
+            )}
           </Button>
         )}
       </div>

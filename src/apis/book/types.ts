@@ -4,6 +4,7 @@ import {
   DiscoverSubCategory,
 } from '../discover-category/types';
 import { RatingResponseDto } from '../rating/types';
+import { ReadingStatusType } from '../reading-status';
 
 export interface Book {
   id: number;
@@ -24,7 +25,8 @@ export interface Book {
   discoverCategory?: DiscoverCategory;
   discoverSubCategory?: DiscoverSubCategory;
   userRating?: RatingResponseDto;
-  userReadingStatus?: string;
+  userReadingStatus?: ReadingStatusType;
+  totalRatings?: number;
   readingStats?: {
     currentReaders: number;
     completedReaders: number;

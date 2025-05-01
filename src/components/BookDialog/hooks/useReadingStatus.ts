@@ -6,6 +6,7 @@ import {
   deleteReadingStatusByBookId,
 } from '@/apis/reading-status';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { invalidateUserProfileQueries } from '@/utils/query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { josa } from 'josa';
 import { usePathname } from 'next/navigation';
@@ -39,18 +40,6 @@ export function useReadingStatus() {
   const [readingStatus, setReadingStatus] = useState<ReadingStatusType | null>(
     initialStatus
   );
-
-  // 현재 경로가 자신의 프로필 페이지인지 확인
-  const isMyProfilePage = useCallback(() => {
-    if (!currentUser) return false;
-
-    // /profile/123 형식의 경로에서 ID 추출
-    const match = pathname.match(/^\/profile\/(\d+)$/);
-    const profileId = match ? match[1] : null;
-
-    // 현재 사용자 ID와 프로필 ID 비교
-    return profileId && currentUser.id.toString() === profileId;
-  }, [currentUser, pathname]);
 
   // 읽기 상태 변경 뮤테이션
   const { mutate: updateReadingStatusMutation, isPending: isUpdatePending } =
@@ -179,13 +168,8 @@ export function useReadingStatus() {
           queryClient.setQueryData(['user-reading-status', book.id], data);
         }
 
-        // 현재 로그인한 사용자의 프로필 페이지에 있을 때만 쿼리 무효화
-        if (currentUser?.id && isMyProfilePage()) {
-          queryClient.invalidateQueries({
-            queryKey: ['user-books', currentUser.id],
-            exact: false,
-          });
-        }
+        // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
+        invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
 
         // josa 라이브러리를 사용하여 적절한 조사 적용
         const statusText = statusTexts[data.status as ReadingStatusType];
@@ -278,13 +262,8 @@ export function useReadingStatus() {
           queryClient.setQueryData(['user-reading-status', book.id], null);
         }
 
-        // 현재 로그인한 사용자의 프로필 페이지에 있을 때만 쿼리 무효화
-        if (currentUser?.id && isMyProfilePage()) {
-          queryClient.invalidateQueries({
-            queryKey: ['user-books', currentUser.id],
-            exact: false,
-          });
-        }
+        // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
+        invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
 
         // UI 상태 업데이트
         setReadingStatus(null);

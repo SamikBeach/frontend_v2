@@ -10,11 +10,18 @@ export function LibraryCardSkeleton() {
   return (
     <Card className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-none">
       <CardHeader className="p-5 pb-3">
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-10 w-10 rounded-full" />
-          <div>
-            <Skeleton className="mb-1 h-5 w-40" />
-            <Skeleton className="h-4 w-24" />
+        <div className="flex items-start gap-3">
+          <Skeleton className="h-10 w-10 flex-shrink-0 rounded-full" />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <Skeleton className="h-5 w-40" />
+              <div className="flex gap-1.5">
+                <Skeleton className="h-5 w-14 flex-shrink-0 rounded-full" />
+                <Skeleton className="h-5 w-10 flex-shrink-0 rounded-full" />
+                <Skeleton className="h-5 w-12 flex-shrink-0 rounded-full border border-gray-300" />
+              </div>
+            </div>
+            <Skeleton className="mt-1 h-4 w-24" />
           </div>
         </div>
       </CardHeader>
