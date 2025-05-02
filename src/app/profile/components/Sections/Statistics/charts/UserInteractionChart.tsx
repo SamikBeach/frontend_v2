@@ -17,7 +17,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { NoDataMessage, PrivateDataMessage } from '../common';
+import { NoDataMessage, PrivateDataMessage } from '../components';
 
 // 파스텔톤 차트 색상
 const PASTEL_COLORS = {

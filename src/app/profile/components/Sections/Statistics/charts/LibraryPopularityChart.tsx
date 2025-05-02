@@ -18,7 +18,7 @@ import {
 import { LibraryPopularityResponse } from '@/apis/user/types';
 import { getLibraryPopularity } from '@/apis/user/user';
 import { cn } from '@/lib/utils';
-import { NoDataMessage, PrivateDataMessage } from '../common';
+import { NoDataMessage, PrivateDataMessage } from '../components';
 
 // 파스텔톤 차트 색상
 const CHART_COLORS = [

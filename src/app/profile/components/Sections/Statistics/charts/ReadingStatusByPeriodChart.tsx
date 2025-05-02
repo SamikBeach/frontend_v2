@@ -16,8 +16,8 @@ import {
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { getReadingStatusByPeriod } from '@/apis/user/user';
 import { cn } from '@/lib/utils';
-import { NoDataMessage } from '../common/NoDataMessage';
-import { PrivateDataMessage } from '../common/PrivateDataMessage';
+import { NoDataMessage } from '../components/NoDataMessage';
+import { PrivateDataMessage } from '../components/PrivateDataMessage';
 
 interface ReadingStatusByPeriodChartProps {
   userId: number;

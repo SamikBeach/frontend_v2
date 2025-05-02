@@ -21,12 +21,17 @@ import {
 import { ProfileTabs, TabsSkeleton } from './components';
 import { ProfileSkeleton } from './ProfileSkeleton';
 
-// Content by section
+// 통계 섹션 ID 타입
+type StatsSectionId = 'reading' | 'activity' | 'community' | 'library' | 'etc';
+
+/**
+ * SectionContent 컴포넌트 - 선택된 섹션에 따라 통계 차트를 렌더링합니다.
+ */
 function SectionContent({
   selectedSection,
   userId,
 }: {
-  selectedSection: string;
+  selectedSection: StatsSectionId;
   userId: number;
 }) {
   switch (selectedSection) {
@@ -120,11 +125,14 @@ function SectionContent({
   }
 }
 
-// Main section loader
+/**
+ * ProfileStatsLoader 컴포넌트 - URL 파라미터를 파싱하고 상태를 관리합니다.
+ */
 function ProfileStatsLoader() {
   const { id } = useParams<{ id: string }>();
   const userId = Number(id);
-  const [selectedSection, setSelectedSection] = useState('reading');
+  const [selectedSection, setSelectedSection] =
+    useState<StatsSectionId>('reading');
 
   return (
     <div className="space-y-5 bg-white">
@@ -132,7 +140,9 @@ function ProfileStatsLoader() {
       <Suspense fallback={<TabsSkeleton />}>
         <ProfileTabs
           selectedSection={selectedSection}
-          onSelectSection={setSelectedSection}
+          onSelectSection={section =>
+            setSelectedSection(section as StatsSectionId)
+          }
         />
       </Suspense>
 
@@ -142,7 +152,9 @@ function ProfileStatsLoader() {
   );
 }
 
-// Main export component
+/**
+ * 메인 ProfileStats 컴포넌트
+ */
 export default function ProfileStats() {
   return <ProfileStatsLoader />;
 }

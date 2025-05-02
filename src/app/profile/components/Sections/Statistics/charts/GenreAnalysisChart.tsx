@@ -12,27 +12,14 @@ import {
 import { GenreAnalysisResponse } from '@/apis/user/types';
 import { getGenreAnalysis } from '@/apis/user/user';
 import { cn } from '@/lib/utils';
-import { PrivateDataMessage } from '../common/PrivateDataMessage';
+
+import { PrivateDataMessage } from '../components';
+import { PASTEL_COLORS } from '../constants';
+import { PeriodType, getAllPeriodOptions } from '../utils';
 
 interface GenreAnalysisChartProps {
   userId: number;
 }
-
-// 파스텔톤 차트 색상 배열
-const GENRE_COLORS = [
-  '#93c5fd', // blue-300
-  '#a7f3d0', // green-200
-  '#fcd34d', // amber-300
-  '#f9a8d4', // pink-300
-  '#c4b5fd', // violet-300
-  '#fda4af', // rose-300
-  '#a5f3fc', // cyan-200
-  '#99f6e4', // teal-200
-  '#bef264', // lime-300
-  '#fdba74', // orange-300
-];
-
-type PeriodType = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'all';
 
 // 커스텀 툴팁 컴포넌트
 const CustomTooltip = ({ active, payload, label }: any) => {
@@ -168,7 +155,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     .slice(0, 5)
     .map((item, index) => ({
       ...item,
-      color: GENRE_COLORS[index % GENRE_COLORS.length],
+      color: PASTEL_COLORS[index % PASTEL_COLORS.length],
       percent:
         totalCategoryCount > 0
           ? item.count / totalCategoryCount
@@ -189,7 +176,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
       .map((item, index) => ({
         ...item,
         color:
-          GENRE_COLORS[(topCategories.length + index) % GENRE_COLORS.length],
+          PASTEL_COLORS[(topCategories.length + index) % PASTEL_COLORS.length],
         percent: 0,
       }));
 
@@ -209,7 +196,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     .slice(0, 5)
     .map((item, index) => ({
       ...item,
-      color: GENRE_COLORS[index % GENRE_COLORS.length],
+      color: PASTEL_COLORS[index % PASTEL_COLORS.length],
       percent:
         totalSubCategoryCount > 0
           ? item.count / totalSubCategoryCount
@@ -230,7 +217,9 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
       .map((item, index) => ({
         ...item,
         color:
-          GENRE_COLORS[(topSubCategories.length + index) % GENRE_COLORS.length],
+          PASTEL_COLORS[
+            (topSubCategories.length + index) % PASTEL_COLORS.length
+          ],
         percent: 0,
       }));
 
@@ -273,15 +262,6 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     );
   };
 
-  // 기간 옵션
-  const periodOptions = [
-    { id: 'all' as PeriodType, name: '전체' },
-    { id: 'daily' as PeriodType, name: '일별' },
-    { id: 'weekly' as PeriodType, name: '주별' },
-    { id: 'monthly' as PeriodType, name: '월별' },
-    { id: 'yearly' as PeriodType, name: '연도별' },
-  ];
-
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-3">
       <div className="mb-2 flex items-center justify-between">
@@ -289,7 +269,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
           <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
         </div>
         <div className="flex gap-1">
-          {periodOptions.map(option => (
+          {getAllPeriodOptions().map(option => (
             <button
               key={option.id}
               onClick={() => setActivePeriod(option.id)}

@@ -17,7 +17,7 @@ import {
 import { SearchActivityResponse } from '@/apis/user/types';
 import { getSearchActivity } from '@/apis/user/user';
 import { cn } from '@/lib/utils';
-import { NoDataMessage, PrivateDataMessage } from '../common';
+import { NoDataMessage, PrivateDataMessage } from '../components';
 
 interface SearchActivityChartProps {
   userId?: number;

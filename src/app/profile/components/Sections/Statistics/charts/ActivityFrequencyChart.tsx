@@ -2,7 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Activity, Calendar, Clock } from 'lucide-react';
 
 import { getActivityFrequency } from '@/apis/user/user';
-import { NoDataMessage, PrivateDataMessage } from '../common';
+import { NoDataMessage, PrivateDataMessage } from '../components';
 
 interface ActivityFrequencyChartProps {
   userId: number;

@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 
 import { cn } from '@/lib/utils';
-import { PrivateDataMessage } from '../common/PrivateDataMessage';
+import { PrivateDataMessage } from '../components/PrivateDataMessage';
 import { useAuthorPublisherStats } from '../hooks';
 
 // 차트 색상 배열

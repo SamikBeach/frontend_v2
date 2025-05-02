@@ -15,7 +15,7 @@ import {
 import { CommunityActivityResponse } from '@/apis/user/types';
 import { getCommunityActivity } from '@/apis/user/user';
 import { cn } from '@/lib/utils';
-import { NoDataMessage, PrivateDataMessage } from '../common';
+import { NoDataMessage, PrivateDataMessage } from '../components';
 
 interface CommunityActivityChartProps {
   userId?: number;

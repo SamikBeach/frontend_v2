@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { NoDataMessage, PrivateDataMessage } from '../common';
+import { NoDataMessage, PrivateDataMessage } from '../components';
 
 interface ReviewStatsChartProps {
   userId: number;

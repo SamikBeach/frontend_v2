@@ -3,8 +3,8 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { getReadingStatusStats } from '@/apis/user/user';
-import { NoDataMessage } from '../common/NoDataMessage';
-import { PrivateDataMessage } from '../common/PrivateDataMessage';
+import { NoDataMessage } from '../components/NoDataMessage';
+import { PrivateDataMessage } from '../components/PrivateDataMessage';
 
 interface ReadingStatusChartProps {
   userId: number;

@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 
 import { ReviewInfluenceResponse } from '@/apis/user/types';
 import { getReviewInfluence } from '@/apis/user/user';
-import { NoDataMessage, PrivateDataMessage } from '../common';
+import { NoDataMessage, PrivateDataMessage } from '../components';
 
 interface CommunityInfluenceChartProps {
   userId?: number;
