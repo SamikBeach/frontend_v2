@@ -3,18 +3,15 @@ import { ReadingStatusType } from '../reading-status/types';
 import {
   AccountActionResponse,
   ActivityFrequencyResponse,
-  AmountStatsResponse,
   AuthorPublisherStatsResponse,
-  BookMetadataStatsResponse,
   ChangePasswordRequest,
   ChangePasswordResponse,
-  CommentActivityResponse,
+  CommunityActivityResponse,
   FollowerStatsResponse,
   FollowersListResponseDto,
   FollowingListResponseDto,
   GenreAnalysisResponse,
   LibraryCompositionResponse,
-  LibraryDiversityResponse,
   LibraryPopularityResponse,
   LibraryUpdatePatternResponse,
   RatingHabitsResponse,
@@ -464,13 +461,15 @@ export const getFollowerStats = async (
 };
 
 /**
- * 댓글 활동 통계를 조회합니다.
+ * 커뮤니티 활동 통계를 조회합니다.
  * @param userId 사용자 ID
  */
-export const getCommentActivity = async (
+export const getCommunityActivity = async (
   userId: number
-): Promise<CommentActivityResponse> => {
-  const response = await api.get(`/user/${userId}/statistics/comment-activity`);
+): Promise<CommunityActivityResponse> => {
+  const response = await api.get(
+    `/user/${userId}/statistics/community-activity`
+  );
   return response.data;
 };
 
@@ -525,30 +524,6 @@ export const getLibraryUpdatePattern = async (
 };
 
 /**
- * 서재 다양성 통계를 조회합니다.
- * @param userId 사용자 ID
- */
-export const getLibraryDiversity = async (
-  userId: number
-): Promise<LibraryDiversityResponse> => {
-  const response = await api.get(
-    `/user/${userId}/statistics/library-diversity`
-  );
-  return response.data;
-};
-
-/**
- * 금액 통계를 조회합니다.
- * @param userId 사용자 ID
- */
-export const getAmountStats = async (
-  userId: number
-): Promise<AmountStatsResponse> => {
-  const response = await api.get(`/user/${userId}/statistics/amount`);
-  return response.data;
-};
-
-/**
  * 검색 활동 통계를 조회합니다.
  * @param userId 사용자 ID
  */
@@ -556,16 +531,5 @@ export const getSearchActivity = async (
   userId: number
 ): Promise<SearchActivityResponse> => {
   const response = await api.get(`/user/${userId}/statistics/search-activity`);
-  return response.data;
-};
-
-/**
- * 도서 메타데이터 통계를 조회합니다.
- * @param userId 사용자 ID
- */
-export const getBookMetadataStats = async (
-  userId: number
-): Promise<BookMetadataStatsResponse> => {
-  const response = await api.get(`/user/${userId}/statistics/book-metadata`);
   return response.data;
 };

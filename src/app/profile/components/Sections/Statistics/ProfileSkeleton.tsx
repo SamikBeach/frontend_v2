@@ -1,6 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function StatisticsSkeleton() {
+export function ProfileSkeleton() {
   return (
     <div className="h-[340px] rounded-lg bg-white p-3">
       <div className="flex h-full flex-col">

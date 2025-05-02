@@ -4,9 +4,11 @@ import { useState } from 'react';
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   CartesianGrid,
+  Cell,
+  Legend,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -15,18 +17,103 @@ import {
 
 import { LibraryPopularityResponse } from '@/apis/user/types';
 import { getLibraryPopularity } from '@/apis/user/user';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { NoDataMessage, PrivateDataMessage } from '../common';
+
+// 파스텔톤 차트 색상
+const CHART_COLORS = [
+  '#93c5fd', // blue-300
+  '#a7f3d0', // green-200
+  '#fcd34d', // amber-300
+  '#f9a8d4', // pink-300
+  '#c4b5fd', // violet-300
+  '#fda4af', // rose-300
+  '#a5f3fc', // cyan-200
+  '#99f6e4', // teal-200
+  '#bef264', // lime-300
+  '#fdba74', // orange-300
+];
+
+type PeriodType = 'yearly' | 'monthly' | 'weekly' | 'daily';
 
 interface LibraryPopularityChartProps {
   userId?: number;
 }
 
+// 커스텀 툴팁 컴포넌트
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
+        <p className="text-xs font-medium text-gray-800">
+          {payload[0].payload.library || label}
+        </p>
+        <div className="mt-1">
+          <p className="text-xs font-semibold text-gray-700">
+            {`${payload[0].value}명`}
+          </p>
+          {payload[0].payload.percent && (
+            <p className="text-xs text-gray-500">
+              {`전체의 ${(payload[0].payload.percent * 100).toFixed(1)}%`}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+// 커스텀 트렌드 툴팁 컴포넌트
+const TrendTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
+        <p className="text-xs font-medium text-gray-800">{label}</p>
+        <div className="mt-1 space-y-1">
+          {payload.map((entry: any, index: number) => (
+            <div key={`tooltip-${index}`} className="flex items-center gap-2">
+              <div
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: entry.color || entry.stroke }}
+              />
+              <p className="text-xs">
+                <span className="text-gray-700">{entry.name}: </span>
+                <span>{entry.value}명</span>
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+// 커스텀 범례 컴포넌트
+const CustomLegend = ({ payload }: any) => {
+  if (!payload || payload.length === 0) return null;
+
+  return (
+    <div className="flex justify-center gap-4 pb-1">
+      {payload.map((entry: any, index: number) => (
+        <div key={`legend-${index}`} className="flex items-center gap-1.5">
+          <div
+            className="h-2.5 w-2.5 rounded-full"
+            style={{ backgroundColor: entry.color }}
+          />
+          <span className="text-xs text-gray-900">{entry.value}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
   const params = useParams<{ id: string }>();
   const id = userId || Number(params?.id || 0);
   const [activeTab, setActiveTab] = useState('current');
-  const [selectedLibrary, setSelectedLibrary] = useState<string | null>(null);
+  const [activePeriod, setActivePeriod] = useState<PeriodType>('monthly');
 
   const { data } = useSuspenseQuery<LibraryPopularityResponse>({
     queryKey: ['libraryPopularity', id],
@@ -35,7 +122,12 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
 
   // 데이터가 비공개인 경우
   if (!data.isPublic) {
-    return <PrivateDataMessage message="이 통계는 비공개 설정되어 있습니다." />;
+    return (
+      <PrivateDataMessage
+        message="이 통계는 비공개 설정되어 있습니다."
+        title="서재 인기도"
+      />
+    );
   }
 
   // 데이터가 없는 경우
@@ -51,143 +143,348 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
     .sort((a, b) => b.subscribers - a.subscribers)
     .slice(0, 10);
 
-  // 추세 데이터 준비
-  const trendData = selectedLibrary
-    ? data.popularityTrend.find(item => item.library === selectedLibrary)
-        ?.trend || []
-    : data.popularityTrend.length > 0
-      ? data.popularityTrend[0].trend
-      : [];
+  // 총 구독자 수 계산
+  const totalSubscribers = sortedSubscribersData.reduce(
+    (sum, item) => sum + item.subscribers,
+    0
+  );
 
-  // 서재 선택 핸들러
-  const handleLibrarySelect = (library: string) => {
-    setSelectedLibrary(library);
-    setActiveTab('trend');
+  // 파이 차트용 데이터 가공
+  const pieChartData = sortedSubscribersData
+    .slice(0, 5) // 상위 5개만 표시
+    .map((item, index) => ({
+      ...item,
+      color: CHART_COLORS[index % CHART_COLORS.length],
+      percent: totalSubscribers > 0 ? item.subscribers / totalSubscribers : 0,
+    }));
+
+  // 커스텀 라벨 렌더링 함수
+  const renderCustomizedLabel = ({
+    cx,
+    cy,
+    midAngle,
+    innerRadius,
+    outerRadius,
+    percent,
+    value,
+  }: any) => {
+    if (percent < 0.05) return null; // 5% 미만은 라벨 생략
+
+    const RADIAN = Math.PI / 180;
+    const radius = innerRadius + (outerRadius - innerRadius) * 0.7;
+    const x = cx + radius * Math.cos(-midAngle * RADIAN);
+    const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+    return (
+      <text
+        x={x}
+        y={y}
+        fill="#4b5563" // text-gray-600
+        textAnchor="middle"
+        dominantBaseline="central"
+        fontSize={11}
+        fontWeight="medium"
+        stroke="#ffffff" // 텍스트 테두리 추가
+        strokeWidth={0.5} // 얇은 테두리
+        paintOrder="stroke" // 테두리 렌더링 순서
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    );
   };
 
+  // 트렌드 차트 데이터 준비
+  const getTrendData = () => {
+    switch (activePeriod) {
+      case 'yearly':
+        return data.yearly || [];
+      case 'monthly':
+        return data.monthly || [];
+      case 'weekly':
+        return data.weekly || [];
+      case 'daily':
+        return data.daily || [];
+      default:
+        return data.monthly || [];
+    }
+  };
+
+  // 기간별 데이터 가져오기
+  const periodData = getTrendData();
+
+  // 트렌드 데이터 가공
+  const trendChartData =
+    periodData.length > 0
+      ? periodData.map(
+          (item: {
+            year?: string;
+            month?: string;
+            week?: string;
+            date?: string;
+            libraries: Array<{ library: string; subscribers: number }>;
+          }) => {
+            // 각 기간별 상위 4개 서재만 표시
+            const topLibraries = item.libraries.slice(0, 4);
+
+            // x축 표시 값 지정
+            const xValue =
+              'year' in item
+                ? item.year
+                : 'month' in item
+                  ? item.month
+                  : 'week' in item
+                    ? item.week
+                    : 'date' in item
+                      ? item.date
+                      : '';
+
+            // 데이터 포맷팅
+            const result: any = { name: xValue };
+
+            // 각 서재별 데이터 추가
+            topLibraries.forEach(
+              (
+                lib: { library: string; subscribers: number },
+                index: number
+              ) => {
+                result[lib.library] = lib.subscribers;
+                result[`${lib.library}Color`] =
+                  CHART_COLORS[index % CHART_COLORS.length];
+              }
+            );
+
+            return result;
+          }
+        )
+      : [];
+
+  // 트렌드 차트의 데이터 키 목록
+  const trendChartKeys =
+    trendChartData.length > 0
+      ? Object.keys(trendChartData[0]).filter(
+          key => !key.includes('Color') && key !== 'name'
+        )
+      : [];
+
+  // X축 라벨 포맷팅
+  const formatXAxisLabel = (label: string) => {
+    if (activePeriod === 'monthly') {
+      // YYYY-MM 형식에서 MM만 표시
+      return label.split('-')[1] + '월';
+    } else if (activePeriod === 'yearly') {
+      // YYYY 형식에서 그대로 표시
+      return label + '년';
+    }
+    // weekly와 daily는 그대로 표시
+    return label;
+  };
+
+  // 기간 옵션 정의
+  const periodOptions = [
+    { id: 'daily', name: '일별' },
+    { id: 'weekly', name: '주별' },
+    { id: 'monthly', name: '월별' },
+    { id: 'yearly', name: '연도별' },
+  ];
+
   return (
-    <div className="h-[240px] w-full rounded-lg bg-gray-50 p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
       <div className="flex h-full flex-col">
-        <div className="mb-2">
-          <h3 className="text-base font-medium text-gray-700">서재 인기도</h3>
-          <p className="text-xs text-gray-500">
-            가장 인기있는 서재: {data.mostPopularLibrary || '데이터 없음'}
-          </p>
+        <div className="mb-2 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-medium text-gray-700">서재 인기도</h3>
+            <p className="text-xs text-gray-500">
+              가장 인기있는 서재: {data.mostPopularLibrary || '데이터 없음'}
+            </p>
+          </div>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab('current')}
+              className={cn(
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                activeTab === 'current'
+                  ? 'border-blue-200 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              )}
+            >
+              서재별 구독자 수
+            </button>
+            <button
+              onClick={() => setActiveTab('trend')}
+              className={cn(
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                activeTab === 'trend'
+                  ? 'border-blue-200 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              )}
+            >
+              주요 서재 구독자 추이
+            </button>
+          </div>
         </div>
 
         <div className="flex-1">
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="h-full"
-          >
-            <TabsList className="mb-2">
-              <TabsTrigger value="current">현재 구독자</TabsTrigger>
-              <TabsTrigger value="trend">구독자 추세</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="current" className="h-[calc(100%-40px)]">
-              {sortedSubscribersData.length > 0 ? (
+          {activeTab === 'current' ? (
+            <div className="flex h-full items-center">
+              <div className="h-full w-3/5">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={sortedSubscribersData}
-                    layout="vertical"
-                    margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
-                    onClick={data =>
-                      data &&
-                      handleLibrarySelect(
-                        data.activePayload?.[0]?.payload.library
-                      )
-                    }
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis
-                      dataKey="library"
-                      type="category"
-                      width={100}
-                      tick={{ fontSize: 11 }}
-                    />
-                    <Tooltip
-                      formatter={(value: number) => [`${value}명`, '구독자 수']}
-                      cursor={{ fill: 'rgba(0, 0, 0, 0.1)' }}
-                    />
-                    <Bar
+                  <PieChart>
+                    <Pie
+                      data={pieChartData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={90}
+                      innerRadius={40}
+                      fill="#8884d8"
                       dataKey="subscribers"
-                      name="구독자 수"
-                      fill="#3b82f6"
-                      isAnimationActive
-                    />
-                  </BarChart>
+                      nameKey="library"
+                      paddingAngle={2}
+                    >
+                      {pieChartData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={entry.color}
+                          stroke="white"
+                          strokeWidth={1}
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                  </PieChart>
                 </ResponsiveContainer>
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-gray-400">서재 구독자 데이터가 없습니다</p>
-                </div>
-              )}
-            </TabsContent>
+              </div>
+              <div className="flex h-full w-2/5 flex-col justify-center">
+                <ul className="space-y-2.5">
+                  {pieChartData.map((entry, index) => (
+                    <li
+                      key={`legend-${index}`}
+                      className="flex items-center gap-2"
+                    >
+                      <div
+                        className="h-3 w-3 flex-shrink-0 rounded-full"
+                        style={{ backgroundColor: entry.color }}
+                      />
+                      <div className="flex-1 text-xs">
+                        <span className="text-gray-700">
+                          {entry.library.length > 15
+                            ? `${entry.library.substring(0, 15)}...`
+                            : entry.library}
+                          :{' '}
+                        </span>
+                        <span>{entry.subscribers}명</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          ) : (
+            <div className="h-full">
+              <div className="mb-2 flex justify-end gap-1">
+                {periodOptions.map(option => (
+                  <button
+                    key={option.id}
+                    onClick={() => setActivePeriod(option.id as PeriodType)}
+                    className={cn(
+                      'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                      activePeriod === option.id
+                        ? 'border-blue-200 bg-blue-50 text-blue-600'
+                        : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                    )}
+                  >
+                    {option.name}
+                  </button>
+                ))}
+              </div>
 
-            <TabsContent value="trend" className="h-[calc(100%-40px)]">
-              {trendData.length > 0 ? (
-                <div className="h-full">
-                  <p className="mb-2 text-center text-xs text-gray-500">
-                    {selectedLibrary
-                      ? `"${selectedLibrary}" 서재의 구독자 추세`
-                      : `"${data.popularityTrend[0].library}" 서재의 구독자 추세`}
-                  </p>
-                  <ResponsiveContainer width="100%" height="85%">
+              {trendChartData.length > 0 ? (
+                <div className="h-[calc(100%-2.5rem)]">
+                  <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
-                      data={trendData}
-                      margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                      data={trendChartData}
+                      margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
                     >
                       <defs>
-                        <linearGradient
-                          id="subscriberGradient"
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="5%"
-                            stopColor="#3b82f6"
-                            stopOpacity={0.8}
-                          />
-                          <stop
-                            offset="95%"
-                            stopColor="#3b82f6"
-                            stopOpacity={0.1}
-                          />
-                        </linearGradient>
+                        {trendChartKeys.map((key, index) => (
+                          <linearGradient
+                            key={`gradient-${key}`}
+                            id={`gradient-${key}`}
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor={
+                                CHART_COLORS[index % CHART_COLORS.length]
+                              }
+                              stopOpacity={0.8}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor={
+                                CHART_COLORS[index % CHART_COLORS.length]
+                              }
+                              stopOpacity={0.1}
+                            />
+                          </linearGradient>
+                        ))}
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip
-                        formatter={(value: number) => [
-                          `${value}명`,
-                          '구독자 수',
-                        ]}
-                        labelFormatter={date => `${date}`}
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fontSize: 11 }}
+                        tickLine={false}
+                        axisLine={{ stroke: '#e5e7eb' }}
+                        tickFormatter={formatXAxisLabel}
+                        height={30}
+                        textAnchor="middle"
                       />
-                      <Area
-                        type="monotone"
-                        dataKey="subscribers"
-                        name="구독자 수"
-                        stroke="#3b82f6"
-                        fillOpacity={1}
-                        fill="url(#subscriberGradient)"
+                      <YAxis
+                        tick={{ fontSize: 11 }}
+                        tickLine={false}
+                        axisLine={{ stroke: '#e5e7eb' }}
+                        tickFormatter={value => Math.floor(value).toString()}
+                        allowDecimals={false}
+                        interval={0}
                       />
+                      <Tooltip content={<TrendTooltip />} />
+                      <Legend
+                        content={<CustomLegend />}
+                        verticalAlign="bottom"
+                        height={20}
+                      />
+                      {trendChartKeys.map((key, index) => (
+                        <Area
+                          key={`area-${key}`}
+                          type="monotone"
+                          dataKey={key}
+                          name={key}
+                          stroke={CHART_COLORS[index % CHART_COLORS.length]}
+                          strokeWidth={2}
+                          fill={`url(#gradient-${key})`}
+                          activeDot={{
+                            r: 6,
+                            fill: CHART_COLORS[index % CHART_COLORS.length],
+                            stroke: '#fff',
+                          }}
+                        />
+                      ))}
                     </AreaChart>
                   </ResponsiveContainer>
                 </div>
               ) : (
                 <div className="flex h-full items-center justify-center">
-                  <p className="text-gray-400">구독자 추세 데이터가 없습니다</p>
+                  <p className="text-xs text-gray-400">
+                    구독자 추세 데이터가 없습니다
+                  </p>
                 </div>
               )}
-            </TabsContent>
-          </Tabs>
+            </div>
+          )}
         </div>
       </div>
     </div>

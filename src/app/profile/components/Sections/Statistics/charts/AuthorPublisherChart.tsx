@@ -37,7 +37,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         </p>
         <div className="flex items-center text-xs font-medium">
           <span
-            className="mr-1.5 h-2 w-2 rounded-full"
+            className="mr-1.5 h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: payload[0].fill }}
           ></span>
           <span className="text-gray-600">{`${data.count}권`}</span>
@@ -183,16 +183,18 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
   const maxValue = Math.max(...topItems.map(item => item.count)) || 1;
 
   return (
-    <div className="h-[270px] w-full rounded-lg bg-white p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white p-3">
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-700">{CHART_TITLE}</h3>
-        <div className="flex gap-1.5">
+        <div className="min-w-[120px]">
+          <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
+        </div>
+        <div className="flex space-x-1">
           {dataTypeOptions.map(option => (
             <button
               key={option.id}
               onClick={() => setActiveDataType(option.id)}
               className={cn(
-                'flex h-6 cursor-pointer items-center rounded-full border px-2.5 text-[10px] font-medium transition-colors',
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
                 activeDataType === option.id
                   ? 'border-blue-200 bg-blue-50 text-blue-600'
                   : 'border-gray-200 text-gray-700 hover:bg-gray-50'
@@ -227,7 +229,7 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
                   type="number"
                   domain={[0, maxValue]}
                   tickFormatter={value => `${Math.floor(value)}`}
-                  tick={{ fontSize: 9, fill: '#9ca3af' }}
+                  tick={{ fontSize: 11, fill: '#9ca3af' }}
                   stroke="#e5e7eb"
                   axisLine={{ stroke: '#e5e7eb' }}
                   allowDecimals={false}
@@ -243,9 +245,9 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
                   type="category"
                   axisLine={false}
                   tickLine={false}
-                  width={60}
+                  width={80}
                   tickFormatter={yAxisLabelFormatter}
-                  tick={{ fontSize: 10, fill: '#4b5563' }}
+                  tick={{ fontSize: 12, fill: '#4b5563', fontWeight: 500 }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="count" barSize={28} minPointSize={2}>
@@ -261,11 +263,21 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
           </div>
         )}
 
+        {/* 차트 대신 항목 표시 */}
+        {topItems.length > 0 && topItems[0].count === 0 && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
+            <p className="mb-1 text-sm text-gray-400">데이터가 없습니다</p>
+            <p className="text-xs text-gray-400">
+              등록된 {labelName} 데이터가 없습니다
+            </p>
+          </div>
+        )}
+
         {/* 가장 많이 읽은 항목 정보 표시 */}
         {mostReadItem && (
           <div className="absolute right-0 bottom-0 left-0 flex justify-center">
             <div className="rounded-md bg-gray-50 px-3 py-1.5">
-              <p className="text-center text-xs text-gray-600">
+              <p className="text-center text-sm text-gray-600">
                 주요{' '}
                 {activeDataType === 'author'
                   ? '저자'

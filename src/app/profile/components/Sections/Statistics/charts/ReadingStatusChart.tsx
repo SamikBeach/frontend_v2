@@ -50,7 +50,7 @@ const CustomTooltip = ({ active, payload }: any) => {
       <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
         <div className="flex items-center gap-2">
           <div
-            className="h-3 w-3 rounded-full"
+            className="h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: STATUS_COLORS[status] }}
           />
           <p className="text-xs font-medium">{STATUS_LABELS[status]}</p>
@@ -132,7 +132,7 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
         textAnchor="middle"
         dominantBaseline="central"
         fontSize={11} // 폰트 크기 증가
-        fontWeight="bold"
+        fontWeight="medium"
         stroke="#ffffff" // 텍스트 테두리 추가
         strokeWidth={0.5} // 얇은 테두리
         paintOrder="stroke" // 테두리 렌더링 순서
@@ -143,8 +143,8 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
   };
 
   return (
-    <div className="h-[240px] w-full rounded-lg bg-white p-3">
-      <h3 className="mb-2 text-sm font-medium text-gray-700">
+    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+      <h3 className="mb-2 text-base font-medium text-gray-700">
         독서 상태별 도서 수
       </h3>
       <div className="flex h-[calc(100%-2rem)] items-center">
@@ -157,8 +157,8 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
                 cy="50%"
                 labelLine={false}
                 label={renderCustomizedLabel}
-                outerRadius={70}
-                innerRadius={30}
+                outerRadius={85}
+                innerRadius={40}
                 fill="#8884d8"
                 dataKey="value"
                 nameKey="name"
@@ -178,23 +178,23 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
           </ResponsiveContainer>
         </div>
         <div className="flex h-full w-2/5 flex-col justify-center">
-          <ul className="space-y-2">
+          <ul className="space-y-2.5">
             {chartData.map((entry, index) => (
               <li key={`legend-${index}`} className="flex items-center gap-2">
                 <div
-                  className="h-3 w-3 rounded-full"
+                  className="h-3 w-3 flex-shrink-0 rounded-full"
                   style={{ backgroundColor: entry.color }}
                 />
-                <div className="text-xs">
-                  <span className="font-medium">{entry.name}: </span>
+                <div className="flex-1 text-xs">
+                  <span className="text-gray-700">{entry.name}: </span>
                   <span>{entry.value}권</span>
                 </div>
               </li>
             ))}
           </ul>
           {data.completionRate > 0 && (
-            <div className="mt-3 rounded-md bg-gray-50 px-2 py-1">
-              <p className="text-center text-xs font-medium text-gray-600">
+            <div className="mt-4 rounded-md bg-gray-50 px-2 py-1.5">
+              <p className="text-center text-sm font-medium text-gray-600">
                 완독률:{' '}
                 <span className="text-green-500">
                   {data.completionRate.toFixed(1)}%

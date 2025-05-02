@@ -358,8 +358,6 @@ export interface UpdateStatisticsSettingRequest {
   isLibraryCompositionPublic?: boolean;
   isLibraryPopularityPublic?: boolean;
   isLibraryUpdatePatternPublic?: boolean;
-  isLibraryDiversityPublic?: boolean;
-  isAmountStatsPublic?: boolean;
   isSearchActivityPublic?: boolean;
   isBookMetadataStatsPublic?: boolean;
 }
@@ -384,8 +382,6 @@ export interface StatisticsSettingResponse {
   isLibraryCompositionPublic: boolean;
   isLibraryPopularityPublic: boolean;
   isLibraryUpdatePatternPublic: boolean;
-  isLibraryDiversityPublic: boolean;
-  isAmountStatsPublic: boolean;
   isSearchActivityPublic: boolean;
   isBookMetadataStatsPublic: boolean;
 }
@@ -473,13 +469,64 @@ export interface AuthorPublisherStatsResponse {
 }
 
 /**
- * 리뷰 통계 응답
+ * 리뷰 통계 응답 DTO
  */
 export interface ReviewStatsResponse {
+  /**
+   * 작성한 총 리뷰 수
+   */
   totalReviews: number;
+
+  /**
+   * 월별 리뷰 작성 수
+   */
   monthlyReviewCounts: { month: string; count: number }[];
+
+  /**
+   * 리뷰 유형별 작성 비율
+   */
   reviewTypeDistribution: { type: string; percentage: number }[];
+
+  /**
+   * 리뷰당 평균 글자 수
+   */
   averageReviewLength: number;
+
+  /**
+   * 연도별 리뷰 통계
+   */
+  yearly: {
+    year: string;
+    count: number;
+  }[];
+
+  /**
+   * 월별 리뷰 통계 (최근 12개월)
+   */
+  monthly: {
+    month: string;
+    count: number;
+  }[];
+
+  /**
+   * 주간별 리뷰 통계
+   */
+  weekly: {
+    week: string;
+    count: number;
+  }[];
+
+  /**
+   * 일별 리뷰 통계 (최근 30일)
+   */
+  daily: {
+    date: string;
+    count: number;
+  }[];
+
+  /**
+   * 공개 여부
+   */
   isPublic: boolean;
 }
 
@@ -521,7 +568,25 @@ export interface RatingHabitsResponse {
 export interface UserInteractionResponse {
   totalLikesReceived: number;
   totalCommentsReceived: number;
+  totalCommentsCreated: number;
+  totalLikesGiven: number;
   engagementRate: number;
+  yearlyLikesReceived: { year: string; count: number }[];
+  monthlyLikesReceived: { month: string; count: number }[];
+  weeklyLikesReceived: { week: string; count: number }[];
+  dailyLikesReceived: { date: string; count: number }[];
+  yearlyCommentsReceived: { year: string; count: number }[];
+  monthlyCommentsReceived: { month: string; count: number }[];
+  weeklyCommentsReceived: { week: string; count: number }[];
+  dailyCommentsReceived: { date: string; count: number }[];
+  yearlyCommentsCreated: { year: string; count: number }[];
+  monthlyCommentsCreated: { month: string; count: number }[];
+  weeklyCommentsCreated: { week: string; count: number }[];
+  dailyCommentsCreated: { date: string; count: number }[];
+  yearlyLikesGiven: { year: string; count: number }[];
+  monthlyLikesGiven: { month: string; count: number }[];
+  weeklyLikesGiven: { week: string; count: number }[];
+  dailyLikesGiven: { date: string; count: number }[];
   monthlyLikes: { month: string; count: number }[];
   isPublic: boolean;
 }
@@ -532,17 +597,40 @@ export interface UserInteractionResponse {
 export interface FollowerStatsResponse {
   followersCount: number;
   followingCount: number;
-  followerGrowth: { date: string; count: number }[];
+  yearly: {
+    year: string;
+    count: number;
+  }[];
+  monthly: {
+    month: string;
+    count: number;
+  }[];
+  weekly: {
+    week: string;
+    count: number;
+  }[];
+  daily: {
+    date: string;
+    count: number;
+  }[];
   isPublic: boolean;
 }
 
 /**
- * 댓글 활동 통계 응답
+ * 커뮤니티 활동 통계 응답
  */
-export interface CommentActivityResponse {
+export interface CommunityActivityResponse {
   totalComments: number;
+  totalReviews: number;
+  totalLikes: number;
   commentsPerWeek: number;
-  commentsPerReview: { range: string; count: number }[];
+  reviewsPerWeek: number;
+  likesPerWeek: number;
+  commentDistribution: { range: string; count: number }[];
+  reviewDistribution: { range: string; count: number }[];
+  likeDistribution: { range: string; count: number }[];
+  activityByCategory: { category: string; count: number }[];
+  mostActiveCategory: string;
   isPublic: boolean;
 }
 
@@ -579,6 +667,22 @@ export interface LibraryPopularityResponse {
     library: string;
     trend: { date: string; subscribers: number }[];
   }[];
+  yearly: {
+    year: string;
+    libraries: { library: string; subscribers: number }[];
+  }[];
+  monthly: {
+    month: string;
+    libraries: { library: string; subscribers: number }[];
+  }[];
+  weekly: {
+    week: string;
+    libraries: { library: string; subscribers: number }[];
+  }[];
+  daily: {
+    date: string;
+    libraries: { library: string; subscribers: number }[];
+  }[];
   isPublic: boolean;
 }
 
@@ -593,42 +697,17 @@ export interface LibraryUpdatePatternResponse {
 }
 
 /**
- * 서재 다양성 통계 응답
- */
-export interface LibraryDiversityResponse {
-  genreDiversityIndex: { library: string; index: number }[];
-  mostSpecializedLibrary: string;
-  mostDiverseLibrary: string;
-  isPublic: boolean;
-}
-
-/**
- * 금액 통계 응답
- */
-export interface AmountStatsResponse {
-  estimatedTotalSpent: number;
-  monthlySpending: { month: string; amount: number }[];
-  categoryPriceAverage: { category: string; averagePrice: number }[];
-  isPublic: boolean;
-}
-
-/**
  * 검색 활동 통계 응답
  */
 export interface SearchActivityResponse {
   searchCount: number;
   topSearchTerms: { term: string; count: number }[];
+  frequentlySearchedTerms: { term: string; count: number }[];
   searchPattern: string;
-  isPublic: boolean;
-}
-
-/**
- * 도서 메타데이터 통계 응답
- */
-export interface BookMetadataStatsResponse {
-  averageBookAge: number;
-  translationRatio: number;
-  publicationYearDistribution: { year: string; count: number }[];
+  yearly: { year: string; count: number }[];
+  monthly: { month: string; count: number }[];
+  weekly: { week: string; count: number }[];
+  daily: { date: string; count: number }[];
   isPublic: boolean;
 }
 

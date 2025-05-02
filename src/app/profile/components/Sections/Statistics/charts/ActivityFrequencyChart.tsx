@@ -16,7 +16,12 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
 
   // 데이터가 비공개인 경우
   if (!data.isPublic) {
-    return <PrivateDataMessage message="이 통계는 비공개 설정되어 있습니다." />;
+    return (
+      <PrivateDataMessage
+        message="이 통계는 비공개 설정되어 있습니다."
+        title="활동 빈도"
+      />
+    );
   }
 
   // 데이터가 없는 경우
@@ -74,10 +79,10 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
     dayMapping[data.mostActiveDay.toLowerCase()] || data.mostActiveDay;
 
   return (
-    <div className="h-[240px] w-full rounded-lg bg-gray-50 p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white p-3">
       <div className="flex h-full flex-col">
         <div className="mb-2">
-          <h3 className="text-base font-medium text-gray-700">활동 빈도 통계</h3>
+          <h3 className="text-base font-medium text-gray-700">활동 빈도</h3>
           <p className="text-xs text-gray-500">
             {data.mostActiveDay && data.mostActiveHour
               ? `가장 활발한 시간대: ${translatedDay} ${formatHour(data.mostActiveHour)}`
@@ -90,8 +95,8 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
             <div className="mb-2 rounded-full bg-blue-100 p-2">
               <Activity className="h-5 w-5 text-blue-600" />
             </div>
-            <h3 className="mb-1 text-base font-medium">리뷰 작성 주기</h3>
-            <p className="text-sm font-bold text-blue-600">
+            <h3 className="mb-1 text-sm font-normal">리뷰 작성 주기</h3>
+            <p className="text-xs font-normal text-blue-600">
               {formatIntervalText(data.averageReviewInterval)}
             </p>
           </div>
@@ -100,8 +105,8 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
             <div className="mb-2 rounded-full bg-amber-100 p-2">
               <Activity className="h-5 w-5 text-amber-600" />
             </div>
-            <h3 className="mb-1 text-base font-medium">평점 등록 주기</h3>
-            <p className="text-sm font-bold text-amber-600">
+            <h3 className="mb-1 text-sm font-normal">평점 등록 주기</h3>
+            <p className="text-xs font-normal text-amber-600">
               {formatIntervalText(data.averageRatingInterval)}
             </p>
           </div>
@@ -110,8 +115,8 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
             <div className="mb-2 rounded-full bg-purple-100 p-2">
               <Calendar className="h-5 w-5 text-purple-600" />
             </div>
-            <h3 className="mb-1 text-base font-medium">가장 활발한 요일</h3>
-            <p className="text-sm font-bold text-purple-600">
+            <h3 className="mb-1 text-sm font-normal">가장 활발한 요일</h3>
+            <p className="text-xs font-normal text-purple-600">
               {translatedDay || '정보 없음'}
             </p>
           </div>
@@ -120,8 +125,8 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
             <div className="mb-2 rounded-full bg-green-100 p-2">
               <Clock className="h-5 w-5 text-green-600" />
             </div>
-            <h3 className="mb-1 text-base font-medium">가장 활발한 시간</h3>
-            <p className="text-sm font-bold text-green-600">
+            <h3 className="mb-1 text-sm font-normal">가장 활발한 시간</h3>
+            <p className="text-xs font-normal text-green-600">
               {formatHour(data.mostActiveHour)}
             </p>
           </div>

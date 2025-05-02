@@ -16,13 +16,13 @@ import {
   LibrariesSkeleton,
   PageSkeleton,
   ProfileHeader,
+  ProfileSkeleton,
+  ProfileStats,
   ProfileSummary,
   ReadBooks,
   ReadBooksSkeleton,
   Reviews,
   ReviewsSkeleton,
-  Stats,
-  StatsSkeleton,
   SubscribedLibraries,
   SummarySkeleton,
 } from '../components';
@@ -127,8 +127,8 @@ export default function ProfilePage() {
         );
       case 'stats':
         return (
-          <Suspense fallback={<StatsSkeleton />}>
-            <Stats />
+          <Suspense fallback={<ProfileSkeleton />}>
+            <ProfileStats />
           </Suspense>
         );
       default:

@@ -96,16 +96,16 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 
     return (
       <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
-        <p className="text-xs font-medium">{formattedDate}</p>
+        <p className="text-xs text-gray-700">{formattedDate}</p>
         <div className="mt-1 space-y-1">
           {sortedPayload.map((entry: any, index: number) => (
             <div key={`tooltip-${index}`} className="flex items-center gap-2">
               <div
-                className="h-3 w-3 rounded-full"
+                className="h-2.5 w-2.5 rounded-full"
                 style={{ backgroundColor: entry.color }}
               />
               <p className="text-xs">
-                <span className="font-medium">{entry.name}: </span>
+                <span className="text-gray-700">{entry.name}: </span>
                 <span>{entry.value}권</span>
               </p>
             </div>
@@ -117,11 +117,35 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+// 커스텀 범례 컴포넌트
+const CustomLegend = ({ payload }: any) => {
+  if (!payload || payload.length === 0) return null;
+
+  // 읽기 상태 순서에 따라 항목 정렬
+  const sortedPayload = [...payload].sort(
+    (a, b) => STATUS_ORDER[a.value] - STATUS_ORDER[b.value]
+  );
+
+  return (
+    <ul className="flex items-center justify-center gap-6 pt-1">
+      {sortedPayload.map((entry: any, index: number) => (
+        <li key={`legend-${index}`} className="flex items-center gap-2">
+          <div
+            className="h-3 w-3 flex-shrink-0 rounded-full"
+            style={{ backgroundColor: entry.color }}
+          />
+          <span className="text-xs text-gray-700">{entry.value}</span>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
 const ReadingStatusByPeriodChart = ({
   userId,
 }: ReadingStatusByPeriodChartProps) => {
   const [activePeriod, setActivePeriod] = useState<PeriodType>('monthly');
-  const CHART_TITLE = '기간별 독서 상태';
+  const CHART_TITLE = '기간별 독서';
 
   const { data } = useSuspenseQuery({
     queryKey: ['readingStatusByPeriod', userId],
@@ -204,16 +228,18 @@ const ReadingStatusByPeriodChart = ({
   };
 
   return (
-    <div className="h-[240px] w-full rounded-lg bg-white p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white p-3">
       <div className="mb-2 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-700">{CHART_TITLE}</h3>
+        <div className="min-w-[120px]">
+          <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
+        </div>
         <div className="flex gap-1">
           {periodOptions.map(option => (
             <button
               key={option.id}
               onClick={() => setActivePeriod(option.id as PeriodType)}
               className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-[11px] font-medium transition-colors',
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
                 activePeriod === option.id
                   ? 'border-blue-200 bg-blue-50 text-blue-600'
                   : 'border-gray-200 text-gray-700 hover:bg-gray-50'
@@ -238,29 +264,25 @@ const ReadingStatusByPeriodChart = ({
               />
               <XAxis
                 dataKey={getDataKey()}
-                tickFormatter={formatXAxisLabel}
-                tick={{ fontSize: activePeriod === 'daily' ? 9 : 10 }}
+                tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={{ stroke: '#e5e7eb' }}
-                interval={0}
-                angle={activePeriod === 'daily' ? -45 : 0}
-                textAnchor={activePeriod === 'daily' ? 'end' : 'middle'}
-                height={activePeriod === 'daily' ? 40 : 30}
+                tickFormatter={formatXAxisLabel}
+                height={30}
+                angle={0}
+                textAnchor="middle"
               />
               <YAxis
-                tick={{ fontSize: 10 }}
+                tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={{ stroke: '#e5e7eb' }}
                 allowDecimals={false}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend
-                iconType="circle"
-                iconSize={8}
-                formatter={value => (
-                  <span className="text-xs text-gray-900">{value}</span>
-                )}
-                wrapperStyle={{ fontSize: 11, paddingTop: 5 }}
+                content={<CustomLegend />}
+                verticalAlign="bottom"
+                height={36}
               />
               <Bar
                 dataKey="wantToReadCount"

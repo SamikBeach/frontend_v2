@@ -1,12 +1,10 @@
 export * from './useActivityFrequency';
-export * from './useAmountStats';
 export * from './useAuthorPublisherStats';
 export * from './useBookMetadataStats';
-export * from './useCommentActivityStats';
+export { useCommunityActivityStats } from './useCommunityActivityStats';
 export * from './useFollowerStats';
 export * from './useGenreAnalysis';
 export * from './useLibraryComposition';
-export * from './useLibraryDiversity';
 export * from './useLibraryPopularity';
 export * from './useLibraryUpdatePattern';
 export * from './useRatingHabits';

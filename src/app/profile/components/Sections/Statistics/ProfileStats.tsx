@@ -21,18 +21,8 @@ import {
 import { ProfileTabs, TabsSkeleton } from './components';
 import { ProfileSkeleton } from './ProfileSkeleton';
 
-// 기본 통계 카드 컴포넌트
-interface StatsCardProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-const StatsCard = ({ children, className = '' }: StatsCardProps) => (
-  <div className={`rounded-lg bg-white p-4 ${className}`}>{children}</div>
-);
-
-// Statistics content by section
-function StatsSectionContent({
+// Content by section
+function SectionContent({
   selectedSection,
   userId,
 }: {
@@ -130,15 +120,15 @@ function StatsSectionContent({
   }
 }
 
-// Main Statistics section loader
-function StatsSectionsLoader() {
+// Main section loader
+function ProfileStatsLoader() {
   const { id } = useParams<{ id: string }>();
   const userId = Number(id);
   const [selectedSection, setSelectedSection] = useState('reading');
 
   return (
     <div className="space-y-5 bg-white">
-      {/* 통계 섹션 탭 메뉴 */}
+      {/* 탭 메뉴 */}
       <Suspense fallback={<TabsSkeleton />}>
         <ProfileTabs
           selectedSection={selectedSection}
@@ -146,13 +136,13 @@ function StatsSectionsLoader() {
         />
       </Suspense>
 
-      {/* 선택된 통계 콘텐츠 */}
-      <StatsSectionContent selectedSection={selectedSection} userId={userId} />
+      {/* 선택된 콘텐츠 */}
+      <SectionContent selectedSection={selectedSection} userId={userId} />
     </div>
   );
 }
 
 // Main export component
-export default function Stats() {
-  return <StatsSectionsLoader />;
+export default function ProfileStats() {
+  return <ProfileStatsLoader />;
 }

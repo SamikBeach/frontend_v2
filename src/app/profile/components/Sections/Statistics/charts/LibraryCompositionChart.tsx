@@ -1,40 +1,119 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Hash, Library } from 'lucide-react';
+import { Hash } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
   Cell,
   Legend,
   Pie,
   PieChart,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
-  YAxis,
 } from 'recharts';
 
 import { LibraryCompositionResponse } from '@/apis/user/types';
 import { getLibraryComposition } from '@/apis/user/user';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { NoDataMessage, PrivateDataMessage } from '../common';
 
-// 차트 색상
-const COLORS = [
-  '#3b82f6', // blue
-  '#10b981', // green
-  '#f59e0b', // amber
-  '#ec4899', // pink
-  '#8b5cf6', // purple
-  '#ef4444', // red
-  '#0ea5e9', // sky
+// 파스텔톤 차트 색상
+const CHART_COLORS = [
+  '#93c5fd', // blue-300
+  '#a7f3d0', // green-200
+  '#fcd34d', // amber-300
+  '#f9a8d4', // pink-300
+  '#c4b5fd', // violet-300
+  '#fda4af', // rose-300
+  '#a5f3fc', // cyan-200
+  '#99f6e4', // teal-200
 ];
 
 interface LibraryCompositionChartProps {
   userId?: number;
 }
+
+// 커스텀 툴팁 컴포넌트
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
+        <p className="text-xs font-medium text-gray-800">
+          {data.name || data.tag || label}
+        </p>
+        <div className="mt-1">
+          <p className="text-xs font-semibold text-gray-700">
+            {`${payload[0].value}${data.tag ? '회' : '권'}`}
+          </p>
+          {data.percent && (
+            <p className="text-xs text-gray-500">
+              {`전체의 ${(data.percent * 100).toFixed(1)}%`}
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+// 커스텀 범례 렌더 컴포넌트
+const CustomLegend = ({ payload }: any) => {
+  return (
+    <ul className="flex flex-col gap-1.5 pl-2">
+      {payload.map((entry: any, index: number) => (
+        <li key={`legend-${index}`} className="flex items-center gap-1.5">
+          <div
+            className="h-3 w-3 flex-shrink-0 rounded-full"
+            style={{ backgroundColor: entry.color }}
+          />
+          <span className="max-w-[120px] truncate text-xs text-gray-700">
+            {entry.value}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+// 파이 차트 커스텀 라벨 렌더링 함수
+const renderCustomizedLabel = ({
+  cx,
+  cy,
+  midAngle,
+  innerRadius,
+  outerRadius,
+  percent,
+  index,
+  name,
+  value,
+  tag,
+}: any) => {
+  if (percent < 0.05) return null; // 작은 조각에는 라벨 표시 안함
+
+  const RADIAN = Math.PI / 180;
+  // 라벨 위치 - 각 조각의 중간 지점에 배치
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.7;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="#4b5563" // text-gray-600
+      textAnchor="middle"
+      dominantBaseline="central"
+      fontSize={11}
+      fontWeight="medium"
+      stroke="#ffffff" // 텍스트 테두리 추가
+      strokeWidth={0.5} // 얇은 테두리
+      paintOrder="stroke" // 테두리 렌더링 순서
+    >
+      {`${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
 
 const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
   const params = useParams<{ id: string }>();
@@ -49,7 +128,12 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
 
   // 데이터가 비공개인 경우
   if (!data.isPublic) {
-    return <PrivateDataMessage message="이 통계는 비공개 설정되어 있습니다." />;
+    return (
+      <PrivateDataMessage
+        message="이 통계는 비공개 설정되어 있습니다."
+        title="서재 구성"
+      />
+    );
   }
 
   // 데이터가 없는 경우
@@ -62,11 +146,18 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
   }
 
   // 서재 데이터 가공
-  const libraryData = data.booksPerLibrary.map((item, index) => ({
-    name: item.name,
-    value: item.count,
-    color: COLORS[index % COLORS.length],
-  }));
+  const totalBooks = data.booksPerLibrary.reduce(
+    (sum, item) => sum + item.count,
+    0
+  );
+  const libraryData = data.booksPerLibrary
+    .map((item, index) => ({
+      name: item.name,
+      value: item.count,
+      color: CHART_COLORS[index % CHART_COLORS.length],
+      percent: totalBooks > 0 ? item.count / totalBooks : 0,
+    }))
+    .slice(0, 5); // 상위 5개만 표시
 
   // 태그 데이터 가공
   const tagData =
@@ -77,32 +168,55 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
   // 태그 데이터 정렬
   const sortedTagData = [...tagData]
     .sort((a, b) => b.count - a.count)
-    .slice(0, 10); // 상위 10개만 표시
+    .slice(0, 5) // 상위 5개만 표시
+    .map((tag, index) => ({
+      name: tag.tag, // 파이 차트의 nameKey로 사용하기 위해 tag 속성을 name으로도 설정
+      tag: tag.tag,
+      value: tag.count, // 파이 차트의 dataKey로 사용하기 위해 count 속성을 value로도 설정
+      count: tag.count,
+      color: CHART_COLORS[index % CHART_COLORS.length],
+      percent:
+        tagData.reduce((sum, t) => sum + t.count, 0) > 0
+          ? tag.count / tagData.reduce((sum, t) => sum + t.count, 0)
+          : 0,
+    }));
 
   return (
-    <div className="h-[240px] w-full rounded-lg bg-gray-50 p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
       <div className="flex h-full flex-col">
-        <div className="mb-2">
+        <div className="mb-2 flex items-center justify-between">
           <h3 className="text-base font-medium text-gray-700">서재 구성</h3>
-          <p className="text-xs text-gray-500">
-            총 서재 수: {data.totalLibraries}개
-          </p>
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab('libraries')}
+              className={cn(
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                activeTab === 'libraries'
+                  ? 'border-blue-200 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              )}
+            >
+              서재별 도서 수
+            </button>
+            <button
+              onClick={() => setActiveTab('tags')}
+              className={cn(
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                activeTab === 'tags'
+                  ? 'border-blue-200 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              )}
+            >
+              태그 분포
+            </button>
+          </div>
         </div>
 
         <div className="flex-1">
-          <Tabs
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="h-full"
-          >
-            <TabsList className="mb-2">
-              <TabsTrigger value="libraries">서재별 도서 수</TabsTrigger>
-              <TabsTrigger value="tags">태그 분포</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="libraries" className="h-[calc(100%-40px)]">
+          {activeTab === 'libraries' ? (
+            <div className="h-full pt-2">
               {libraryData.length > 0 ? (
-                <div className="grid h-full grid-cols-[1fr_auto]">
+                <div className="h-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -110,14 +224,14 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        outerRadius={80}
+                        label={renderCustomizedLabel}
+                        outerRadius={90}
+                        innerRadius={35}
                         fill="#8884d8"
                         dataKey="value"
                         nameKey="name"
-                        label={({ name, percent }) =>
-                          `${name}: ${(percent * 100).toFixed(0)}%`
-                        }
                         onClick={data => setSelectedLibrary(data.name)}
+                        paddingAngle={2}
                       >
                         {libraryData.map((entry, index) => (
                           <Cell
@@ -130,75 +244,65 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
                           />
                         ))}
                       </Pie>
-                      <Tooltip
-                        formatter={(value: number) => [`${value}권`, '도서 수']}
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend
+                        content={<CustomLegend />}
+                        verticalAlign="middle"
+                        align="right"
+                        layout="vertical"
                       />
-                      <Legend />
                     </PieChart>
                   </ResponsiveContainer>
-
-                  <div className="flex flex-col justify-center pr-1">
-                    <div className="rounded-lg bg-blue-50 p-2">
-                      <div className="flex items-center justify-center">
-                        <div className="rounded-full bg-blue-100 p-1">
-                          <Library className="h-4 w-4 text-blue-600" />
-                        </div>
-                      </div>
-                      <p className="mt-1 text-center text-xs text-blue-700">
-                        클릭하여
-                        <br />
-                        서재 선택
-                      </p>
-                    </div>
-                  </div>
                 </div>
               ) : (
                 <div className="flex h-full items-center justify-center">
-                  <p className="text-gray-400">서재 데이터가 없습니다</p>
+                  <p className="text-xs text-gray-400">
+                    서재 데이터가 없습니다
+                  </p>
                 </div>
               )}
-            </TabsContent>
-
-            <TabsContent value="tags" className="h-[calc(100%-40px)]">
+            </div>
+          ) : (
+            <div className="h-full">
               {sortedTagData.length > 0 ? (
                 <div className="h-full">
-                  <p className="mb-2 text-center text-xs text-gray-500">
-                    {selectedLibrary
-                      ? `"${selectedLibrary}" 서재의 태그 분포`
-                      : '모든 서재의 태그 분포'}
-                  </p>
-                  <ResponsiveContainer width="100%" height="85%">
-                    <BarChart
-                      data={sortedTagData}
-                      layout="vertical"
-                      margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" />
-                      <YAxis
-                        dataKey="tag"
-                        type="category"
-                        width={80}
-                        tick={{ fontSize: 11 }}
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={sortedTagData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={renderCustomizedLabel}
+                        outerRadius={90}
+                        innerRadius={35}
+                        fill="#8884d8"
+                        dataKey="value"
+                        nameKey="name"
+                        paddingAngle={2}
+                      >
+                        {sortedTagData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend
+                        content={<CustomLegend />}
+                        verticalAlign="middle"
+                        align="right"
+                        layout="vertical"
                       />
-                      <Tooltip
-                        formatter={(value: number) => [
-                          `${value}개`,
-                          '사용 횟수',
-                        ]}
-                      />
-                      <Bar dataKey="count" name="사용 횟수" fill="#8b5cf6" />
-                    </BarChart>
+                    </PieChart>
                   </ResponsiveContainer>
                 </div>
               ) : selectedLibrary ? (
                 <div className="flex h-full flex-col items-center justify-center">
-                  <Hash className="mb-2 h-12 w-12 text-gray-300" />
-                  <p className="text-gray-400">
-                    "{selectedLibrary}" 서재에 태그가 없습니다
+                  <Hash className="mb-2 h-8 w-8 text-gray-300" />
+                  <p className="text-xs text-gray-400">
+                    &quot;{selectedLibrary}&quot; 서재에 태그가 없습니다
                   </p>
                   <button
-                    className="mt-2 text-sm text-blue-500 hover:underline"
+                    className="mt-2 text-xs text-blue-500 hover:underline"
                     onClick={() => setSelectedLibrary(null)}
                   >
                     모든 서재 보기
@@ -206,11 +310,13 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
                 </div>
               ) : (
                 <div className="flex h-full items-center justify-center">
-                  <p className="text-gray-400">태그 데이터가 없습니다</p>
+                  <p className="text-xs text-gray-400">
+                    태그 데이터가 없습니다
+                  </p>
                 </div>
               )}
-            </TabsContent>
-          </Tabs>
+            </div>
+          )}
         </div>
       </div>
     </div>

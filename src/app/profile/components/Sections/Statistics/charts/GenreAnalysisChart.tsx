@@ -59,9 +59,28 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
+// 커스텀 범례 렌더 컴포넌트
+const CustomLegend = ({ payload }: any) => {
+  return (
+    <ul className="flex flex-col gap-1.5 pl-2">
+      {payload.map((entry: any, index: number) => (
+        <li key={`legend-${index}`} className="flex items-center gap-1.5">
+          <div
+            className="h-3 w-3 flex-shrink-0 rounded-full"
+            style={{ backgroundColor: entry.color }}
+          />
+          <span className="max-w-[120px] truncate text-xs text-gray-700">
+            {entry.value}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
 const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
   const [activePeriod, setActivePeriod] = useState<PeriodType>('all');
-  const CHART_TITLE = '장르 분석';
+  const CHART_TITLE = '장르';
 
   const { data } = useSuspenseQuery<GenreAnalysisResponse>({
     queryKey: ['genreAnalysis', userId],
@@ -243,8 +262,11 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
         fill="#4b5563"
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        fontSize={9}
-        fontWeight="600"
+        fontSize={11}
+        fontWeight="normal"
+        stroke="#ffffff"
+        strokeWidth={0.5}
+        paintOrder="stroke"
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
@@ -261,16 +283,18 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
   ];
 
   return (
-    <div className="h-[270px] w-full rounded-lg bg-white p-3">
-      <div className="mb-1 flex items-center justify-between">
-        <h3 className="text-sm font-medium text-gray-700">{CHART_TITLE}</h3>
+    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+      <div className="mb-2 flex items-center justify-between">
+        <div className="min-w-[120px]">
+          <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
+        </div>
         <div className="flex gap-1">
           {periodOptions.map(option => (
             <button
               key={option.id}
               onClick={() => setActivePeriod(option.id)}
               className={cn(
-                'flex h-6 cursor-pointer items-center rounded-full border px-2 text-[10px] font-medium transition-colors',
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
                 activePeriod === option.id
                   ? 'border-blue-200 bg-blue-50 text-blue-600'
                   : 'border-gray-200 text-gray-700 hover:bg-gray-50'
@@ -282,134 +306,124 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
         </div>
       </div>
 
-      <div className="relative flex h-[calc(100%-3rem)]">
+      <div className="relative flex h-[calc(100%-3rem)] px-2">
         {/* 카테고리 차트 */}
-        <div className="relative h-full w-1/2 px-1">
+        <div className="relative h-full w-1/2 pr-4">
           {/* 카테고리 차트 타이틀 */}
-          <div className="absolute top-4 right-0 left-0 z-10 text-center">
-            <span className="text-[10px] font-medium text-gray-600">
-              카테고리
-            </span>
+          <div className="absolute top-2 right-0 left-0 z-10 text-center">
+            <span className="text-sm text-gray-600">카테고리</span>
           </div>
 
           {totalCategoryCount === 0 && (
-            <div className="pointer-events-none absolute inset-0 top-5 z-10 flex items-center justify-center">
+            <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
               <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
                 데이터가 없습니다
               </p>
             </div>
           )}
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={{ top: 20, right: 0, bottom: 0, left: 0 }}>
-              <Pie
-                data={topCategories}
-                cx="50%"
-                cy="55%"
-                labelLine={false}
-                label={renderCustomizedLabel}
-                outerRadius={45}
-                innerRadius={20}
-                fill="#8884d8"
-                dataKey="count"
-                nameKey="category"
-                paddingAngle={2}
-              >
-                {topCategories.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.color}
-                    stroke="#fff"
-                    strokeWidth={1}
-                  />
-                ))}
-              </Pie>
-              <Tooltip
-                content={<CustomTooltip />}
-                wrapperStyle={{ zIndex: 20 }}
-              />
-              <Legend
-                layout="vertical"
-                verticalAlign="middle"
-                align="right"
-                iconType="circle"
-                iconSize={6}
-                formatter={(value, entry: any, index) => (
-                  <span className="text-[9px] text-gray-900">{value}</span>
-                )}
-                wrapperStyle={{ fontSize: 9, paddingLeft: 5 }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="flex h-full items-center justify-center pt-8">
+            <ResponsiveContainer width="100%" height="85%">
+              <PieChart>
+                <Pie
+                  data={topCategories}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius={60}
+                  innerRadius={30}
+                  fill="#8884d8"
+                  dataKey="count"
+                  nameKey="category"
+                  paddingAngle={2}
+                >
+                  {topCategories.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.color}
+                      stroke="#fff"
+                      strokeWidth={1}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  content={<CustomTooltip />}
+                  wrapperStyle={{ zIndex: 20 }}
+                />
+                <Legend
+                  content={<CustomLegend />}
+                  verticalAlign="middle"
+                  align="right"
+                  layout="vertical"
+                  wrapperStyle={{ right: -5 }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* 세부 장르 차트 */}
-        <div className="relative h-full w-1/2 px-1">
+        <div className="relative h-full w-1/2 pl-4">
           {/* 세부 장르 차트 타이틀 */}
-          <div className="absolute top-4 right-0 left-0 z-10 text-center">
-            <span className="text-[10px] font-medium text-gray-600">
-              세부 장르
-            </span>
+          <div className="absolute top-2 right-0 left-0 z-10 text-center">
+            <span className="text-sm text-gray-600">세부 장르</span>
           </div>
 
           {totalSubCategoryCount === 0 && (
-            <div className="pointer-events-none absolute inset-0 top-5 z-10 flex items-center justify-center">
+            <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
               <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
                 데이터가 없습니다
               </p>
             </div>
           )}
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={{ top: 20, right: 0, bottom: 0, left: 0 }}>
-              <Pie
-                data={topSubCategories}
-                cx="50%"
-                cy="55%"
-                labelLine={false}
-                label={renderCustomizedLabel}
-                outerRadius={45}
-                innerRadius={20}
-                fill="#8884d8"
-                dataKey="count"
-                nameKey="subCategory"
-                paddingAngle={2}
-              >
-                {topSubCategories.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.color}
-                    stroke="#fff"
-                    strokeWidth={1}
-                  />
-                ))}
-              </Pie>
-              <Tooltip
-                content={<CustomTooltip />}
-                wrapperStyle={{ zIndex: 20 }}
-              />
-              <Legend
-                layout="vertical"
-                verticalAlign="middle"
-                align="right"
-                iconType="circle"
-                iconSize={6}
-                formatter={(value, entry: any, index) => (
-                  <span className="text-[9px] text-gray-900">{value}</span>
-                )}
-                wrapperStyle={{ fontSize: 9, paddingLeft: 5 }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="flex h-full items-center justify-center pt-8">
+            <ResponsiveContainer width="100%" height="85%">
+              <PieChart>
+                <Pie
+                  data={topSubCategories}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  label={renderCustomizedLabel}
+                  outerRadius={60}
+                  innerRadius={30}
+                  fill="#8884d8"
+                  dataKey="count"
+                  nameKey="subCategory"
+                  paddingAngle={2}
+                >
+                  {topSubCategories.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={entry.color}
+                      stroke="#fff"
+                      strokeWidth={1}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip
+                  content={<CustomTooltip />}
+                  wrapperStyle={{ zIndex: 20 }}
+                />
+                <Legend
+                  content={<CustomLegend />}
+                  verticalAlign="middle"
+                  align="right"
+                  layout="vertical"
+                  wrapperStyle={{ right: -5 }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </div>
 
         {/* 주요 카테고리 표시 - 하단 중앙에 배치 */}
         {data.mostReadCategory && (
           <div className="absolute right-0 bottom-0 left-0 z-[5] flex justify-center">
             <div className="rounded-md bg-gray-50 px-3 py-1.5">
-              <p className="text-center text-xs text-gray-600">
+              <p className="text-center text-sm text-gray-600">
                 주요 카테고리:{' '}
-                <span className="font-medium text-blue-600">
-                  {data.mostReadCategory}
-                </span>
+                <span className="text-blue-600">{data.mostReadCategory}</span>
               </p>
             </div>
           </div>
