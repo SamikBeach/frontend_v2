@@ -27,12 +27,79 @@ export const useStatisticsSettings = (userId: number) => {
   const { mutate: updateSettings, isPending: isUpdating } = useMutation({
     mutationFn: (data: UpdateStatisticsSettingRequest) =>
       updateUserStatisticsSettings(userId, data),
-    onSuccess: () => {
-      // 설정이 변경되면 통계 설정 쿼리와 모든 통계 쿼리 무효화
-      queryClient.invalidateQueries({
-        queryKey: ['user-statistics-settings', userId],
-      });
-      queryClient.invalidateQueries({ queryKey: ['user-statistics', userId] });
+    onMutate: async updatedSettings => {
+      // 기존 쿼리 캐시 데이터 백업
+      const previousSettings = queryClient.getQueryData([
+        'user-statistics-settings',
+        userId,
+      ]);
+
+      // 낙관적 업데이트 적용
+      queryClient.setQueryData(
+        ['user-statistics-settings', userId],
+        (old: any) => ({
+          ...old,
+          ...updatedSettings,
+        })
+      );
+
+      return { previousSettings };
+    },
+    onError: (error, variables, context) => {
+      // 에러 발생 시 이전 설정으로 롤백
+      if (context?.previousSettings) {
+        queryClient.setQueryData(
+          ['user-statistics-settings', userId],
+          context.previousSettings
+        );
+      }
+    },
+    onSuccess: (newSettings, variables) => {
+      // 성공 시 설정 데이터 업데이트
+      queryClient.setQueryData(
+        ['user-statistics-settings', userId],
+        newSettings
+      );
+
+      // variables에 포함된 설정 키와 관련된 통계 데이터 업데이트
+      // 각 설정 키와 관련된 통계 데이터 매핑
+      const settingToStatKey: Record<string, string | undefined> = {
+        isReadingStatusStatsPublic: 'reading-status',
+        isReadingStatusByPeriodPublic: 'reading-status-by-period',
+        isGenreAnalysisPublic: 'genre-analysis',
+        isAuthorPublisherStatsPublic: 'author-publisher',
+        isReviewStatsPublic: 'reviews',
+        isRatingStatsPublic: 'ratings',
+        isActivityFrequencyPublic: 'activity-frequency',
+        isRatingHabitsPublic: 'rating-habits',
+        isUserInteractionPublic: 'user-interaction',
+        isFollowerStatsPublic: 'follower',
+        isCommunityActivityPublic: 'community-activity',
+        isReviewInfluencePublic: 'review-influence',
+        isLibraryCompositionPublic: 'library-composition',
+        isLibraryPopularityPublic: 'library-popularity',
+        isLibraryUpdatePatternPublic: 'library-update-pattern',
+        isSearchActivityPublic: 'search-activity',
+      };
+
+      // 변경된 설정과 관련된 통계 데이터 업데이트
+      for (const [key, value] of Object.entries(variables)) {
+        const statKey = settingToStatKey[key];
+        if (statKey) {
+          queryClient.setQueryData(
+            ['user-statistics', userId, statKey],
+            (oldData: any) => {
+              if (oldData) {
+                return {
+                  ...oldData,
+                  isPublic: value,
+                };
+              }
+              return oldData;
+            }
+          );
+        }
+      }
     },
   });
 

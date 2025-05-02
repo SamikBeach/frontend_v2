@@ -17,8 +17,11 @@ import {
 
 import { LibraryUpdatePatternResponse } from '@/apis/user/types';
 import { getLibraryUpdatePattern } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 // 파스텔톤 차트 색상
 const CHART_COLORS = [
@@ -130,13 +133,19 @@ const LibraryUpdatePatternChart = ({
   const id = userId || Number(params?.id || 0);
   const [activeTab, setActiveTab] = useState('frequency');
 
-  const { data } = useSuspenseQuery<LibraryUpdatePatternResponse>({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === id;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(id)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery<LibraryUpdatePatternResponse>({
     queryKey: ['libraryUpdatePattern', id],
     queryFn: () => getLibraryUpdatePattern(id),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -179,41 +188,58 @@ const LibraryUpdatePatternChart = ({
     color: CHART_COLORS[index % CHART_COLORS.length],
   }));
 
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isLibraryUpdatePatternPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
+
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
       <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex items-start justify-between">
           <div>
-            <h3 className="text-sm font-medium text-gray-700">
+            <h3 className="text-base font-medium text-gray-700">
               서재 업데이트 패턴
             </h3>
             <p className="text-xs text-gray-500">
               가장 활발한 서재: {data.mostActiveLibrary || '데이터 없음'}
             </p>
           </div>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setActiveTab('frequency')}
-              className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                activeTab === 'frequency'
-                  ? 'border-blue-200 bg-blue-50 text-blue-600'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              업데이트 빈도
-            </button>
-            <button
-              onClick={() => setActiveTab('weekday')}
-              className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                activeTab === 'weekday'
-                  ? 'border-blue-200 bg-blue-50 text-blue-600'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              요일별 활동
-            </button>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              <button
+                onClick={() => setActiveTab('frequency')}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activeTab === 'frequency'
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                업데이트 빈도
+              </button>
+              <button
+                onClick={() => setActiveTab('weekday')}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activeTab === 'weekday'
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                요일별 활동
+              </button>
+            </div>
+            {isMyProfile && (
+              <PrivacyToggle
+                isPublic={settings?.isLibraryUpdatePatternPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            )}
           </div>
         </div>
 

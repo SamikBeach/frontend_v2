@@ -1,4 +1,5 @@
 import { getRatingStats } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -18,6 +19,8 @@ import {
   YAxis,
 } from 'recharts';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface RatingStatsChartProps {
   userId: number;
@@ -121,13 +124,19 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
   const [activeTab, setActiveTab] = useState<TabType>('distribution');
   const CHART_TITLE = '평점';
 
-  const { data } = useSuspenseQuery({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === userId;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(userId)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery({
     queryKey: ['ratingStats', userId],
     queryFn: () => getRatingStats(userId),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -135,6 +144,14 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
       />
     );
   }
+
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isRatingStatsPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   // 데이터가 없는 경우
   if (
@@ -174,7 +191,7 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
 
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-3">
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2 flex items-start justify-between">
         <div className="min-w-[120px]">
           <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
           <p className="flex items-center gap-1 text-xs text-gray-500">
@@ -182,21 +199,30 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
             평균 {data.averageRating.toFixed(1)}점
           </p>
         </div>
-        <div className="flex gap-1">
-          {tabOptions.map(option => (
-            <button
-              key={option.id}
-              onClick={() => setActiveTab(option.id)}
-              className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                activeTab === option.id
-                  ? 'border-blue-200 bg-blue-50 text-blue-600'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              {option.name}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            {tabOptions.map(option => (
+              <button
+                key={option.id}
+                onClick={() => setActiveTab(option.id)}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activeTab === option.id
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                {option.name}
+              </button>
+            ))}
+          </div>
+          {isMyProfile && (
+            <PrivacyToggle
+              isPublic={settings?.isRatingStatsPublic || false}
+              isLoading={showLoading}
+              onToggle={handlePrivacyToggle}
+            />
+          )}
         </div>
       </div>
 

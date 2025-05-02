@@ -3,8 +3,13 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { getReadingStatusStats } from '@/apis/user/user';
-import { NoDataMessage } from '../components/NoDataMessage';
-import { PrivateDataMessage } from '../components/PrivateDataMessage';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import {
+  NoDataMessage,
+  PrivacyToggle,
+  PrivateDataMessage,
+} from '../components';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface ReadingStatusChartProps {
   userId: number;
@@ -58,14 +63,25 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
-  const { data } = useSuspenseQuery({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === userId;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(userId)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery({
     queryKey: ['readingStatusStats', userId],
     queryFn: () => getReadingStatusStats(userId),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
-    return <PrivateDataMessage message="이 통계는 비공개 설정되어 있습니다." />;
+  if (!data.isPublic && !isMyProfile) {
+    return (
+      <PrivateDataMessage
+        message="이 통계는 비공개 설정되어 있습니다."
+        title="독서 상태별 도서 수"
+      />
+    );
   }
 
   // 데이터가 없는 경우
@@ -133,13 +149,30 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
     );
   };
 
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isReadingStatusPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
+
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-3">
-      <h3 className="mb-2 text-base font-medium text-gray-700">
-        독서 상태별 도서 수
-      </h3>
-      <div className="flex h-[calc(100%-2rem)] items-center">
-        <div className="h-full w-3/5">
+      <div className="mb-2 flex items-start justify-between">
+        <h3 className="text-base font-medium text-gray-700">
+          독서 상태별 도서 수
+        </h3>
+        {isMyProfile && (
+          <PrivacyToggle
+            isPublic={settings?.isReadingStatusPublic || false}
+            isLoading={showLoading}
+            onToggle={handlePrivacyToggle}
+          />
+        )}
+      </div>
+      <div className="flex h-[calc(100%-2rem)] flex-col items-center sm:flex-row">
+        <div className="h-full w-full sm:w-3/5">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -168,7 +201,7 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="flex h-full w-2/5 flex-col justify-center">
+        <div className="flex h-full w-full flex-col justify-center sm:w-2/5">
           <ul className="space-y-2.5">
             {chartData.map((entry, index) => (
               <li key={`legend-${index}`} className="flex items-center gap-2">

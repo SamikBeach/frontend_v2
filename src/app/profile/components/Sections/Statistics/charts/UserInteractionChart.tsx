@@ -1,5 +1,6 @@
 import { UserInteractionResponse } from '@/apis/user/types';
 import { getUserInteraction } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { MessageSquare, ThumbsUp } from 'lucide-react';
@@ -18,6 +19,8 @@ import {
   YAxis,
 } from 'recharts';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 // 파스텔톤 차트 색상
 const PASTEL_COLORS = {
@@ -84,13 +87,19 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
   const [activeDataType, setActiveDataType] = useState<DataType>('likes');
   const CHART_TITLE = '좋아요와 댓글';
 
-  const { data } = useSuspenseQuery<UserInteractionResponse>({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === userId;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(userId)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery<UserInteractionResponse>({
     queryKey: ['userInteraction', userId],
     queryFn: () => getUserInteraction(userId),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -108,6 +117,14 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
   ) {
     return <NoDataMessage message="상호작용 데이터가 없습니다." />;
   }
+
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isUserInteractionPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   // 활성 기간과 데이터 타입에 따른 차트 데이터 가져오기
   const getChartData = () => {
@@ -354,22 +371,23 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
             <h3 className="text-base font-medium text-gray-700">
               {CHART_TITLE}
             </h3>
-            <p className="text-xs text-gray-500">
-              참여율:{' '}
-              {data.engagementRate > 0
-                ? `${data.engagementRate.toFixed(1)}%`
-                : '데이터 없음'}
+            <p className="flex flex-wrap gap-2 text-xs text-gray-500">
+              <span className="inline-flex items-center gap-1">
+                <ThumbsUp className="h-3 w-3" /> 받은 좋아요:{' '}
+                {data.totalLikesReceived}개
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <MessageSquare className="h-3 w-3" /> 받은 댓글:{' '}
+                {data.totalCommentsReceived}개
+              </span>
             </p>
           </div>
-
-          <div className="flex flex-col gap-2">
-            <div className="flex justify-end gap-1">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
               {dataTypeOptions.map(option => (
                 <button
                   key={option.id}
-                  onClick={() => {
-                    setActiveDataType(option.id as DataType);
-                  }}
+                  onClick={() => setActiveDataType(option.id as DataType)}
                   className={cn(
                     'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
                     activeDataType === option.id
@@ -377,28 +395,17 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
                       : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                   )}
                 >
-                  {option.icon}
                   {option.name}
                 </button>
               ))}
             </div>
-
-            <div className="flex justify-end gap-1">
-              {periodOptions.map(option => (
-                <button
-                  key={option.id}
-                  onClick={() => setActivePeriod(option.id as PeriodType)}
-                  className={cn(
-                    'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                    activePeriod === option.id
-                      ? 'border-blue-200 bg-blue-50 text-blue-600'
-                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                  )}
-                >
-                  {option.name}
-                </button>
-              ))}
-            </div>
+            {isMyProfile && (
+              <PrivacyToggle
+                isPublic={settings?.isUserInteractionPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            )}
           </div>
         </div>
 

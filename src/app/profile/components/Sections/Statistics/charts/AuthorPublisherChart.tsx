@@ -10,9 +10,12 @@ import {
   YAxis,
 } from 'recharts';
 
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
+import { PrivacyToggle } from '../components/PrivacyToggle';
 import { PrivateDataMessage } from '../components/PrivateDataMessage';
 import { useAuthorPublisherStats } from '../hooks';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 // 차트 색상 배열
 const CHART_COLORS = [
@@ -63,11 +66,17 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
   const [activeDataType, setActiveDataType] = useState<DataType>('author');
   const CHART_TITLE = '저자 및 출판사';
 
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === userId;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(userId)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
   // 데이터 가져오기
-  const { data } = useAuthorPublisherStats(userId);
+  const { data, isLoading } = useAuthorPublisherStats(userId);
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -182,27 +191,44 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
   // 차트 최대값 계산
   const maxValue = Math.max(...topItems.map(item => item.count)) || 1;
 
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isAuthorPublisherStatsPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
+
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-3">
       <div className="mb-2 flex items-center justify-between">
         <div className="min-w-[120px]">
           <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
         </div>
-        <div className="flex space-x-1">
-          {dataTypeOptions.map(option => (
-            <button
-              key={option.id}
-              onClick={() => setActiveDataType(option.id)}
-              className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                activeDataType === option.id
-                  ? 'border-blue-200 bg-blue-50 text-blue-600'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              {option.name}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <div className="flex space-x-1">
+            {dataTypeOptions.map(option => (
+              <button
+                key={option.id}
+                onClick={() => setActiveDataType(option.id)}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activeDataType === option.id
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                {option.name}
+              </button>
+            ))}
+          </div>
+          {isMyProfile && (
+            <PrivacyToggle
+              isPublic={settings?.isAuthorPublisherStatsPublic || false}
+              isLoading={showLoading}
+              onToggle={handlePrivacyToggle}
+            />
+          )}
         </div>
       </div>
 

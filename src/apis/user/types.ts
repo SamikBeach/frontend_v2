@@ -353,7 +353,7 @@ export interface UpdateStatisticsSettingRequest {
   isRatingHabitsPublic?: boolean;
   isUserInteractionPublic?: boolean;
   isFollowerStatsPublic?: boolean;
-  isCommentActivityPublic?: boolean;
+  isCommunityActivityPublic?: boolean;
   isReviewInfluencePublic?: boolean;
   isLibraryCompositionPublic?: boolean;
   isLibraryPopularityPublic?: boolean;
@@ -377,7 +377,7 @@ export interface StatisticsSettingResponse {
   isRatingHabitsPublic: boolean;
   isUserInteractionPublic: boolean;
   isFollowerStatsPublic: boolean;
-  isCommentActivityPublic: boolean;
+  isCommunityActivityPublic: boolean;
   isReviewInfluencePublic: boolean;
   isLibraryCompositionPublic: boolean;
   isLibraryPopularityPublic: boolean;

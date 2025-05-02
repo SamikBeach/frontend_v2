@@ -13,8 +13,11 @@ import {
 
 import { LibraryCompositionResponse } from '@/apis/user/types';
 import { getLibraryComposition } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 // 파스텔톤 차트 색상
 const CHART_COLORS = [
@@ -117,13 +120,19 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
   const [activeTab, setActiveTab] = useState('libraries');
   const [selectedLibrary, setSelectedLibrary] = useState<string | null>(null);
 
-  const { data } = useSuspenseQuery<LibraryCompositionResponse>({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === id;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(id)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery<LibraryCompositionResponse>({
     queryKey: ['libraryComposition', id],
     queryFn: () => getLibraryComposition(id),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -131,6 +140,14 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
       />
     );
   }
+
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isLibraryCompositionPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   // 데이터가 없는 경우
   if (
@@ -180,31 +197,40 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
       <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex items-start justify-between">
           <h3 className="text-base font-medium text-gray-700">서재 구성</h3>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setActiveTab('libraries')}
-              className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                activeTab === 'libraries'
-                  ? 'border-blue-200 bg-blue-50 text-blue-600'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              서재별 도서 수
-            </button>
-            <button
-              onClick={() => setActiveTab('tags')}
-              className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                activeTab === 'tags'
-                  ? 'border-blue-200 bg-blue-50 text-blue-600'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              태그 분포
-            </button>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              <button
+                onClick={() => setActiveTab('libraries')}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activeTab === 'libraries'
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                서재별 도서 수
+              </button>
+              <button
+                onClick={() => setActiveTab('tags')}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activeTab === 'tags'
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                태그 분포
+              </button>
+            </div>
+            {isMyProfile && (
+              <PrivacyToggle
+                isPublic={settings?.isLibraryCompositionPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            )}
           </div>
         </div>
 

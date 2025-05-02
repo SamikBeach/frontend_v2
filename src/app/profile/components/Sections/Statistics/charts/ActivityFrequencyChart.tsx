@@ -2,20 +2,29 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Activity, Calendar, Clock } from 'lucide-react';
 
 import { getActivityFrequency } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface ActivityFrequencyChartProps {
   userId: number;
 }
 
 const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
-  const { data } = useSuspenseQuery({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === userId;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(userId)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery({
     queryKey: ['activityFrequency', userId],
     queryFn: () => getActivityFrequency(userId),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -23,6 +32,14 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
       />
     );
   }
+
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isActivityFrequencyPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   // 데이터가 없는 경우
   if (
@@ -81,13 +98,22 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-3">
       <div className="flex h-full flex-col">
-        <div className="mb-2">
-          <h3 className="text-base font-medium text-gray-700">활동 빈도</h3>
-          <p className="text-xs text-gray-500">
-            {data.mostActiveDay && data.mostActiveHour
-              ? `가장 활발한 시간대: ${translatedDay} ${formatHour(data.mostActiveHour)}`
-              : '아직 충분한 활동 데이터가 없습니다.'}
-          </p>
+        <div className="mb-2 flex items-center justify-between">
+          <div>
+            <h3 className="text-base font-medium text-gray-700">활동 빈도</h3>
+            <p className="text-xs text-gray-500">
+              {data.mostActiveDay && data.mostActiveHour
+                ? `가장 활발한 시간대: ${translatedDay} ${formatHour(data.mostActiveHour)}`
+                : '아직 충분한 활동 데이터가 없습니다.'}
+            </p>
+          </div>
+          {isMyProfile && (
+            <PrivacyToggle
+              isPublic={settings?.isActivityFrequencyPublic || false}
+              isLoading={showLoading}
+              onToggle={handlePrivacyToggle}
+            />
+          )}
         </div>
 
         <div className="grid flex-1 grid-cols-2 grid-rows-2 gap-4">

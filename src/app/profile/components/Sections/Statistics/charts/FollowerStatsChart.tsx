@@ -1,4 +1,5 @@
 import { getFollowerStats } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
@@ -13,6 +14,8 @@ import {
   YAxis,
 } from 'recharts';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface FollowerStatsChartProps {
   userId: number;
@@ -75,13 +78,19 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
   const [activePeriod, setActivePeriod] = useState<PeriodType>('monthly');
   const CHART_TITLE = '팔로워';
 
-  const { data } = useSuspenseQuery({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === userId;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(userId)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery({
     queryKey: ['followerStats', userId],
     queryFn: () => getFollowerStats(userId),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -89,6 +98,14 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
       />
     );
   }
+
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isFollowerStatsPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   // 기간별 데이터 선택
   let chartData = [];
@@ -218,7 +235,7 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-3">
       <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex items-start justify-between">
           <div>
             <h3 className="text-base font-medium text-gray-700">
               {CHART_TITLE}
@@ -227,21 +244,30 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
               팔로워: {data.followersCount}명 / 팔로잉: {data.followingCount}명
             </p>
           </div>
-          <div className="flex gap-1">
-            {periodOptions.map(option => (
-              <button
-                key={option.id}
-                onClick={() => setActivePeriod(option.id)}
-                className={cn(
-                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                  activePeriod === option.id
-                    ? 'border-blue-200 bg-blue-50 text-blue-600'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                )}
-              >
-                {option.name}
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              {periodOptions.map(option => (
+                <button
+                  key={option.id}
+                  onClick={() => setActivePeriod(option.id)}
+                  className={cn(
+                    'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                    activePeriod === option.id
+                      ? 'border-blue-200 bg-blue-50 text-blue-600'
+                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                  )}
+                >
+                  {option.name}
+                </button>
+              ))}
+            </div>
+            {isMyProfile && (
+              <PrivacyToggle
+                isPublic={settings?.isFollowerStatsPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            )}
           </div>
         </div>
 

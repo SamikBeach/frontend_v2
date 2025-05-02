@@ -16,8 +16,11 @@ import {
 
 import { SearchActivityResponse } from '@/apis/user/types';
 import { getSearchActivity } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface SearchActivityChartProps {
   userId?: number;
@@ -67,13 +70,19 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
   const [activePeriod, setActivePeriod] = useState<PeriodType>('keywords');
   const CHART_TITLE = '검색 활동';
 
-  const { data } = useSuspenseQuery<SearchActivityResponse>({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === id;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(id)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery<SearchActivityResponse>({
     queryKey: ['searchActivity', id],
     queryFn: () => getSearchActivity(id),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -165,6 +174,14 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
     { id: 'yearly' as PeriodType, name: '연도별' },
   ];
 
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isSearchActivityPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
+
   return (
     <div className="h-[340px] w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm">
       <div className="flex h-full flex-col">
@@ -182,11 +199,20 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
                 {CHART_TITLE}
               </h3>
             </div>
-            <div className="flex items-center gap-1.5">
-              <div className="mr-1 h-2 w-2 rounded-full bg-blue-400"></div>
-              <p className="text-xs text-gray-500">
-                총 {data.searchCount.toLocaleString()}회 검색
-              </p>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
+                <div className="mr-1 h-2 w-2 rounded-full bg-blue-400"></div>
+                <p className="text-xs text-gray-500">
+                  총 {data.searchCount.toLocaleString()}회 검색
+                </p>
+              </div>
+              {isMyProfile && (
+                <PrivacyToggle
+                  isPublic={settings?.isSearchActivityPublic || false}
+                  isLoading={showLoading}
+                  onToggle={handlePrivacyToggle}
+                />
+              )}
             </div>
           </div>
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -269,7 +295,7 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
             // 시간 기반 모드 - 영역 차트 표시
             <div className="h-full">
               <div className="mb-2 px-2 text-center">
-                <p className="text-sm font-medium text-gray-700">
+                <p className="text-base font-medium text-gray-700">
                   {activePeriod === 'daily'
                     ? '일별'
                     : activePeriod === 'weekly'

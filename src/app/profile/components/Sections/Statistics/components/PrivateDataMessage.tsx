@@ -13,7 +13,7 @@ export function PrivateDataMessage({
     <div className="h-[240px] w-full rounded-lg bg-white p-3">
       <div className="flex h-full flex-col">
         <div className="mb-2">
-          <h3 className="text-xs font-medium text-gray-600">{title}</h3>
+          <h3 className="text-base font-medium text-gray-600">{title}</h3>
           <p className="text-xs text-gray-400">{message}</p>
         </div>
         <div className="flex flex-1 items-center justify-center">

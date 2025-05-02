@@ -4,7 +4,10 @@ import { useParams } from 'next/navigation';
 
 import { ReviewInfluenceResponse } from '@/apis/user/types';
 import { getReviewInfluence } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface CommunityInfluenceChartProps {
   userId?: number;
@@ -14,13 +17,19 @@ const CommunityInfluenceChart = ({ userId }: CommunityInfluenceChartProps) => {
   const params = useParams<{ id: string }>();
   const id = userId || Number(params?.id || 0);
 
-  const { data } = useSuspenseQuery<ReviewInfluenceResponse>({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === id;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(id)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery<ReviewInfluenceResponse>({
     queryKey: ['reviewInfluence', id],
     queryFn: () => getReviewInfluence(id),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -28,6 +37,14 @@ const CommunityInfluenceChart = ({ userId }: CommunityInfluenceChartProps) => {
       />
     );
   }
+
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isReviewInfluencePublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   // 데이터가 없는 경우
   if (
@@ -50,8 +67,17 @@ const CommunityInfluenceChart = ({ userId }: CommunityInfluenceChartProps) => {
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
       <div className="flex h-full flex-col">
-        <div className="mb-2">
-          <h3 className="text-sm font-medium text-gray-700">커뮤니티 영향력</h3>
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-base font-medium text-gray-700">
+            커뮤니티 영향력
+          </h3>
+          {isMyProfile && (
+            <PrivacyToggle
+              isPublic={settings?.isReviewInfluencePublic || false}
+              isLoading={showLoading}
+              onToggle={handlePrivacyToggle}
+            />
+          )}
         </div>
 
         <div className="mb-3 flex gap-2">

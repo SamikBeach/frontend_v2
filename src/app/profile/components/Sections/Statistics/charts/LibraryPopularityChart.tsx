@@ -17,8 +17,11 @@ import {
 
 import { LibraryPopularityResponse } from '@/apis/user/types';
 import { getLibraryPopularity } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 // 파스텔톤 차트 색상
 const CHART_COLORS = [
@@ -115,13 +118,19 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
   const [activeTab, setActiveTab] = useState('current');
   const [activePeriod, setActivePeriod] = useState<PeriodType>('monthly');
 
-  const { data } = useSuspenseQuery<LibraryPopularityResponse>({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === id;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(id)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery<LibraryPopularityResponse>({
     queryKey: ['libraryPopularity', id],
     queryFn: () => getLibraryPopularity(id),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -286,39 +295,56 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
     { id: 'yearly', name: '연도별' },
   ];
 
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isLibraryPopularityPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
+
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
       <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex items-start justify-between">
           <div>
             <h3 className="text-base font-medium text-gray-700">서재 인기도</h3>
             <p className="text-xs text-gray-500">
-              가장 인기있는 서재: {data.mostPopularLibrary || '데이터 없음'}
+              가장 인기 있는 서재: {data.mostPopularLibrary || '데이터 없음'}
             </p>
           </div>
-          <div className="flex gap-1">
-            <button
-              onClick={() => setActiveTab('current')}
-              className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                activeTab === 'current'
-                  ? 'border-blue-200 bg-blue-50 text-blue-600'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              서재별 구독자 수
-            </button>
-            <button
-              onClick={() => setActiveTab('trend')}
-              className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                activeTab === 'trend'
-                  ? 'border-blue-200 bg-blue-50 text-blue-600'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              주요 서재 구독자 추이
-            </button>
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
+              <button
+                onClick={() => setActiveTab('current')}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activeTab === 'current'
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                현재 구독자
+              </button>
+              <button
+                onClick={() => setActiveTab('trend')}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activeTab === 'trend'
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                구독자 추이
+              </button>
+            </div>
+            {isMyProfile && (
+              <PrivacyToggle
+                isPublic={settings?.isLibraryPopularityPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            )}
           </div>
         </div>
 

@@ -15,11 +15,14 @@ import {
 
 import { ReviewStatsResponse } from '@/apis/user/types';
 import { getReviewStats } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivacyToggle } from '../components/PrivacyToggle';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface ReviewStatsChartProps {
   userId: number;
@@ -151,13 +154,19 @@ const ReviewStatsChart = ({ userId }: ReviewStatsChartProps) => {
   const [activePeriod, setActivePeriod] = useState<PeriodType>('monthly');
   const CHART_TITLE = '리뷰';
 
-  const { data } = useSuspenseQuery<ReviewStatsResponse>({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === userId;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(userId)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery<ReviewStatsResponse>({
     queryKey: ['reviewStats', userId],
     queryFn: () => getReviewStats(userId),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -234,9 +243,17 @@ const ReviewStatsChart = ({ userId }: ReviewStatsChartProps) => {
 
   const timelineData = getTimelineData();
 
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isReviewStatsPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
+
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-3">
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2 flex items-start justify-between">
         <div className="min-w-[120px]">
           <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
           <p className="text-xs text-gray-500">
@@ -261,6 +278,13 @@ const ReviewStatsChart = ({ userId }: ReviewStatsChartProps) => {
                 {option.name}
               </button>
             ))}
+            {isMyProfile && (
+              <PrivacyToggle
+                isPublic={settings?.isReviewStatsPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            )}
           </div>
 
           {/* Fixed height container for the submenu */}

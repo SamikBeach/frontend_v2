@@ -15,9 +15,12 @@ import {
 
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { getReadingStatusByPeriod } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { NoDataMessage } from '../components/NoDataMessage';
+import { PrivacyToggle } from '../components/PrivacyToggle';
 import { PrivateDataMessage } from '../components/PrivateDataMessage';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface ReadingStatusByPeriodChartProps {
   userId: number;
@@ -147,13 +150,19 @@ const ReadingStatusByPeriodChart = ({
   const [activePeriod, setActivePeriod] = useState<PeriodType>('monthly');
   const CHART_TITLE = '기간별 독서';
 
-  const { data } = useSuspenseQuery({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === userId;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(userId)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery({
     queryKey: ['readingStatusByPeriod', userId],
     queryFn: () => getReadingStatusByPeriod(userId),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
+  if (!data.isPublic && !isMyProfile) {
     return (
       <PrivateDataMessage
         message="이 통계는 비공개 설정되어 있습니다."
@@ -161,6 +170,14 @@ const ReadingStatusByPeriodChart = ({
       />
     );
   }
+
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isReadingStatusByPeriodPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   // 선택된 기간의 데이터
   const periodData = data[activePeriod]?.map(item => ({
@@ -229,25 +246,34 @@ const ReadingStatusByPeriodChart = ({
 
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-3">
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-2 flex items-start justify-between">
         <div className="min-w-[120px]">
           <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
         </div>
-        <div className="flex gap-1">
-          {periodOptions.map(option => (
-            <button
-              key={option.id}
-              onClick={() => setActivePeriod(option.id as PeriodType)}
-              className={cn(
-                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                activePeriod === option.id
-                  ? 'border-blue-200 bg-blue-50 text-blue-600'
-                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-              )}
-            >
-              {option.name}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            {periodOptions.map(option => (
+              <button
+                key={option.id}
+                onClick={() => setActivePeriod(option.id as PeriodType)}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activePeriod === option.id
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                {option.name}
+              </button>
+            ))}
+          </div>
+          {isMyProfile && (
+            <PrivacyToggle
+              isPublic={settings?.isReadingStatusByPeriodPublic || false}
+              isLoading={showLoading}
+              onToggle={handlePrivacyToggle}
+            />
+          )}
         </div>
       </div>
       <div className="h-[calc(100%-2.5rem)]">
