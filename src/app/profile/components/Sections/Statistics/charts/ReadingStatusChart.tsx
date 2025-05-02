@@ -17,13 +17,6 @@ const STATUS_COLORS = {
   [ReadingStatusType.WANT_TO_READ]: '#c4b5fd', // violet-300 (파스텔)
 };
 
-// 읽기 상태별 배경색 매핑
-const STATUS_BG_COLORS = {
-  [ReadingStatusType.READ]: '#dcfce7', // 녹색 배경
-  [ReadingStatusType.READING]: '#dbeafe', // 파란색 배경
-  [ReadingStatusType.WANT_TO_READ]: '#ede9fe', // 보라색 배경
-};
-
 // 읽기 상태별 표시 이름 (BookDialog와 일치시킴)
 const STATUS_LABELS = {
   [ReadingStatusType.READ]: '읽었어요',
@@ -114,8 +107,6 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
     innerRadius,
     outerRadius,
     percent,
-    index,
-    name,
   }: any) => {
     if (percent < 0.05) return null; // 5% 미만은 라벨 생략
 

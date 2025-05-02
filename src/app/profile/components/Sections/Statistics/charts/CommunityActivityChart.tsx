@@ -16,12 +16,37 @@ import { CommunityActivityResponse } from '@/apis/user/types';
 import { getCommunityActivity } from '@/apis/user/user';
 import { cn } from '@/lib/utils';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import {
+  CustomLegendProps,
+  CustomTooltipProps,
+} from '../utils/chartFormatters';
 
 interface CommunityActivityChartProps {
   userId?: number;
 }
 
 type PeriodType = 'daily' | 'weekly' | 'monthly' | 'yearly';
+
+// 커뮤니티 활동 데이터 항목 타입
+interface CommunityActivityDataItem {
+  year?: string;
+  month?: string;
+  week?: string;
+  date?: string;
+  general: number;
+  discussion: number;
+  question: number;
+  meetup: number;
+  [key: string]: any; // 동적 필드 처리를 위한 인덱스 시그니처
+}
+
+// API 응답 확장 타입
+interface ExtendedCommunityActivityResponse extends CommunityActivityResponse {
+  yearly?: CommunityActivityDataItem[];
+  monthly?: CommunityActivityDataItem[];
+  weekly?: CommunityActivityDataItem[];
+  daily?: CommunityActivityDataItem[];
+}
 
 // 리뷰 타입별 색상 정의 (리뷰 타입 제외)
 const REVIEW_TYPE_COLORS = {
@@ -40,13 +65,13 @@ const REVIEW_TYPE_NAMES = {
 };
 
 // 커스텀 툴팁 컴포넌트
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
     return (
       <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
         <p className="text-xs font-medium text-gray-800">{label}</p>
         <div className="mt-1 space-y-1">
-          {payload.map((entry: any, index: number) => (
+          {payload.map((entry, index) => (
             <div key={`tooltip-${index}`} className="flex items-center gap-2">
               <div
                 className="h-2.5 w-2.5 rounded-full"
@@ -54,7 +79,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
               />
               <p className="text-xs">
                 <span className="text-gray-700">
-                  {REVIEW_TYPE_NAMES[entry.dataKey] || entry.name}:{' '}
+                  {REVIEW_TYPE_NAMES[
+                    entry.dataKey as keyof typeof REVIEW_TYPE_NAMES
+                  ] || entry.name}
+                  :{' '}
                 </span>
                 <span>{entry.value}개</span>
               </p>
@@ -68,19 +96,21 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 // 커스텀 범례 컴포넌트
-const CustomLegend = ({ payload }: any) => {
+const CustomLegend = ({ payload }: CustomLegendProps) => {
   if (!payload || payload.length === 0) return null;
 
   return (
     <div className="flex justify-center gap-4 pb-1">
-      {payload.map((entry: any, index: number) => (
+      {payload.map((entry, index) => (
         <div key={`legend-${index}`} className="flex items-center gap-1.5">
           <div
             className="h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: entry.color }}
           />
           <span className="text-xs text-gray-900">
-            {REVIEW_TYPE_NAMES[entry.dataKey] || entry.value}
+            {REVIEW_TYPE_NAMES[
+              entry.dataKey as keyof typeof REVIEW_TYPE_NAMES
+            ] || entry.value}
           </span>
         </div>
       ))}
@@ -93,7 +123,7 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
   const id = userId || Number(params?.id || 0);
   const [activePeriod, setActivePeriod] = useState<PeriodType>('monthly');
 
-  const { data } = useSuspenseQuery<CommunityActivityResponse>({
+  const { data } = useSuspenseQuery<ExtendedCommunityActivityResponse>({
     queryKey: ['communityActivity', id],
     queryFn: () => getCommunityActivity(id),
   });
@@ -109,25 +139,27 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
   }
 
   // 기간별 데이터 선택
-  let chartData = [];
+  let chartData: CommunityActivityDataItem[] = [];
   let dataKey = '';
 
   switch (activePeriod) {
     case 'yearly':
-      chartData = [...(data.yearly || [])].sort((a, b) =>
-        a.year.localeCompare(b.year)
+      chartData = [...(data.yearly || [])].sort(
+        (a, b) => a.year?.localeCompare(b.year || '') || 0
       );
       dataKey = 'year';
       break;
     case 'monthly':
-      chartData = [...(data.monthly || [])].sort((a, b) =>
-        a.month.localeCompare(b.month)
+      chartData = [...(data.monthly || [])].sort(
+        (a, b) => a.month?.localeCompare(b.month || '') || 0
       );
       dataKey = 'month';
       break;
     case 'weekly':
       // 주별 데이터 정렬 (n월 m째주 형식)
       chartData = [...(data.weekly || [])].sort((a, b) => {
+        if (!a.week || !b.week) return 0;
+
         // 월이 다르면 월로 비교
         const aMonth = parseInt(a.week.split('월')[0]);
         const bMonth = parseInt(b.week.split('월')[0]);
@@ -141,14 +173,14 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
       dataKey = 'week';
       break;
     case 'daily':
-      chartData = [...(data.daily || [])].sort((a, b) =>
-        a.date.localeCompare(b.date)
+      chartData = [...(data.daily || [])].sort(
+        (a, b) => a.date?.localeCompare(b.date || '') || 0
       );
       dataKey = 'date';
       break;
     default:
-      chartData = [...(data.monthly || [])].sort((a, b) =>
-        a.month.localeCompare(b.month)
+      chartData = [...(data.monthly || [])].sort(
+        (a, b) => a.month?.localeCompare(b.month || '') || 0
       );
       dataKey = 'month';
   }
@@ -158,12 +190,12 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
     if (activePeriod === 'yearly') {
       return label;
     } else if (activePeriod === 'monthly') {
-      const [year, month] = label.split('-');
+      const [_, month] = label.split('-');
       return `${parseInt(month)}월`;
     } else if (activePeriod === 'weekly') {
       return label;
     } else if (activePeriod === 'daily') {
-      const [year, month, day] = label.split('-');
+      const [_, month, day] = label.split('-');
       return `${parseInt(month)}/${parseInt(day)}`;
     }
     return label;

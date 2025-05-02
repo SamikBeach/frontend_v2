@@ -10,12 +10,6 @@ interface CommunityInfluenceChartProps {
   userId?: number;
 }
 
-// 파스텔톤 차트 색상
-const COLORS = {
-  LIKES: '#93c5fd', // blue-300 (파스텔)
-  CONTRIBUTION: '#c4b5fd', // violet-300 (파스텔)
-};
-
 const CommunityInfluenceChart = ({ userId }: CommunityInfluenceChartProps) => {
   const params = useParams<{ id: string }>();
   const id = userId || Number(params?.id || 0);

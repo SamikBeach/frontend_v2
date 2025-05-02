@@ -84,10 +84,6 @@ const renderCustomizedLabel = ({
   innerRadius,
   outerRadius,
   percent,
-  index,
-  name,
-  value,
-  tag,
 }: any) => {
   if (percent < 0.05) return null; // 작은 조각에는 라벨 표시 안함
 

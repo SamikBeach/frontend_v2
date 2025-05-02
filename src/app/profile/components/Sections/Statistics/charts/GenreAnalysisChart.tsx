@@ -16,20 +16,41 @@ import { cn } from '@/lib/utils';
 import { PrivateDataMessage } from '../components';
 import { PASTEL_COLORS } from '../constants';
 import { PeriodType, getAllPeriodOptions } from '../utils';
+import {
+  CustomLegendProps,
+  CustomTooltipProps,
+  PieChartLabelProps,
+} from '../utils/chartFormatters';
 
 interface GenreAnalysisChartProps {
   userId: number;
 }
 
+// 카테고리 데이터 타입
+interface CategoryData {
+  category: string;
+  count: number;
+  color?: string;
+  percent?: number;
+}
+
+// 서브카테고리 데이터 타입
+interface SubCategoryData {
+  subCategory: string;
+  count: number;
+  color?: string;
+  percent?: number;
+}
+
 // 커스텀 툴팁 컴포넌트
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (active && payload && payload.length) {
-    const data = payload[0].payload;
+    const data = payload[0].payload as CategoryData | SubCategoryData;
+    const category = 'category' in data ? data.category : data.subCategory;
+
     return (
       <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
-        <p className="text-xs font-medium text-gray-800">
-          {data.category || data.subCategory || label}
-        </p>
+        <p className="text-xs font-medium text-gray-800">{category || label}</p>
         <div className="mt-1">
           <p className="text-xs font-semibold text-gray-700">
             {`${payload[0].value}권`}
@@ -47,10 +68,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 // 커스텀 범례 렌더 컴포넌트
-const CustomLegend = ({ payload }: any) => {
+const CustomLegend = ({ payload }: CustomLegendProps) => {
+  if (!payload) return null;
+
   return (
     <ul className="flex flex-col gap-1.5 pl-2">
-      {payload.map((entry: any, index: number) => (
+      {payload.map((entry, index) => (
         <li key={`legend-${index}`} className="flex items-center gap-1.5">
           <div
             className="h-3 w-3 flex-shrink-0 rounded-full"
@@ -85,8 +108,8 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
   }
 
   // 활성 기간에 따른 데이터 가져오기
-  let categoryData: { category: string; count: number }[] = [];
-  let subCategoryData: { subCategory: string; count: number }[] = [];
+  let categoryData: CategoryData[] = [];
+  let subCategoryData: SubCategoryData[] = [];
 
   if (activePeriod === 'all') {
     // 전체 데이터 (기존 API 응답 구조)
@@ -117,7 +140,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
   }
 
   // 항상 기본적인 데이터 준비 (데이터가 없는 경우도 차트 표시용)
-  const defaultCategories = [
+  const defaultCategories: CategoryData[] = [
     { category: '미분류', count: 0 },
     { category: '소설', count: 0 },
     { category: '인문학', count: 0 },
@@ -125,7 +148,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     { category: '자기계발', count: 0 },
   ];
 
-  const defaultSubCategories = [
+  const defaultSubCategories: SubCategoryData[] = [
     { subCategory: '미분류', count: 0 },
     { subCategory: '한국소설', count: 0 },
     { subCategory: '외국소설', count: 0 },
@@ -144,8 +167,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
 
   // 카테고리 데이터 가공 (총 합계 계산)
   const totalCategoryCount = categoryData.reduce(
-    (sum: number, item: { category: string; count: number }) =>
-      sum + item.count,
+    (sum: number, item: CategoryData) => sum + item.count,
     0
   );
 
@@ -185,8 +207,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
 
   // 서브카테고리 데이터 가공 (총 합계 계산)
   const totalSubCategoryCount = subCategoryData.reduce(
-    (sum: number, item: { subCategory: string; count: number }) =>
-      sum + item.count,
+    (sum: number, item: SubCategoryData) => sum + item.count,
     0
   );
 
@@ -231,11 +252,11 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     cx,
     cy,
     midAngle,
-    innerRadius,
+    innerRadius: _,
     outerRadius,
     percent,
     value,
-  }: any) => {
+  }: PieChartLabelProps) => {
     // 값이 0이거나 비율이 너무 작은 경우 레이블 숨김
     if (value === 0 || percent < 0.08) return null;
 

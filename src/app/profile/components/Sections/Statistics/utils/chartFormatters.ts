@@ -1,12 +1,41 @@
 /**
  * 차트 데이터 포맷팅 및 처리 유틸리티
  */
+import { TooltipProps } from 'recharts';
+import {
+  NameType,
+  ValueType,
+} from 'recharts/types/component/DefaultTooltipContent';
 
-// 사용자 정의 툴팁 컴포넌트를 위한 타입
-export interface CustomTooltipProps {
-  active?: boolean;
-  payload?: any[];
-  label?: string;
+// Recharts 툴팁 컴포넌트를 위한 타입
+export type CustomTooltipProps = TooltipProps<ValueType, NameType>;
+
+// Legend 아이템 타입
+export interface LegendPayloadItem {
+  value: string;
+  id?: string;
+  type?: string;
+  color: string;
+  payload?: any;
+  dataKey?: string;
+}
+
+// 커스텀 범례 컴포넌트를 위한 타입
+export interface CustomLegendProps {
+  payload?: LegendPayloadItem[];
+}
+
+// 파이차트 라벨 렌더링 함수 타입
+export interface PieChartLabelProps {
+  cx: number;
+  cy: number;
+  midAngle: number;
+  innerRadius: number;
+  outerRadius: number;
+  percent: number;
+  index: number;
+  value: number;
+  name: string;
 }
 
 // 데이터 정렬 헬퍼

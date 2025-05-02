@@ -145,12 +145,12 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
     if (activePeriod === 'yearly') {
       return label;
     } else if (activePeriod === 'monthly') {
-      const [year, month] = label.split('-');
+      const [_, month] = label.split('-');
       return `${parseInt(month)}월`;
     } else if (activePeriod === 'weekly') {
       return label;
     } else if (activePeriod === 'daily') {
-      const [year, month, day] = label.split('-');
+      const [_, month, day] = label.split('-');
       return `${parseInt(month)}/${parseInt(day)}`;
     }
     return label;

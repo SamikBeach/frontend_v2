@@ -140,12 +140,12 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
     if (activePeriod === 'yearly') {
       return label;
     } else if (activePeriod === 'monthly') {
-      const [year, month] = label.split('-');
+      const [_, month] = label.split('-');
       return `${parseInt(month)}월`;
     } else if (activePeriod === 'weekly') {
       return label;
     } else if (activePeriod === 'daily') {
-      const [year, month, day] = label.split('-');
+      const [_, month, day] = label.split('-');
       return `${parseInt(month)}/${parseInt(day)}`;
     }
     return label;
@@ -166,7 +166,6 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
           const countDiff = maxCount - minCount;
 
           // 현재 팔로워 수는 최대 count값과 같다고 가정
-          const currentFollowers = data.followersCount;
           const currentFollowing = data.followingCount;
 
           // 증가율이 비슷하다는 가정하에 팔로잉 값 계산

@@ -271,7 +271,7 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
       return label; // 년도는 그대로 표시
     } else if (activePeriod === 'monthly') {
       // YYYY-MM 형식을 MM월로 변환
-      const [year, month] = label.split('-');
+      const [_, month] = label.split('-');
       return `${Number(month)}월`;
     } else if (activePeriod === 'weekly') {
       // 주간은 그대로 표시 (n월 m째주 형식)
@@ -279,7 +279,7 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
     } else if (activePeriod === 'daily') {
       // 날짜 포맷팅 (YYYY-MM-DD -> MM/DD)
       try {
-        const [year, month, day] = label.split('-');
+        const [_, month, day] = label.split('-');
         return `${Number(month)}/${Number(day)}`;
       } catch {
         return label;
@@ -326,7 +326,7 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
   };
 
   // 전체 메뉴 툴팁 컴포넌트
-  const AllModeTooltip = ({ active, payload, label }: any) => {
+  const AllModeTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       return (
         <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">

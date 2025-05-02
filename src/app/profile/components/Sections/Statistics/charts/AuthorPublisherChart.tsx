@@ -27,7 +27,7 @@ const CHART_COLORS = [
 ];
 
 // 커스텀 툴팁 컴포넌트
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload }: any) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
@@ -251,7 +251,7 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="count" barSize={28} minPointSize={2}>
-                  {topItems.map((entry, index) => (
+                  {topItems.map((_, index) => (
                     <Cell
                       key={`cell-${index}`}
                       fill={CHART_COLORS[index % CHART_COLORS.length]}
