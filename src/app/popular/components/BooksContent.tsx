@@ -3,7 +3,6 @@ import {
   PopularBooksSortOptions,
   TimeRangeOptions,
 } from '@/apis/book/types';
-import { selectedBookIdAtom } from '@/atoms/book';
 import { sortOptionAtom, timeRangeAtom } from '@/atoms/popular';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
@@ -15,17 +14,15 @@ import { usePopularBooksQuery } from '../hooks';
 
 export function BooksContent() {
   const { updateQueryParams } = useQueryParams();
-  const [selectedBookId, setSelectedBookId] = useAtom(selectedBookIdAtom);
   const [, setSortOption] = useAtom(sortOptionAtom);
   const [, setTimeRange] = useAtom(timeRangeAtom);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
 
   // Get books with infinite query
-  const { books, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } =
+  const { books, hasNextPage, fetchNextPage, isLoading } =
     usePopularBooksQuery();
 
   const handleBookSelect = (book: Book) => {
-    setSelectedBookId(book.id.toString());
     // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
     const bookIsbn = book.isbn13 || book.isbn;
     openBookDialog(bookIsbn);
