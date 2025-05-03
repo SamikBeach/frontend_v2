@@ -183,65 +183,54 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   return (
-    <div className="h-[340px] w-full overflow-hidden rounded-lg border border-gray-100 bg-white shadow-sm">
+    <div className="h-[340px] w-full rounded-lg bg-white p-3">
       <div className="flex h-full flex-col">
-        <div className="border-b border-gray-100 bg-gradient-to-r from-blue-50 to-transparent px-4 py-3">
-          <div className="mb-1 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="rounded-full bg-blue-100 p-1.5">
-                {activePeriod === 'keywords' ? (
-                  <Search className="h-4 w-4 text-blue-600" />
-                ) : (
-                  <BarChart3 className="h-4 w-4 text-blue-600" />
-                )}
-              </div>
-              <h3 className="text-base font-medium text-gray-800">
-                {CHART_TITLE}
-              </h3>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1.5">
-                <div className="mr-1 h-2 w-2 rounded-full bg-blue-400"></div>
-                <p className="text-xs text-gray-500">
-                  총 {data.searchCount.toLocaleString()}회 검색
-                </p>
-              </div>
-              {isMyProfile && (
-                <PrivacyToggle
-                  isPublic={settings?.isSearchActivityPublic || false}
-                  isLoading={showLoading}
-                  onToggle={handlePrivacyToggle}
-                />
+        <div className="mb-2 flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <div className="rounded-full bg-blue-100 p-1.5">
+              {activePeriod === 'keywords' ? (
+                <Search className="h-4 w-4 text-blue-600" />
+              ) : (
+                <BarChart3 className="h-4 w-4 text-blue-600" />
               )}
             </div>
+            <div>
+              <h3 className="text-base font-medium text-gray-700">
+                {CHART_TITLE}
+              </h3>
+              <p className="text-xs text-gray-500">
+                총 {data.searchCount.toLocaleString()}회 검색
+              </p>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex flex-wrap gap-1">
+          <div className="flex items-center gap-2">
+            <div className="flex gap-1">
               {periodOptions.map(option => (
                 <button
                   key={option.id}
                   onClick={() => setActivePeriod(option.id)}
                   className={cn(
-                    'flex h-7 cursor-pointer items-center rounded-full border px-2.5 text-xs font-medium transition-colors',
+                    'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
                     activePeriod === option.id
-                      ? 'border-blue-300 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-800'
+                      ? 'border-blue-200 bg-blue-50 text-blue-600'
+                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                   )}
                 >
                   {option.name}
                 </button>
               ))}
             </div>
-            {data.searchPattern && (
-              <div className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-700">
-                <span className="font-medium">검색 패턴:</span>{' '}
-                {data.searchPattern}
-              </div>
+            {isMyProfile && (
+              <PrivacyToggle
+                isPublic={settings?.isSearchActivityPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
             )}
           </div>
         </div>
 
-        <div className="flex-1 px-2 py-3">
+        <div className="h-[calc(100%-3rem)] overflow-hidden">
           {activePeriod === 'keywords' ? (
             // 키워드 모드 - 바 차트 표시
             <div className="h-full">
@@ -250,7 +239,7 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
                   <BarChart
                     data={chartData}
                     layout="vertical"
-                    margin={{ top: 5, right: 25, left: 70, bottom: 5 }}
+                    margin={{ top: 5, right: 20, left: 50, bottom: 5 }}
                     barSize={16}
                   >
                     <CartesianGrid
@@ -268,10 +257,13 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
                     <YAxis
                       dataKey="term"
                       type="category"
-                      width={70}
-                      tick={{ fontSize: 11 }}
+                      width={50}
+                      tick={{ fontSize: 10 }}
                       axisLine={false}
                       tickLine={false}
+                      tickFormatter={value =>
+                        value.length > 8 ? `${value.substring(0, 8)}...` : value
+                      }
                     />
                     <Tooltip
                       content={<KeywordTooltip />}
@@ -295,7 +287,7 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
             // 시간 기반 모드 - 영역 차트 표시
             <div className="h-full">
               <div className="mb-2 px-2 text-center">
-                <p className="text-base font-medium text-gray-700">
+                <p className="text-sm text-gray-600">
                   {activePeriod === 'daily'
                     ? '일별'
                     : activePeriod === 'weekly'
@@ -312,7 +304,7 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                       data={chartData}
-                      margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+                      margin={{ top: 5, right: 20, left: 5, bottom: 5 }}
                     >
                       <defs>
                         <linearGradient
@@ -337,14 +329,14 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
                       <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                       <XAxis
                         dataKey={dataKey}
-                        tick={{ fontSize: 11 }}
+                        tick={{ fontSize: 10 }}
                         tickFormatter={formatXAxisLabel}
                         axisLine={{ stroke: '#e5e7eb' }}
                         tickLine={false}
                       />
                       <YAxis
                         allowDecimals={false}
-                        tick={{ fontSize: 11 }}
+                        tick={{ fontSize: 10 }}
                         axisLine={false}
                         tickLine={false}
                         width={25}
@@ -359,7 +351,7 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
                         fill="url(#colorCount)"
                         name="검색 횟수"
                         activeDot={{
-                          r: 6,
+                          r: 4,
                           fill: '#3b82f6',
                           stroke: '#fff',
                           strokeWidth: 2,
