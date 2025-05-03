@@ -37,21 +37,6 @@ export interface UpdateUserInfoResponse {
 }
 
 /**
- * 비밀번호 변경 요청
- */
-export interface ChangePasswordRequest {
-  currentPassword: string;
-  newPassword: string;
-}
-
-/**
- * 비밀번호 변경 응답
- */
-export interface ChangePasswordResponse {
-  message: string;
-}
-
-/**
  * 프로필 이미지 업로드 응답
  */
 export interface UploadProfileImageResponse {

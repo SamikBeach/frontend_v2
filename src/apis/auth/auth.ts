@@ -1,8 +1,12 @@
 import api from '../axios';
 import {
+  ChangePasswordRequest,
+  ChangePasswordResponse,
   CheckEmailResponse,
   CompleteRegistrationRequest,
   CompleteRegistrationResponse,
+  DeleteAccountRequest,
+  DeleteAccountResponse,
   LoginRequest,
   LoginResponse,
   RefreshTokenRequest,
@@ -169,5 +173,29 @@ export const verifyResetToken = async (
   data: VerifyResetTokenRequest
 ): Promise<VerifyResetTokenResponse> => {
   const response = await api.post('/auth/verify-reset-token', data);
+  return response.data;
+};
+
+/**
+ * 비밀번호 변경 API
+ * @param data 비밀번호 변경 요청 데이터
+ * @returns 비밀번호 변경 결과
+ */
+export const changePassword = async (
+  data: ChangePasswordRequest
+): Promise<ChangePasswordResponse> => {
+  const response = await api.post('/auth/change-password', data);
+  return response.data;
+};
+
+/**
+ * 계정 삭제 API
+ * @param data 계정 삭제 요청 데이터
+ * @returns 계정 삭제 결과
+ */
+export const deleteAccount = async (
+  data: DeleteAccountRequest
+): Promise<DeleteAccountResponse> => {
+  const response = await api.post('/auth/delete-account', data);
   return response.data;
 };

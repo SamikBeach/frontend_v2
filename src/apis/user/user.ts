@@ -4,8 +4,6 @@ import {
   AccountActionResponse,
   ActivityFrequencyResponse,
   AuthorPublisherStatsResponse,
-  ChangePasswordRequest,
-  ChangePasswordResponse,
   CommunityActivityResponse,
   FollowerStatsResponse,
   FollowersListResponseDto,
@@ -119,28 +117,10 @@ export const uploadProfileImage = async (
 };
 
 /**
- * 사용자의 비밀번호를 변경합니다.
- */
-export const changePassword = async (
-  data: ChangePasswordRequest
-): Promise<ChangePasswordResponse> => {
-  const response = await api.post('/user/change-password', data);
-  return response.data;
-};
-
-/**
  * 사용자 계정을 비활성화합니다.
  */
 export const deactivateAccount = async (): Promise<AccountActionResponse> => {
   const response = await api.post('/user/deactivate');
-  return response.data;
-};
-
-/**
- * 사용자 계정을 삭제합니다.
- */
-export const deleteAccount = async (): Promise<AccountActionResponse> => {
-  const response = await api.delete('/user/delete');
   return response.data;
 };
 
