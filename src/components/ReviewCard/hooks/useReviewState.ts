@@ -3,10 +3,13 @@ import { SearchResult } from '@/apis/search/types';
 import { useEffect, useState } from 'react';
 import { ExtendedReviewResponseDto } from '../types';
 
-export function useReviewState(review: ExtendedReviewResponseDto) {
+export function useReviewState(
+  review: ExtendedReviewResponseDto,
+  initialShowComments = false
+) {
   // UI 상태 관리
   const [expanded, setExpanded] = useState(false);
-  const [showComments, setShowComments] = useState(false);
+  const [showComments, setShowComments] = useState(initialShowComments);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Review 수정 관련 상태

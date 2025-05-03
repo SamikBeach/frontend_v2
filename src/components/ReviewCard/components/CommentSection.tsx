@@ -24,6 +24,7 @@ interface CommentSectionProps {
     commentId: number,
     isLiked: boolean
   ) => Promise<void>;
+  highlightedCommentId?: number | null;
 }
 
 export function CommentSection({
@@ -36,11 +37,12 @@ export function CommentSection({
   handleSubmitComment,
   handleDeleteComment,
   handleCommentLikeToggle,
+  highlightedCommentId,
 }: CommentSectionProps) {
   return (
     <div className="w-full space-y-3">
       {/* 댓글 입력 */}
-      <div className="flex gap-2">
+      <div className="flex w-full gap-2">
         <Avatar className="mt-1 h-7 w-7 flex-shrink-0">
           <AvatarImage
             src={currentUser.avatar}
@@ -51,14 +53,14 @@ export function CommentSection({
             {getNameInitial(currentUser.username)}
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1">
-          <div className="flex gap-2">
+        <div className="w-full flex-1">
+          <div className="flex w-full gap-2">
             <div className="flex-1">
               <Input
                 placeholder="댓글을 입력하세요..."
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
-                className="h-9 flex-1 rounded-xl border-gray-200 bg-gray-50 text-sm shadow-none"
+                className="h-9 w-full flex-1 rounded-xl border-gray-200 bg-gray-50 text-sm shadow-none"
                 disabled={isCommentLoading}
                 onKeyDown={e => {
                   // Cmd+Enter(Mac) 또는 Ctrl+Enter(Windows)로 댓글 제출
@@ -90,7 +92,7 @@ export function CommentSection({
           <p className="mt-3 text-xs text-gray-500">댓글을 불러오는 중...</p>
         </div>
       ) : comments && comments.length > 0 ? (
-        <div className="space-y-3 pl-9">
+        <div className="w-full space-y-3 pl-9">
           {comments.map(comment => (
             <CommentItem
               key={comment.id}
@@ -105,6 +107,7 @@ export function CommentSection({
               }}
               onDelete={handleDeleteComment}
               onLike={handleCommentLikeToggle}
+              isHighlighted={highlightedCommentId === comment.id}
             />
           ))}
         </div>

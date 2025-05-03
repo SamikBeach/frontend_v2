@@ -7,6 +7,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { CommentSection } from './components';
 import { ReviewActions } from './components/ReviewActions';
 import { ReviewContent } from './components/ReviewContent';
@@ -22,9 +24,16 @@ import {
 import { ExtendedReviewResponseDto, ReviewCardProps } from './types';
 import { formatDate } from './utils';
 
-export function ReviewCard({ review }: ReviewCardProps) {
+export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
   // Cast to our extended type
   const extendedReview = review as ExtendedReviewResponseDto;
+
+  // 검색 파라미터에서 commentId 가져오기 (알림으로부터 이동한 경우)
+  const searchParams = useSearchParams();
+  const highlightedCommentId = searchParams?.get('commentId')
+    ? parseInt(searchParams.get('commentId')!, 10)
+    : null;
+  const commentSectionRef = useRef<HTMLDivElement>(null);
 
   // 현재 사용자 정보 가져오기
   const currentUser = useCurrentUser();
@@ -36,7 +45,8 @@ export function ReviewCard({ review }: ReviewCardProps) {
   const isAuthor = currentUser?.id === review.author.id;
 
   // 상태 관리 훅 사용 - 메인 컴포넌트에서만 사용
-  const reviewState = useReviewState(extendedReview);
+  // 상세 페이지에서 오면서 commentId가 있으면 댓글 섹션 자동 열기
+  const reviewState = useReviewState(extendedReview, !!highlightedCommentId);
 
   // Review 좋아요 관련 훅
   const { handleLikeToggle, isLoading: isLikeLoading } = useReviewLike();
@@ -56,27 +66,53 @@ export function ReviewCard({ review }: ReviewCardProps) {
   } = useReviewComments(review.id, reviewState.showComments);
 
   // 뮤테이션 훅 사용
-  const {
-    handleEditReview,
-    handleDeleteReview,
-    handleCreateReview,
-    updateRatingMutation,
-  } = useReviewMutations({
-    review: extendedReview,
-    currentUserId: currentUser?.id,
-    onUpdateSuccess: () => {
-      reviewState.handleEditModeToggle(false);
-      reviewState.setReviewDialogOpen(false);
-      reviewState.setIsSubmitting(false);
-    },
-    onDeleteSuccess: () => {
-      reviewState.setDeleteDialogOpen(false);
-    },
-    onCreateSuccess: () => {
-      reviewState.setReviewDialogOpen(false);
-      reviewState.setIsSubmitting(false);
-    },
-  });
+  const { handleEditReview, handleDeleteReview, handleCreateReview } =
+    useReviewMutations({
+      review: extendedReview,
+      currentUserId: currentUser?.id,
+      onUpdateSuccess: () => {
+        reviewState.handleEditModeToggle(false);
+        reviewState.setReviewDialogOpen(false);
+        reviewState.setIsSubmitting(false);
+      },
+      onDeleteSuccess: () => {
+        reviewState.setDeleteDialogOpen(false);
+      },
+      onCreateSuccess: () => {
+        reviewState.setReviewDialogOpen(false);
+        reviewState.setIsSubmitting(false);
+      },
+    });
+
+  // 알림에서 들어온 경우 댓글 섹션 열고 해당 댓글로 스크롤
+  useEffect(() => {
+    if (
+      isDetailed &&
+      highlightedCommentId &&
+      reviewState.showComments &&
+      comments.length > 0
+    ) {
+      // 댓글 목록이 로드되면 해당 댓글 찾기
+      const timer = setTimeout(() => {
+        const highlightedCommentElement = document.getElementById(
+          `comment-${highlightedCommentId}`
+        );
+        if (highlightedCommentElement && commentSectionRef.current) {
+          highlightedCommentElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }
+      }, 100); // 약간의 지연 후 스크롤 실행
+
+      return () => clearTimeout(timer);
+    }
+  }, [
+    isDetailed,
+    highlightedCommentId,
+    reviewState.showComments,
+    comments.length,
+  ]);
 
   // 리뷰 편집 모드 핸들러
   const handleEditReviewClick = () => {
@@ -128,13 +164,6 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
       // 1. 책이 선택된 경우
       if (reviewState.selectedBook) {
-        const bookId = Number(reviewState.selectedBook.id);
-        const isNegativeBookId = bookId < 0;
-        const bookIsbn =
-          reviewState.selectedBook.isbn13 ||
-          reviewState.selectedBook.isbn ||
-          '';
-
         // 리뷰 생성 모드 여부 확인
         const isCreateMode = !extendedReview.content && content.trim();
 
@@ -237,17 +266,6 @@ export function ReviewCard({ review }: ReviewCardProps) {
     try {
       // 리뷰 타입인 경우
       if (reviewState.editedType === 'review' && reviewState.selectedBook) {
-        const bookId =
-          typeof reviewState.selectedBook.id === 'number'
-            ? reviewState.selectedBook.id
-            : parseInt(String(reviewState.selectedBook.id), 10);
-        const bookIsbn =
-          reviewState.selectedBook.isbn ||
-          reviewState.selectedBook.isbn13 ||
-          '';
-        const isNegativeBookId = bookId < 0;
-        const finalBookId = isNegativeBookId ? -1 : bookId;
-
         // 내용 변경과 별점 변경이 함께 이루어진 경우
         if (hasRatingChanged && (hasContentChanged || hasTypeChanged)) {
           // 별점과 리뷰 모두 변경된 경우 - 두 API를 모두 호출하고 한 번만 무효화하는 함수 호출
@@ -384,7 +402,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
   };
 
   return (
-    <Card className="overflow-hidden border-gray-200 shadow-none">
+    <Card className="w-full overflow-hidden border-gray-200 shadow-none">
       <CardHeader className="p-5 pb-3">
         <ReviewHeader
           review={extendedReview}
@@ -432,17 +450,20 @@ export function ReviewCard({ review }: ReviewCardProps) {
 
           {/* 댓글 섹션 */}
           {reviewState.showComments && comments && (
-            <CommentSection
-              comments={comments}
-              formatDate={formatDate}
-              currentUser={getUserForComments()}
-              commentText={commentText}
-              setCommentText={setCommentText}
-              isCommentLoading={isCommentLoading}
-              handleSubmitComment={handleSubmitComment}
-              handleDeleteComment={handleDeleteComment}
-              handleCommentLikeToggle={handleCommentLikeToggle}
-            />
+            <div ref={commentSectionRef} className="w-full min-w-0">
+              <CommentSection
+                comments={comments}
+                formatDate={formatDate}
+                currentUser={getUserForComments()}
+                commentText={commentText}
+                setCommentText={setCommentText}
+                isCommentLoading={isCommentLoading}
+                handleSubmitComment={handleSubmitComment}
+                handleDeleteComment={handleDeleteComment}
+                handleCommentLikeToggle={handleCommentLikeToggle}
+                highlightedCommentId={highlightedCommentId}
+              />
+            </div>
           )}
         </CardFooter>
       )}
