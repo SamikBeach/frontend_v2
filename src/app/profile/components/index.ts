@@ -5,12 +5,12 @@ export {
   Community,
   CommunitySkeleton,
   Libraries,
+  ProfileSkeleton,
+  ProfileStats,
   ReadBooks,
   ReadBooksSkeleton,
   Reviews,
   ReviewsSkeleton,
-  Stats,
-  StatsSkeleton,
   SubscribedLibraries,
 } from './Sections';
 export * from './Skeletons';

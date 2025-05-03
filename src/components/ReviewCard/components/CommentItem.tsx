@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MoreHorizontal, Pencil, ThumbsUp, Trash } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { CommentItemProps } from '../types';
 
@@ -22,13 +22,26 @@ export function CommentItem({
   currentUser,
   onDelete,
   onLike,
+  isHighlighted = false,
 }: CommentItemProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(comment.content);
   const [isLiked, setIsLiked] = useState(comment.isLiked || false);
   const [likeCount, setLikeCount] = useState(comment.likeCount || 0);
+  const [highlightBg, setHighlightBg] = useState(isHighlighted);
   const queryClient = useQueryClient();
+
+  // 하이라이트 효과 관리 - 3초 후 사라짐
+  useEffect(() => {
+    if (isHighlighted) {
+      setHighlightBg(true);
+      const timer = setTimeout(() => {
+        setHighlightBg(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [isHighlighted]);
 
   // 현재 사용자가 댓글 작성자인지 확인
   const isAuthor = currentUser.id === comment.author.id;
@@ -105,18 +118,22 @@ export function CommentItem({
   };
 
   return (
-    <div className="flex gap-2">
+    <div id={`comment-${comment.id}`} className="flex w-full gap-2">
       <Avatar className="h-7 w-7 flex-shrink-0">
-        <AvatarImage
-          src={comment.author.profileImage || `/images/avatars/placeholder.png`}
-          alt={comment.author.username}
-          className="object-cover"
-        />
+        {comment.author.profileImage && (
+          <AvatarImage
+            src={comment.author.profileImage}
+            alt={comment.author.username}
+            className="object-cover"
+          />
+        )}
         <AvatarFallback className="bg-gray-200 text-gray-700">
           {comment.author.username.charAt(0).toUpperCase()}
         </AvatarFallback>
       </Avatar>
-      <div className="flex-1 rounded-xl bg-gray-50 p-2.5">
+      <div
+        className={`flex-1 rounded-xl ${highlightBg ? 'bg-blue-50' : 'bg-gray-50'} p-2.5 transition-colors duration-3000 ease-in-out`}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1.5">
             <Link

@@ -3,8 +3,13 @@ import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { getReadingStatusStats } from '@/apis/user/user';
-import { NoDataMessage } from '../common/NoDataMessage';
-import { PrivateDataMessage } from '../common/PrivateDataMessage';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import {
+  NoDataMessage,
+  PrivacyToggle,
+  PrivateDataMessage,
+} from '../components';
+import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface ReadingStatusChartProps {
   userId: number;
@@ -15,13 +20,6 @@ const STATUS_COLORS = {
   [ReadingStatusType.READ]: '#86efac', // green-300 (파스텔)
   [ReadingStatusType.READING]: '#93c5fd', // blue-300 (파스텔)
   [ReadingStatusType.WANT_TO_READ]: '#c4b5fd', // violet-300 (파스텔)
-};
-
-// 읽기 상태별 배경색 매핑
-const STATUS_BG_COLORS = {
-  [ReadingStatusType.READ]: '#dcfce7', // 녹색 배경
-  [ReadingStatusType.READING]: '#dbeafe', // 파란색 배경
-  [ReadingStatusType.WANT_TO_READ]: '#ede9fe', // 보라색 배경
 };
 
 // 읽기 상태별 표시 이름 (BookDialog와 일치시킴)
@@ -50,7 +48,7 @@ const CustomTooltip = ({ active, payload }: any) => {
       <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
         <div className="flex items-center gap-2">
           <div
-            className="h-3 w-3 rounded-full"
+            className="h-2.5 w-2.5 rounded-full"
             style={{ backgroundColor: STATUS_COLORS[status] }}
           />
           <p className="text-xs font-medium">{STATUS_LABELS[status]}</p>
@@ -65,14 +63,25 @@ const CustomTooltip = ({ active, payload }: any) => {
 };
 
 const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
-  const { data } = useSuspenseQuery({
+  const currentUser = useCurrentUser();
+  const isMyProfile = currentUser?.id === userId;
+  const { settings, handleUpdateSetting, isUpdating } = isMyProfile
+    ? useStatisticsSettings(userId)
+    : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
+
+  const { data, isLoading } = useSuspenseQuery({
     queryKey: ['readingStatusStats', userId],
     queryFn: () => getReadingStatusStats(userId),
   });
 
   // 데이터가 비공개인 경우
-  if (!data.isPublic) {
-    return <PrivateDataMessage message="이 통계는 비공개 설정되어 있습니다." />;
+  if (!data.isPublic && !isMyProfile) {
+    return (
+      <PrivateDataMessage
+        message="이 통계는 비공개 설정되어 있습니다."
+        title="독서 상태별 도서 수"
+      />
+    );
   }
 
   // 데이터가 없는 경우
@@ -114,8 +123,6 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
     innerRadius,
     outerRadius,
     percent,
-    index,
-    name,
   }: any) => {
     if (percent < 0.05) return null; // 5% 미만은 라벨 생략
 
@@ -132,7 +139,7 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
         textAnchor="middle"
         dominantBaseline="central"
         fontSize={11} // 폰트 크기 증가
-        fontWeight="bold"
+        fontWeight="medium"
         stroke="#ffffff" // 텍스트 테두리 추가
         strokeWidth={0.5} // 얇은 테두리
         paintOrder="stroke" // 테두리 렌더링 순서
@@ -142,13 +149,30 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
     );
   };
 
+  // 공개/비공개 토글 핸들러
+  const handlePrivacyToggle = (isPublic: boolean) => {
+    handleUpdateSetting('isReadingStatusPublic', isPublic);
+  };
+
+  // 설정 로딩 중 또는 설정 업데이트 중인지 확인
+  const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
+
   return (
-    <div className="h-[240px] w-full rounded-lg bg-white p-3">
-      <h3 className="mb-2 text-sm font-medium text-gray-700">
-        독서 상태별 도서 수
-      </h3>
-      <div className="flex h-[calc(100%-2rem)] items-center">
-        <div className="h-full w-3/5">
+    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+      <div className="mb-2 flex items-start justify-between">
+        <h3 className="text-base font-medium text-gray-700">
+          독서 상태별 도서 수
+        </h3>
+        {isMyProfile && (
+          <PrivacyToggle
+            isPublic={settings?.isReadingStatusPublic || false}
+            isLoading={showLoading}
+            onToggle={handlePrivacyToggle}
+          />
+        )}
+      </div>
+      <div className="flex h-[calc(100%-2rem)] flex-col items-center sm:flex-row">
+        <div className="h-full w-full sm:w-3/5">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -157,8 +181,8 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
                 cy="50%"
                 labelLine={false}
                 label={renderCustomizedLabel}
-                outerRadius={70}
-                innerRadius={30}
+                outerRadius={85}
+                innerRadius={40}
                 fill="#8884d8"
                 dataKey="value"
                 nameKey="name"
@@ -177,24 +201,24 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="flex h-full w-2/5 flex-col justify-center">
-          <ul className="space-y-2">
+        <div className="flex h-full w-full flex-col justify-center sm:w-2/5">
+          <ul className="space-y-2.5">
             {chartData.map((entry, index) => (
               <li key={`legend-${index}`} className="flex items-center gap-2">
                 <div
-                  className="h-3 w-3 rounded-full"
+                  className="h-3 w-3 flex-shrink-0 rounded-full"
                   style={{ backgroundColor: entry.color }}
                 />
-                <div className="text-xs">
-                  <span className="font-medium">{entry.name}: </span>
+                <div className="flex-1 text-xs">
+                  <span className="text-gray-700">{entry.name}: </span>
                   <span>{entry.value}권</span>
                 </div>
               </li>
             ))}
           </ul>
           {data.completionRate > 0 && (
-            <div className="mt-3 rounded-md bg-gray-50 px-2 py-1">
-              <p className="text-center text-xs font-medium text-gray-600">
+            <div className="mt-4 rounded-md bg-gray-50 px-2 py-1.5">
+              <p className="text-center text-sm font-medium text-gray-600">
                 완독률:{' '}
                 <span className="text-green-500">
                   {data.completionRate.toFixed(1)}%

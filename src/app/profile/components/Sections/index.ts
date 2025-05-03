@@ -2,7 +2,7 @@ import Community from './Community';
 import Libraries from './Libraries';
 import { ReadBooks, ReadBooksSkeleton } from './ReadBooks';
 import Reviews from './Reviews';
-import { Stats } from './Statistics';
+import { ProfileSkeleton, ProfileStats } from './Statistics';
 import {
   SubscribedLibraries,
   SubscribedLibrariesSkeleton,
@@ -11,19 +11,18 @@ import {
 import { LibrariesSkeleton } from '../Skeletons/ProfileSkeletons';
 import { CommunitySkeleton } from './Community';
 import { ReviewsSkeleton } from './Reviews';
-import { StatisticsSkeleton } from './Statistics';
 
 export {
   Community,
   CommunitySkeleton,
   Libraries,
   LibrariesSkeleton,
+  ProfileSkeleton,
+  ProfileStats,
   ReadBooks,
   ReadBooksSkeleton,
   Reviews,
   ReviewsSkeleton,
-  StatisticsSkeleton,
-  Stats,
   SubscribedLibraries,
   SubscribedLibrariesSkeleton,
 };

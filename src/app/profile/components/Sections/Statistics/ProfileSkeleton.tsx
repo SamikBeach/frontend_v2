@@ -1,8 +1,8 @@
 import { Skeleton } from '@/components/ui/skeleton';
 
-export function StatisticsSkeleton() {
+export function ProfileSkeleton() {
   return (
-    <div className="h-[240px] rounded-lg bg-white p-3">
+    <div className="h-[340px] rounded-lg bg-white p-3">
       <div className="flex h-full flex-col">
         {/* Header skeleton */}
         <div className="mb-2">
@@ -12,9 +12,9 @@ export function StatisticsSkeleton() {
 
         {/* Content skeleton */}
         <div className="flex flex-1 items-center justify-center">
-          <div className="relative h-[140px] w-[140px] overflow-hidden rounded-full">
+          <div className="relative h-[200px] w-[200px] overflow-hidden rounded-full">
             <Skeleton className="absolute h-full w-full opacity-40" />
-            <div className="absolute top-1/2 left-1/2 h-[100px] w-[100px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-100"></div>
+            <div className="absolute top-1/2 left-1/2 h-[150px] w-[150px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-100"></div>
           </div>
         </div>
       </div>

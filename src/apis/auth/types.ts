@@ -155,7 +155,7 @@ export interface RequestPasswordResetResponse {
 }
 
 /**
- * 비밀번호 변경 요청
+ * 비밀번호 재설정 요청
  */
 export interface ResetPasswordRequest {
   email: string;
@@ -164,9 +164,38 @@ export interface ResetPasswordRequest {
 }
 
 /**
- * 비밀번호 변경 응답
+ * 비밀번호 재설정 응답
  */
 export interface ResetPasswordResponse {
+  message: string;
+}
+
+/**
+ * 비밀번호 변경 요청
+ */
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+/**
+ * 비밀번호 변경 응답
+ */
+export interface ChangePasswordResponse {
+  message: string;
+}
+
+/**
+ * 계정 삭제 요청
+ */
+export interface DeleteAccountRequest {
+  password: string;
+}
+
+/**
+ * 계정 삭제 응답
+ */
+export interface DeleteAccountResponse {
   message: string;
 }
 

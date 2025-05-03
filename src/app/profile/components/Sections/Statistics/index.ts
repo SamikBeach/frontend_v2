@@ -1,4 +1,4 @@
 export * from './charts';
 export * from './hooks';
-export { default as Stats } from './Statistics';
-export * from './StatisticsSkeleton';
+export * from './ProfileSkeleton';
+export { default as ProfileStats } from './ProfileStats';
