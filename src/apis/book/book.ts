@@ -1,6 +1,7 @@
 import api from '../axios';
 import {
   Book,
+  BookSearchResponse,
   CreateBookDto,
   HomeDiscoverBooksResponse,
   HomePopularBooksResponse,
@@ -67,42 +68,6 @@ export const getBooksBySubcategoryId = async (
   subcategoryId: number
 ): Promise<Book[]> => {
   const response = await api.get<Book[]>(`/book/subcategory/${subcategoryId}`);
-  return response.data;
-};
-
-/**
- * 특정 카테고리의 인기 도서 조회
- */
-export const getPopularBooksByCategory = async (
-  categoryId: number,
-  subcategoryId?: number,
-  sort: SortOption = 'rating-desc',
-  timeRange: TimeRange = 'all'
-): Promise<Book[]> => {
-  // 쿼리 파라미터 구성
-  const params: Record<string, string> = {
-    sort,
-    timeRange,
-  };
-
-  if (subcategoryId) {
-    params.subcategoryId = subcategoryId.toString();
-  }
-
-  const response = await api.get<Book[]>(
-    `/book/popular/category/${categoryId}`,
-    { params }
-  );
-  return response.data;
-};
-
-/**
- * 모든 카테고리의 인기 도서 조회
- */
-export const getAllPopularBooks = async (
-  params?: PopularBooksParams
-): Promise<Book[]> => {
-  const response = await api.get<Book[]>('/book/popular/all', { params });
   return response.data;
 };
 
@@ -242,5 +207,18 @@ export const getDiscoverBooksForHome = async (
       params: { limit },
     }
   );
+  return response.data;
+};
+
+/**
+ * 인기 도서 조회 (무한 스크롤 지원)
+ * 카테고리, 서브카테고리, 정렬, 기간 필터링 지원
+ */
+export const getPopularBooks = async (
+  params: PopularBooksParams
+): Promise<BookSearchResponse> => {
+  const response = await api.get<BookSearchResponse>('/book/popular', {
+    params,
+  });
   return response.data;
 };

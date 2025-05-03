@@ -1,6 +1,11 @@
 'use client';
 
-import { SortOption, TimeRange } from '@/apis/book/types';
+import {
+  PopularBooksSortOptions,
+  SortOption,
+  TimeRange,
+  TimeRangeOptions,
+} from '@/apis/book/types';
 import { selectedBookIdAtom } from '@/atoms/book';
 import {
   categoryFilterAtom,
@@ -81,15 +86,6 @@ function CategoryFilterSkeleton() {
           ))}
         </div>
       </div>
-
-      {/* 서브카테고리 스켈레톤 */}
-      <div className="no-scrollbar mb-4 flex w-full overflow-x-auto py-1">
-        <div className="flex gap-2 px-0.5">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-8 w-16 rounded-full" />
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
@@ -110,15 +106,17 @@ export default function PopularPage() {
   useEffect(() => {
     const category = searchParams.get('category') || 'all';
     const subcategory = searchParams.get('subcategory') || 'all';
-    const sortValue = searchParams.get('sort') || 'reviews-desc';
+    const sortValue =
+      searchParams.get('sort') || PopularBooksSortOptions.RATING_DESC;
     const sort: SortOption = isValidSortOption(sortValue)
       ? sortValue
-      : 'reviews-desc';
+      : PopularBooksSortOptions.RATING_DESC;
 
-    const timeRangeValue = searchParams.get('timeRange') || 'all';
+    const timeRangeValue =
+      searchParams.get('timeRange') || TimeRangeOptions.ALL;
     const timeRange: TimeRange = isValidTimeRange(timeRangeValue)
       ? timeRangeValue
-      : 'all';
+      : TimeRangeOptions.ALL;
 
     const bookId = searchParams.get('book');
 

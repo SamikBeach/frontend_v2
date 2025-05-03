@@ -1,69 +1,28 @@
-import { getAllPopularBooks } from '@/apis/book/book';
-import { Book, PopularBooksParams, SortOption } from '@/apis/book/types';
-import { selectedBookIdAtom } from '@/atoms/book';
 import {
-  categoryFilterAtom,
-  sortOptionAtom,
-  subcategoryFilterAtom,
-  timeRangeAtom,
-} from '@/atoms/popular';
+  Book,
+  PopularBooksSortOptions,
+  TimeRangeOptions,
+} from '@/apis/book/types';
+import { selectedBookIdAtom } from '@/atoms/book';
+import { sortOptionAtom, timeRangeAtom } from '@/atoms/popular';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useDialogQuery, useQueryParams } from '@/hooks';
-import { isValidSortOption } from '@/utils/type-guards';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { usePopularBooksQuery } from '../hooks';
 
 export function BooksContent() {
-  const { clearQueryParams } = useQueryParams();
-  const categoryParam = useAtomValue(categoryFilterAtom);
-  const subcategoryParam = useAtomValue(subcategoryFilterAtom);
-  const sortParamRaw = useAtomValue(sortOptionAtom);
-  const timeRangeParam = useAtomValue(timeRangeAtom);
+  const { updateQueryParams } = useQueryParams();
   const [selectedBookId, setSelectedBookId] = useAtom(selectedBookIdAtom);
+  const [, setSortOption] = useAtom(sortOptionAtom);
+  const [, setTimeRange] = useAtom(timeRangeAtom);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
 
-  // 타입 가드를 사용하여 안전하게 처리
-  const sortParam: SortOption = isValidSortOption(sortParamRaw)
-    ? sortParamRaw
-    : 'reviews-desc';
-
-  // 도서 데이터 가져오기
-  const { data: books } = useSuspenseQuery({
-    queryKey: [
-      'popular-books',
-      categoryParam,
-      subcategoryParam,
-      sortParam,
-      timeRangeParam,
-    ],
-    queryFn: async () => {
-      // API 요청 시 필요한 파라미터 구성
-      const params: PopularBooksParams = {
-        sort: sortParam,
-        timeRange: timeRangeParam,
-      };
-
-      // 추가 파라미터 (PopularBooksParams에는 없지만 API에서는 지원하는 파라미터)
-      type ExtendedParams = PopularBooksParams & {
-        category?: string;
-        subcategory?: string;
-      };
-
-      const extendedParams: ExtendedParams = params;
-
-      if (categoryParam !== 'all') {
-        extendedParams.category = categoryParam;
-      }
-
-      if (subcategoryParam && subcategoryParam !== 'all') {
-        extendedParams.subcategory = subcategoryParam;
-      }
-
-      return getAllPopularBooks(extendedParams);
-    },
-    staleTime: 1000 * 60 * 2, // 2분 동안 캐시 유지
-  });
+  // Get books with infinite query
+  const { books, hasNextPage, fetchNextPage, isFetchingNextPage, isLoading } =
+    usePopularBooksQuery();
 
   const handleBookSelect = (book: Book) => {
     setSelectedBookId(book.id.toString());
@@ -73,17 +32,41 @@ export function BooksContent() {
   };
 
   const handleClearFilters = () => {
-    clearQueryParams();
+    // 카테고리 필터는 유지하면서 정렬과 시간 필터만 초기화
+    setSortOption(PopularBooksSortOptions.RATING_DESC);
+    setTimeRange(TimeRangeOptions.ALL);
+
+    updateQueryParams({
+      sort: PopularBooksSortOptions.RATING_DESC,
+      timeRange: TimeRangeOptions.ALL,
+    });
   };
 
   return (
     <>
-      {books && books.length > 0 ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {books.map(book => (
-            <BookCard key={book.id} book={book} onClick={handleBookSelect} />
-          ))}
+      {isLoading ? (
+        <div className="flex h-[calc(100vh-200px)] w-full items-center justify-center">
+          <LoadingSpinner />
         </div>
+      ) : books && books.length > 0 ? (
+        <InfiniteScroll
+          dataLength={books.length}
+          next={fetchNextPage}
+          hasMore={!!hasNextPage}
+          loader={
+            <div className="my-8 flex justify-center">
+              <LoadingSpinner size="md" />
+            </div>
+          }
+          endMessage={null}
+          scrollThreshold={0.8}
+        >
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {books.map(book => (
+              <BookCard key={book.id} book={book} onClick={handleBookSelect} />
+            ))}
+          </div>
+        </InfiniteScroll>
       ) : (
         <div className="mt-8 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-12 text-center">
           <div className="text-3xl">📚</div>
