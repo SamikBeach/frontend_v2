@@ -52,7 +52,7 @@ export const formatDate = (dateStr: string) => {
   try {
     const date = new Date(dateStr);
     return format(date, 'PPP', { locale: ko });
-  } catch (error) {
+  } catch {
     return dateStr;
   }
 };

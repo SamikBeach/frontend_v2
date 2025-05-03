@@ -44,11 +44,13 @@ export function CommentSection({
       {/* 댓글 입력 */}
       <div className="flex w-full gap-2">
         <Avatar className="mt-1 h-7 w-7 flex-shrink-0">
-          <AvatarImage
-            src={currentUser.avatar}
-            alt={currentUser.username}
-            className="object-cover"
-          />
+          {currentUser.avatar && (
+            <AvatarImage
+              src={currentUser.avatar}
+              alt={currentUser.username}
+              className="object-cover"
+            />
+          )}
           <AvatarFallback className="bg-gray-200 text-gray-700">
             {getNameInitial(currentUser.username)}
           </AvatarFallback>

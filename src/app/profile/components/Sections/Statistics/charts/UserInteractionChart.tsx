@@ -307,15 +307,6 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
     return label;
   };
 
-  // 기간 옵션
-  const periodOptions = [
-    { id: 'all', name: '전체' },
-    { id: 'daily', name: '일별' },
-    { id: 'weekly', name: '주별' },
-    { id: 'monthly', name: '월별' },
-    { id: 'yearly', name: '연도별' },
-  ];
-
   // 데이터 타입 옵션
   const dataTypeOptions = [
     {

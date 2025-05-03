@@ -40,7 +40,6 @@ export function useNotifications(initialLimit = 10, isDropdownOpen = false) {
       const page = pageParam as number;
       try {
         const result = await getNotifications(page, initialLimit);
-        console.log('[알림 API] 알림 목록 응답:', result);
         return result;
       } catch (err) {
         console.error('[알림 API] 알림 목록 오류:', err);
@@ -89,7 +88,6 @@ export function useNotifications(initialLimit = 10, isDropdownOpen = false) {
     queryFn: async () => {
       try {
         const count = await getUnreadNotificationCount();
-        console.log('[알림 API] 읽지 않은 알림 수:', count);
         return count;
       } catch (err) {
         console.error('[알림 API] 읽지 않은 알림 수 오류:', err);
@@ -124,7 +122,6 @@ export function useNotifications(initialLimit = 10, isDropdownOpen = false) {
   const { mutate: markAsRead, error: markAsReadError } = useMutation({
     mutationFn: async (id: number) => {
       try {
-        console.log(`[알림 API] 알림 읽음 처리: ID ${id}`);
         return await updateNotification(id, true);
       } catch (err) {
         console.error(`[알림 API] 알림 읽음 처리 오류: ID ${id}`, err);
@@ -142,7 +139,6 @@ export function useNotifications(initialLimit = 10, isDropdownOpen = false) {
     useMutation({
       mutationFn: async () => {
         try {
-          console.log('[알림 API] 모든 알림 읽음 처리');
           return await markAllAsRead();
         } catch (err) {
           console.error('[알림 API] 모든 알림 읽음 처리 오류:', err);
@@ -161,7 +157,6 @@ export function useNotifications(initialLimit = 10, isDropdownOpen = false) {
     useMutation({
       mutationFn: async (id: number) => {
         try {
-          console.log(`[알림 API] 알림 삭제: ID ${id}`);
           return await deleteNotification(id);
         } catch (err) {
           console.error(`[알림 API] 알림 삭제 오류: ID ${id}`, err);
@@ -181,7 +176,6 @@ export function useNotifications(initialLimit = 10, isDropdownOpen = false) {
   } = useMutation({
     mutationFn: async () => {
       try {
-        console.log('[알림 API] 모든 알림 삭제');
         return await deleteAllNotifications();
       } catch (err) {
         console.error('[알림 API] 모든 알림 삭제 오류:', err);
@@ -259,103 +253,6 @@ export function useNotifications(initialLimit = 10, isDropdownOpen = false) {
     }
   };
 
-  // 알림 내용 처리 (details와 content를 결합)
-  const getNotificationContent = (notification: any): string => {
-    // 이미 처리된 content가 있으면 그대로 반환
-    if (notification.content) {
-      return notification.content;
-    }
-
-    // details의 metadata가 있으면 사용
-    if (notification.details?.metadata) {
-      return notification.details.metadata;
-    }
-
-    // 액터 이름 (알림 주체)
-    const actorName = notification.actor?.username || '누군가';
-
-    // 소스 정보
-    const reviewTitle = notification.review?.content
-      ? notification.review.content.length > 20
-        ? `"${notification.review.content.substring(0, 20)}..."`
-        : `"${notification.review.content}"`
-      : '리뷰';
-
-    const bookTitle =
-      notification.details?.data?.bookTitle ||
-      (notification.review?.books && notification.review.books.length > 0
-        ? notification.review.books[0].title
-        : '책');
-
-    const commentContent =
-      notification.comment?.content ||
-      notification.details?.data?.commentContent ||
-      '댓글';
-
-    const libraryName =
-      notification.library?.name ||
-      notification.details?.data?.libraryName ||
-      '서재';
-
-    // 타입에 따라 상세 메시지 생성
-    switch (notification.type) {
-      case 'comment':
-        // 댓글 관련 알림
-        if (notification.sourceType === 'review') {
-          // 리뷰에 달린 댓글
-          return `${actorName}님이 ${bookTitle}에 대한 ${reviewTitle} 리뷰에 댓글을 남겼습니다: "${commentContent.length > 30 ? commentContent.substring(0, 30) + '...' : commentContent}"`;
-        } else {
-          // 기타 댓글
-          return `${actorName}님이 댓글을 남겼습니다: "${commentContent.length > 30 ? commentContent.substring(0, 30) + '...' : commentContent}"`;
-        }
-
-      case 'like':
-        // 좋아요 관련 알림
-        if (notification.sourceType === 'review') {
-          // 리뷰에 좋아요
-          return `${actorName}님이 ${bookTitle}에 대한 ${reviewTitle} 리뷰를 좋아합니다.`;
-        } else if (notification.sourceType === 'comment') {
-          // 댓글에 좋아요
-          return `${actorName}님이 회원님의 댓글을 좋아합니다: "${commentContent.length > 30 ? commentContent.substring(0, 30) + '...' : commentContent}"`;
-        } else {
-          // 기타 좋아요
-          return `${actorName}님이 회원님의 콘텐츠를 좋아합니다.`;
-        }
-
-      case 'follow':
-        // 팔로우 관련 알림
-        return `${actorName}님이 회원님을 팔로우하기 시작했습니다.`;
-
-      case 'library_update':
-        // 서재 업데이트 관련 알림
-        if (notification.details?.data?.action === 'add_book') {
-          return `${libraryName} 서재에 새 책 '${bookTitle}'이(가) 추가되었습니다.`;
-        } else if (notification.details?.data?.action === 'remove_book') {
-          return `${libraryName} 서재에서 '${bookTitle}' 책이 제거되었습니다.`;
-        } else if (notification.details?.data?.action === 'update') {
-          return `${libraryName} 서재가 업데이트되었습니다.`;
-        } else {
-          return `${libraryName} 서재에 변경사항이 있습니다.`;
-        }
-
-      case 'system':
-        // 시스템 알림
-        if (notification.title) {
-          return notification.title;
-        } else {
-          return '시스템 알림이 도착했습니다.';
-        }
-
-      default:
-        // 기타 알림
-        if (notification.title) {
-          return notification.title;
-        } else {
-          return '새로운 알림이 도착했습니다.';
-        }
-    }
-  };
-
   return {
     notifications,
     total,
@@ -370,7 +267,6 @@ export function useNotifications(initialLimit = 10, isDropdownOpen = false) {
     deleteAllNotifications: deleteAllNotificationsMutation,
     formatNotificationTime,
     getNotificationLink,
-    getNotificationContent,
     error,
     queryError,
     unreadCountError,

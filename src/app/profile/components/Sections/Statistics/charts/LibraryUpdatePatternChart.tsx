@@ -99,7 +99,6 @@ const renderCustomizedLabel = ({
   innerRadius,
   outerRadius,
   percent,
-  value,
 }: any) => {
   if (percent < 0.05) return null; // 5% 미만은 라벨 생략
 

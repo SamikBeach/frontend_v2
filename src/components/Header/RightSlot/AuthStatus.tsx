@@ -2,7 +2,7 @@
 
 import { useCurrentUser } from '@/hooks';
 import { LoginButton } from './LoginButton';
-import { NotificationDropdown } from './NotificationDropdown';
+import { NotificationDropdown } from './Notification';
 import { UserDropdown } from './UserDropdown';
 
 export function AuthStatus() {

@@ -120,11 +120,13 @@ export function CommentItem({
   return (
     <div id={`comment-${comment.id}`} className="flex w-full gap-2">
       <Avatar className="h-7 w-7 flex-shrink-0">
-        <AvatarImage
-          src={comment.author.profileImage || `/images/avatars/placeholder.png`}
-          alt={comment.author.username}
-          className="object-cover"
-        />
+        {comment.author.profileImage && (
+          <AvatarImage
+            src={comment.author.profileImage}
+            alt={comment.author.username}
+            className="object-cover"
+          />
+        )}
         <AvatarFallback className="bg-gray-200 text-gray-700">
           {comment.author.username.charAt(0).toUpperCase()}
         </AvatarFallback>

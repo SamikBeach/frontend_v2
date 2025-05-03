@@ -29,3 +29,30 @@ export interface Notification {
     avatar?: string;
   };
 }
+
+// 각 컴포넌트별 Props 정의
+export interface NotificationDropdownProps {
+  className?: string;
+}
+
+export interface NotificationContentProps {
+  onClose: () => void;
+  isOpen: boolean;
+}
+
+export interface NotificationItemProps {
+  notification: Notification;
+  onItemClick: (notification: Notification) => void;
+}
+
+export interface NotificationBadgeProps {
+  count?: number;
+}
+
+export interface NotificationTypeBadgeProps {
+  type: string;
+}
+
+export interface PostTypeBadgeProps {
+  sourceType?: string;
+}

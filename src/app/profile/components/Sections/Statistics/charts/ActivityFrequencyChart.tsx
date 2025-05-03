@@ -87,7 +87,7 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
       } else {
         return `오후 ${hourNum - 12}시`;
       }
-    } catch (e) {
+    } catch {
       return hour;
     }
   };

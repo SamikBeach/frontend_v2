@@ -42,7 +42,7 @@ const formatMonth = (monthStr: string): string => {
     return format(new Date(Number(year), Number(month) - 1, 1), 'yyyy년 M월', {
       locale: ko,
     });
-  } catch (error) {
+  } catch {
     return monthStr;
   }
 };
