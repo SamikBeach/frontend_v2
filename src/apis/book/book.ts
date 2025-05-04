@@ -3,11 +3,14 @@ import {
   Book,
   BookSearchResponse,
   CreateBookDto,
+  DiscoverBooksParams,
   HomeDiscoverBooksResponse,
   HomePopularBooksResponse,
   PopularBooksParams,
+  PopularBooksSortOptions,
   SortOption,
   TimeRange,
+  TimeRangeOptions,
   UpdateBookDto,
 } from './types';
 
@@ -113,8 +116,8 @@ export const getAllDiscoverBooks = async (
 export const getBooksByDiscoverCategoryId = async (
   discoverCategoryId: number,
   discoverSubCategoryId?: number,
-  sort: SortOption = 'rating-desc',
-  timeRange: TimeRange = 'all'
+  sort: SortOption = PopularBooksSortOptions.RATING_DESC,
+  timeRange: TimeRange = TimeRangeOptions.ALL
 ): Promise<Book[]> => {
   // 쿼리 파라미터 구성
   const params: Record<string, string> = {
@@ -138,8 +141,8 @@ export const getBooksByDiscoverCategoryId = async (
  */
 export const getBooksByDiscoverSubCategoryId = async (
   discoverSubCategoryId: number,
-  sort: SortOption = 'rating-desc',
-  timeRange: TimeRange = 'all'
+  sort: SortOption = PopularBooksSortOptions.RATING_DESC,
+  timeRange: TimeRange = TimeRangeOptions.ALL
 ): Promise<Book[]> => {
   // 쿼리 파라미터 구성
   const params: Record<string, string> = {
@@ -218,6 +221,19 @@ export const getPopularBooks = async (
   params: PopularBooksParams
 ): Promise<BookSearchResponse> => {
   const response = await api.get<BookSearchResponse>('/book/popular', {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * 발견하기 도서 조회 (무한 스크롤 지원)
+ * 발견하기 카테고리, 서브카테고리, 정렬, 기간 필터링 지원
+ */
+export const getDiscoverBooks = async (
+  params: DiscoverBooksParams
+): Promise<BookSearchResponse> => {
+  const response = await api.get<BookSearchResponse>('/book/discover', {
     params,
   });
   return response.data;

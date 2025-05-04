@@ -113,6 +113,15 @@ export interface PopularBooksParams {
   limit?: number;
 }
 
+export interface DiscoverBooksParams {
+  discoverCategoryId?: number;
+  discoverSubCategoryId?: number;
+  sort?: SortOption | PopularBooksSortOptions;
+  timeRange?: TimeRange | TimeRangeOptions;
+  page?: number;
+  limit?: number;
+}
+
 export interface HomeBookPreview {
   id: number;
   title: string;

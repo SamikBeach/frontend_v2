@@ -5,8 +5,8 @@ import {
 import {
   Book,
   PopularBooksParams,
-  SortOption,
-  TimeRange,
+  PopularBooksSortOptions,
+  TimeRangeOptions,
 } from '@/apis/book/types';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -37,9 +37,9 @@ export function useDiscoverBooks(params?: UseDiscoverBooksParams) {
   const timeRangeParam = params?.timeRange || 'all';
 
   // 타입 가드를 사용하여 안전하게 처리
-  const sortParam: SortOption = isValidSortOption(sortParamRaw)
+  const sortParam = isValidSortOption(sortParamRaw)
     ? sortParamRaw
-    : 'reviews-desc';
+    : PopularBooksSortOptions.REVIEWS_DESC;
 
   // 도서 데이터 가져오기
   const { data: books = [] } = useSuspenseQuery<Book[]>({
@@ -52,9 +52,9 @@ export function useDiscoverBooks(params?: UseDiscoverBooksParams) {
     ],
     queryFn: async () => {
       // API 요청 시 필요한 파라미터 구성
-      const timeRange: TimeRange = isValidTimeRange(timeRangeParam)
+      const timeRange = isValidTimeRange(timeRangeParam)
         ? timeRangeParam
-        : 'all';
+        : TimeRangeOptions.ALL;
 
       // 카테고리가 선택되지 않은 경우 (all)
       if (categoryParam === 'all') {

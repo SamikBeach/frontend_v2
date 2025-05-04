@@ -8,10 +8,12 @@ import {
 } from '@/atoms/discover';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useDialogQuery, useQueryParams } from '@/hooks';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback } from 'react';
-import { useDiscoverBooks } from '../hooks/useDiscoverBooks';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import { useDiscoverBooksQuery } from '../hooks';
 
 export function BooksContent() {
   const { clearQueryParams } = useQueryParams();
@@ -24,13 +26,9 @@ export function BooksContent() {
   const [selectedBookId, setSelectedBookId] = useAtom(selectedBookIdAtom);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
 
-  // 도서 데이터 가져오기
-  const { books } = useDiscoverBooks({
-    category: categoryFilter,
-    subcategory: subcategoryFilter,
-    sort: sortOption,
-    timeRange: timeRange,
-  });
+  // 무한 스크롤로 도서 데이터 가져오기
+  const { books, fetchNextPage, hasNextPage, isLoading } =
+    useDiscoverBooksQuery();
 
   // 도서 선택 핸들러
   const handleBookSelect = useCallback(
@@ -50,12 +48,29 @@ export function BooksContent() {
 
   return (
     <>
-      {books && books.length > 0 ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {books.map(book => (
-            <BookCard key={book.id} book={book} onClick={handleBookSelect} />
-          ))}
+      {isLoading ? (
+        <div className="flex h-[calc(100vh-200px)] w-full items-center justify-center">
+          <LoadingSpinner />
         </div>
+      ) : books && books.length > 0 ? (
+        <InfiniteScroll
+          dataLength={books.length}
+          next={fetchNextPage}
+          hasMore={!!hasNextPage}
+          loader={
+            <div className="my-8 flex justify-center">
+              <LoadingSpinner size="md" />
+            </div>
+          }
+          endMessage={null}
+          scrollThreshold={0.8}
+        >
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {books.map(book => (
+              <BookCard key={book.id} book={book} onClick={handleBookSelect} />
+            ))}
+          </div>
+        </InfiniteScroll>
       ) : (
         <div className="mt-8 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-12 text-center">
           <div className="text-3xl">📚</div>
