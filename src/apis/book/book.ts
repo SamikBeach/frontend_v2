@@ -5,7 +5,6 @@ import {
   CreateBookDto,
   DiscoverBooksParams,
   HomeDiscoverBooksResponse,
-  HomePopularBooksResponse,
   PopularBooksParams,
   UpdateBookDto,
 } from './types';
@@ -141,13 +140,10 @@ export const removeBookFromDiscoverCategory = async (
  */
 export const getPopularBooksForHome = async (
   limit: number = 4
-): Promise<HomePopularBooksResponse> => {
-  const response = await api.get<HomePopularBooksResponse>(
-    '/book/popular/home',
-    {
-      params: { limit },
-    }
-  );
+): Promise<BookSearchResponse> => {
+  const response = await api.get<BookSearchResponse>('/book/popular/home', {
+    params: { limit },
+  });
   return response.data;
 };
 

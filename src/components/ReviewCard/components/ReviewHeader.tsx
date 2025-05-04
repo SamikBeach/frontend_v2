@@ -58,7 +58,11 @@ export function ReviewHeader({
           className="h-8 w-8 cursor-pointer"
           onClick={() => onUserClick && onUserClick(review.author.id)}
         >
-          <AvatarImage src={avatarSrc} alt={review.author.username} />
+          <AvatarImage
+            src={avatarSrc}
+            alt={review.author.username}
+            className="object-cover"
+          />
           <AvatarFallback>
             {getNameInitial(review.author.username)}
           </AvatarFallback>

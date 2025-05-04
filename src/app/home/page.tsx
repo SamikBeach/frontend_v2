@@ -4,42 +4,35 @@ import { HomeBookPreview } from '@/apis/book/types';
 import { selectedBookIdAtom } from '@/atoms/book';
 import { useDialogQuery } from '@/hooks';
 import { useAtom } from 'jotai';
-import { Suspense, useEffect } from 'react';
+import { Suspense } from 'react';
 import {
   DiscoverBooksSection,
   PopularBooksSection,
   PopularLibrariesSection,
   PopularReviewsSection,
 } from './components';
-import { useHomeData } from './hooks';
+import {
+  useHomeDiscoverBooksQuery,
+  useHomePopularBooksQuery,
+  useHomePopularLibrariesQuery,
+  useHomePopularReviewsQuery,
+} from './hooks';
 
 function HomePageContent() {
-  const {
-    popularBooks,
-    discoverBooks,
-    popularLibraries,
-    popularReviews,
-    isLoading,
-  } = useHomeData();
+  const { books: popularBooks, isLoading: isPopularBooksLoading } =
+    useHomePopularBooksQuery();
+  const { discoverBooks, isLoading: isDiscoverBooksLoading } =
+    useHomeDiscoverBooksQuery();
+  const { libraries: popularLibraries, isLoading: isPopularLibrariesLoading } =
+    useHomePopularLibrariesQuery();
+  const { reviews: popularReviews, isLoading: isPopularReviewsLoading } =
+    useHomePopularReviewsQuery();
+
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
   const [, setSelectedBookId] = useAtom(selectedBookIdAtom);
 
-  // 데이터 디버깅을 위한 콘솔 로그
-  useEffect(() => {
-    console.log('Home page data:', {
-      popularBooks,
-      discoverBooks,
-      popularLibraries,
-      popularReviews,
-      isLoading,
-    });
-  }, [
-    popularBooks,
-    discoverBooks,
-    popularLibraries,
-    popularReviews,
-    isLoading,
-  ]);
+  // For debugging purposes
+  console.log('Popular Libraries:', popularLibraries);
 
   // 책 선택 핸들러
   const handleBookSelect = (book: HomeBookPreview) => {
@@ -56,25 +49,28 @@ function HomePageContent() {
         {/* 인기 있는 책 섹션 */}
         <PopularBooksSection
           books={popularBooks}
-          isLoading={isLoading}
+          isLoading={isPopularBooksLoading}
           onSelectBook={handleBookSelect}
         />
 
         {/* 오늘의 발견 섹션 */}
         <DiscoverBooksSection
           discoverData={discoverBooks}
-          isLoading={isLoading}
+          isLoading={isDiscoverBooksLoading}
           onSelectBook={handleBookSelect}
+        />
+
+        {/* 커뮤니티 인기글 */}
+        <PopularReviewsSection
+          reviews={popularReviews}
+          isLoading={isPopularReviewsLoading}
         />
 
         {/* 인기 서재 */}
         <PopularLibrariesSection
           libraries={popularLibraries}
-          isLoading={isLoading}
+          isLoading={isPopularLibrariesLoading}
         />
-
-        {/* 커뮤니티 */}
-        <PopularReviewsSection reviews={popularReviews} isLoading={isLoading} />
       </div>
     </div>
   );

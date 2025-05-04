@@ -26,6 +26,8 @@ export function LibraryCard({
   // 현재 사용자 정보 가져오기
   const currentUser = useCurrentUser();
 
+  // API URL 환경 변수
+
   // 사용자가 서재의 소유자인지 확인
   const isOwner = currentUser?.id === library.owner?.id;
 
@@ -46,9 +48,6 @@ export function LibraryCard({
 
   // 소유자 정보
   const ownerName = library.owner?.username || 'Unknown';
-  const ownerAvatar = library.owner?.id
-    ? `https://i.pravatar.cc/150?u=${library.owner.id}`
-    : '';
 
   // 책 개수 - bookCount가 없는 경우 previewBooks 길이를 사용
   const booksCount = library.bookCount ?? displayBooks.length;
@@ -60,7 +59,7 @@ export function LibraryCard({
           <div className="flex items-start gap-3">
             <Avatar className="h-10 w-10 flex-shrink-0 border border-gray-50">
               <AvatarImage
-                src={ownerAvatar}
+                src={library.owner?.profileImage}
                 alt={ownerName}
                 className="object-cover"
               />
@@ -162,6 +161,10 @@ export function LibraryCard({
                       src={book.coverImage}
                       alt={book.title}
                       className="h-full w-full object-cover"
+                      onError={e => {
+                        // 이미지 로드 실패 시 기본 이미지로 대체
+                        e.currentTarget.src = '/images/no-image.png';
+                      }}
                     />
                   </div>
                 ))}

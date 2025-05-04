@@ -5,7 +5,6 @@ import {
   AddBookToLibraryDto,
   AddTagToLibraryDto,
   CreateLibraryDto,
-  HomePopularLibrariesResponse,
   Library,
   LibraryBook,
   LibrarySortOption,
@@ -207,14 +206,30 @@ export const getLibraryUpdates = async (
  */
 export const getPopularLibrariesForHome = async (
   limit: number = 3
-): Promise<HomePopularLibrariesResponse> => {
-  const response = await api.get<HomePopularLibrariesResponse>(
+): Promise<PaginatedLibraryResponse> => {
+  const response = await api.get<PaginatedLibraryResponse>(
     '/library/popular/home',
     {
       params: { limit },
     }
   );
-  return response.data;
+
+  // API 응답 구조를 확인하고 처리
+  // response.data가 { data: [...], meta: {...} } 형태인지 확인
+  if (response.data && 'data' in response.data && 'meta' in response.data) {
+    return response.data;
+  }
+
+  // 다른 형태의 응답인 경우 적절한 형태로 변환
+  return {
+    data: Array.isArray(response.data) ? response.data : [response.data],
+    meta: {
+      total: 1,
+      page: 1,
+      limit: limit,
+      totalPages: 1,
+    },
+  };
 };
 
 /**

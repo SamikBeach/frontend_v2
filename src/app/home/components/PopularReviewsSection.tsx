@@ -1,18 +1,10 @@
 import { HomeReviewPreview, ReviewType } from '@/apis/review/types';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { ReviewCard } from '@/components/ReviewCard/ReviewCard';
+import { ExtendedReviewResponseDto } from '@/components/ReviewCard/types';
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from '@/components/ui/card';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { Separator } from '@/components/ui/separator';
-import { format } from 'date-fns';
-import { ko } from 'date-fns/locale';
-import { MessageCircle, ThumbsUp, Users } from 'lucide-react';
-import Link from 'next/link';
+import { Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface PopularReviewsSectionProps {
   reviews: HomeReviewPreview[];
@@ -23,110 +15,42 @@ export function PopularReviewsSection({
   reviews,
   isLoading = false,
 }: PopularReviewsSectionProps) {
-  // 날짜 포맷팅 함수
-  const formatDate = (dateStr: string | Date) => {
-    const date = new Date(dateStr);
-    return format(date, 'MM.dd', { locale: ko });
+  const router = useRouter();
+
+  const handleMoreClick = () => {
+    router.push('/community');
   };
 
   return (
     <section className="h-auto p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-[#9935FF]" />
+          <Users className="h-5 w-5 text-blue-500" />
           <h2 className="text-xl font-semibold text-gray-900">
             커뮤니티 인기글
           </h2>
         </div>
-        <Link href="/community">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-sm font-medium text-gray-500 hover:text-gray-900"
-          >
-            더보기
-          </Button>
-        </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-sm font-medium text-gray-500 hover:text-gray-900"
+          onClick={handleMoreClick}
+        >
+          더보기
+        </Button>
       </div>
 
       {isLoading ? (
-        <div className="flex h-[200px] items-center justify-center">
+        <div className="flex h-full w-full items-center justify-center">
           <LoadingSpinner />
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="space-y-4">
           {reviews.slice(0, 2).map(review => (
-            <Card
+            <ReviewCard
               key={review.id}
-              className="border border-gray-200 shadow-none transition-colors hover:bg-gray-50"
-            >
-              <Link href={`/community?review=${review.id}`}>
-                <CardHeader className="p-4 pb-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage
-                          src={`https://i.pravatar.cc/150?u=${review.authorName}`}
-                          alt={review.authorName}
-                        />
-                        <AvatarFallback>
-                          {review.authorName?.charAt(0).toUpperCase() || '?'}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">{review.authorName}</div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500">
-                            {review.createdAt
-                              ? formatDate(review.createdAt)
-                              : ''}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="px-4 pt-0 pb-3">
-                  <p className="line-clamp-2 text-sm text-gray-600">
-                    {review.content}
-                  </p>
-                  {review.books && review.books.length > 0 && (
-                    <div className="mt-3 flex gap-3 rounded-xl border border-gray-100 bg-[#F9FAFB] p-3">
-                      <div className="flex-shrink-0">
-                        <img
-                          src={review.books[0].coverImage}
-                          alt={review.books[0].title}
-                          className="h-[70px] w-[45px] rounded-lg object-cover"
-                        />
-                      </div>
-                      <div className="flex flex-1 flex-col justify-between py-1">
-                        <div>
-                          <h4 className="font-medium text-gray-900">
-                            {review.books[0].title}
-                          </h4>
-                          <p className="text-sm text-gray-500">
-                            {review.books[0].author}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-                <Separator className="bg-gray-100" />
-                <CardFooter className="flex items-center px-4 py-3 text-xs text-gray-500">
-                  <div className="flex gap-4">
-                    <div className="flex items-center gap-1.5">
-                      <ThumbsUp className="h-3.5 w-3.5 text-gray-400" />
-                      <span>{review.likeCount || 0}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <MessageCircle className="h-3.5 w-3.5 text-gray-400" />
-                      <span>{review.commentCount || 0}</span>
-                    </div>
-                  </div>
-                </CardFooter>
-              </Link>
-            </Card>
+              review={review as unknown as ExtendedReviewResponseDto}
+            />
           ))}
         </div>
       )}

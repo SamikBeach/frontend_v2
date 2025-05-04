@@ -5,7 +5,6 @@ import {
   CommentsResponse,
   CreateCommentDto,
   CreateReviewDto,
-  HomePopularReviewsResponse,
   Review,
   ReviewResponseDto,
   ReviewsResponse,
@@ -188,15 +187,11 @@ export const deleteComment = async (commentId: number): Promise<void> => {
  */
 export const getPopularReviewsForHome = async (
   limit: number = 4
-): Promise<HomePopularReviewsResponse> => {
-  const response = await api.get<any>('/review/popular/home', {
+): Promise<ReviewsResponse> => {
+  const response = await api.get<ReviewsResponse>('/review/popular/home', {
     params: { limit },
   });
-
-  // 서버 응답이 배열 형태이거나 다른 형태일 수 있으므로 유연하게 처리
-  return {
-    reviews: Array.isArray(response.data) ? response.data : response.data || [],
-  };
+  return response.data;
 };
 
 /**

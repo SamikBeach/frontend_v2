@@ -95,13 +95,9 @@ export interface HomeReviewPreview {
   previewImage?: string;
   likeCount: number;
   commentCount: number;
-  books?: {
-    id: number;
-    title: string;
-    author: string;
-    coverImage: string;
-  }[];
+  books?: ReviewBook[];
   createdAt: Date | string;
+  author?: Author;
 }
 
 // 홈화면용 인기 리뷰 응답 타입
