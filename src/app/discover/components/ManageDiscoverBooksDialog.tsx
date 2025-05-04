@@ -38,6 +38,7 @@ import {
   Search,
   Star,
   Trash2,
+  X,
 } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -433,315 +434,341 @@ export function ManageDiscoverBooksDialog({
 
   return (
     <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
-      <ResponsiveDialogContent className="max-h-[95vh] w-[1600px] min-w-[70vw] p-5 pb-2">
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle className="text-xl">
-            발견하기 도서 관리
-          </ResponsiveDialogTitle>
-        </ResponsiveDialogHeader>
+      <ResponsiveDialogContent className="max-h-[95vh] w-[1600px] min-w-[70vw] overflow-hidden rounded-xl p-0 shadow-lg md:p-0">
+        <div className="flex h-full flex-col">
+          <ResponsiveDialogHeader className="border-b border-gray-100 bg-white p-5">
+            <ResponsiveDialogTitle className="text-xl font-semibold text-gray-900">
+              발견하기 도서 관리
+            </ResponsiveDialogTitle>
+          </ResponsiveDialogHeader>
 
-        <div className="grid h-[80vh] grid-cols-1 gap-6 overflow-hidden lg:grid-cols-2 lg:divide-x">
-          {/* 왼쪽: 현재 카테고리 도서 목록 */}
-          <div className="flex h-full flex-col space-y-4 overflow-hidden">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-800">
-                카테고리 도서 관리
-              </h3>
-              {booksData.length > 0 && (
-                <div className="text-sm text-gray-500">
-                  총 <span className="font-medium">{booksData.length}권</span>
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-end gap-4">
-              <div className="flex-1 space-y-1">
-                <Label htmlFor="category" className="text-sm font-medium">
-                  카테고리
-                </Label>
-                <Select
-                  value={selectedCategoryId}
-                  onValueChange={value => {
-                    handleCategoryChange(value);
-                  }}
-                >
-                  <SelectTrigger id="category" className="h-10">
-                    <SelectValue placeholder="카테고리 선택" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(category => {
-                      return (
-                        <SelectItem
-                          key={category.id}
-                          value={category.id.toString()}
-                        >
-                          {category.name}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {selectedCategory &&
-                selectedCategory.subCategories.length > 0 && (
-                  <div className="flex-1 space-y-1">
-                    <Label
-                      htmlFor="subcategory"
-                      className="text-sm font-medium"
-                    >
-                      서브카테고리
-                    </Label>
-                    <Select
-                      value={selectedSubcategoryId}
-                      onValueChange={value => {
-                        setSelectedSubcategoryId(value);
-                      }}
-                    >
-                      <SelectTrigger id="subcategory" className="h-10">
-                        <SelectValue placeholder="서브카테고리 선택" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {selectedCategory.subCategories.map(subcategory => {
-                          return (
-                            <SelectItem
-                              key={subcategory.id}
-                              value={subcategory.id.toString()}
-                            >
-                              {subcategory.name}
-                            </SelectItem>
-                          );
-                        })}
-                      </SelectContent>
-                    </Select>
+          <div className="grid h-[80vh] grid-cols-1 overflow-hidden lg:grid-cols-2 lg:divide-x lg:divide-gray-100">
+            {/* 왼쪽: 현재 카테고리 도서 목록 */}
+            <div className="flex h-full flex-col overflow-hidden bg-white p-5">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-800">
+                  카테고리 도서 관리
+                </h3>
+                {booksData.length > 0 && (
+                  <div className="rounded-full bg-gray-50 px-3 py-1 text-sm text-gray-500">
+                    총{' '}
+                    <span className="font-semibold text-gray-700">
+                      {booksData.length}권
+                    </span>
                   </div>
                 )}
-            </div>
+              </div>
 
-            <ScrollArea className="h-[calc(100%-120px)] rounded-md border border-gray-100">
-              {!isSelectionComplete() ? (
-                <div className="flex h-full flex-col items-center justify-center py-8 text-center">
-                  <BookOpen className="mb-2 h-12 w-12 text-gray-300" />
-                  <h3 className="text-lg font-medium text-gray-900">
-                    카테고리 선택이 필요합니다
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    카테고리 및 서브카테고리를 선택해 주세요.
-                  </p>
-                </div>
-              ) : isBooksLoading ? (
-                <div className="flex h-full items-center justify-center">
-                  <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                </div>
-              ) : booksData.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center py-8 text-center">
-                  <BookOpen className="mb-2 h-12 w-12 text-gray-300" />
-                  <h3 className="text-lg font-medium text-gray-900">
-                    도서가 없습니다
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    이 카테고리에 추가된 도서가 없습니다.
-                  </p>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100">
-                  {booksData.map(book => (
-                    <div
-                      key={book.id}
-                      className="flex items-start gap-4 p-4 hover:bg-gray-50"
+              <div className="mb-5 flex flex-wrap items-end gap-4">
+                <div className="flex-1 space-y-1.5">
+                  <Label
+                    htmlFor="category"
+                    className="text-sm font-medium text-gray-700"
+                  >
+                    카테고리
+                  </Label>
+                  <Select
+                    value={selectedCategoryId}
+                    onValueChange={value => {
+                      handleCategoryChange(value);
+                    }}
+                  >
+                    <SelectTrigger
+                      id="category"
+                      className="h-10 cursor-pointer border-gray-200 transition-all hover:border-gray-300 focus:ring-2 focus:ring-blue-100"
                     >
-                      <div className="h-20 w-14 flex-shrink-0 overflow-hidden rounded-md border shadow-sm">
-                        <img
-                          src={book.coverImage}
-                          alt={book.title}
-                          className="h-full w-full object-cover"
-                          onError={e => {
-                            e.currentTarget.src = '/images/no-image.png';
-                          }}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">
-                          {book.title}
-                        </h4>
-                        <p className="text-sm text-gray-500">{book.author}</p>
-                        <div className="mt-1 flex items-center gap-2">
-                          <span className="text-xs text-gray-500">
-                            {book.publisher} ·{' '}
-                            {new Date(book.publishDate).getFullYear()}
-                          </span>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 text-gray-400 hover:bg-red-50 hover:text-red-500"
-                        onClick={() => removeBookMutation(book.id)}
-                        disabled={isRemoving}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </ScrollArea>
-          </div>
-
-          {/* 오른쪽: 도서 검색 및 추가 */}
-          <div className="flex h-full flex-col space-y-4 overflow-hidden lg:pl-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-800">
-                도서 검색 및 추가
-              </h3>
-              {searchResults.length > 0 && (
-                <div className="text-sm text-gray-500">
-                  검색 결과:{' '}
-                  <span className="font-medium">{totalSearchResults}권</span>
-                </div>
-              )}
-            </div>
-
-            {isSelectionComplete() ? (
-              <>
-                <div className="relative">
-                  <Input
-                    ref={searchInputRef}
-                    type="text"
-                    placeholder="도서 제목, 저자, ISBN 등으로 검색"
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    className="h-10 pr-10"
-                  />
-                  <Search className="absolute top-1/2 right-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
-                </div>
-
-                <div
-                  ref={searchScrollContainerRef}
-                  className="flex-1 overflow-y-auto rounded-md border border-gray-100 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
-                  onScroll={handleSearchScroll}
-                  style={{
-                    height: 'calc(100% - 60px)',
-                  }}
-                >
-                  {searchQuery.length === 0 ? (
-                    <div className="flex h-full items-center justify-center p-8 text-center">
-                      <div className="space-y-3">
-                        <Search className="mx-auto h-8 w-8 text-gray-300" />
-                        <h3 className="text-sm font-medium text-gray-700">
-                          도서를 검색하세요
-                        </h3>
-                        <p className="text-xs text-gray-500">
-                          도서 제목, 저자, ISBN 등으로 검색할 수 있습니다
-                        </p>
-                      </div>
-                    </div>
-                  ) : isSearchLoading ? (
-                    <div className="flex h-full items-center justify-center">
-                      <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
-                    </div>
-                  ) : searchResults.length === 0 ? (
-                    <div className="flex h-full flex-col items-center justify-center py-8 text-center">
-                      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-                        <span className="text-3xl">📚</span>
-                      </div>
-                      <h3 className="text-lg font-medium text-gray-900">
-                        검색 결과가 없습니다
-                      </h3>
-                      <p className="mt-1 text-sm text-gray-500">
-                        다른 검색어를 입력해보세요
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-1 p-1">
-                      {searchResults.map(book => {
-                        const imageUrl = normalizeImageUrl(getImageUrl(book));
-                        const bookId = getBookId(book);
-
+                      <SelectValue placeholder="카테고리 선택" />
+                    </SelectTrigger>
+                    <SelectContent className="border border-gray-100 shadow-md">
+                      {categories.map(category => {
                         return (
-                          <div
-                            key={getBookIdentifier(book)}
-                            className="group relative flex h-auto items-start gap-4 rounded-md border-b border-gray-100 px-4 py-4 transition-colors hover:bg-gray-50"
+                          <SelectItem
+                            key={category.id}
+                            value={category.id.toString()}
+                            className="cursor-pointer hover:bg-gray-50"
                           >
-                            <div className="relative w-[100px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white shadow-sm">
-                              <img
-                                src={imageUrl}
-                                alt={book.title}
-                                className="h-auto w-full object-contain"
-                                onError={e => {
-                                  e.currentTarget.src = '/images/no-image.png';
-                                }}
-                                loading="lazy"
-                              />
-                            </div>
-
-                            <div className="flex min-w-0 flex-1 flex-col justify-start pt-1">
-                              <h4 className="line-clamp-2 text-base font-medium text-gray-800 group-hover:text-gray-700">
-                                {highlightText(book.title, searchQuery)}
-                              </h4>
-
-                              {book.author && (
-                                <p className="mt-1.5 line-clamp-1 text-sm text-gray-500">
-                                  {book.author}
-                                </p>
-                              )}
-
-                              <div className="mt-2 flex items-center gap-3">
-                                <div className="flex items-center">
-                                  {renderStarRating(book.rating)}
-                                  <span className="mx-1.5 text-sm font-medium text-gray-800">
-                                    {typeof book.rating === 'number'
-                                      ? book.rating.toFixed(1)
-                                      : book.rating || '0.0'}
-                                  </span>
-                                  <span className="text-sm text-gray-500">
-                                    ({book.totalRatings || 0})
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center border-l border-gray-200 pl-3">
-                                  <MessageSquare className="h-4 w-4 text-gray-400" />
-                                  <span className="ml-1.5 text-sm text-gray-500">
-                                    {book.reviews && book.reviews > 999
-                                      ? `${Math.floor(book.reviews / 1000)}k`
-                                      : book.reviews || 0}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            <Button
-                              size="sm"
-                              className="ml-auto self-center"
-                              onClick={() => addBookToCategory(book)}
-                            >
-                              추가
-                            </Button>
-                          </div>
+                            {category.name}
+                          </SelectItem>
                         );
                       })}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                      {isFetchingNextSearchPage && (
-                        <div className="flex justify-center py-4">
-                          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
-                        </div>
-                      )}
+                {selectedCategory &&
+                  selectedCategory.subCategories.length > 0 && (
+                    <div className="flex-1 space-y-1.5">
+                      <Label
+                        htmlFor="subcategory"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        서브카테고리
+                      </Label>
+                      <Select
+                        value={selectedSubcategoryId}
+                        onValueChange={value => {
+                          setSelectedSubcategoryId(value);
+                        }}
+                      >
+                        <SelectTrigger
+                          id="subcategory"
+                          className="h-10 cursor-pointer border-gray-200 transition-all hover:border-gray-300 focus:ring-2 focus:ring-blue-100"
+                        >
+                          <SelectValue placeholder="서브카테고리 선택" />
+                        </SelectTrigger>
+                        <SelectContent className="border border-gray-100 shadow-md">
+                          {selectedCategory.subCategories.map(subcategory => {
+                            return (
+                              <SelectItem
+                                key={subcategory.id}
+                                value={subcategory.id.toString()}
+                                className="cursor-pointer hover:bg-gray-50"
+                              >
+                                {subcategory.name}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
                     </div>
                   )}
-                </div>
-              </>
-            ) : (
-              <div className="flex h-full flex-col items-center justify-center py-8 text-center">
-                <BookOpen className="mb-2 h-12 w-12 text-gray-300" />
-                <h3 className="text-lg font-medium text-gray-900">
-                  카테고리 선택이 필요합니다
-                </h3>
-                <p className="mt-1 text-sm text-gray-500">
-                  도서 검색 및 추가를 위해 카테고리 및 서브카테고리를 선택해
-                  주세요.
-                </p>
               </div>
-            )}
+
+              <ScrollArea className="flex-1 rounded-lg border border-gray-100 shadow-sm">
+                {!isSelectionComplete() ? (
+                  <div className="flex h-full flex-col items-center justify-center px-4 py-12 text-center">
+                    <BookOpen className="mb-3 h-12 w-12 text-gray-200" />
+                    <h3 className="mb-1 text-lg font-medium text-gray-800">
+                      카테고리 선택이 필요합니다
+                    </h3>
+                    <p className="max-w-sm text-sm text-gray-500">
+                      카테고리 및 서브카테고리를 선택해 주세요.
+                    </p>
+                  </div>
+                ) : isBooksLoading ? (
+                  <div className="flex h-full items-center justify-center">
+                    <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                  </div>
+                ) : booksData.length === 0 ? (
+                  <div className="flex h-full flex-col items-center justify-center px-4 py-12 text-center">
+                    <BookOpen className="mb-3 h-12 w-12 text-gray-200" />
+                    <h3 className="mb-1 text-lg font-medium text-gray-800">
+                      도서가 없습니다
+                    </h3>
+                    <p className="max-w-sm text-sm text-gray-500">
+                      이 카테고리에 추가된 도서가 없습니다.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-100">
+                    {booksData.map(book => (
+                      <div
+                        key={book.id}
+                        className="flex items-start gap-4 p-4 transition-colors hover:bg-gray-50"
+                      >
+                        <div className="h-20 w-14 flex-shrink-0 overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm">
+                          <img
+                            src={book.coverImage}
+                            alt={book.title}
+                            className="h-full w-full object-cover"
+                            onError={e => {
+                              e.currentTarget.src = '/images/no-image.png';
+                            }}
+                          />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="line-clamp-1 font-medium text-gray-900">
+                            {book.title}
+                          </h4>
+                          <p className="line-clamp-1 text-sm text-gray-500">
+                            {book.author}
+                          </p>
+                          <div className="mt-1 flex items-center gap-2">
+                            <span className="text-xs text-gray-500">
+                              {book.publisher} ·{' '}
+                              {new Date(book.publishDate).getFullYear()}
+                            </span>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 flex-shrink-0 cursor-pointer rounded-full text-gray-400 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-500"
+                          onClick={() => removeBookMutation(book.id)}
+                          disabled={isRemoving}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+
+            {/* 오른쪽: 도서 검색 및 추가 */}
+            <div className="flex h-full flex-col overflow-hidden bg-white p-5">
+              <div className="mb-5 flex items-center justify-between">
+                <h3 className="text-lg font-medium text-gray-800">
+                  도서 검색 및 추가
+                </h3>
+                {searchResults.length > 0 && (
+                  <div className="rounded-full bg-gray-50 px-3 py-1 text-sm text-gray-500">
+                    검색 결과:{' '}
+                    <span className="font-semibold text-gray-700">
+                      {totalSearchResults}권
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {isSelectionComplete() ? (
+                <>
+                  <div className="relative mb-5">
+                    <Input
+                      ref={searchInputRef}
+                      type="text"
+                      placeholder="도서 제목, 저자, ISBN 등으로 검색"
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      className="focus:ring-opacity-50 h-10 rounded-full border-gray-200 pr-10 pl-10 transition-all hover:border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200"
+                    />
+                    <Search className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                    {searchQuery && (
+                      <button
+                        className="absolute top-1/2 right-3.5 -translate-y-1/2 transform cursor-pointer text-gray-400 hover:text-gray-600"
+                        onClick={() => setSearchQuery('')}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div
+                    ref={searchScrollContainerRef}
+                    className="flex-1 overflow-y-auto rounded-lg border border-gray-100 shadow-sm [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+                    onScroll={handleSearchScroll}
+                  >
+                    {searchQuery.length === 0 ? (
+                      <div className="flex h-full items-center justify-center p-8 text-center">
+                        <div className="space-y-3">
+                          <Search className="mx-auto h-8 w-8 text-gray-200" />
+                          <h3 className="text-sm font-medium text-gray-700">
+                            도서를 검색하세요
+                          </h3>
+                          <p className="mx-auto max-w-xs text-xs text-gray-500">
+                            도서 제목, 저자, ISBN 등으로 검색할 수 있습니다
+                          </p>
+                        </div>
+                      </div>
+                    ) : isSearchLoading ? (
+                      <div className="flex h-full items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                      </div>
+                    ) : searchResults.length === 0 ? (
+                      <div className="flex h-full flex-col items-center justify-center px-4 py-12 text-center">
+                        <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-50">
+                          <span className="text-3xl">📚</span>
+                        </div>
+                        <h3 className="mb-1 text-lg font-medium text-gray-800">
+                          검색 결과가 없습니다
+                        </h3>
+                        <p className="max-w-sm text-sm text-gray-500">
+                          다른 검색어를 입력해보세요
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-100">
+                        {searchResults.map(book => {
+                          const imageUrl = normalizeImageUrl(getImageUrl(book));
+                          const bookId = getBookId(book);
+
+                          return (
+                            <div
+                              key={getBookIdentifier(book)}
+                              className="group relative flex h-auto items-start gap-4 px-4 py-4 transition-colors hover:bg-gray-50"
+                            >
+                              <div className="relative h-[145px] w-[100px] flex-shrink-0 overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm">
+                                <img
+                                  src={imageUrl}
+                                  alt={book.title}
+                                  className="h-full w-full object-cover"
+                                  onError={e => {
+                                    e.currentTarget.src =
+                                      '/images/no-image.png';
+                                  }}
+                                  loading="lazy"
+                                />
+                              </div>
+
+                              <div className="flex min-w-0 flex-1 flex-col justify-start pt-1">
+                                <h4 className="line-clamp-2 text-base font-medium text-gray-800 group-hover:text-gray-700">
+                                  {highlightText(book.title, searchQuery)}
+                                </h4>
+
+                                {book.author && (
+                                  <p className="mt-1.5 line-clamp-1 text-sm text-gray-500">
+                                    {book.author}
+                                  </p>
+                                )}
+
+                                <div className="mt-2 flex items-center gap-3">
+                                  <div className="flex items-center">
+                                    {renderStarRating(book.rating)}
+                                    <span className="mx-1.5 text-sm font-medium text-gray-800">
+                                      {typeof book.rating === 'number'
+                                        ? book.rating.toFixed(1)
+                                        : book.rating || '0.0'}
+                                    </span>
+                                    <span className="text-sm text-gray-500">
+                                      ({book.totalRatings || 0})
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center border-l border-gray-200 pl-3">
+                                    <MessageSquare className="h-4 w-4 text-gray-400" />
+                                    <span className="ml-1.5 text-sm text-gray-500">
+                                      {book.reviews && book.reviews > 999
+                                        ? `${Math.floor(book.reviews / 1000)}k`
+                                        : book.reviews || 0}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <Button
+                                size="sm"
+                                className="ml-auto cursor-pointer self-center bg-blue-500 text-white shadow-sm transition-colors hover:bg-blue-600 hover:shadow"
+                                onClick={() => addBookToCategory(book)}
+                              >
+                                추가
+                              </Button>
+                            </div>
+                          );
+                        })}
+
+                        {isFetchingNextSearchPage && (
+                          <div className="flex justify-center py-4">
+                            <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="flex h-full flex-col items-center justify-center px-4 py-12 text-center">
+                  <BookOpen className="mb-3 h-12 w-12 text-gray-200" />
+                  <h3 className="mb-1 text-lg font-medium text-gray-800">
+                    카테고리 선택이 필요합니다
+                  </h3>
+                  <p className="max-w-sm text-sm text-gray-500">
+                    도서 검색 및 추가를 위해 카테고리 및 서브카테고리를 선택해
+                    주세요.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </ResponsiveDialogContent>
