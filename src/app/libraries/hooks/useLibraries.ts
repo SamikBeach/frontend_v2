@@ -1,6 +1,9 @@
-import { TimeRange } from '@/apis/book/types';
 import { getAllLibraries } from '@/apis/library';
-import { Library, LibrarySortOption } from '@/apis/library/types';
+import {
+  Library,
+  LibrarySortOption,
+  TimeRangeOptions,
+} from '@/apis/library/types';
 import {
   librarySearchQueryAtom,
   librarySortOptionAtom,
@@ -16,7 +19,7 @@ import { useCallback, useEffect, useMemo } from 'react';
 // 기본값 상수 정의
 const DEFAULT_TAG_FILTER = 'all';
 const DEFAULT_SORT_OPTION = 'popular';
-const DEFAULT_TIME_RANGE = 'all';
+const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
 
 interface UseLibrariesResult {
   libraries: Library[];
@@ -26,10 +29,10 @@ interface UseLibrariesResult {
   fetchNextPage: () => void;
   tagFilter: string;
   sortOption: string;
-  timeRange: TimeRange;
+  timeRange: TimeRangeOptions;
   searchQuery: string;
   handleSortChange: (sortId: string) => void;
-  handleTimeRangeChange: (timeRange: TimeRange) => void;
+  handleTimeRangeChange: (timeRange: TimeRangeOptions) => void;
   handleSearchChange: (value: string) => void;
   refetch: () => void;
 }
@@ -100,7 +103,7 @@ export function useLibraries(): UseLibrariesResult {
     fetchNextPage,
     refetch,
   } = useInfiniteQuery({
-    queryKey: ['libraries', sortOption, searchQuery, tagId],
+    queryKey: ['libraries', sortOption, searchQuery, tagId, timeRange],
     queryFn: async ({ pageParam = 1 }) => {
       const apiSortOption = getApiSortOption();
       return await getAllLibraries(
@@ -108,7 +111,8 @@ export function useLibraries(): UseLibrariesResult {
         9, // 한 페이지당 9개 항목
         apiSortOption,
         searchQuery,
-        tagId
+        tagId,
+        timeRange !== DEFAULT_TIME_RANGE ? timeRange : undefined
       );
     },
     initialPageParam: 1,
@@ -144,7 +148,7 @@ export function useLibraries(): UseLibrariesResult {
   );
 
   const handleTimeRangeChange = useCallback(
-    (newTimeRange: TimeRange) => {
+    (newTimeRange: TimeRangeOptions) => {
       setTimeRange(newTimeRange);
       // URL 쿼리 파라미터 업데이트 - 기본값이 아닌 경우에만
       if (newTimeRange !== DEFAULT_TIME_RANGE) {
@@ -184,25 +188,25 @@ export function useLibraries(): UseLibrariesResult {
 }
 
 // 기간별 필터링을 위한 날짜 계산 함수
-function getDateFromTimeRange(timeRange: string): Date | null {
+function getDateFromTimeRange(timeRange: TimeRangeOptions): Date | null {
   const now = new Date();
 
   switch (timeRange) {
-    case 'today':
+    case TimeRangeOptions.TODAY:
       // 오늘 00:00:00 시간으로 설정
       now.setHours(0, 0, 0, 0);
       return now;
-    case 'week':
+    case TimeRangeOptions.WEEK:
       // 이번 주 일요일로 설정 (0: 일요일, 1: 월요일, ..., 6: 토요일)
       now.setDate(now.getDate() - now.getDay());
       now.setHours(0, 0, 0, 0);
       return now;
-    case 'month':
+    case TimeRangeOptions.MONTH:
       // 이번 달 1일로 설정
       now.setDate(1);
       now.setHours(0, 0, 0, 0);
       return now;
-    case 'year':
+    case TimeRangeOptions.YEAR:
       // 올해 1월 1일로 설정
       now.setMonth(0, 1);
       now.setHours(0, 0, 0, 0);

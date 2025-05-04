@@ -3,6 +3,7 @@ import {
   HomeLibraryPreview,
   LibraryListItem,
   PaginatedLibraryResponse,
+  TimeRangeOptions,
 } from '@/apis/library/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
@@ -10,11 +11,15 @@ import { useMemo } from 'react';
 /**
  * 홈 화면에 표시할 인기 서재 데이터를 가져오는 훅
  * @param limit 가져올 서재 수 (기본값: 3)
+ * @param timeRange 특정 기간 데이터만 가져오는 필터 (기본값: 없음)
  */
-export function useHomePopularLibrariesQuery(limit: number = 3) {
+export function useHomePopularLibrariesQuery(
+  limit: number = 3,
+  timeRange?: TimeRangeOptions
+) {
   const { data, isLoading } = useSuspenseQuery<PaginatedLibraryResponse>({
-    queryKey: ['home', 'popularLibraries', limit],
-    queryFn: () => getPopularLibrariesForHome(limit),
+    queryKey: ['home', 'popularLibraries', limit, timeRange],
+    queryFn: () => getPopularLibrariesForHome(limit, timeRange),
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시
   });
 

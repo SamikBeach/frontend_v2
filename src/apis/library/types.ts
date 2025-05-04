@@ -20,6 +20,15 @@ export enum LibrarySortOption {
   RECENT = 'recent', // 최신순
 }
 
+// 기간 필터 옵션 (백엔드 enum과 일치)
+export enum TimeRangeOptions {
+  ALL = 'all',
+  TODAY = 'today',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+
 // 기본 사용자 정보 타입
 export interface UserInfo {
   id: number;
@@ -114,6 +123,7 @@ export interface PaginationMeta {
   limit: number;
   totalPages: number;
   sort?: LibrarySortOption;
+  timeRange?: TimeRangeOptions;
   query?: string;
   tagId?: number;
   tagName?: string;

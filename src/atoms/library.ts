@@ -1,4 +1,4 @@
-import { TimeRange } from '@/components/SortDropdown';
+import { TimeRangeOptions } from '@/apis/library/types';
 import { atom } from 'jotai';
 
 // 서재 태그 필터 atom
@@ -8,7 +8,9 @@ export const libraryTagFilterAtom = atom<string>('all');
 export const librarySortOptionAtom = atom<string>('popular');
 
 // 서재 기간 필터 atom
-export const libraryTimeRangeAtom = atom<TimeRange>('all');
+export const libraryTimeRangeAtom = atom<TimeRangeOptions>(
+  TimeRangeOptions.ALL
+);
 
 // 선택된 서재 ID atom
 export const selectedLibraryIdAtom = atom<string | null>(null);

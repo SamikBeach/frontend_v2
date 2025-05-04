@@ -47,6 +47,9 @@ export function SortDropdown({
     }
   };
 
+  // 최신순(latest)일 때는 시간 범위 필터를 표시하지 않기 위해 onTimeRangeChange를 조건부로 전달
+  const shouldShowTimeRange = selectedSort !== 'latest' && onTimeRangeChange;
+
   return (
     <CommonSortDropdown<Library>
       selectedSort={selectedSort}
@@ -54,7 +57,9 @@ export function SortDropdown({
       sortOptions={sortOptions}
       className={className}
       selectedTimeRange={selectedTimeRange}
-      onTimeRangeChange={onTimeRangeChange ? handleTimeRangeChange : undefined}
+      onTimeRangeChange={
+        shouldShowTimeRange ? handleTimeRangeChange : undefined
+      }
     />
   );
 }
