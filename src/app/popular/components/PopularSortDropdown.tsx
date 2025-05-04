@@ -5,6 +5,10 @@ import { useQueryParams } from '@/hooks';
 import { useAtom } from 'jotai';
 import { useMemo } from 'react';
 
+// 기본값 상수 정의
+const DEFAULT_SORT = PopularBooksSortOptions.RATING_DESC;
+const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
+
 interface PopularSortDropdownProps {
   className?: string;
 }
@@ -34,8 +38,14 @@ export function PopularSortDropdown({ className }: PopularSortDropdownProps) {
       sort === PopularBooksSortOptions.TITLE_ASC
     ) {
       setSortOption(sort);
-      // URL 쿼리 파라미터 업데이트
-      updateQueryParams({ sort });
+
+      // 기본값과 다른 경우에만 URL 쿼리 파라미터 업데이트
+      if (sort !== DEFAULT_SORT) {
+        updateQueryParams({ sort });
+      } else {
+        // 기본값인 경우 URL에서 제거
+        updateQueryParams({ sort: undefined });
+      }
     }
   };
 
@@ -48,12 +58,18 @@ export function PopularSortDropdown({ className }: PopularSortDropdownProps) {
       range === TimeRangeOptions.WEEK
     ) {
       setTimeRange(range);
-      // URL 쿼리 파라미터 업데이트
-      updateQueryParams({ timeRange: range });
+
+      // 기본값과 다른 경우에만 URL 쿼리 파라미터 업데이트
+      if (range !== DEFAULT_TIME_RANGE) {
+        updateQueryParams({ timeRange: range });
+      } else {
+        // 기본값인 경우 URL에서 제거
+        updateQueryParams({ timeRange: undefined });
+      }
     } else {
-      setTimeRange(TimeRangeOptions.ALL);
-      // URL 쿼리 파라미터 업데이트
-      updateQueryParams({ timeRange: TimeRangeOptions.ALL });
+      setTimeRange(DEFAULT_TIME_RANGE);
+      // 기본값으로 설정된 경우 URL에서 제거
+      updateQueryParams({ timeRange: undefined });
     }
   };
 

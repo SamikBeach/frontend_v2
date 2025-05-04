@@ -90,10 +90,16 @@ function CategoryFilterSkeleton() {
   );
 }
 
+// 기본값 상수 정의
+const DEFAULT_CATEGORY = 'all';
+const DEFAULT_SUBCATEGORY = 'all';
+const DEFAULT_SORT = PopularBooksSortOptions.RATING_DESC;
+const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
+
 export default function PopularPage() {
   const isMobile = useIsMobile();
   const searchParams = useSearchParams();
-  const { updateQueryParams } = useQueryParams();
+  const { updateQueryParams, clearQueryParams } = useQueryParams();
 
   // Atom setters
   const setCategoryFilter = useSetAtom(categoryFilterAtom);
@@ -104,39 +110,56 @@ export default function PopularPage() {
 
   // URL 파라미터에서 필터 상태 초기화
   useEffect(() => {
-    const category = searchParams.get('category') || 'all';
-    const subcategory = searchParams.get('subcategory') || 'all';
-    const sortValue =
-      searchParams.get('sort') || PopularBooksSortOptions.RATING_DESC;
+    const category = searchParams.get('category') || DEFAULT_CATEGORY;
+    const subcategory = searchParams.get('subcategory') || DEFAULT_SUBCATEGORY;
+    const sortValue = searchParams.get('sort') || DEFAULT_SORT;
     const sort: SortOption = isValidSortOption(sortValue)
       ? sortValue
-      : PopularBooksSortOptions.RATING_DESC;
+      : DEFAULT_SORT;
 
-    const timeRangeValue =
-      searchParams.get('timeRange') || TimeRangeOptions.ALL;
+    const timeRangeValue = searchParams.get('timeRange') || DEFAULT_TIME_RANGE;
     const timeRange: TimeRange = isValidTimeRange(timeRangeValue)
       ? timeRangeValue
-      : TimeRangeOptions.ALL;
+      : DEFAULT_TIME_RANGE;
 
     const bookId = searchParams.get('book');
 
+    // Atoms 업데이트
     setCategoryFilter(category);
     setSubcategoryFilter(subcategory);
     setSortOption(sort);
     setTimeRange(timeRange);
     if (bookId) setSelectedBookId(bookId);
 
-    // URL 파라미터 동기화
-    updateQueryParams({
-      category,
-      subcategory,
-      sort,
-      timeRange,
-      book: bookId || undefined,
-    });
+    // 모든 값이 기본값이면 URL에서 쿼리 파라미터 제거
+    const isAllDefault =
+      category === DEFAULT_CATEGORY &&
+      subcategory === DEFAULT_SUBCATEGORY &&
+      sort === DEFAULT_SORT &&
+      timeRange === DEFAULT_TIME_RANGE &&
+      !bookId;
+
+    if (isAllDefault) {
+      // URL에서 쿼리 파라미터 제거
+      clearQueryParams();
+    } else {
+      // 필요한 경우에만 URL 파라미터 업데이트
+      // 기본값이 아닌 매개변수만 URL에 포함
+      const updates: Record<string, string | undefined> = {};
+
+      if (category !== DEFAULT_CATEGORY) updates.category = category;
+      if (subcategory !== DEFAULT_SUBCATEGORY)
+        updates.subcategory = subcategory;
+      if (sort !== DEFAULT_SORT) updates.sort = sort;
+      if (timeRange !== DEFAULT_TIME_RANGE) updates.timeRange = timeRange;
+      if (bookId) updates.book = bookId;
+
+      updateQueryParams(updates);
+    }
   }, [
     searchParams,
     updateQueryParams,
+    clearQueryParams,
     setCategoryFilter,
     setSubcategoryFilter,
     setSortOption,

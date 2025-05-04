@@ -71,24 +71,42 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
 
   const subcategories = selectedCategoryObj?.subCategories || [];
 
+  const DEFAULT_CATEGORY = 'all';
+  const DEFAULT_SUBCATEGORY = 'all';
+
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setSelectedSubcategory('all'); // 카테고리 변경 시 서브카테고리 'all'로 초기화
 
-    // URL 쿼리 파라미터 업데이트
-    updateQueryParams({
-      category: categoryId,
-      subcategory: 'all', // 서브카테고리 'all'로 초기화
-    });
+    // URL 쿼리 파라미터 업데이트 - 기본값이 아닌 경우에만
+    if (categoryId !== DEFAULT_CATEGORY) {
+      updateQueryParams({
+        category: categoryId,
+        subcategory: undefined, // 서브카테고리는 기본값이므로 제거
+      });
+    } else {
+      // 카테고리가 기본값이면 URL에서 제거
+      updateQueryParams({
+        category: undefined,
+        subcategory: undefined,
+      });
+    }
   };
 
   const handleSubcategoryClick = (subcategoryId: string) => {
     setSelectedSubcategory(subcategoryId);
 
-    // URL 쿼리 파라미터 업데이트
-    updateQueryParams({
-      subcategory: subcategoryId,
-    });
+    // URL 쿼리 파라미터 업데이트 - 기본값이 아닌 경우에만
+    if (subcategoryId !== DEFAULT_SUBCATEGORY) {
+      updateQueryParams({
+        subcategory: subcategoryId,
+      });
+    } else {
+      // 기본값인 경우 URL에서 제거
+      updateQueryParams({
+        subcategory: undefined,
+      });
+    }
   };
 
   // 카테고리별 색상 가져오기 (인덱스에 따라 다른 파스텔톤 적용)

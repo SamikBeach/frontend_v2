@@ -1,4 +1,7 @@
-import { SortOption as ApiSortOption } from '@/apis/book/types';
+import {
+  SortOption as ApiSortOption,
+  PopularBooksSortOptions,
+} from '@/apis/book/types';
 import {
   discoverSortOptionAtom,
   discoverTimeRangeAtom,
@@ -11,6 +14,10 @@ import { useQueryParams } from '@/hooks';
 import { useAtom } from 'jotai';
 import { BarChart3, ClockIcon, Star } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+
+// 기본값 상수 정의
+const DEFAULT_SORT = PopularBooksSortOptions.REVIEWS_DESC;
+const DEFAULT_TIME_RANGE = 'all';
 
 // 정렬 옵션 타입
 export interface SortOption {
@@ -29,21 +36,21 @@ const sortOptions: SortOption[] = [
   {
     id: 'reviews',
     label: '리뷰 많은 순',
-    value: 'reviews-desc',
+    value: PopularBooksSortOptions.REVIEWS_DESC,
     icon: <BarChart3 className="h-4 w-4" />,
     supportsTimeRange: true,
   },
   {
     id: 'rating',
     label: '평점 높은 순',
-    value: 'rating-desc',
+    value: PopularBooksSortOptions.RATING_DESC,
     icon: <Star className="h-4 w-4" />,
     supportsTimeRange: true,
   },
   {
     id: 'latest',
     label: '최신 출간 순',
-    value: 'publishDate-desc',
+    value: PopularBooksSortOptions.PUBLISH_DATE_DESC,
     icon: <ClockIcon className="h-4 w-4" />,
     supportsTimeRange: false,
   },
@@ -76,13 +83,20 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
   // 정렬 옵션 변경 핸들러
   const handleSortChange = (sort: string) => {
     if (
-      sort === 'rating-desc' ||
-      sort === 'reviews-desc' ||
-      sort === 'publishDate-desc' ||
-      sort === 'title-asc'
+      sort === PopularBooksSortOptions.RATING_DESC ||
+      sort === PopularBooksSortOptions.REVIEWS_DESC ||
+      sort === PopularBooksSortOptions.PUBLISH_DATE_DESC ||
+      sort === PopularBooksSortOptions.TITLE_ASC
     ) {
       setSortOption(sort);
-      updateQueryParams({ sort });
+
+      // 기본값과 다른 경우에만 URL 쿼리 파라미터 업데이트
+      if (sort !== DEFAULT_SORT) {
+        updateQueryParams({ sort });
+      } else {
+        // 기본값인 경우 URL에서 제거
+        updateQueryParams({ sort: undefined });
+      }
     }
   };
 
@@ -96,10 +110,18 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
       range === 'week'
     ) {
       setTimeRange(range);
-      updateQueryParams({ timeRange: range });
+
+      // 기본값과 다른 경우에만 URL 쿼리 파라미터 업데이트
+      if (range !== DEFAULT_TIME_RANGE) {
+        updateQueryParams({ timeRange: range });
+      } else {
+        // 기본값인 경우 URL에서 제거
+        updateQueryParams({ timeRange: undefined });
+      }
     } else {
       setTimeRange('all');
-      updateQueryParams({ timeRange: 'all' });
+      // 기본값으로 설정된 경우 URL에서 제거
+      updateQueryParams({ timeRange: undefined });
     }
   };
 
