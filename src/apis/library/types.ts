@@ -143,7 +143,7 @@ export interface UpdateLibraryDto {
 
 // 서재에 책 추가 DTO
 export interface AddBookToLibraryDto {
-  bookId: number;
+  bookId?: number;
   note?: string;
   isbn?: string;
 }

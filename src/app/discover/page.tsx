@@ -1,6 +1,11 @@
 'use client';
 
-import { SortOption, TimeRange } from '@/apis/book/types';
+import {
+  PopularBooksSortOptions,
+  SortOption,
+  TimeRange,
+  TimeRangeOptions,
+} from '@/apis/book/types';
 import { selectedBookIdAtom } from '@/atoms/book';
 import {
   discoverCategoryFilterAtom,
@@ -17,6 +22,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
 import {
+  AdminBookManageButton,
   BooksContent,
   CategoryFilter,
   CategoryFilterSkeleton,
@@ -105,12 +111,12 @@ export default function DiscoverPage() {
     const sortValue = searchParams.get('sort') || 'reviews-desc';
     const sort: SortOption = isValidSortOption(sortValue)
       ? sortValue
-      : 'reviews-desc';
+      : PopularBooksSortOptions.REVIEWS_DESC;
 
     const timeRangeValue = searchParams.get('timeRange') || 'all';
     const timeRange: TimeRange = isValidTimeRange(timeRangeValue)
       ? timeRangeValue
-      : 'all';
+      : TimeRangeOptions.ALL;
 
     const bookId = searchParams.get('book');
 
@@ -145,9 +151,16 @@ export default function DiscoverPage() {
 
       {/* 브레드크럼 */}
       <div className="mx-auto w-full px-4 py-2">
-        <Suspense fallback={<div className="h-6" />}>
-          <DiscoverBreadcrumb />
-        </Suspense>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <Suspense fallback={<div className="h-6" />}>
+              <DiscoverBreadcrumb />
+            </Suspense>
+          </div>
+
+          {/* 관리자 버튼 */}
+          <AdminBookManageButton />
+        </div>
       </div>
 
       {/* 필터 영역 - 스크롤 시 상단에 고정 */}
