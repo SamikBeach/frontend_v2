@@ -102,7 +102,6 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
     // isbn13을 우선적으로 사용하고, 없으면 isbn 사용
     const bookIsbn = item.isbn13 || item.isbn || '';
     openBookDialog(bookIsbn);
-    handleClose();
   };
 
   // 검색 결과 또는 최근 검색 표시 여부
@@ -123,7 +122,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
       <ResponsiveDialogPortal>
         <ResponsiveDialogContent
           className={cn(
-            'animate-expandDown fixed top-[6px] left-1/2 z-[100] max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
+            'animate-expandDown fixed top-[6px] left-1/2 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
             query ? 'h-[calc(100vh-32px)]' : 'auto'
           )}
           drawerClassName="animate-expandUp gap-1 p-0 shadow-none outline-none z-[100]"

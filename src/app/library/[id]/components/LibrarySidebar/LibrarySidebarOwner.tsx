@@ -2,13 +2,16 @@ import { useUserFollow } from '@/app/profile/hooks';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { Check, FC } from 'lucide-react';
+import { Check } from 'lucide-react';
+import Link from 'next/link';
+import { FC } from 'react';
 
 interface LibrarySidebarOwnerProps {
   owner: {
     id: number;
     username: string;
     isFollowing?: boolean;
+    profileImage?: string;
   };
 }
 
@@ -38,18 +41,20 @@ export const LibrarySidebarOwner: FC<LibrarySidebarOwnerProps> = ({
     <div className="rounded-xl bg-gray-50 p-4">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12 border border-gray-200">
-            <AvatarImage
-              src={`https://i.pravatar.cc/150?u=${owner.id}`}
-              alt={owner.username}
-            />
-            <AvatarFallback className="bg-blue-100 text-blue-600">
-              {owner.username[0]}
-            </AvatarFallback>
-          </Avatar>
+          <Link href={`/profile/${owner.id}`}>
+            <Avatar className="h-12 w-12 cursor-pointer border border-gray-200 transition-opacity hover:opacity-90">
+              <AvatarImage src={owner.profileImage} alt={owner.username} />
+              <AvatarFallback className="bg-blue-100 text-blue-600">
+                {owner.username[0]}
+              </AvatarFallback>
+            </Avatar>
+          </Link>
           <div>
-            <h3 className="font-medium text-gray-900">{owner.username}</h3>
-            <p className="text-sm text-gray-500">@{owner.username}</p>
+            <Link href={`/profile/${owner.id}`}>
+              <h3 className="cursor-pointer font-medium text-gray-900 hover:underline">
+                {owner.username}
+              </h3>
+            </Link>
           </div>
         </div>
 

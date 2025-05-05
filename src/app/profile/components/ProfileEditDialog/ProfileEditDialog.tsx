@@ -64,17 +64,19 @@ export function ProfileEditDialog({
     try {
       setIsSubmitting(true);
 
-      // ProfileFormData에서 profileImage가 null인 경우는 프로필 이미지 삭제 요청
-      const removeProfileImage = formData.profileImage === null;
-
       // 프로필 정보 및 이미지 업데이트
       await updateProfile({
         userData: {
           username: formData.username,
           bio: formData.bio,
-          ...(removeProfileImage && { removeProfileImage: true }),
+          // formData.removeProfileImage가 true인 경우에만 이미지 삭제 요청
+          ...(formData.removeProfileImage && { removeProfileImage: true }),
         },
-        file: formData.profileImage || undefined,
+        // 파일이 제공된 경우에만 전달 (undefined는 기존 이미지 유지)
+        file:
+          formData.profileImage instanceof File
+            ? formData.profileImage
+            : undefined,
       });
     } catch (error) {
       console.error('프로필 업데이트 오류:', error);

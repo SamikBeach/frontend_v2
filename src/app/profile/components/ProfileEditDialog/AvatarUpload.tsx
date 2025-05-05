@@ -57,7 +57,7 @@ export function AvatarUpload({
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    // null은 이미지 삭제를 의미
+    // null을 전달하여 프로필 이미지 삭제를 표시
     onChange(null);
   };
 

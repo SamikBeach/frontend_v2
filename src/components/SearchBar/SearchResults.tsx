@@ -42,20 +42,23 @@ function RecentSearches({
   return (
     <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
       {/* 최근 검색 목록 */}
-      {recentSearches.length > 0 && (
-        <div>
-          <div className="mb-2 flex items-center justify-between px-4 pt-2">
-            <h3 className="flex items-center text-sm font-medium text-gray-700">
-              <Clock className="mr-2 h-4 w-4 text-gray-500" />
-              최근 검색 기록
-            </h3>
+      <div>
+        <div className="mb-2 flex items-center justify-between px-4 pt-2">
+          <h3 className="flex items-center text-sm font-medium text-gray-700">
+            <Clock className="mr-2 h-4 w-4 text-gray-500" />
+            최근 검색 기록
+          </h3>
+          {recentSearches.length > 0 && (
             <button
               className="cursor-pointer text-xs text-gray-600 hover:text-gray-900 hover:underline"
               onClick={() => deleteAllRecentSearches()}
             >
               전체 삭제
             </button>
-          </div>
+          )}
+        </div>
+
+        {recentSearches.length > 0 ? (
           <RecentSearchList
             searches={recentSearches}
             onOpenChange={onOpenChange}
@@ -65,8 +68,12 @@ function RecentSearches({
               deleteRecentSearch(searchId);
             }}
           />
-        </div>
-      )}
+        ) : (
+          <div className="flex h-32 flex-col items-center justify-center px-4 py-6 text-center">
+            <p className="text-sm text-gray-500">최근 검색 기록이 없습니다.</p>
+          </div>
+        )}
+      </div>
 
       {/* 인기 검색어 */}
       <Suspense fallback={<PopularSearchesSkeleton />}>
