@@ -23,7 +23,7 @@ export function ConflictAlertDialog({
 }: ConflictAlertDialogProps) {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent onEscapeKeyDown={() => onOpenChange(false)}>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-base font-normal text-gray-700">
             이 책은 이미 &quot;{libraryName}&quot; 서재에 담겨 있습니다.

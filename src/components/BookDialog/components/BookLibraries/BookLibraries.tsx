@@ -3,6 +3,7 @@ import {
   LibraryListItem,
   LibrarySortOption,
 } from '@/apis/library/types';
+import { libraryAddDropdownOpenAtom } from '@/atoms/book-dialog';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { LibraryDialog } from '@/components/Library';
 import { LibraryCard } from '@/components/LibraryCard';
@@ -16,6 +17,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { getTagColor } from '@/utils/tags';
+import { useAtom } from 'jotai';
 import { ListPlus, Plus } from 'lucide-react';
 import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -60,11 +62,14 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
     handleAddToLibrary,
     conflictDialogOpen,
     conflictLibraryName,
-    closeConflictDialog,
+    onConflictDialogOpenChange,
   } = useLibrary(book, book?.isbn || '', userLibraries);
 
   // 새 서재 생성 다이얼로그 상태
   const [isNewLibraryDialogOpen, setIsNewLibraryDialogOpen] = useState(false);
+  const [libraryAddOpen, setLibraryAddOpen] = useAtom(
+    libraryAddDropdownOpenAtom
+  );
 
   // 새 서재 생성 및 책 추가 핸들러
   const handleCreateLibraryWithBook = async (libraryData: CreateLibraryDto) => {
@@ -110,7 +115,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
         <p className="text-sm text-gray-500">
           아직 이 책이 등록된 서재가 없습니다.
         </p>
-        <DropdownMenu>
+        <DropdownMenu open={libraryAddOpen} onOpenChange={setLibraryAddOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
@@ -120,7 +125,11 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
               <span className="text-sm">내 서재에 담기</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-44 rounded-xl">
+          <DropdownMenuContent
+            disablePortal
+            className="min-w-44 rounded-xl"
+            onEscapeKeyDown={() => setLibraryAddOpen(false)}
+          >
             {userLibraries && userLibraries.length > 0 ? (
               userLibraries.map(library => (
                 <DropdownMenuItem
@@ -151,7 +160,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
         {/* 충돌 알림 다이얼로그 */}
         <ConflictAlertDialog
           open={conflictDialogOpen}
-          onOpenChange={closeConflictDialog}
+          onOpenChange={onConflictDialogOpenChange}
           libraryName={conflictLibraryName}
         />
       </div>
@@ -208,7 +217,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
       {/* 충돌 알림 다이얼로그 */}
       <ConflictAlertDialog
         open={conflictDialogOpen}
-        onOpenChange={closeConflictDialog}
+        onOpenChange={onConflictDialogOpenChange}
         libraryName={conflictLibraryName}
       />
 

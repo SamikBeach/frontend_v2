@@ -1,6 +1,7 @@
 'use client';
 
 import { LibrarySortOption } from '@/apis/library/types';
+import { librarySortDropdownOpenAtom } from '@/atoms/book-dialog';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -8,8 +9,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAtom } from 'jotai';
 import { Clock, Flame, Library } from 'lucide-react';
-import { useState } from 'react';
 
 interface LibrarySortDropdownProps {
   onChange: (sort: LibrarySortOption) => void;
@@ -23,7 +24,8 @@ export function LibrarySortDropdown({
   onChange,
   value,
 }: LibrarySortDropdownProps) {
-  const [open, setOpen] = useState(false);
+  // 드롭다운 상태를 atom으로 관리
+  const [open, setOpen] = useAtom(librarySortDropdownOpenAtom);
 
   const sortOptions = [
     {
@@ -66,7 +68,13 @@ export function LibrarySortDropdown({
           {selectedOption.label}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-36" sideOffset={8}>
+      <DropdownMenuContent
+        disablePortal
+        align="end"
+        className="w-36"
+        sideOffset={8}
+        onEscapeKeyDown={() => setOpen(false)}
+      >
         {sortOptions.map(option => (
           <DropdownMenuItem
             key={option.value}
