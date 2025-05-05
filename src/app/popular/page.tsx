@@ -130,32 +130,6 @@ export default function PopularPage() {
     setSortOption(sort);
     setTimeRange(timeRange);
     if (bookId) setSelectedBookId(bookId);
-
-    // 모든 값이 기본값이면 URL에서 쿼리 파라미터 제거
-    const isAllDefault =
-      category === DEFAULT_CATEGORY &&
-      subcategory === DEFAULT_SUBCATEGORY &&
-      sort === DEFAULT_SORT &&
-      timeRange === DEFAULT_TIME_RANGE &&
-      !bookId;
-
-    if (isAllDefault) {
-      // URL에서 쿼리 파라미터 제거
-      clearQueryParams();
-    } else {
-      // 필요한 경우에만 URL 파라미터 업데이트
-      // 기본값이 아닌 매개변수만 URL에 포함
-      const updates: Record<string, string | undefined> = {};
-
-      if (category !== DEFAULT_CATEGORY) updates.category = category;
-      if (subcategory !== DEFAULT_SUBCATEGORY)
-        updates.subcategory = subcategory;
-      if (sort !== DEFAULT_SORT) updates.sort = sort;
-      if (timeRange !== DEFAULT_TIME_RANGE) updates.timeRange = timeRange;
-      if (bookId) updates.book = bookId;
-
-      updateQueryParams(updates);
-    }
   }, [
     searchParams,
     updateQueryParams,
