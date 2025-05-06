@@ -714,22 +714,22 @@ function ReviewsList({
                     <Button
                       variant="outline"
                       className={`flex h-7 items-center gap-1 rounded-full border px-2.5 ${
-                        review.userLiked
+                        review.isLiked
                           ? 'border-pink-200 bg-pink-50 text-pink-500 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-600'
                           : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-700'
                       }`}
                       onClick={() =>
-                        handleLikeWithAuth(review.id, review.userLiked || false)
+                        handleLikeWithAuth(review.id, review.isLiked || false)
                       }
                       disabled={likingReviewId === review.id && isLikeLoading}
                     >
-                      {review.userLiked ? (
+                      {review.isLiked ? (
                         <ThumbsUp className="h-3.5 w-3.5 fill-pink-500 text-pink-500" />
                       ) : (
                         <ThumbsUp className="h-3.5 w-3.5" />
                       )}
                       <span
-                        className={`text-xs font-medium ${review.userLiked ? 'text-pink-500' : ''}`}
+                        className={`text-xs font-medium ${review.isLiked ? 'text-pink-500' : ''}`}
                       >
                         {review.likesCount || 0}
                       </span>
