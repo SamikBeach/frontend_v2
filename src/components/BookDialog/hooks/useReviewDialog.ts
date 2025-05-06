@@ -1,4 +1,8 @@
 import { createOrUpdateRating } from '@/apis/rating/rating';
+import {
+  ReadingStatusType,
+  createOrUpdateReadingStatus,
+} from '@/apis/reading-status';
 import { createReview, deleteReview, updateReview } from '@/apis/review/review';
 import { Review } from '@/apis/review/types';
 import { bookReviewSortAtom } from '@/atoms/book';
@@ -13,7 +17,12 @@ import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
 
 export function useReviewDialog() {
-  const { book, isbn, userRating: userRatingData } = useBookDetails();
+  const {
+    book,
+    isbn,
+    userRating: userRatingData,
+    userReadingStatus: initialReadingStatus,
+  } = useBookDetails();
   const queryClient = useQueryClient();
   const currentUser = useCurrentUser();
   const pathname = usePathname();
@@ -31,8 +40,9 @@ export function useReviewDialog() {
     mutationFn: async (params: {
       rating: number;
       content: string;
+      readingStatus?: ReadingStatusType;
     }): Promise<any> => {
-      const { rating, content } = params;
+      const { rating, content, readingStatus } = params;
 
       // 책 ID 확인
       if (!book?.id) {
@@ -88,13 +98,38 @@ export function useReviewDialog() {
         };
       }
 
-      // 별점만 등록(또는 업데이트)하는 경우
+      // 별점만 등록(또는 업데이트)하는 경우 (내용이 없는 경우)
       if (!content.trim()) {
-        return await createOrUpdateRating(
+        // 읽기 상태가 전달된 경우에도 변경해야 함
+        let readingStatusResponse = null;
+        let readingStatusChanged = false;
+
+        // 먼저 별점 업데이트
+        const ratingResponse = await createOrUpdateRating(
           book.id,
           { rating },
           book.id < 0 ? isbn : undefined
         );
+
+        // 읽기 상태가 전달된 경우 읽기 상태도 업데이트
+        if (readingStatus) {
+          readingStatusResponse = await createOrUpdateReadingStatus(
+            book.id,
+            { status: readingStatus },
+            book.id < 0 ? isbn : undefined
+          );
+          readingStatusChanged = true;
+        }
+
+        // 별점과 읽기 상태 응답을 합쳐서 반환
+        return {
+          ...ratingResponse,
+          ratingChanged: true,
+          readingStatus: readingStatusResponse
+            ? readingStatusResponse.status
+            : readingStatus,
+          readingStatusChanged,
+        };
       }
 
       // 새 리뷰 생성 - 별점과 리뷰를 따로 처리
@@ -119,12 +154,29 @@ export function useReviewDialog() {
         isbn: isbn, // ISBN 항상 포함하도록 수정
       });
 
-      // 별점과 리뷰 응답을 합쳐서 반환
+      // 읽기 상태가 전달된 경우 읽기 상태도 업데이트
+      let readingStatusResponse = null;
+      let readingStatusChanged = false;
+
+      if (readingStatus) {
+        readingStatusResponse = await createOrUpdateReadingStatus(
+          book.id,
+          { status: readingStatus },
+          book.id < 0 ? isbn : undefined
+        );
+        readingStatusChanged = true;
+      }
+
+      // 별점과 리뷰 및 읽기 상태 응답을 합쳐서 반환
       return {
         ...reviewResponse,
         rating: ratingResponse ? ratingResponse.rating : rating,
         ratingId: ratingResponse ? ratingResponse.id : userRatingData?.id || 0,
         ratingChanged,
+        readingStatus: readingStatusResponse
+          ? readingStatusResponse.status
+          : readingStatus,
+        readingStatusChanged,
       };
     },
     onSuccess: data => {
@@ -171,16 +223,83 @@ export function useReviewDialog() {
             }
           }
 
+          // 읽기 상태 업데이트 (읽기 상태가 변경된 경우)
+          const updatedUserReadingStatus = data.readingStatus
+            ? (data.readingStatus as ReadingStatusType)
+            : typedOldData.userReadingStatus;
+
+          // 읽기 상태 카운트 업데이트 (readingStats가 있는 경우)
+          let updatedReadingStats = typedOldData.readingStats || {};
+
+          console.log({ typedOldData });
+
+          // readingStats가 없는 경우도 처리하도록 if 조건 제거
+          const oldStatus = typedOldData.userReadingStatus as
+            | ReadingStatusType
+            | undefined;
+          const newStatus =
+            (data.readingStatus as ReadingStatusType) ||
+            updatedUserReadingStatus;
+
+          // 읽기 상태 카운트 복사 또는 기본값 생성
+          const readingStatusCounts = typedOldData.readingStats
+            ?.readingStatusCounts
+            ? { ...typedOldData.readingStats.readingStatusCounts }
+            : {
+                [ReadingStatusType.WANT_TO_READ]: 0,
+                [ReadingStatusType.READING]: 0,
+                [ReadingStatusType.READ]: 0,
+              };
+
+          // 이전 상태가 있으면 카운트 감소
+          if (oldStatus) {
+            readingStatusCounts[oldStatus] = Math.max(
+              0,
+              (readingStatusCounts[oldStatus] || 0) - 1
+            );
+          }
+
+          // 새 상태 카운트 증가
+          readingStatusCounts[newStatus] =
+            (readingStatusCounts[newStatus] || 0) + 1;
+
+          // 현재 읽는 중인 사용자와 완료한 사용자 수 업데이트
+          let currentReaders = typedOldData.readingStats?.currentReaders || 0;
+          let completedReaders =
+            typedOldData.readingStats?.completedReaders || 0;
+
+          // 이전 상태에 따른 조정
+          if (oldStatus === ReadingStatusType.READING) {
+            currentReaders = Math.max(0, currentReaders - 1);
+          } else if (oldStatus === ReadingStatusType.READ) {
+            completedReaders = Math.max(0, completedReaders - 1);
+          }
+
+          // 새 상태에 따른 조정
+          if (newStatus === ReadingStatusType.READING) {
+            currentReaders += 1;
+          } else if (newStatus === ReadingStatusType.READ) {
+            completedReaders += 1;
+          }
+
+          // 업데이트된 읽기 상태 통계
+          updatedReadingStats = {
+            ...(typedOldData.readingStats || {}),
+            readingStatusCounts,
+            currentReaders,
+            completedReaders,
+          };
+
           // 업데이트된 데이터 반환
           return {
             ...typedOldData,
             userRating: userRatingData,
             rating: newRatingValue,
             totalRatings: newTotalRatings,
+            userReadingStatus: updatedUserReadingStatus,
+            readingStats: updatedReadingStats,
           };
         });
-
-        console.log('book.id', book.id);
 
         // user-book-rating 캐시 직접 업데이트
         if (book?.id) {
@@ -188,6 +307,11 @@ export function useReviewDialog() {
             ['user-book-rating', book.id],
             userRatingData
           );
+
+          // user-reading-status 캐시 항상 업데이트
+          queryClient.setQueryData(['user-reading-status', book.id], {
+            status: data.readingStatus || book.userReadingStatus,
+          });
         }
 
         // 평균 별점 정보 계산 (book-reviews 업데이트에 사용)
@@ -228,6 +352,18 @@ export function useReviewDialog() {
             refetchType: 'active',
           });
         }
+
+        // 읽기 상태가 변경된 경우 관련 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['reading-status'],
+          refetchType: 'active',
+        });
+
+        // 독서 상태별 도서 수 통계 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['user-statistics', currentUser?.id, 'reading-status'],
+          refetchType: 'active',
+        });
 
         // book-reviews 쿼리 데이터 업데이트하여 별점 즉시 반영
         queryClient.setQueryData(['book-reviews', book.id], (oldData: any) => {
@@ -374,9 +510,13 @@ export function useReviewDialog() {
           toast.success('변경 사항이 없습니다.');
         }
       } else {
-        // 새 리뷰 생성 시 별점 변경 여부에 따라 다른 메시지 표시
-        if (data.ratingChanged) {
+        // 새 리뷰 생성 시 메시지 표시 (별점, 읽기 상태 변경 여부에 따라 다른 메시지)
+        if (data.ratingChanged && data.readingStatusChanged) {
+          toast.success('리뷰, 별점, 읽기 상태가 성공적으로 저장되었습니다.');
+        } else if (data.ratingChanged) {
           toast.success('리뷰와 별점이 성공적으로 저장되었습니다.');
+        } else if (data.readingStatusChanged) {
+          toast.success('리뷰와 읽기 상태가 성공적으로 저장되었습니다.');
         } else {
           toast.success('리뷰가 성공적으로 저장되었습니다.');
         }
@@ -416,7 +556,7 @@ export function useReviewDialog() {
 
   // 리뷰 제출 핸들러
   const handleReviewSubmit = useCallback(
-    (rating: number, content: string) => {
+    (rating: number, content: string, readingStatus?: ReadingStatusType) => {
       if (!book) {
         toast.error('책 정보가 없습니다.');
         return;
@@ -428,7 +568,7 @@ export function useReviewDialog() {
         return;
       }
 
-      mutation.mutate({ rating, content });
+      mutation.mutate({ rating, content, readingStatus });
     },
     [book, mutation]
   );

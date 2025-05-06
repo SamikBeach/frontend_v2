@@ -1,6 +1,15 @@
-import { PenLine, Star, Trash2, X } from 'lucide-react';
-
+import { ReadingStatusType } from '@/apis/reading-status';
+import {
+  statusIcons,
+  statusTexts,
+} from '@/components/BookDialog/hooks/useReadingStatus';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -9,6 +18,8 @@ import {
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
+import { ChevronDown, PenLine, Star, Trash2, X } from 'lucide-react';
 import { ReviewAlertDialog } from './components/ReviewAlertDialog';
 import { useReviewDialogState } from './hooks/useReviewDialogState';
 
@@ -16,7 +27,11 @@ interface ReviewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   bookTitle: string;
-  onSubmit: (rating: number, content: string) => void;
+  onSubmit: (
+    rating: number,
+    content: string,
+    readingStatus?: ReadingStatusType
+  ) => void;
   initialRating?: number;
   initialContent?: string;
   isEditMode?: boolean;
@@ -41,6 +56,8 @@ export function ReviewDialog({
     setRating,
     content,
     setContent,
+    readingStatus,
+    setReadingStatus,
     alertDialogOpen,
     setAlertDialogOpen,
     alertMessage,
@@ -65,8 +82,14 @@ export function ReviewDialog({
       return;
     }
 
-    // 유효성 검사 통과 시 제출
-    onSubmit(rating, content);
+    // 유효성 검사 통과 시 제출 (읽기 상태는 생성 모드에서만 전달)
+    if (isCreateMode && readingStatus) {
+      // 생성 모드에서는 읽기 상태도 함께 전달
+      onSubmit(rating, content, readingStatus);
+    } else {
+      // 수정 모드에서는 읽기 상태를 전달하지 않음
+      onSubmit(rating, content);
+    }
   };
 
   // 버튼 텍스트 결정
@@ -81,6 +104,20 @@ export function ReviewDialog({
       return '리뷰 수정하기';
     } else {
       return '리뷰 등록하기';
+    }
+  };
+
+  // 읽기 상태별 스타일 반환
+  const getReadingStatusStyle = (status: ReadingStatusType) => {
+    switch (status) {
+      case ReadingStatusType.WANT_TO_READ:
+        return 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100';
+      case ReadingStatusType.READING:
+        return 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100';
+      case ReadingStatusType.READ:
+        return 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100';
+      default:
+        return 'bg-gray-50 text-gray-700';
     }
   };
 
@@ -122,6 +159,79 @@ export function ReviewDialog({
               <span className="font-medium text-gray-800">{bookTitle}</span>에
               대한 {getDialogDescription()}
             </ResponsiveDialogDescription>
+
+            {/* 생성 모드에서만 읽기 상태 선택 UI 표시 */}
+            {isCreateMode && (
+              <div className="mb-6">
+                <label className="mb-2 block text-sm font-medium text-gray-700">
+                  읽기 상태
+                </label>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        'w-full justify-between rounded-xl border-gray-300 hover:bg-gray-100 hover:text-gray-900',
+                        readingStatus
+                          ? getReadingStatusStyle(readingStatus)
+                          : 'bg-gray-50 text-gray-700'
+                      )}
+                      disabled={isSubmitting}
+                    >
+                      {readingStatus && (
+                        <span className="mr-1.5">
+                          {statusIcons[readingStatus]}
+                        </span>
+                      )}
+                      <span>
+                        {readingStatus
+                          ? statusTexts[readingStatus]
+                          : '읽기 상태 선택'}
+                      </span>
+                      <ChevronDown className="ml-auto h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    disablePortal
+                    className="min-w-48 rounded-xl"
+                  >
+                    {Object.values(ReadingStatusType).map(status => (
+                      <DropdownMenuItem
+                        key={status}
+                        className={cn(
+                          'flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2',
+                          readingStatus === status ? 'bg-gray-100' : '',
+                          status === ReadingStatusType.WANT_TO_READ &&
+                            'hover:bg-purple-50',
+                          status === ReadingStatusType.READING &&
+                            'hover:bg-blue-50',
+                          status === ReadingStatusType.READ &&
+                            'hover:bg-green-50'
+                        )}
+                        onClick={() =>
+                          !isSubmitting && setReadingStatus(status)
+                        }
+                        disabled={isSubmitting}
+                      >
+                        <span className="text-base">{statusIcons[status]}</span>
+                        <span
+                          className={cn(
+                            status === ReadingStatusType.WANT_TO_READ &&
+                              'text-purple-600',
+                            status === ReadingStatusType.READING &&
+                              'text-blue-600',
+                            status === ReadingStatusType.READ &&
+                              'text-green-600'
+                          )}
+                        >
+                          {statusTexts[status]}
+                        </span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            )}
 
             <div className="mb-6 flex flex-col items-center space-y-3">
               <div className="relative flex w-full items-center justify-center">

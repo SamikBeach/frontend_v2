@@ -1,3 +1,4 @@
+import { ReadingStatusType } from '@/apis/reading-status';
 import { atom } from 'jotai';
 
 // BookDialog 내 드롭다운 메뉴의 열림 상태를 관리하는 atom들
@@ -17,3 +18,6 @@ export const hasOpenDropdownAtom = atom(get => {
     get(conflictDialogOpenAtom)
   );
 });
+
+// BookDialog 내에서 현재 책의 읽기 상태를 공유하는 atom
+export const bookReadingStatusAtom = atom<ReadingStatusType | null>(null);

@@ -10,7 +10,7 @@ import { invalidateUserProfileQueries } from '@/utils/query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { josa } from 'josa';
 import { usePathname } from 'next/navigation';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
 
@@ -36,10 +36,17 @@ export function useReadingStatus() {
   const currentUser = useCurrentUser();
   const pathname = usePathname();
 
-  // 현재 책의 읽기 상태를 저장할 상태 변수 - 초기값은 책 데이터에서 가져옴
+  // atom 대신 로컬 상태로 관리
   const [readingStatus, setReadingStatus] = useState<ReadingStatusType | null>(
     initialStatus
   );
+
+  // 초기 상태 설정 - 컴포넌트 마운트 시 한 번만 실행 (atom 대신 로컬 상태 사용)
+  useEffect(() => {
+    if (initialStatus !== undefined && initialStatus !== readingStatus) {
+      setReadingStatus(initialStatus);
+    }
+  }, [initialStatus, readingStatus]);
 
   // 읽기 상태 변경 뮤테이션
   const { mutate: updateReadingStatusMutation, isPending: isUpdatePending } =
@@ -81,7 +88,7 @@ export function useReadingStatus() {
           return;
         }
 
-        // 상태 업데이트
+        // 로컬 상태 업데이트
         setReadingStatus(data.status as ReadingStatusType);
 
         // book-detail 캐시 직접 업데이트하여 읽기 상태 통계 반영
@@ -265,7 +272,7 @@ export function useReadingStatus() {
         // 사용자 프로필 관련 쿼리 무효화 (현재 본인 프로필 페이지인 경우)
         invalidateUserProfileQueries(queryClient, pathname, currentUser?.id);
 
-        // UI 상태 업데이트
+        // UI 상태 업데이트 - 로컬 상태 사용
         setReadingStatus(null);
         toast.success('읽기 상태가 초기화되었습니다.');
       },
@@ -285,7 +292,6 @@ export function useReadingStatus() {
       // 'NONE' 옵션이 선택되면 삭제 뮤테이션 호출
       if (status === 'NONE') {
         deleteReadingStatusMutation(book.id);
-        setReadingStatus(null);
         return;
       }
 
@@ -305,6 +311,7 @@ export function useReadingStatus() {
       readingStatus,
       updateReadingStatusMutation,
       deleteReadingStatusMutation,
+      setReadingStatus,
     ]
   );
 
