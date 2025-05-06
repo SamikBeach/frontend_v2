@@ -18,12 +18,14 @@ import {
 import { BookInfo, BookInfoSkeleton } from './components/BookInfo';
 import { BookFullSkeleton, ErrorFallback } from './components/common';
 
+import { hasOpenDropdownAtom } from '@/atoms/book-dialog';
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
   ResponsiveDialogPortal,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
+import { useAtomValue } from 'jotai';
 
 // 모바일용 BookDialogContent 컴포넌트
 function MobileBookDialogContent() {
@@ -141,6 +143,9 @@ export function BookDialog() {
   const { isOpen, close } = useDialogQuery({ type: 'book', idType });
   const isMobile = useIsMobile();
 
+  // 현재 열려있는 드롭다운이 있는지 확인
+  const hasOpenDropdown = useAtomValue(hasOpenDropdownAtom);
+
   // 모바일 환경에서는 ResponsiveDialog 사용, 데스크톱에서는 직접 Dialog 컴포넌트 스타일링
   if (isMobile) {
     return (
@@ -193,7 +198,16 @@ export function BookDialog() {
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 overflow-y-auto bg-black/50">
           <div className="min-h-full rounded-lg py-5">
-            <DialogPrimitive.Content className="relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg md:max-w-screen-xl">
+            <DialogPrimitive.Content
+              aria-describedby={undefined}
+              className="relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg md:max-w-screen-xl"
+              onEscapeKeyDown={e => {
+                if (hasOpenDropdown) {
+                  e.preventDefault();
+                  return;
+                }
+              }}
+            >
               {/* DialogTitle 컴포넌트는 접근성 목적으로 필요하지만 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
               <DialogPrimitive.Title className="sr-only">
                 도서 상세 정보

@@ -1,6 +1,11 @@
 'use client';
 
-import { SortOption, TimeRange } from '@/apis/book/types';
+import {
+  PopularBooksSortOptions,
+  SortOption,
+  TimeRange,
+  TimeRangeOptions,
+} from '@/apis/book/types';
 import { selectedBookIdAtom } from '@/atoms/book';
 import {
   categoryFilterAtom,
@@ -81,23 +86,20 @@ function CategoryFilterSkeleton() {
           ))}
         </div>
       </div>
-
-      {/* 서브카테고리 스켈레톤 */}
-      <div className="no-scrollbar mb-4 flex w-full overflow-x-auto py-1">
-        <div className="flex gap-2 px-0.5">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-8 w-16 rounded-full" />
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
 
+// 기본값 상수 정의
+const DEFAULT_CATEGORY = 'all';
+const DEFAULT_SUBCATEGORY = 'all';
+const DEFAULT_SORT = PopularBooksSortOptions.RATING_DESC;
+const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
+
 export default function PopularPage() {
   const isMobile = useIsMobile();
   const searchParams = useSearchParams();
-  const { updateQueryParams } = useQueryParams();
+  const { updateQueryParams, clearQueryParams } = useQueryParams();
 
   // Atom setters
   const setCategoryFilter = useSetAtom(categoryFilterAtom);
@@ -108,37 +110,30 @@ export default function PopularPage() {
 
   // URL 파라미터에서 필터 상태 초기화
   useEffect(() => {
-    const category = searchParams.get('category') || 'all';
-    const subcategory = searchParams.get('subcategory') || 'all';
-    const sortValue = searchParams.get('sort') || 'reviews-desc';
+    const category = searchParams.get('category') || DEFAULT_CATEGORY;
+    const subcategory = searchParams.get('subcategory') || DEFAULT_SUBCATEGORY;
+    const sortValue = searchParams.get('sort') || DEFAULT_SORT;
     const sort: SortOption = isValidSortOption(sortValue)
       ? sortValue
-      : 'reviews-desc';
+      : DEFAULT_SORT;
 
-    const timeRangeValue = searchParams.get('timeRange') || 'all';
+    const timeRangeValue = searchParams.get('timeRange') || DEFAULT_TIME_RANGE;
     const timeRange: TimeRange = isValidTimeRange(timeRangeValue)
       ? timeRangeValue
-      : 'all';
+      : DEFAULT_TIME_RANGE;
 
     const bookId = searchParams.get('book');
 
+    // Atoms 업데이트
     setCategoryFilter(category);
     setSubcategoryFilter(subcategory);
     setSortOption(sort);
     setTimeRange(timeRange);
     if (bookId) setSelectedBookId(bookId);
-
-    // URL 파라미터 동기화
-    updateQueryParams({
-      category,
-      subcategory,
-      sort,
-      timeRange,
-      book: bookId || undefined,
-    });
   }, [
     searchParams,
     updateQueryParams,
+    clearQueryParams,
     setCategoryFilter,
     setSubcategoryFilter,
     setSortOption,

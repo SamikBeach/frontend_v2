@@ -1,5 +1,6 @@
 import { ReviewSortType } from '@/apis/review/types';
 import { bookReviewSortAtom } from '@/atoms/book';
+import { reviewSortDropdownOpenAtom } from '@/atoms/book-dialog';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -9,11 +10,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAtom } from 'jotai';
 import { Clock, Flame, MessageSquare } from 'lucide-react';
-import { useState } from 'react';
 
 export function ReviewSortDropdown() {
   const [sort, setSort] = useAtom(bookReviewSortAtom);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useAtom(reviewSortDropdownOpenAtom);
 
   // 정렬 옵션 배열 정의 (레이블, 값, 아이콘을 포함)
   const sortOptions = [
@@ -57,7 +57,13 @@ export function ReviewSortDropdown() {
           {selectedOption.label}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-36" sideOffset={8}>
+      <DropdownMenuContent
+        disablePortal
+        align="end"
+        className="w-36"
+        sideOffset={8}
+        onEscapeKeyDown={() => setOpen(false)}
+      >
         {sortOptions.map(option => (
           <DropdownMenuItem
             key={option.value}

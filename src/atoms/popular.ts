@@ -1,4 +1,9 @@
-import { TimeRange as ApiTimeRange, SortOption } from '@/apis/book/types';
+import {
+  TimeRange as ApiTimeRange,
+  PopularBooksSortOptions,
+  SortOption,
+  TimeRangeOptions,
+} from '@/apis/book/types';
 import { atom } from 'jotai';
 
 // 파스텔 색상 목록 (CategoryFilter에서 사용)
@@ -21,8 +26,10 @@ export const categoryFilterAtom = atom<string>('all');
 // 서브카테고리 필터 atom
 export const subcategoryFilterAtom = atom<string>('all');
 
-// 정렬 옵션 atom
-export const sortOptionAtom = atom<SortOption>('reviews-desc');
+// 정렬 옵션 atom - 기본값은 평점 높은순
+export const sortOptionAtom = atom<SortOption>(
+  PopularBooksSortOptions.RATING_DESC
+);
 
 // 시간 범위 atom
-export const timeRangeAtom = atom<ApiTimeRange>('all');
+export const timeRangeAtom = atom<ApiTimeRange>(TimeRangeOptions.ALL);

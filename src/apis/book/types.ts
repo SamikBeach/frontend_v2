@@ -27,6 +27,7 @@ export interface Book {
   userRating?: RatingResponseDto;
   userReadingStatus?: ReadingStatusType;
   totalRatings?: number;
+  libraryAdds?: number;
   readingStats?: {
     currentReaders: number;
     completedReaders: number;
@@ -66,19 +67,61 @@ export interface UpdateBookDto {
   isFeatured?: boolean;
 }
 
-export type SortOption =
-  | 'rating-desc'
-  | 'reviews-desc'
-  | 'publishDate-desc'
-  | 'title-asc';
-export type TimeRange = 'all' | 'month' | 'year' | 'today' | 'week';
-
-export interface PopularBooksParams {
-  sort?: SortOption;
-  timeRange?: TimeRange;
+export enum PopularBooksSortOptions {
+  RATING_DESC = 'rating-desc',
+  REVIEWS_DESC = 'reviews-desc',
+  LIBRARY_COUNT_DESC = 'library-desc',
+  PUBLISH_DATE_DESC = 'publishDate-desc',
+  TITLE_ASC = 'title-asc',
 }
 
-// 홈 화면용 간소화된 도서 정보
+export enum TimeRangeOptions {
+  ALL = 'all',
+  TODAY = 'today',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+
+export type SortOption =
+  | PopularBooksSortOptions.RATING_DESC
+  | PopularBooksSortOptions.REVIEWS_DESC
+  | PopularBooksSortOptions.LIBRARY_COUNT_DESC
+  | PopularBooksSortOptions.PUBLISH_DATE_DESC
+  | PopularBooksSortOptions.TITLE_ASC;
+
+export type TimeRange =
+  | TimeRangeOptions.ALL
+  | TimeRangeOptions.TODAY
+  | TimeRangeOptions.WEEK
+  | TimeRangeOptions.MONTH
+  | TimeRangeOptions.YEAR;
+
+export interface BookSearchResponse {
+  books: Book[];
+  total: number;
+  page: number;
+  totalPages: number;
+}
+
+export interface PopularBooksParams {
+  categoryId?: number;
+  subcategoryId?: number;
+  sort?: SortOption | PopularBooksSortOptions;
+  timeRange?: TimeRange | TimeRangeOptions;
+  page?: number;
+  limit?: number;
+}
+
+export interface DiscoverBooksParams {
+  discoverCategoryId?: number;
+  discoverSubCategoryId?: number;
+  sort?: SortOption | PopularBooksSortOptions;
+  timeRange?: TimeRange | TimeRangeOptions;
+  page?: number;
+  limit?: number;
+}
+
 export interface HomeBookPreview {
   id: number;
   title: string;
@@ -94,14 +137,53 @@ export interface HomeBookPreview {
   publisher?: string;
 }
 
-// 홈 화면용 발견하기 응답 타입
 export interface HomeDiscoverBooksResponse {
   categoryId: number;
   categoryName: string;
   books: HomeBookPreview[];
 }
 
-// 홈 화면용 인기 도서 응답 타입
 export interface HomePopularBooksResponse {
   books: HomeBookPreview[];
+}
+
+export interface BookResponse {
+  id: number;
+  title: string;
+  author: string;
+  isbn: string;
+  isbn13?: string;
+  description: string;
+  coverImage: string;
+  rating: number;
+  reviews: number;
+  publisher: string;
+  publishDate: Date;
+  category: Category;
+  subcategory?: SubCategory;
+  isFeatured?: boolean;
+  isDiscovered?: boolean;
+  discoverCategory?: DiscoverCategory;
+  discoverSubCategory?: DiscoverSubCategory;
+  totalRatings?: number;
+  libraryAdds?: number;
+
+  // Additional fields in BookResponse
+  searchId?: number;
+  bookId?: number;
+  readingStats?: {
+    currentReaders: number;
+    completedReaders: number;
+    averageReadingTime: string;
+    difficulty: string;
+    readingStatusCounts: Record<string, number>;
+  };
+  userReadingStatus?: string;
+  userRating?: {
+    bookId: number;
+    rating: number;
+    comment?: string;
+  };
+  searchTerm?: string;
+  searchedAt?: Date;
 }

@@ -17,6 +17,7 @@ export interface ProfileFormData {
   username: string;
   bio: string;
   profileImage?: File | null;
+  removeProfileImage?: boolean;
 }
 
 export function ProfileEditForm({
@@ -32,7 +33,8 @@ export function ProfileEditForm({
   const [formData, setFormData] = useState<ProfileFormData>({
     username: displayName,
     bio: user.bio || '',
-    profileImage: null,
+    profileImage: undefined,
+    removeProfileImage: false,
   });
 
   // 프로필 데이터가 변경되면 폼 데이터 업데이트
@@ -40,7 +42,8 @@ export function ProfileEditForm({
     setFormData({
       username: user.username || '',
       bio: user.bio || '',
-      profileImage: null,
+      profileImage: undefined,
+      removeProfileImage: false,
     });
   }, [user]);
 
@@ -55,10 +58,21 @@ export function ProfileEditForm({
   };
 
   const handleAvatarChange = (file: File | null) => {
-    setFormData(prev => ({
-      ...prev,
-      profileImage: file,
-    }));
+    if (file === null) {
+      // 프로필 이미지 삭제
+      setFormData(prev => ({
+        ...prev,
+        profileImage: null,
+        removeProfileImage: true,
+      }));
+    } else {
+      // 새 이미지 업로드
+      setFormData(prev => ({
+        ...prev,
+        profileImage: file,
+        removeProfileImage: false,
+      }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -1,7 +1,9 @@
 import { Book } from '@/apis/book/types';
 import { addBookToLibraryWithIsbn } from '@/apis/library/library';
 import { Library } from '@/apis/library/types';
+import { conflictDialogOpenAtom } from '@/atoms/book-dialog';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAtom } from 'jotai';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { BookDetails } from '../types';
@@ -15,7 +17,9 @@ export function useLibrary(
   const queryClient = useQueryClient();
   // 에러 상태 관리
   const [error, setError] = useState<Error | null>(null);
-  const [conflictDialogOpen, setConflictDialogOpen] = useState(false);
+  const [conflictDialogOpen, setConflictDialogOpen] = useAtom(
+    conflictDialogOpenAtom
+  );
   const [conflictLibraryName, setConflictLibraryName] = useState('');
 
   // 책을 서재에 추가하는 뮤테이션
@@ -124,11 +128,6 @@ export function useLibrary(
     setError(null);
   }, []);
 
-  // 충돌 다이얼로그 닫기 함수
-  const closeConflictDialog = useCallback(() => {
-    setConflictDialogOpen(false);
-  }, []);
-
   return {
     handleAddToLibrary,
     isPending,
@@ -136,6 +135,6 @@ export function useLibrary(
     resetError,
     conflictDialogOpen,
     conflictLibraryName,
-    closeConflictDialog,
+    onConflictDialogOpenChange: setConflictDialogOpen,
   };
 }

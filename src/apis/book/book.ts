@@ -1,12 +1,11 @@
 import api from '../axios';
 import {
   Book,
+  BookSearchResponse,
   CreateBookDto,
+  DiscoverBooksParams,
   HomeDiscoverBooksResponse,
-  HomePopularBooksResponse,
   PopularBooksParams,
-  SortOption,
-  TimeRange,
   UpdateBookDto,
 } from './types';
 
@@ -71,42 +70,6 @@ export const getBooksBySubcategoryId = async (
 };
 
 /**
- * 특정 카테고리의 인기 도서 조회
- */
-export const getPopularBooksByCategory = async (
-  categoryId: number,
-  subcategoryId?: number,
-  sort: SortOption = 'rating-desc',
-  timeRange: TimeRange = 'all'
-): Promise<Book[]> => {
-  // 쿼리 파라미터 구성
-  const params: Record<string, string> = {
-    sort,
-    timeRange,
-  };
-
-  if (subcategoryId) {
-    params.subcategoryId = subcategoryId.toString();
-  }
-
-  const response = await api.get<Book[]>(
-    `/book/popular/category/${categoryId}`,
-    { params }
-  );
-  return response.data;
-};
-
-/**
- * 모든 카테고리의 인기 도서 조회
- */
-export const getAllPopularBooks = async (
-  params?: PopularBooksParams
-): Promise<Book[]> => {
-  const response = await api.get<Book[]>('/book/popular/all', { params });
-  return response.data;
-};
-
-/**
  * 새 도서 생성
  */
 export const createBook = async (bookData: CreateBookDto): Promise<Book> => {
@@ -133,75 +96,26 @@ export const deleteBook = async (id: number): Promise<void> => {
 };
 
 /**
- * 모든 발견하기 도서 조회
- */
-export const getAllDiscoverBooks = async (
-  params?: PopularBooksParams
-): Promise<Book[]> => {
-  const response = await api.get<Book[]>('/book/discover/all', { params });
-  return response.data;
-};
-
-/**
- * 특정 발견하기 카테고리의 도서 조회
- */
-export const getBooksByDiscoverCategoryId = async (
-  discoverCategoryId: number,
-  discoverSubCategoryId?: number,
-  sort: SortOption = 'rating-desc',
-  timeRange: TimeRange = 'all'
-): Promise<Book[]> => {
-  // 쿼리 파라미터 구성
-  const params: Record<string, string> = {
-    sort,
-    timeRange,
-  };
-
-  if (discoverSubCategoryId) {
-    params.discoverSubCategoryId = discoverSubCategoryId.toString();
-  }
-
-  const response = await api.get<Book[]>(
-    `/book/discover/category/${discoverCategoryId}`,
-    { params }
-  );
-  return response.data;
-};
-
-/**
- * 특정 발견하기 서브카테고리의 도서 조회
- */
-export const getBooksByDiscoverSubCategoryId = async (
-  discoverSubCategoryId: number,
-  sort: SortOption = 'rating-desc',
-  timeRange: TimeRange = 'all'
-): Promise<Book[]> => {
-  // 쿼리 파라미터 구성
-  const params: Record<string, string> = {
-    sort,
-    timeRange,
-  };
-
-  const response = await api.get<Book[]>(
-    `/book/discover/subcategory/${discoverSubCategoryId}`,
-    { params }
-  );
-  return response.data;
-};
-
-/**
  * 도서를 발견하기 카테고리에 추가
  */
 export const addBookToDiscoverCategory = async (
-  bookId: number,
+  bookId: number | undefined,
   discoverCategoryId: number,
-  discoverSubCategoryId?: number
+  discoverSubCategoryId?: number,
+  isbn?: string
 ): Promise<Book> => {
-  const response = await api.post<Book>('/book/discover/add', {
-    bookId,
-    discoverCategoryId,
-    discoverSubCategoryId,
-  });
+  const response = await api.post<Book>(
+    '/book/discover/add',
+    {},
+    {
+      params: {
+        bookId: bookId && bookId > 0 ? bookId : undefined,
+        isbn: (!bookId || bookId <= 0) && isbn ? isbn : undefined,
+        discoverCategoryId,
+        discoverSubCategoryId,
+      },
+    }
+  );
   return response.data;
 };
 
@@ -211,7 +125,13 @@ export const addBookToDiscoverCategory = async (
 export const removeBookFromDiscoverCategory = async (
   bookId: number
 ): Promise<Book> => {
-  const response = await api.delete<Book>(`/book/discover/remove/${bookId}`);
+  const response = await api.post<Book>(
+    '/book/discover/remove',
+    {},
+    {
+      params: { bookId },
+    }
+  );
   return response.data;
 };
 
@@ -220,13 +140,10 @@ export const removeBookFromDiscoverCategory = async (
  */
 export const getPopularBooksForHome = async (
   limit: number = 4
-): Promise<HomePopularBooksResponse> => {
-  const response = await api.get<HomePopularBooksResponse>(
-    '/book/popular/home',
-    {
-      params: { limit },
-    }
-  );
+): Promise<BookSearchResponse> => {
+  const response = await api.get<BookSearchResponse>('/book/popular/home', {
+    params: { limit },
+  });
   return response.data;
 };
 
@@ -243,4 +160,43 @@ export const getDiscoverBooksForHome = async (
     }
   );
   return response.data;
+};
+
+/**
+ * 인기 도서 조회 (무한 스크롤 지원)
+ * 카테고리, 서브카테고리, 정렬, 기간 필터링 지원
+ */
+export const getPopularBooks = async (
+  params: PopularBooksParams
+): Promise<BookSearchResponse> => {
+  const response = await api.get<BookSearchResponse>('/book/popular', {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * 발견하기 도서 조회 (무한 스크롤 지원)
+ * 발견하기 카테고리, 서브카테고리, 정렬, 기간 필터링 지원
+ */
+export const getDiscoverBooks = async (
+  params: DiscoverBooksParams
+): Promise<BookSearchResponse> => {
+  const response = await api.get<BookSearchResponse>('/book/discover', {
+    params,
+  });
+  return response.data;
+};
+
+/**
+ * 발견하기 카테고리 통계 조회 (단순 모의 데이터 반환)
+ */
+export const getDiscoverBooksStats = async (): Promise<any> => {
+  // 간단한 모의 데이터 반환
+  return {
+    categories: [],
+    stats: {
+      totalBooks: 0,
+    },
+  };
 };

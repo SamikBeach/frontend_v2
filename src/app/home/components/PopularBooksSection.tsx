@@ -3,7 +3,7 @@ import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Lightbulb } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface PopularBooksSectionProps {
   books: HomeBookPreview[];
@@ -16,6 +16,8 @@ export function PopularBooksSection({
   isLoading = false,
   onSelectBook,
 }: PopularBooksSectionProps) {
+  const router = useRouter();
+
   return (
     <section className="h-auto p-4">
       <div className="mb-2 flex items-center justify-between">
@@ -25,15 +27,14 @@ export function PopularBooksSection({
             지금 인기 있는 책
           </h2>
         </div>
-        <Link href="/popular">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-sm font-medium text-gray-500 hover:text-gray-900"
-          >
-            더보기
-          </Button>
-        </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-sm font-medium text-gray-500 hover:text-gray-900"
+          onClick={() => router.push('/popular')}
+        >
+          더보기
+        </Button>
       </div>
 
       {isLoading ? (

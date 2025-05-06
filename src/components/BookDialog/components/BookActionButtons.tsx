@@ -1,5 +1,9 @@
 import { CreateLibraryDto } from '@/apis/library/types';
 import { ReadingStatusType } from '@/apis/reading-status';
+import {
+  libraryAddDropdownOpenAtom,
+  readingStatusDropdownOpenAtom,
+} from '@/atoms/book-dialog';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { LibraryDialog } from '@/components/Library';
 import { Button } from '@/components/ui/button';
@@ -11,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
+import { useAtom } from 'jotai';
 import { ChevronDown, ListPlus, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -26,6 +31,15 @@ export function BookActionButtons() {
   const { book, isbn, userLibraries } = useBookDetails();
   const currentUser = useCurrentUser();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
+  // 드롭다운 상태 atom 사용
+  const [readingStatusOpen, setReadingStatusOpen] = useAtom(
+    readingStatusDropdownOpenAtom
+  );
+  const [libraryAddOpen, setLibraryAddOpen] = useAtom(
+    libraryAddDropdownOpenAtom
+  );
+
   const {
     readingStatus,
     isPending,
@@ -40,7 +54,7 @@ export function BookActionButtons() {
     resetError,
     conflictDialogOpen,
     conflictLibraryName,
-    closeConflictDialog,
+    onConflictDialogOpenChange,
   } = useLibrary(book, isbn, userLibraries);
   const { createLibrary } = useUserLibraries();
 
@@ -105,7 +119,10 @@ export function BookActionButtons() {
   return (
     <>
       <div className="grid grid-cols-2 gap-2">
-        <DropdownMenu>
+        <DropdownMenu
+          open={readingStatusOpen}
+          onOpenChange={setReadingStatusOpen}
+        >
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
@@ -124,7 +141,11 @@ export function BookActionButtons() {
               <ChevronDown className="ml-auto h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48 rounded-xl">
+          <DropdownMenuContent
+            disablePortal
+            className="min-w-48 rounded-xl"
+            onEscapeKeyDown={() => setReadingStatusOpen(false)}
+          >
             {Object.values(ReadingStatusType).map(status => (
               <DropdownMenuItem
                 key={status}
@@ -170,7 +191,7 @@ export function BookActionButtons() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <DropdownMenu>
+        <DropdownMenu open={libraryAddOpen} onOpenChange={setLibraryAddOpen}>
           <DropdownMenuTrigger asChild>
             <Button
               variant="outline"
@@ -180,7 +201,11 @@ export function BookActionButtons() {
               <span className="text-sm">서재에 담기</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-48 rounded-xl">
+          <DropdownMenuContent
+            disablePortal
+            className="min-w-48 rounded-xl"
+            onEscapeKeyDown={() => setLibraryAddOpen(false)}
+          >
             {userLibraries && userLibraries.length > 0 ? (
               userLibraries.map(library => (
                 <DropdownMenuItem
@@ -220,7 +245,7 @@ export function BookActionButtons() {
       {/* 충돌 알림 다이얼로그 */}
       <ConflictAlertDialog
         open={conflictDialogOpen}
-        onOpenChange={closeConflictDialog}
+        onOpenChange={onConflictDialogOpenChange}
         libraryName={conflictLibraryName}
       />
 

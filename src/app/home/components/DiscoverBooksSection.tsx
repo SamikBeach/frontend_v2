@@ -3,7 +3,7 @@ import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Compass } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface DiscoverBooksSectionProps {
   discoverData: HomeDiscoverBooksResponse[];
@@ -16,6 +16,8 @@ export function DiscoverBooksSection({
   isLoading = false,
   onSelectBook,
 }: DiscoverBooksSectionProps) {
+  const router = useRouter();
+
   // 모든 카테고리의 책을 하나의 배열로 합친 후 최대 3개만 표시
   const allBooks = discoverData.flatMap(category => category.books || []);
   const displayBooks = allBooks.slice(0, 3);
@@ -27,15 +29,14 @@ export function DiscoverBooksSection({
           <Compass className="h-5 w-5 text-[#00C471]" />
           <h2 className="text-xl font-semibold text-gray-900">오늘의 발견</h2>
         </div>
-        <Link href="/discover">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-sm font-medium text-gray-500 hover:text-gray-900"
-          >
-            더보기
-          </Button>
-        </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-sm font-medium text-gray-500 hover:text-gray-900"
+          onClick={() => router.push('/discover')}
+        >
+          더보기
+        </Button>
       </div>
 
       {isLoading ? (

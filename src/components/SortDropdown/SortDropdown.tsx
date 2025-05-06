@@ -1,5 +1,6 @@
 import {
   ArrowDownAZ,
+  Bookmark,
   Calendar,
   CalendarClock,
   CalendarDays,
@@ -21,10 +22,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 // API와 일치하는 타입 사용
-import { TimeRange as ApiTimeRange } from '@/apis/book/types';
+import { TimeRange as ApiTimeRange, TimeRangeOptions } from '@/apis/book/types';
 
 // UI에서 사용하는 확장된 TimeRange
-export type TimeRange = ApiTimeRange | 'today' | 'week';
+export type TimeRange = ApiTimeRange;
 
 export type SortOption<T = Book> = {
   id: string;
@@ -36,6 +37,13 @@ export type SortOption<T = Book> = {
 
 export const defaultSortOptions: SortOption<Book>[] = [
   {
+    id: 'rating-desc',
+    label: '평점 높은순',
+    icon: <Star className="mr-2 h-4 w-4 text-[#FFAB00]" />,
+    sortFn: (a, b) => b.rating - a.rating,
+    supportsTimeRange: true,
+  },
+  {
     id: 'reviews-desc',
     label: '리뷰 많은순',
     icon: <Users className="mr-2 h-4 w-4 text-gray-500" />,
@@ -43,10 +51,12 @@ export const defaultSortOptions: SortOption<Book>[] = [
     supportsTimeRange: true,
   },
   {
-    id: 'rating-desc',
-    label: '평점 높은순',
-    icon: <Star className="mr-2 h-4 w-4 text-[#FFAB00]" />,
-    sortFn: (a, b) => b.rating - a.rating,
+    id: 'library-desc',
+    label: '서재에 많이 담긴 순',
+    icon: <Bookmark className="mr-2 h-4 w-4 text-gray-500" />,
+    sortFn: (a, b) =>
+      ((b as any).libraryAdds || 0) - ((a as any).libraryAdds || 0),
+    supportsTimeRange: true,
   },
   {
     id: 'publishDate-desc',
@@ -66,27 +76,27 @@ export const defaultSortOptions: SortOption<Book>[] = [
 // 기간 필터 옵션
 export const timeRangeOptions = [
   {
-    id: 'all',
+    id: TimeRangeOptions.ALL,
     label: '전체 기간',
     icon: <CalendarDays className="mr-2 h-4 w-4 text-gray-500" />,
   },
   {
-    id: 'today',
+    id: TimeRangeOptions.TODAY,
     label: '오늘',
     icon: <Clock className="mr-2 h-4 w-4 text-gray-500" />,
   },
   {
-    id: 'week',
+    id: TimeRangeOptions.WEEK,
     label: '이번 주',
     icon: <Clock3 className="mr-2 h-4 w-4 text-gray-500" />,
   },
   {
-    id: 'month',
+    id: TimeRangeOptions.MONTH,
     label: '이번 달',
     icon: <Calendar className="mr-2 h-4 w-4 text-gray-500" />,
   },
   {
-    id: 'year',
+    id: TimeRangeOptions.YEAR,
     label: '올해',
     icon: <CalendarClock className="mr-2 h-4 w-4 text-gray-500" />,
   },
@@ -110,6 +120,8 @@ const SORT_LABELS: Record<string, string> = {
   latest: '최신순',
   title: '제목순',
   relevance: '관련도순',
+  'library-adds-desc': '서재에 많이 담긴 순',
+  'library-desc': '서재에 많이 담긴 순',
 };
 
 export function SortDropdown<T = Book>({
@@ -118,7 +130,7 @@ export function SortDropdown<T = Book>({
   sortOptions = defaultSortOptions as unknown as SortOption<T>[],
   className = '',
   align = 'end',
-  selectedTimeRange = 'all',
+  selectedTimeRange = TimeRangeOptions.ALL,
   onTimeRangeChange,
 }: SortDropdownProps<T>) {
   // 현재 선택된 정렬 옵션 가져오기
@@ -130,9 +142,8 @@ export function SortDropdown<T = Book>({
     timeRangeOptions.find(option => option.id === selectedTimeRange) ||
     timeRangeOptions[0];
 
-  // 인기순 정렬이 선택되었고, 기간 필터를 지원하는지 확인
-  const showTimeRangeFilter =
-    currentSortOption.supportsTimeRange && onTimeRangeChange;
+  // 기간 필터 표시 여부 - onTimeRangeChange가 존재할 때만 표시
+  const showTimeRangeFilter = !!onTimeRangeChange;
 
   // 버튼에 표시할 정렬 텍스트
   const sortButtonText = SORT_LABELS[selectedSort] || currentSortOption.label;
@@ -201,23 +212,27 @@ export function SortDropdown<T = Book>({
 // 기간별 필터링을 위한 날짜 계산 함수
 export const getDateFromTimeRange = (timeRange: TimeRange): Date | null => {
   const now = new Date();
+  let dayOfWeek: number;
+  let diff: number;
 
   switch (timeRange) {
-    case 'today':
+    case TimeRangeOptions.TODAY:
       // 오늘 00:00:00 시간으로 설정
       now.setHours(0, 0, 0, 0);
       return now;
-    case 'week':
-      // 이번 주 일요일로 설정 (0: 일요일, 1: 월요일, ..., 6: 토요일)
-      now.setDate(now.getDate() - now.getDay());
+    case TimeRangeOptions.WEEK:
+      // 이번 주의 시작일(월요일)을 계산
+      dayOfWeek = now.getDay(); // 0: 일요일, 1: 월요일, ..., 6: 토요일
+      diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // 일요일이면 6, 아니면 현재 요일 - 1
+      now.setDate(now.getDate() - diff);
       now.setHours(0, 0, 0, 0);
       return now;
-    case 'month':
+    case TimeRangeOptions.MONTH:
       // 이번 달 1일로 설정
       now.setDate(1);
       now.setHours(0, 0, 0, 0);
       return now;
-    case 'year':
+    case TimeRangeOptions.YEAR:
       // 올해 1월 1일로 설정
       now.setMonth(0, 1);
       now.setHours(0, 0, 0, 0);
@@ -232,7 +247,7 @@ export function useSortedBooks<T extends object>(
   books: T[],
   selectedSort: string,
   sortOptions: SortOption<T>[],
-  selectedTimeRange: TimeRange = 'all'
+  selectedTimeRange: TimeRange = TimeRangeOptions.ALL
 ): T[] {
   // 현재 선택된 정렬 옵션 가져오기
   const currentSortOption =
@@ -243,7 +258,10 @@ export function useSortedBooks<T extends object>(
     let filteredBooks = [...books];
 
     // 기간별 필터링 (supportsTimeRange가 true인 정렬 옵션일 때만)
-    if (currentSortOption.supportsTimeRange && selectedTimeRange !== 'all') {
+    if (
+      currentSortOption.supportsTimeRange &&
+      selectedTimeRange !== TimeRangeOptions.ALL
+    ) {
       const cutoffDate = getDateFromTimeRange(selectedTimeRange);
       if (cutoffDate && books.length > 0 && 'publishDate' in books[0]) {
         filteredBooks = filteredBooks.filter(book => {

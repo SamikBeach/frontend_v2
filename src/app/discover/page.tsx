@@ -1,6 +1,11 @@
 'use client';
 
-import { SortOption, TimeRange } from '@/apis/book/types';
+import {
+  PopularBooksSortOptions,
+  SortOption,
+  TimeRange,
+  TimeRangeOptions,
+} from '@/apis/book/types';
 import { selectedBookIdAtom } from '@/atoms/book';
 import {
   discoverCategoryFilterAtom,
@@ -17,6 +22,7 @@ import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
 import {
+  AdminBookManageButton,
   BooksContent,
   CategoryFilter,
   CategoryFilterSkeleton,
@@ -86,10 +92,16 @@ function BooksLoading() {
 
 // 카테고리 필터 로딩 스켈레톤 컴포넌트 제거 - 이제 CategoryFilter에서 import함
 
+// 기본값 상수 정의
+const DEFAULT_CATEGORY = 'all';
+const DEFAULT_SUBCATEGORY = 'all';
+const DEFAULT_SORT = PopularBooksSortOptions.REVIEWS_DESC;
+const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
+
 export default function DiscoverPage() {
   const isMobile = useIsMobile();
   const searchParams = useSearchParams();
-  const { updateQueryParams } = useQueryParams();
+  const { updateQueryParams, clearQueryParams } = useQueryParams();
 
   // Atom setters
   const setCategoryFilter = useSetAtom(discoverCategoryFilterAtom);
@@ -100,37 +112,30 @@ export default function DiscoverPage() {
 
   // URL 파라미터에서 필터 상태 초기화
   useEffect(() => {
-    const category = searchParams.get('category') || 'all';
-    const subcategory = searchParams.get('subcategory') || 'all';
-    const sortValue = searchParams.get('sort') || 'reviews-desc';
+    const category = searchParams.get('category') || DEFAULT_CATEGORY;
+    const subcategory = searchParams.get('subcategory') || DEFAULT_SUBCATEGORY;
+    const sortValue = searchParams.get('sort') || DEFAULT_SORT;
     const sort: SortOption = isValidSortOption(sortValue)
       ? sortValue
-      : 'reviews-desc';
+      : DEFAULT_SORT;
 
-    const timeRangeValue = searchParams.get('timeRange') || 'all';
+    const timeRangeValue = searchParams.get('timeRange') || DEFAULT_TIME_RANGE;
     const timeRange: TimeRange = isValidTimeRange(timeRangeValue)
       ? timeRangeValue
-      : 'all';
+      : DEFAULT_TIME_RANGE;
 
     const bookId = searchParams.get('book');
 
+    // Atoms 업데이트
     setCategoryFilter(category);
     setSubcategoryFilter(subcategory);
     setSortOption(sort);
     setTimeRange(timeRange);
     if (bookId) setSelectedBookId(bookId);
-
-    // URL 파라미터 동기화
-    updateQueryParams({
-      category,
-      subcategory,
-      sort,
-      timeRange,
-      book: bookId || undefined,
-    });
   }, [
     searchParams,
     updateQueryParams,
+    clearQueryParams,
     setCategoryFilter,
     setSubcategoryFilter,
     setSortOption,
@@ -145,9 +150,16 @@ export default function DiscoverPage() {
 
       {/* 브레드크럼 */}
       <div className="mx-auto w-full px-4 py-2">
-        <Suspense fallback={<div className="h-6" />}>
-          <DiscoverBreadcrumb />
-        </Suspense>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <Suspense fallback={<div className="h-6" />}>
+              <DiscoverBreadcrumb />
+            </Suspense>
+          </div>
+
+          {/* 관리자 버튼 */}
+          <AdminBookManageButton />
+        </div>
       </div>
 
       {/* 필터 영역 - 스크롤 시 상단에 고정 */}

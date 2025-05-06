@@ -1,4 +1,4 @@
-import { getAllDiscoverData } from '@/apis/discover-category/discover-category';
+import { getAllDiscoverCategories } from '@/apis/discover-category/discover-category';
 import { DiscoverCategory } from '@/apis/discover-category/types';
 import { useSuspenseQuery } from '@tanstack/react-query';
 
@@ -8,7 +8,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 export function useDiscoverCategories() {
   const { data: categories = [] } = useSuspenseQuery<DiscoverCategory[]>({
     queryKey: ['discover-categories'],
-    queryFn: getAllDiscoverData,
+    queryFn: getAllDiscoverCategories,
     staleTime: 1000 * 60 * 10, // 10분 동안 캐시 유지
   });
 

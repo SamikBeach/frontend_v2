@@ -5,12 +5,12 @@ import {
   AddBookToLibraryDto,
   AddTagToLibraryDto,
   CreateLibraryDto,
-  HomePopularLibrariesResponse,
   Library,
   LibraryBook,
   LibrarySortOption,
   LibraryTag,
   PaginatedLibraryResponse,
+  TimeRangeOptions,
   UpdateHistoryItem,
   UpdateLibraryDto,
   UserInfo,
@@ -24,7 +24,8 @@ export const getAllLibraries = async (
   limit: number = 10,
   sort?: LibrarySortOption,
   query?: string,
-  tagId?: number
+  tagId?: number,
+  timeRange?: TimeRangeOptions
 ): Promise<PaginatedLibraryResponse> => {
   const params: Record<string, string> = {};
 
@@ -33,6 +34,7 @@ export const getAllLibraries = async (
   if (sort) params.sort = sort;
   if (query && query.trim() !== '') params.query = query;
   if (tagId) params.tagId = tagId.toString();
+  if (timeRange) params.timeRange = timeRange;
 
   const response = await api.get<PaginatedLibraryResponse>('/library', {
     params,
@@ -46,12 +48,14 @@ export const getAllLibraries = async (
 export const getLibrariesByUser = async (
   userId: number,
   requestingUserId?: number,
-  sort?: LibrarySortOption
+  sort?: LibrarySortOption,
+  timeRange?: TimeRangeOptions
 ): Promise<Library[]> => {
   const params: Record<string, string> = {};
 
   if (requestingUserId) params.requestingUserId = requestingUserId.toString();
   if (sort) params.sort = sort;
+  if (timeRange) params.timeRange = timeRange;
 
   const response = await api.get<Library[]>(`/library/user/${userId}`, {
     params,
@@ -206,15 +210,36 @@ export const getLibraryUpdates = async (
  * 홈화면용 인기 서재 조회
  */
 export const getPopularLibrariesForHome = async (
-  limit: number = 3
-): Promise<HomePopularLibrariesResponse> => {
-  const response = await api.get<HomePopularLibrariesResponse>(
+  limit: number = 3,
+  timeRange?: TimeRangeOptions
+): Promise<PaginatedLibraryResponse> => {
+  const params: Record<string, string | number> = { limit };
+  if (timeRange) params.timeRange = timeRange;
+
+  const response = await api.get<PaginatedLibraryResponse>(
     '/library/popular/home',
     {
-      params: { limit },
+      params,
     }
   );
-  return response.data;
+
+  // API 응답 구조를 확인하고 처리
+  // response.data가 { data: [...], meta: {...} } 형태인지 확인
+  if (response.data && 'data' in response.data && 'meta' in response.data) {
+    return response.data;
+  }
+
+  // 다른 형태의 응답인 경우 적절한 형태로 변환
+  return {
+    data: Array.isArray(response.data) ? response.data : [response.data],
+    meta: {
+      total: 1,
+      page: 1,
+      limit: limit,
+      totalPages: 1,
+      timeRange,
+    },
+  };
 };
 
 /**
@@ -245,25 +270,27 @@ export const getLibrariesByBookId = async (
   page: number = 1,
   limit: number = 10,
   isbn?: string,
-  sort?: LibrarySortOption
+  sort?: LibrarySortOption,
+  timeRange?: TimeRangeOptions
 ): Promise<PaginatedLibraryResponse> => {
-  const params: Record<string, string> = {};
+  const params: Record<string, string | number> = {
+    page,
+    limit,
+  };
 
-  if (page) params.page = page.toString();
-  if (limit) params.limit = limit.toString();
   if (isbn) params.isbn = isbn;
   if (sort) params.sort = sort;
+  if (timeRange) params.timeRange = timeRange;
 
   const response = await api.get<PaginatedLibraryResponse>(
     `/library/book/${bookId}`,
     { params }
   );
-
   return response.data;
 };
 
 /**
- * 서재에 여러 권의 책 추가
+ * 서재에 여러 책 한번에 추가
  */
 export const addBooksToLibrary = async (
   libraryId: number,

@@ -1,2 +1,3 @@
-export * from './useDiscoverBooks';
+export * from './useAdminDiscoverBooks';
+export * from './useDiscoverBooksQuery';
 export * from './useDiscoverCategories';
