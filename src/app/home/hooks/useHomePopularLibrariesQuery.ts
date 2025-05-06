@@ -5,7 +5,7 @@ import {
   PaginatedLibraryResponse,
   TimeRangeOptions,
 } from '@/apis/library/types';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 /**
@@ -17,7 +17,7 @@ export function useHomePopularLibrariesQuery(
   limit: number = 3,
   timeRange?: TimeRangeOptions
 ) {
-  const { data, isLoading } = useSuspenseQuery<PaginatedLibraryResponse>({
+  const { data, isLoading, error } = useQuery<PaginatedLibraryResponse>({
     queryKey: ['home', 'popularLibraries', limit, timeRange],
     queryFn: () => getPopularLibrariesForHome(limit, timeRange),
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시
@@ -27,12 +27,7 @@ export function useHomePopularLibrariesQuery(
   const libraries = useMemo<HomeLibraryPreview[]>(() => {
     if (!data?.data) return [];
 
-    console.log('Library API Response:', data);
-
     return data.data.map((library: LibraryListItem) => {
-      console.log('Library owner:', library.owner);
-      console.log('Profile Image:', library.owner?.profileImage);
-
       return {
         ...library, // 모든 원본 데이터 유지
         id: library.id,
@@ -54,6 +49,7 @@ export function useHomePopularLibrariesQuery(
   return {
     libraries,
     isLoading,
+    error,
     totalLibraries: data?.meta?.total || 0,
   };
 }

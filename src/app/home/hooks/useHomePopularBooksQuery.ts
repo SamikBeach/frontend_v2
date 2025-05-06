@@ -1,6 +1,6 @@
 import { getPopularBooksForHome } from '@/apis/book/book';
 import { BookSearchResponse, HomeBookPreview } from '@/apis/book/types';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 /**
@@ -8,7 +8,7 @@ import { useMemo } from 'react';
  * @param limit 가져올 도서 수 (기본값: 4)
  */
 export function useHomePopularBooksQuery(limit: number = 4) {
-  const { data, isLoading } = useSuspenseQuery<BookSearchResponse>({
+  const { data, isLoading, error } = useQuery<BookSearchResponse>({
     queryKey: ['home', 'popularBooks', limit],
     queryFn: () => getPopularBooksForHome(limit),
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시
@@ -22,6 +22,7 @@ export function useHomePopularBooksQuery(limit: number = 4) {
   return {
     books,
     isLoading,
+    error,
     totalBooks: data?.total || 0,
   };
 }

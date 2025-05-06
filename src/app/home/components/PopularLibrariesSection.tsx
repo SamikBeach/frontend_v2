@@ -1,21 +1,25 @@
-import { HomeLibraryPreview } from '@/apis/library/types';
 import { LibraryCard } from '@/components/LibraryCard/LibraryCard';
+import { LibraryCardSkeleton } from '@/components/LibraryCard/LibraryCardSkeleton';
 import { Button } from '@/components/ui/button';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Tag } from '@/utils/tags';
 import { BookOpen } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useHomePopularLibrariesQuery } from '../hooks';
 
-interface PopularLibrariesSectionProps {
-  libraries: HomeLibraryPreview[];
-  isLoading?: boolean;
+// 인기 서재 스켈레톤 컴포넌트
+export function PopularLibrariesSkeleton() {
+  return (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {[...Array(2)].map((_, index) => (
+        <LibraryCardSkeleton key={index} />
+      ))}
+    </div>
+  );
 }
 
-export function PopularLibrariesSection({
-  libraries,
-  isLoading = false,
-}: PopularLibrariesSectionProps) {
+export function PopularLibrariesSection() {
   const router = useRouter();
+  const { libraries, isLoading } = useHomePopularLibrariesQuery();
 
   // 더미 태그 배열 (실제 데이터에서는 서재 태그를 사용해야 함)
   const dummyTags: Tag[] = [];
@@ -38,9 +42,7 @@ export function PopularLibrariesSection({
       </div>
 
       {isLoading ? (
-        <div className="flex h-[200px] items-center justify-center">
-          <LoadingSpinner />
-        </div>
+        <PopularLibrariesSkeleton />
       ) : libraries.length === 0 ? (
         <div className="flex h-[200px] items-center justify-center">
           <p className="text-sm text-gray-500">인기 서재가 없습니다.</p>

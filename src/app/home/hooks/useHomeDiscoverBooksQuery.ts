@@ -1,13 +1,13 @@
 import { getDiscoverBooksForHome } from '@/apis/book/book';
 import { HomeDiscoverBooksResponse } from '@/apis/book/types';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 /**
  * 홈 화면에 표시할 발견 도서 데이터를 가져오는 훅
  */
 export function useHomeDiscoverBooksQuery() {
-  const { data, isLoading } = useSuspenseQuery<HomeDiscoverBooksResponse[]>({
+  const { data, isLoading, error } = useQuery<HomeDiscoverBooksResponse[]>({
     queryKey: ['home', 'discoverBooks'],
     queryFn: () => getDiscoverBooksForHome(),
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시
@@ -22,5 +22,6 @@ export function useHomeDiscoverBooksQuery() {
   return {
     discoverBooks,
     isLoading,
+    error,
   };
 }

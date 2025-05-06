@@ -231,8 +231,6 @@ export function useReviewDialog() {
           // 읽기 상태 카운트 업데이트 (readingStats가 있는 경우)
           let updatedReadingStats = typedOldData.readingStats || {};
 
-          console.log({ typedOldData });
-
           // readingStats가 없는 경우도 처리하도록 if 조건 제거
           const oldStatus = typedOldData.userReadingStatus as
             | ReadingStatusType
