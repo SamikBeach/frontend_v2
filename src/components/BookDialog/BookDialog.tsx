@@ -199,6 +199,7 @@ export function BookDialog() {
         <DialogPrimitive.Overlay className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 overflow-y-auto bg-black/50">
           <div className="min-h-full rounded-lg py-5">
             <DialogPrimitive.Content
+              aria-describedby={undefined}
               className="relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg md:max-w-screen-xl"
               onEscapeKeyDown={e => {
                 if (hasOpenDropdown) {
