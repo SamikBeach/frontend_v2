@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Star } from 'lucide-react';
+import { BarChart3, Star } from 'lucide-react';
 import { useState } from 'react';
 import {
   Bar,
@@ -270,10 +270,15 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-full items-center justify-center">
-              <p className="text-sm text-gray-400">
-                평점 분포 데이터가 없습니다
-              </p>
+            <div className="flex h-full flex-col items-center justify-center">
+              <div className="flex flex-col items-center text-center">
+                <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                  <BarChart3 className="h-10 w-10 text-gray-300" />
+                </div>
+                <p className="text-sm font-medium text-gray-500">
+                  평점 분포 데이터가 없습니다
+                </p>
+              </div>
             </div>
           )
         ) : activeTab === 'categories' ? (
@@ -323,10 +328,15 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex h-full items-center justify-center">
-              <p className="text-sm text-gray-400">
-                카테고리별 평점 데이터가 없습니다
-              </p>
+            <div className="flex h-full flex-col items-center justify-center">
+              <div className="flex flex-col items-center text-center">
+                <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                  <BarChart3 className="h-10 w-10 text-gray-300" />
+                </div>
+                <p className="text-sm font-medium text-gray-500">
+                  카테고리별 평점 데이터가 없습니다
+                </p>
+              </div>
             </div>
           )
         ) : formattedMonthlyData.length > 0 ? (
@@ -381,8 +391,15 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <p className="text-sm text-gray-400">월별 평점 데이터가 없습니다</p>
+          <div className="flex h-full flex-col items-center justify-center">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                <BarChart3 className="h-10 w-10 text-gray-300" />
+              </div>
+              <p className="text-sm font-medium text-gray-500">
+                월별 평점 데이터가 없습니다
+              </p>
+            </div>
           </div>
         )}
       </div>

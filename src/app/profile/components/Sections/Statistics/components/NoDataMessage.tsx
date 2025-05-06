@@ -21,9 +21,6 @@ export function NoDataMessage({
               <BarChart3 className="h-10 w-10 text-gray-300" />
             </div>
             <p className="text-sm font-medium text-gray-500">{message}</p>
-            <p className="mt-1 text-xs text-gray-400">
-              나중에 다시 확인해주세요
-            </p>
           </div>
         </div>
       </div>

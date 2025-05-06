@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Hash } from 'lucide-react';
+import { BookOpen, Hash, Tag } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import {
@@ -277,10 +277,15 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-xs text-gray-400">
-                    서재 데이터가 없습니다
-                  </p>
+                <div className="flex h-full flex-col items-center justify-center">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                      <BookOpen className="h-10 w-10 text-gray-300" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-500">
+                      서재 데이터가 없습니다
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -319,22 +324,31 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
                 </div>
               ) : selectedLibrary ? (
                 <div className="flex h-full flex-col items-center justify-center">
-                  <Hash className="mb-2 h-8 w-8 text-gray-300" />
-                  <p className="text-xs text-gray-400">
-                    &quot;{selectedLibrary}&quot; 서재에 태그가 없습니다
-                  </p>
-                  <button
-                    className="mt-2 text-xs text-blue-500 hover:underline"
-                    onClick={() => setSelectedLibrary(null)}
-                  >
-                    모든 서재 보기
-                  </button>
+                  <div className="flex flex-col items-center text-center">
+                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                      <Hash className="h-10 w-10 text-gray-300" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-500">
+                      &quot;{selectedLibrary}&quot; 서재에 태그가 없습니다
+                    </p>
+                    <button
+                      className="mt-3 text-xs text-blue-500 hover:underline"
+                      onClick={() => setSelectedLibrary(null)}
+                    >
+                      모든 서재 보기
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-xs text-gray-400">
-                    태그 데이터가 없습니다
-                  </p>
+                <div className="flex h-full flex-col items-center justify-center">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                      <Tag className="h-10 w-10 text-gray-300" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-500">
+                      태그 데이터가 없습니다
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
