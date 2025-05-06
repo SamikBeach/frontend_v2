@@ -582,21 +582,26 @@ export interface UserInteractionResponse {
 export interface FollowerStatsResponse {
   followersCount: number;
   followingCount: number;
+  followerGrowth: { date: string; count: number }[];
   yearly: {
     year: string;
-    count: number;
+    followers: number;
+    following: number;
   }[];
   monthly: {
     month: string;
-    count: number;
+    followers: number;
+    following: number;
   }[];
   weekly: {
     week: string;
-    count: number;
+    followers: number;
+    following: number;
   }[];
   daily: {
     date: string;
-    count: number;
+    followers: number;
+    following: number;
   }[];
   isPublic: boolean;
 }
@@ -605,17 +610,35 @@ export interface FollowerStatsResponse {
  * 커뮤니티 활동 통계 응답
  */
 export interface CommunityActivityResponse {
-  totalComments: number;
   totalReviews: number;
-  totalLikes: number;
-  commentsPerWeek: number;
-  reviewsPerWeek: number;
-  likesPerWeek: number;
-  commentDistribution: { range: string; count: number }[];
-  reviewDistribution: { range: string; count: number }[];
-  likeDistribution: { range: string; count: number }[];
-  activityByCategory: { category: string; count: number }[];
-  mostActiveCategory: string;
+  yearly: {
+    year: string;
+    general: number;
+    discussion: number;
+    question: number;
+    meetup: number;
+  }[];
+  monthly: {
+    month: string;
+    general: number;
+    discussion: number;
+    question: number;
+    meetup: number;
+  }[];
+  weekly: {
+    week: string;
+    general: number;
+    discussion: number;
+    question: number;
+    meetup: number;
+  }[];
+  daily: {
+    date: string;
+    general: number;
+    discussion: number;
+    question: number;
+    meetup: number;
+  }[];
   isPublic: boolean;
 }
 

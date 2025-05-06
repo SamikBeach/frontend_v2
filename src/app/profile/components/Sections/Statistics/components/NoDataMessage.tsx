@@ -6,7 +6,7 @@ interface NoDataMessageProps {
 }
 
 export function NoDataMessage({
-  title = '통계 데이터',
+  title = '',
   message = '데이터가 없습니다',
 }: NoDataMessageProps) {
   return (

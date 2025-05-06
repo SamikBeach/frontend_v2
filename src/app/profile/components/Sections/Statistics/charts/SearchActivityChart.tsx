@@ -100,7 +100,12 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
       (!data.weekly || data.weekly.length === 0) &&
       (!data.daily || data.daily.length === 0))
   ) {
-    return <NoDataMessage message="검색 활동 데이터가 없습니다." />;
+    return (
+      <NoDataMessage
+        title={CHART_TITLE}
+        message="검색 활동 데이터가 없습니다."
+      />
+    );
   }
 
   // 기간별 데이터 선택

@@ -1,5 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BookOpen, Hash, Tag } from 'lucide-react';
+import { Hash, Tag } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import {
@@ -155,7 +155,9 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
     !data.booksPerLibrary ||
     data.booksPerLibrary.length === 0
   ) {
-    return <NoDataMessage message="서재 구성 데이터가 없습니다." />;
+    return (
+      <NoDataMessage title="서재 구성" message="서재 구성 데이터가 없습니다." />
+    );
   }
 
   // 서재 데이터 가공
@@ -277,16 +279,10 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
                   </ResponsiveContainer>
                 </div>
               ) : (
-                <div className="flex h-full flex-col items-center justify-center">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
-                      <BookOpen className="h-10 w-10 text-gray-300" />
-                    </div>
-                    <p className="text-sm font-medium text-gray-500">
-                      서재 데이터가 없습니다
-                    </p>
-                  </div>
-                </div>
+                <NoDataMessage
+                  title="서재 구성"
+                  message="서재 구성 데이터가 없습니다."
+                />
               )}
             </div>
           ) : (

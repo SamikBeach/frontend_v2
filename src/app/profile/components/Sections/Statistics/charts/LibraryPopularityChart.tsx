@@ -1,4 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { TrendingUp } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import {
@@ -139,16 +140,19 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
     );
   }
 
-  // 데이터가 없는 경우
-  if (
-    (!data.subscribersPerLibrary || data.subscribersPerLibrary.length === 0) &&
-    (!data.popularityTrend || data.popularityTrend.length === 0)
-  ) {
-    return <NoDataMessage message="서재 인기도 데이터가 없습니다." />;
-  }
+  // 구독자 데이터 준비 - 없는 경우 기본 데이터 설정
+  const subscribersData = data.subscribersPerLibrary || [];
+
+  // 서재 데이터가 없는 경우 기본 데이터 생성
+  const hasSubscriberData = subscribersData.length > 0;
+
+  // 기본 데이터 (데이터가 없는 경우 표시할 데이터)
+  const defaultSubscribersData = !hasSubscriberData
+    ? [{ library: '서재 데이터 없음', subscribers: 1 }]
+    : [];
 
   // 서재별 구독자 데이터 가공 (상위 10개만)
-  const sortedSubscribersData = [...data.subscribersPerLibrary]
+  const sortedSubscribersData = [...subscribersData, ...defaultSubscribersData]
     .sort((a, b) => b.subscribers - a.subscribers)
     .slice(0, 10);
 
@@ -158,13 +162,20 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
     0
   );
 
+  // 구독자가 모두 0인지 확인
+  const allSubscribersZero = totalSubscribers === 0;
+
   // 파이 차트용 데이터 가공
   const pieChartData = sortedSubscribersData
     .slice(0, 5) // 상위 5개만 표시
     .map((item, index) => ({
       ...item,
+      // 모든 값이 0인 경우 시각화를 위해 임의의 값(1) 설정
+      displayValue: allSubscribersZero ? 1 : item.subscribers,
       color: CHART_COLORS[index % CHART_COLORS.length],
-      percent: totalSubscribers > 0 ? item.subscribers / totalSubscribers : 0,
+      percent: allSubscribersZero
+        ? 1 / sortedSubscribersData.length
+        : item.subscribers / totalSubscribers,
     }));
 
   // 커스텀 라벨 렌더링 함수
@@ -219,60 +230,65 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
 
   // 기간별 데이터 가져오기
   const periodData = getTrendData();
+  const hasTrendData = periodData.length > 0;
 
   // 트렌드 데이터 가공
-  const trendChartData =
-    periodData.length > 0
-      ? periodData.map(
-          (item: {
-            year?: string;
-            month?: string;
-            week?: string;
-            date?: string;
-            libraries: Array<{ library: string; subscribers: number }>;
-          }) => {
-            // 각 기간별 상위 4개 서재만 표시
-            const topLibraries = item.libraries.slice(0, 4);
+  const trendChartData = hasTrendData
+    ? periodData.map(
+        (item: {
+          year?: string;
+          month?: string;
+          week?: string;
+          date?: string;
+          libraries: Array<{ library: string; subscribers: number }>;
+        }) => {
+          // 각 기간별 상위 4개 서재만 표시
+          const topLibraries = item.libraries.slice(0, 4);
 
-            // x축 표시 값 지정
-            const xValue =
-              'year' in item
-                ? item.year
-                : 'month' in item
-                  ? item.month
-                  : 'week' in item
-                    ? item.week
-                    : 'date' in item
-                      ? item.date
-                      : '';
+          // x축 표시 값 지정
+          const xValue =
+            'year' in item
+              ? item.year
+              : 'month' in item
+                ? item.month
+                : 'week' in item
+                  ? item.week
+                  : 'date' in item
+                    ? item.date
+                    : '';
 
-            // 데이터 포맷팅
-            const result: any = { name: xValue };
+          // 데이터 포맷팅
+          const result: any = { name: xValue };
 
-            // 각 서재별 데이터 추가
-            topLibraries.forEach(
-              (
-                lib: { library: string; subscribers: number },
-                index: number
-              ) => {
-                result[lib.library] = lib.subscribers;
-                result[`${lib.library}Color`] =
-                  CHART_COLORS[index % CHART_COLORS.length];
-              }
-            );
+          // 각 서재별 데이터 추가
+          topLibraries.forEach(
+            (lib: { library: string; subscribers: number }, index: number) => {
+              result[lib.library] = lib.subscribers;
+              result[`${lib.library}Color`] =
+                CHART_COLORS[index % CHART_COLORS.length];
+            }
+          );
 
-            return result;
-          }
-        )
-      : [];
+          return result;
+        }
+      )
+    : [];
+
+  // 트렌드 데이터가 없는 경우 기본 데이터 생성
+  const defaultTrendData = !hasTrendData
+    ? [
+        { name: '1월', 기본값: 0 },
+        { name: '2월', 기본값: 0 },
+        { name: '3월', 기본값: 0 },
+      ]
+    : [];
 
   // 트렌드 차트의 데이터 키 목록
-  const trendChartKeys =
-    trendChartData.length > 0
-      ? Object.keys(trendChartData[0]).filter(
-          key => !key.includes('Color') && key !== 'name'
-        )
-      : [];
+  const trendChartKeys = hasTrendData
+    ? Object.keys(trendChartData[0]).filter(
+        key => !key.includes('Color') && key !== 'name'
+      )
+    : ['기본값'];
 
   // X축 라벨 포맷팅
   const formatXAxisLabel = (label: string) => {
@@ -302,6 +318,23 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
 
   // 설정 로딩 중 또는 설정 업데이트 중인지 확인
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
+
+  // 특별한 툴팁 컴포넌트 - 값이 0이거나 기본값인 경우
+  const ZeroValueTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
+          <p className="text-xs font-medium text-gray-800">
+            {payload[0].payload.library || label}
+          </p>
+          <div className="mt-1">
+            <p className="text-xs font-semibold text-gray-700">0명</p>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
@@ -351,59 +384,80 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
         <div className="flex-1">
           {activeTab === 'current' ? (
             <div className="flex h-full items-center">
-              <div className="h-full w-3/5">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieChartData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                      outerRadius={90}
-                      innerRadius={40}
-                      fill="#8884d8"
-                      dataKey="subscribers"
-                      nameKey="library"
-                      paddingAngle={2}
-                    >
-                      {pieChartData.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.color}
-                          stroke="white"
-                          strokeWidth={1}
+              {hasSubscriberData ? (
+                <>
+                  <div className="h-full w-3/5">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={pieChartData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={renderCustomizedLabel}
+                          outerRadius={90}
+                          innerRadius={40}
+                          fill="#8884d8"
+                          dataKey={
+                            allSubscribersZero ? 'displayValue' : 'subscribers'
+                          }
+                          nameKey="library"
+                          paddingAngle={2}
+                        >
+                          {pieChartData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={entry.color}
+                              stroke="white"
+                              strokeWidth={1}
+                            />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          content={
+                            allSubscribersZero ? (
+                              <ZeroValueTooltip />
+                            ) : (
+                              <CustomTooltip />
+                            )
+                          }
                         />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="flex h-full w-2/5 flex-col justify-center">
+                    <ul className="space-y-2.5">
+                      {pieChartData.map((entry, index) => (
+                        <li
+                          key={`legend-${index}`}
+                          className="flex items-center gap-2"
+                        >
+                          <div
+                            className="h-3 w-3 flex-shrink-0 rounded-full"
+                            style={{ backgroundColor: entry.color }}
+                          />
+                          <div className="flex-1 text-xs">
+                            <span className="text-gray-700">
+                              {entry.library.length > 15
+                                ? `${entry.library.substring(0, 15)}...`
+                                : entry.library}
+                              :{' '}
+                            </span>
+                            <span>
+                              {allSubscribersZero ? '0' : entry.subscribers}명
+                            </span>
+                          </div>
+                        </li>
                       ))}
-                    </Pie>
-                    <Tooltip content={<CustomTooltip />} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="flex h-full w-2/5 flex-col justify-center">
-                <ul className="space-y-2.5">
-                  {pieChartData.map((entry, index) => (
-                    <li
-                      key={`legend-${index}`}
-                      className="flex items-center gap-2"
-                    >
-                      <div
-                        className="h-3 w-3 flex-shrink-0 rounded-full"
-                        style={{ backgroundColor: entry.color }}
-                      />
-                      <div className="flex-1 text-xs">
-                        <span className="text-gray-700">
-                          {entry.library.length > 15
-                            ? `${entry.library.substring(0, 15)}...`
-                            : entry.library}
-                          :{' '}
-                        </span>
-                        <span>{entry.subscribers}명</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                    </ul>
+                  </div>
+                </>
+              ) : (
+                <NoDataMessage
+                  title="서재 인기도"
+                  message="서재 구독자 데이터가 없습니다"
+                />
+              )}
             </div>
           ) : (
             <div className="h-full">
@@ -424,8 +478,8 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
                 ))}
               </div>
 
-              {trendChartData.length > 0 ? (
-                <div className="h-[calc(100%-2.5rem)]">
+              <div className="h-[calc(100%-2.5rem)]">
+                {hasTrendData ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart
                       data={trendChartData}
@@ -500,14 +554,19 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
                       ))}
                     </AreaChart>
                   </ResponsiveContainer>
-                </div>
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-xs text-gray-400">
-                    구독자 추세 데이터가 없습니다
-                  </p>
-                </div>
-              )}
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                        <TrendingUp className="h-10 w-10 text-gray-300" />
+                      </div>
+                      <p className="text-sm font-medium text-gray-500">
+                        구독자 추세 데이터가 없습니다
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
