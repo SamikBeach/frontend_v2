@@ -1,6 +1,5 @@
 export * from './useActivityFrequency';
 export * from './useAuthorPublisherStats';
-export * from './useBookMetadataStats';
 export { useCommunityActivityStats } from './useCommunityActivityStats';
 export * from './useFollowerStats';
 export * from './useGenreAnalysis';
