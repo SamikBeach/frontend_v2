@@ -1,4 +1,9 @@
 import { createOrUpdateRating } from '@/apis/rating/rating';
+import {
+  ReadingStatusType,
+  createOrUpdateReadingStatus,
+  deleteReadingStatusByBookId,
+} from '@/apis/reading-status';
 import { createReview } from '@/apis/review/review';
 import { ReviewType } from '@/apis/review/types';
 import { SearchResult } from '@/apis/search/types';
@@ -25,6 +30,8 @@ interface UseCreateReviewResult {
   setSelectedBook: (book: SearchResult | null) => void;
   rating: number;
   setRating: (rating: number) => void;
+  readingStatus: ReadingStatusType | null;
+  setReadingStatus: (status: ReadingStatusType | null) => void;
 }
 
 export function useCreateReview(): UseCreateReviewResult {
@@ -34,6 +41,9 @@ export function useCreateReview(): UseCreateReviewResult {
   const [images, setImages] = useState<File[]>([]);
   const [selectedBook, setSelectedBook] = useState<SearchResult | null>(null);
   const [rating, setRating] = useState(0);
+  const [readingStatus, setReadingStatus] = useState<ReadingStatusType | null>(
+    ReadingStatusType.READ
+  );
 
   // 이미지 변경 핸들러
   const handleImageChange = (files: FileList | null) => {
@@ -54,7 +64,7 @@ export function useCreateReview(): UseCreateReviewResult {
     useMutation({
       mutationFn: async () => {
         // 책이 선택된 경우에만 bookId와 isbn 처리
-        let bookId = undefined;
+        let bookId: number | undefined = undefined;
         let bookIsbn = undefined;
         let isNegativeBookId = false;
 
@@ -87,7 +97,7 @@ export function useCreateReview(): UseCreateReviewResult {
         const reviewData = {
           content,
           type,
-          bookId: bookId,
+          bookId,
           // ISBN은 책이 선택된 경우 항상 전송
           isbn: isNegativeBookId ? bookIsbn : undefined,
         };
@@ -97,13 +107,28 @@ export function useCreateReview(): UseCreateReviewResult {
           selectedBook && rating > 0 && bookId !== undefined;
 
         // 별점이 있는 경우에만 별점 API 호출 - rating이 0인 경우 호출 안함
-        if (shouldCallRatingAPI) {
+        if (shouldCallRatingAPI && bookId !== undefined) {
           // 별점 등록 API 호출 - isbn 항상 전송
           await createOrUpdateRating(
             bookId,
             { rating },
             isNegativeBookId ? bookIsbn : undefined
           );
+        }
+
+        // 읽기 상태 API 호출 - 리뷰 타입이고 책이 선택된 경우에만
+        if (type === 'review' && bookId !== undefined) {
+          if (readingStatus) {
+            // 읽기 상태가 있으면 업데이트
+            await createOrUpdateReadingStatus(
+              bookId,
+              { status: readingStatus },
+              isNegativeBookId ? bookIsbn : undefined
+            );
+          } else {
+            // 읽기 상태가 null이면 삭제
+            await deleteReadingStatusByBookId(bookId);
+          }
         }
 
         return createReview(reviewData);
@@ -115,12 +140,25 @@ export function useCreateReview(): UseCreateReviewResult {
           exact: false,
         });
 
+        // 읽기 상태 관련 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['reading-status'],
+          exact: false,
+        });
+
+        // 독서 상태별 도서 수 통계 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['user-statistics'],
+          exact: false,
+        });
+
         // 입력 필드 초기화
         setContent('');
         setImages([]);
         setSelectedBook(null);
         setRating(0);
         setType('general');
+        setReadingStatus(ReadingStatusType.READ);
 
         toast.success('리뷰가 등록되었습니다.');
       },
@@ -182,5 +220,7 @@ export function useCreateReview(): UseCreateReviewResult {
     setSelectedBook,
     rating,
     setRating,
+    readingStatus,
+    setReadingStatus,
   };
 }

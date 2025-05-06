@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { BookOpen, SendHorizontal } from 'lucide-react';
+import { ReactNode } from 'react';
 
 interface ReviewFormProps {
   content: string;
@@ -19,6 +20,7 @@ interface ReviewFormProps {
   handleBookDialogOpen: () => void;
   handleSubmitReview: () => Promise<void>;
   isLoading: boolean;
+  children?: ReactNode;
 }
 
 export function ReviewForm({
@@ -29,6 +31,7 @@ export function ReviewForm({
   handleBookDialogOpen,
   handleSubmitReview,
   isLoading,
+  children,
 }: ReviewFormProps) {
   // 태그 변경 핸들러
   const handleTypeChange = (newType: string) => {
@@ -59,6 +62,10 @@ export function ReviewForm({
         value={content}
         onChange={e => setContent(e.target.value)}
       />
+
+      {/* 선택된 책 정보 및 별점/읽기 상태 표시 (children으로 받음) */}
+      {children}
+
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <Select value={type} onValueChange={handleTypeChange}>
           <SelectTrigger className="h-9 w-[130px] cursor-pointer rounded-xl border-gray-200 bg-white font-medium text-gray-700">
