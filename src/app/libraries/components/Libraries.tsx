@@ -1,10 +1,21 @@
 'use client';
 
-import { Clock, Flame, Library } from 'lucide-react';
+import { CreateLibraryDto } from '@/apis/library/types';
+import { LibraryDialog } from '@/components/Library';
+import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { Clock, Flame, Library, Plus } from 'lucide-react';
+import { useState } from 'react';
 import { useLibraries } from '../hooks/useLibraries';
 import { SortOption } from '../types';
 import { Header } from './Header';
 import { LibraryList, LibraryListSkeleton } from './LibraryList';
+import { useCreateLibrary } from './hooks/useCreateLibrary';
 
 // 정렬 옵션 정의
 const sortOptions: SortOption[] = [
@@ -26,6 +37,9 @@ const sortOptions: SortOption[] = [
 ];
 
 export function Libraries() {
+  const currentUser = useCurrentUser();
+  const [showLibraryDialog, setShowLibraryDialog] = useState(false);
+
   const {
     libraries,
     isLoading,
@@ -39,7 +53,31 @@ export function Libraries() {
     handleSortChange,
     handleTimeRangeChange,
     handleSearchChange,
+    refetch,
   } = useLibraries();
+
+  // 현재 사용자 ID가 있는 경우 서재 생성 훅 사용
+  const { createLibraryMutation } = useCreateLibrary(
+    currentUser?.id || 0,
+    () => {
+      setShowLibraryDialog(false);
+      refetch(); // 서재 목록 갱신
+    }
+  );
+
+  // 새 서재 만들기 클릭 핸들러
+  const handleCreateLibrary = () => {
+    if (!currentUser) {
+      // 로그인 필요 메시지 또는 로그인 다이얼로그 표시 로직 추가
+      return;
+    }
+    setShowLibraryDialog(true);
+  };
+
+  // 새 서재 생성 처리 함수
+  const handleCreateNewLibrary = async (libraryData: CreateLibraryDto) => {
+    return createLibraryMutation(libraryData);
+  };
 
   return (
     <>
@@ -70,6 +108,34 @@ export function Libraries() {
           />
         )}
       </div>
+
+      {/* 새 서재 만들기 다이얼로그 */}
+      {showLibraryDialog && (
+        <LibraryDialog
+          open={showLibraryDialog}
+          onOpenChange={setShowLibraryDialog}
+          mode="create"
+          onCreateLibrary={handleCreateNewLibrary}
+        />
+      )}
+
+      {/* 우측 하단 고정 플러스 버튼 (채널톡 버튼처럼) */}
+      {currentUser && (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleCreateLibrary}
+              className="fixed right-6 bottom-6 flex h-12 w-12 items-center justify-center rounded-full bg-gray-900 p-0 shadow-lg transition-all duration-200 ease-in-out hover:translate-y-[-2px] hover:bg-gray-800 hover:shadow-xl"
+              size="icon"
+            >
+              <Plus className="h-5 w-5 text-white" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="left">
+            <p className="text-sm">새 서재 만들기</p>
+          </TooltipContent>
+        </Tooltip>
+      )}
     </>
   );
 }
