@@ -5,29 +5,21 @@ import {
 } from '@/apis/reading-status';
 import { createReview, deleteReview, updateReview } from '@/apis/review/review';
 import { Review } from '@/apis/review/types';
-import { bookReviewSortAtom } from '@/atoms/book';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { invalidateUserProfileQueries } from '@/utils/query';
 import { BookWithRating } from '@/utils/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAtomValue } from 'jotai';
 import { usePathname } from 'next/navigation';
 import { useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
 
 export function useReviewDialog() {
-  const {
-    book,
-    isbn,
-    userRating: userRatingData,
-    userReadingStatus: initialReadingStatus,
-  } = useBookDetails();
+  const { book, isbn, userRating: userRatingData } = useBookDetails();
   const queryClient = useQueryClient();
   const currentUser = useCurrentUser();
   const pathname = usePathname();
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
-  const sort = useAtomValue(bookReviewSortAtom);
 
   // 수정 모드 상태 추가
   const [isEditMode, setIsEditMode] = useState(false);
