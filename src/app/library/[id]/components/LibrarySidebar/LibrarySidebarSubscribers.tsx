@@ -70,15 +70,9 @@ const SubscriberItem: FC<SubscriberItemProps> = ({
   return (
     <div className="flex items-center gap-2">
       <Avatar className="h-8 w-8 border border-gray-200">
-        <AvatarImage
-          src={
-            subscriber.profileImage ||
-            `https://i.pravatar.cc/150?u=${subscriber.id}`
-          }
-          alt={subscriber.username}
-        />
+        <AvatarImage src={subscriber.profileImage} alt={subscriber.username} />
         <AvatarFallback className="bg-gray-200">
-          {subscriber.username[0]}
+          {subscriber.username[0].toUpperCase()}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1">
