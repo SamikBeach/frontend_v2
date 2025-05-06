@@ -33,7 +33,11 @@ export function LibraryContent() {
   });
 
   // 사용자 서재 목록 불러오기
-  const { userLibraries, isLoading: isLoadingLibraries } = useUserLibraries();
+  const {
+    userLibraries,
+    isLoading: isLoadingLibraries,
+    isOwner: isLibraryOwner,
+  } = useUserLibraries(libraryId, library?.owner?.id);
 
   // 책 관련 hooks
   const { moveBook, removeBook } = useLibraryBooks(libraryId);
