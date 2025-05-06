@@ -35,6 +35,7 @@ export interface UserInfo {
   username: string;
   email: string;
   profileImage?: string;
+  isFollowing?: boolean;
 }
 
 // 책 미리보기 정보 타입

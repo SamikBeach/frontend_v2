@@ -36,7 +36,7 @@ export const LibrarySidebarContent: FC<LibrarySidebarContentProps> = ({
       <LibrarySidebarOwner
         owner={{
           ...library.owner,
-          isFollowing: isSubscribed,
+          isFollowing: library.owner.isFollowing ?? isSubscribed,
         }}
       />
 
