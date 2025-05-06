@@ -151,7 +151,7 @@ export function ReviewDialog({
             </Button>
           </div>
 
-          <div className="px-5 py-4">
+          <div className="px-5">
             <ResponsiveDialogDescription
               className="mb-6 text-sm text-gray-600"
               drawerClassName="mb-6 text-sm text-gray-600"
@@ -160,12 +160,52 @@ export function ReviewDialog({
               대한 {getDialogDescription()}
             </ResponsiveDialogDescription>
 
-            {/* 생성 모드에서만 읽기 상태 선택 UI 표시 */}
+            <div className="mb-6 flex flex-col items-center space-y-3">
+              <div className="relative flex w-full items-center justify-center">
+                <div className="flex space-x-2">
+                  {[1, 2, 3, 4, 5].map(star => (
+                    <Star
+                      key={star}
+                      className={`h-9 w-9 cursor-pointer ${
+                        star <= rating
+                          ? 'fill-yellow-400 text-yellow-400'
+                          : 'text-gray-200 hover:text-gray-300'
+                      }`}
+                      onClick={() => !isSubmitting && setRating(star)}
+                    />
+                  ))}
+                </div>
+                {rating > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute -right-10 h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    onClick={handleResetRating}
+                    disabled={isSubmitting}
+                    title="별점 취소"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              <p className="text-sm font-medium text-gray-900">
+                {rating === 0
+                  ? '별점 선택'
+                  : rating === 1
+                    ? '별로예요'
+                    : rating === 2
+                      ? '아쉬워요'
+                      : rating === 3
+                        ? '보통이에요'
+                        : rating === 4
+                          ? '좋아요'
+                          : '최고예요'}
+              </p>
+            </div>
+
+            {/* 생성 모드에서만 읽기 상태 선택 UI 표시 - 별점 아래로 이동 */}
             {isCreateMode && (
               <div className="mb-6">
-                <label className="mb-2 block text-sm font-medium text-gray-700">
-                  읽기 상태
-                </label>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -232,49 +272,6 @@ export function ReviewDialog({
                 </DropdownMenu>
               </div>
             )}
-
-            <div className="mb-6 flex flex-col items-center space-y-3">
-              <div className="relative flex w-full items-center justify-center">
-                <div className="flex space-x-2">
-                  {[1, 2, 3, 4, 5].map(star => (
-                    <Star
-                      key={star}
-                      className={`h-9 w-9 cursor-pointer ${
-                        star <= rating
-                          ? 'fill-yellow-400 text-yellow-400'
-                          : 'text-gray-200 hover:text-gray-300'
-                      }`}
-                      onClick={() => !isSubmitting && setRating(star)}
-                    />
-                  ))}
-                </div>
-                {rating > 0 && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute -right-10 h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                    onClick={handleResetRating}
-                    disabled={isSubmitting}
-                    title="별점 취소"
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              <p className="text-sm font-medium text-gray-900">
-                {rating === 0
-                  ? '별점 선택'
-                  : rating === 1
-                    ? '별로예요'
-                    : rating === 2
-                      ? '아쉬워요'
-                      : rating === 3
-                        ? '보통이에요'
-                        : rating === 4
-                          ? '좋아요'
-                          : '최고예요'}
-              </p>
-            </div>
 
             <div className={isMobile ? 'mb-4 flex-1' : 'mb-4'}>
               <textarea

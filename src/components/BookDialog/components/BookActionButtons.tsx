@@ -77,7 +77,7 @@ export function BookActionButtons() {
   // 상태 텍스트 표시
   const displayStatusText = readingStatus
     ? statusTexts[readingStatus]
-    : '책 상태 설정';
+    : '읽기 상태 설정';
 
   // 상태 아이콘 표시
   const displayStatusIcon = readingStatus ? statusIcons[readingStatus] : null;
