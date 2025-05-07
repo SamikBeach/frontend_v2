@@ -119,6 +119,7 @@ export function AuthDialog({
         drawerClassName="w-full max-w-none overflow-hidden rounded-t-[16px] border-0 p-0 shadow-xl h-[100dvh]"
         onPointerDownOutside={handlePointerDownOutside}
         hideCloseButton
+        aria-describedby={undefined}
       >
         {/* 헤더 - 로고와 뒤로가기 버튼 */}
         <ResponsiveDialogHeader

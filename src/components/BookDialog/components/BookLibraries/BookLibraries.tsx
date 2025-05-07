@@ -163,6 +163,9 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
           onOpenChange={onConflictDialogOpenChange}
           libraryName={conflictLibraryName}
         />
+
+        {/* 로그인 다이얼로그 */}
+        <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
       </div>
     );
   }
@@ -221,7 +224,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
         libraryName={conflictLibraryName}
       />
 
-      {/* 인증 다이얼로그 */}
+      {/* 로그인 다이얼로그 */}
       <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
