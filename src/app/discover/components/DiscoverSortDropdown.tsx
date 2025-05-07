@@ -12,7 +12,7 @@ import {
 } from '@/components/SortDropdown';
 import { useQueryParams } from '@/hooks';
 import { useAtom } from 'jotai';
-import { BarChart3, ClockIcon, Star } from 'lucide-react';
+import { BarChart3, Bookmark, ClockIcon, Star } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 // 기본값 상수 정의
@@ -45,6 +45,13 @@ const sortOptions: SortOption[] = [
     label: '평점 높은 순',
     value: PopularBooksSortOptions.RATING_DESC,
     icon: <Star className="h-4 w-4" />,
+    supportsTimeRange: true,
+  },
+  {
+    id: 'library',
+    label: '서재에 많이담긴 순',
+    value: PopularBooksSortOptions.LIBRARY_COUNT_DESC,
+    icon: <Bookmark className="h-4 w-4" />,
     supportsTimeRange: true,
   },
   {
@@ -85,6 +92,7 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
     if (
       sort === PopularBooksSortOptions.RATING_DESC ||
       sort === PopularBooksSortOptions.REVIEWS_DESC ||
+      sort === PopularBooksSortOptions.LIBRARY_COUNT_DESC ||
       sort === PopularBooksSortOptions.PUBLISH_DATE_DESC ||
       sort === PopularBooksSortOptions.TITLE_ASC
     ) {
