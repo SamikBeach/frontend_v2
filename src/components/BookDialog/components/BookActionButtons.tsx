@@ -1,7 +1,7 @@
 import { CreateLibraryDto } from '@/apis/library/types';
 import { ReadingStatusType } from '@/apis/reading-status';
 import {
-  libraryAddDropdownOpenAtom,
+  actionButtonsLibraryDropdownAtom,
   readingStatusDropdownOpenAtom,
 } from '@/atoms/book-dialog';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
@@ -37,7 +37,7 @@ export function BookActionButtons() {
     readingStatusDropdownOpenAtom
   );
   const [libraryAddOpen, setLibraryAddOpen] = useAtom(
-    libraryAddDropdownOpenAtom
+    actionButtonsLibraryDropdownAtom
   );
 
   const {

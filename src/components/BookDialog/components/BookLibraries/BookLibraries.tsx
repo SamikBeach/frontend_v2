@@ -3,7 +3,7 @@ import {
   LibraryListItem,
   LibrarySortOption,
 } from '@/apis/library/types';
-import { libraryAddDropdownOpenAtom } from '@/atoms/book-dialog';
+import { bookLibrariesDropdownAtom } from '@/atoms/book-dialog';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { LibraryDialog } from '@/components/Library';
 import { LibraryCard } from '@/components/LibraryCard';
@@ -68,7 +68,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
   // 새 서재 생성 다이얼로그 상태
   const [isNewLibraryDialogOpen, setIsNewLibraryDialogOpen] = useState(false);
   const [libraryAddOpen, setLibraryAddOpen] = useAtom(
-    libraryAddDropdownOpenAtom
+    bookLibrariesDropdownAtom
   );
 
   // 새 서재 생성 및 책 추가 핸들러
