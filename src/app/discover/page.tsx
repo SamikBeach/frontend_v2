@@ -167,21 +167,22 @@ export default function DiscoverPage() {
         {/* 카테고리 필터와 정렬 옵션 */}
         <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} py-2`}>
           <div className="relative">
-            {/* xl 이상 화면에서만 보이는 정렬 버튼 (오른쪽 위치) */}
-            <div className="hidden xl:absolute xl:top-0 xl:right-0 xl:block">
-              <DiscoverSortDropdown />
+            {/* xl 이상 화면에서 보이는 정렬 버튼 - 오른쪽에 배치하지만 카테고리 필터와 겹치지 않도록 함 */}
+            <div className="mb-2 flex items-start justify-between">
+              <div className="flex-1">
+                {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
+                <Suspense fallback={<CategoryFilterSkeleton />}>
+                  <CategoryFilter className="w-full" />
+                </Suspense>
+              </div>
+              <div className="ml-4 hidden flex-shrink-0 xl:block">
+                <DiscoverSortDropdown />
+              </div>
             </div>
 
-            <div className="flex flex-col gap-2">
-              {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
-              <Suspense fallback={<CategoryFilterSkeleton />}>
-                <CategoryFilter className="w-full" />
-              </Suspense>
-
-              {/* xl 미만 화면에서 보이는 정렬 버튼 */}
-              <div className="w-full xl:hidden">
-                <DiscoverSortDropdown className="w-full" />
-              </div>
+            {/* xl 미만 화면에서 보이는 정렬 버튼 */}
+            <div className="w-full xl:hidden">
+              <DiscoverSortDropdown className="w-full" />
             </div>
           </div>
         </div>
