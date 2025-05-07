@@ -1,10 +1,11 @@
 import { useUserFollow } from '@/app/profile/hooks';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 
 interface LibrarySidebarOwnerProps {
   owner: {
@@ -24,18 +25,22 @@ export const LibrarySidebarOwner: FC<LibrarySidebarOwnerProps> = ({
   );
   const isOwnProfile = currentUser?.id === owner.id;
 
+  // 로그인 다이얼로그 상태
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
   // 팔로우 핸들러
   const handleFollowClick = async () => {
     if (!currentUser) {
-      // TODO: 로그인 다이얼로그 표시
+      // 로그인 다이얼로그 표시
+      setAuthDialogOpen(true);
       return;
     }
 
     await toggleFollow(owner.id);
   };
 
-  // 자기 자신이면 팔로우 버튼 숨김
-  const showFollowButton = !isOwnProfile && currentUser;
+  // 비로그인 사용자에게도 항상 팔로우 버튼 표시 (자기 자신이 아닌 경우)
+  const showFollowButton = !isOwnProfile;
 
   return (
     <div className="rounded-xl bg-gray-50 p-4">
@@ -81,6 +86,9 @@ export const LibrarySidebarOwner: FC<LibrarySidebarOwnerProps> = ({
           </Button>
         )}
       </div>
+
+      {/* 로그인 다이얼로그 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 };

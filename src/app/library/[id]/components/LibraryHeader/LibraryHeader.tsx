@@ -35,6 +35,9 @@ export function LibraryHeader() {
     updateLibraryVisibility,
   } = useLibraryDetail(libraryId);
 
+  // 현재 사용자가 로그인했는지 확인
+  const isLoggedIn = !!currentUser;
+
   // 현재 사용자가 서재 소유자인지 확인
   const isOwner = currentUser?.id === library?.owner?.id;
 
@@ -93,6 +96,7 @@ export function LibraryHeader() {
               setIsDropdownOpen={setIsDropdownOpen}
               setShowEditDialog={setShowEditDialog}
               setShowDeleteDialog={setShowDeleteDialog}
+              isLoggedIn={isLoggedIn}
             />
           )}
         </div>

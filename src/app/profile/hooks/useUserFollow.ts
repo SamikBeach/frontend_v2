@@ -1,4 +1,5 @@
 import { followUser, unfollowUser } from '@/apis/user/user';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -18,6 +19,8 @@ interface UseUserFollowResult {
 export function useUserFollow(initialIsFollowing = false): UseUserFollowResult {
   const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
   const queryClient = useQueryClient();
+  const currentUser = useCurrentUser();
+  const isLoggedIn = !!currentUser;
 
   // 팔로우 mutation
   const { mutateAsync: follow, isPending: isFollowLoading } = useMutation({
@@ -52,6 +55,9 @@ export function useUserFollow(initialIsFollowing = false): UseUserFollowResult {
    * @param userId 대상 사용자 ID
    */
   const toggleFollow = async (userId: number) => {
+    // 로그인 체크는 컴포넌트에서 처리하므로 여기서는 API 호출만 처리
+    if (!isLoggedIn) return;
+
     try {
       // 낙관적 업데이트를 위해 먼저 상태 변경
       const newFollowingState = !isFollowing;
