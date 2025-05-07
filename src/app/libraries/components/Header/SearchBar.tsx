@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Search } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface SearchBarProps {
   value: string;
@@ -9,26 +9,38 @@ interface SearchBarProps {
 }
 
 export function SearchBar({ value, onSearchChange }: SearchBarProps) {
-  const [searchValue, setSearchValue] = useState(value);
-  const debouncedValue = useDebounce(searchValue, 300);
+  // 내부 입력 상태는 제어 컴포넌트로 관리
+  const [inputValue, setInputValue] = useState(value);
+  // 디바운스된 값이 변경될 때만 부모에게 알림
+  const debouncedValue = useDebounce(inputValue, 300);
 
-  // 검색어 변경 핸들러 - useCallback으로 메모이제이션
-  const handleSearchChange = useCallback(() => {
-    onSearchChange(debouncedValue);
-  }, [debouncedValue, onSearchChange]);
-
-  // 검색어가 변경되면 부모 컴포넌트에 알림
+  // 외부에서 전달된 value가 변경될 때만 내부 상태 업데이트
   useEffect(() => {
-    handleSearchChange();
-  }, [handleSearchChange]);
+    if (value !== inputValue) {
+      setInputValue(value);
+    }
+  }, [value]);
+
+  // 디바운스된 값이 변경되면 부모에게 알림
+  useEffect(() => {
+    // 기존 value와 다를 때만 호출하여 루프 방지
+    if (debouncedValue !== value) {
+      onSearchChange(debouncedValue);
+    }
+  }, [debouncedValue]); // onSearchChange는 dependency에서 제거하여 무한루프 방지
+
+  // 사용자 입력 핸들러
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
 
   return (
     <div className="relative w-full max-w-md">
       <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
       <Input
         placeholder="서재 검색..."
-        value={searchValue}
-        onChange={e => setSearchValue(e.target.value)}
+        value={inputValue}
+        onChange={handleInputChange}
         className="h-10 rounded-xl border-gray-200 bg-[#F9FAFB] pl-9 focus-visible:ring-gray-300"
       />
     </div>

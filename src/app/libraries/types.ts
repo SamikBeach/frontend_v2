@@ -1,5 +1,8 @@
-import { Library as ApiLibrary, BookPreview } from '@/apis/library/types';
-import { TimeRange } from '@/components/SortDropdown';
+import {
+  Library as ApiLibrary,
+  BookPreview,
+  TimeRangeOptions,
+} from '@/apis/library/types';
 import { ReactNode } from 'react';
 
 // 서재 태그 타입
@@ -59,8 +62,8 @@ export interface SortDropdownProps {
   sortOptions: SortOption[];
   className?: string;
   // 기간 필터 관련 props 추가
-  selectedTimeRange?: TimeRange;
-  onTimeRangeChange?: (range: TimeRange) => void;
+  selectedTimeRange?: TimeRangeOptions;
+  onTimeRangeChange?: (range: TimeRangeOptions) => void;
 }
 
 // 서재 카드 속성

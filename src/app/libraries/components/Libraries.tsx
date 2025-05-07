@@ -36,7 +36,11 @@ const sortOptions: SortOption[] = [
   },
 ];
 
-export function Libraries() {
+interface LibrariesProps {
+  setSearchQuery?: (query: string) => void;
+}
+
+export function Libraries({ setSearchQuery }: LibrariesProps) {
   const currentUser = useCurrentUser();
   const [showLibraryDialog, setShowLibraryDialog] = useState(false);
 
@@ -79,6 +83,17 @@ export function Libraries() {
     return createLibraryMutation(libraryData);
   };
 
+  // 검색어 변경 핸들러 (URL 업데이트 지원)
+  const onSearchChange = (value: string) => {
+    // 외부에서 전달된 함수가 있으면 사용
+    if (setSearchQuery) {
+      setSearchQuery(value);
+    } else {
+      // 그렇지 않으면 내부 핸들러 사용
+      handleSearchChange(value);
+    }
+  };
+
   return (
     <>
       {/* Header 컴포넌트로 필터 영역 분리 */}
@@ -89,7 +104,7 @@ export function Libraries() {
         timeRange={timeRange}
         onSortChange={handleSortChange}
         onTimeRangeChange={handleTimeRangeChange}
-        onSearchChange={handleSearchChange}
+        onSearchChange={onSearchChange}
       />
 
       {/* 메인 콘텐츠 */}
