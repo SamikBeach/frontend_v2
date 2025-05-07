@@ -1,3 +1,4 @@
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
@@ -40,6 +41,7 @@ export default function ProfileHeader() {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [followDialogType, setFollowDialogType] =
     useState<FollowListType | null>(null);
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   // 사용자 표시 정보 설정
   const displayName = user.username || user.email?.split('@')[0] || '';
@@ -48,7 +50,8 @@ export default function ProfileHeader() {
   // 팔로우 버튼 클릭 핸들러
   const handleFollowClick = async () => {
     if (!currentUser) {
-      // TODO: 로그인 다이얼로그 표시
+      // 로그인 다이얼로그 표시
+      setAuthDialogOpen(true);
       return;
     }
 
@@ -175,6 +178,9 @@ export default function ProfileHeader() {
           onClose={handleCloseFollowDialog}
         />
       )}
+
+      {/* 로그인 다이얼로그 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </div>
   );
 }

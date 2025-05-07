@@ -2,6 +2,7 @@ import {
   likeComment as apiLikeComment,
   unlikeComment as apiUnlikeComment,
 } from '@/apis/review/review';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UseCommentLikeResult {
@@ -20,6 +21,7 @@ interface Comment {
 
 export function useCommentLike(): UseCommentLikeResult {
   const queryClient = useQueryClient();
+  const currentUser = useCurrentUser();
 
   // 좋아요 추가 mutation
   const { mutateAsync: addLike, isPending: isAddLikeLoading } = useMutation({
@@ -163,6 +165,7 @@ export function useCommentLike(): UseCommentLikeResult {
 
   // 좋아요 토글 핸들러
   const handleLikeToggle = async (commentId: number, isLiked: boolean) => {
+    // 로그인 확인은 UI 컴포넌트에서 처리하므로 여기서는 별도 체크 없이 API 호출만 처리
     try {
       if (isLiked) {
         await removeLike(commentId);
