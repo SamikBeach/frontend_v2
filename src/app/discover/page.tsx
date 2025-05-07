@@ -95,7 +95,7 @@ function BooksLoading() {
 // 기본값 상수 정의
 const DEFAULT_CATEGORY = 'all';
 const DEFAULT_SUBCATEGORY = 'all';
-const DEFAULT_SORT = PopularBooksSortOptions.REVIEWS_DESC;
+const DEFAULT_SORT = PopularBooksSortOptions.RATING_DESC;
 const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
 
 export default function DiscoverPage() {

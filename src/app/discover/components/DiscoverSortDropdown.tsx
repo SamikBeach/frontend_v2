@@ -16,7 +16,7 @@ import { BarChart3, Bookmark, ClockIcon, Star } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 // 기본값 상수 정의
-const DEFAULT_SORT = PopularBooksSortOptions.REVIEWS_DESC;
+const DEFAULT_SORT = PopularBooksSortOptions.RATING_DESC;
 const DEFAULT_TIME_RANGE = 'all';
 
 // 정렬 옵션 타입
