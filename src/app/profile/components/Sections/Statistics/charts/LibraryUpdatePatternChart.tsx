@@ -1,4 +1,5 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { BarChart3, BookOpen } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import {
@@ -65,6 +66,22 @@ const CustomTooltip = ({ active, payload, label }: any) => {
           <p className="text-xs font-semibold text-gray-700">
             {`${payload[0].value}${payload[0].name.includes('빈도') ? '회/월' : '회'}`}
           </p>
+        </div>
+      </div>
+    );
+  }
+  return null;
+};
+
+// 업데이트 빈도가 0인 경우의 툴팁 컴포넌트
+const ZeroFrequencyTooltip = ({ active, payload }: any) => {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
+        <p className="text-xs font-medium text-gray-800">{data.library}</p>
+        <div className="mt-1">
+          <p className="text-xs font-semibold text-gray-700">0회/월</p>
         </div>
       </div>
     );
@@ -153,32 +170,38 @@ const LibraryUpdatePatternChart = ({
     );
   }
 
-  // 데이터가 없는 경우
+  // 데이터가 전혀 없는 경우 (배열 자체가 없거나 빈 배열)
   if (
     (!data.updateFrequency || data.updateFrequency.length === 0) &&
     (!data.weekdayActivity || data.weekdayActivity.length === 0)
   ) {
-    return <NoDataMessage message="서재 업데이트 패턴 데이터가 없습니다." />;
+    return (
+      <NoDataMessage
+        title="서재 업데이트 패턴"
+        message="서재 업데이트 패턴 데이터가 없습니다."
+      />
+    );
   }
 
-  // 서재 업데이트 빈도 데이터 가공 (상위 5개만)
+  // 총 업데이트 횟수가 0인지 확인
+  const totalUpdatesPerMonth = data.updateFrequency.reduce(
+    (sum, curr) => sum + curr.updatesPerMonth,
+    0
+  );
+
+  // 서재 업데이트 빈도 데이터 가공
   const sortedFrequencyData = [...data.updateFrequency]
     .sort((a, b) => b.updatesPerMonth - a.updatesPerMonth)
     .slice(0, 5)
     .map((item, index) => ({
       ...item,
+      // 모든 값이 0인 경우 시각화를 위해 임의의 동일한 값(1)을 설정
+      displayValue: totalUpdatesPerMonth === 0 ? 1 : item.updatesPerMonth,
       color: CHART_COLORS[index % CHART_COLORS.length],
       percent:
-        data.updateFrequency.reduce(
-          (sum, curr) => sum + curr.updatesPerMonth,
-          0
-        ) > 0
-          ? item.updatesPerMonth /
-            data.updateFrequency.reduce(
-              (sum, curr) => sum + curr.updatesPerMonth,
-              0
-            )
-          : 0,
+        totalUpdatesPerMonth > 0
+          ? item.updatesPerMonth / totalUpdatesPerMonth
+          : 1 / data.updateFrequency.length, // 모든 값이 0인 경우 균등 분배
     }));
 
   // 요일별 활동 데이터 가공
@@ -194,6 +217,12 @@ const LibraryUpdatePatternChart = ({
 
   // 설정 로딩 중 또는 설정 업데이트 중인지 확인
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
+
+  // 요일별 총 활동 수가 0인지 확인
+  const totalWeekdayActivity = data.weekdayActivity.reduce(
+    (sum, curr) => sum + curr.count,
+    0
+  );
 
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
@@ -245,7 +274,7 @@ const LibraryUpdatePatternChart = ({
         <div className="flex-1">
           {activeTab === 'frequency' ? (
             <div className="h-full pt-2">
-              {sortedFrequencyData.length > 0 ? (
+              {data.updateFrequency.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -256,7 +285,7 @@ const LibraryUpdatePatternChart = ({
                       label={renderCustomizedLabel}
                       outerRadius={90}
                       innerRadius={35}
-                      dataKey="updatesPerMonth"
+                      dataKey="displayValue"
                       nameKey="library"
                       paddingAngle={2}
                     >
@@ -264,7 +293,15 @@ const LibraryUpdatePatternChart = ({
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip content={<CustomTooltip />} />
+                    <Tooltip
+                      content={
+                        totalUpdatesPerMonth === 0 ? (
+                          <ZeroFrequencyTooltip />
+                        ) : (
+                          <CustomTooltip />
+                        )
+                      }
+                    />
                     <Legend
                       content={<CustomLegend />}
                       verticalAlign="middle"
@@ -274,16 +311,21 @@ const LibraryUpdatePatternChart = ({
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-xs text-gray-400">
-                    업데이트 빈도 데이터가 없습니다
-                  </p>
+                <div className="flex h-full flex-col items-center justify-center">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                      <BookOpen className="h-10 w-10 text-gray-300" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-500">
+                      업데이트 빈도 데이터가 없습니다
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
           ) : (
             <div className="h-full pt-2">
-              {weekdayData.length > 0 ? (
+              {data.weekdayActivity.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={weekdayData}
@@ -311,10 +353,15 @@ const LibraryUpdatePatternChart = ({
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-xs text-gray-400">
-                    요일별 활동 데이터가 없습니다
-                  </p>
+                <div className="flex h-full flex-col items-center justify-center">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                      <BarChart3 className="h-10 w-10 text-gray-300" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-500">
+                      요일별 활동 데이터가 없습니다
+                    </p>
+                  </div>
                 </div>
               )}
             </div>

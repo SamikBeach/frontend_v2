@@ -1,3 +1,4 @@
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import {
   Card,
   CardContent,
@@ -8,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CommentSection } from './components';
 import { ReviewActions } from './components/ReviewActions';
 import { ReviewContent } from './components/ReviewContent';
@@ -37,6 +38,9 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
 
   // 현재 사용자 정보 가져오기
   const currentUser = useCurrentUser();
+
+  // AuthDialog 상태 추가
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   // Book 다이얼로그 쿼리 사용
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
@@ -331,10 +335,11 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
     }
   };
 
-  // 좋아요 핸들러 - 낙관적 UI 업데이트 적용
+  // 좋아요 핸들러 - 낙관적 UI 업데이트 적용 (비로그인 시 AuthDialog 표시 추가)
   const handleLike = async () => {
-    // 로그인하지 않은 경우 차단
+    // 로그인하지 않은 경우 AuthDialog 표시
     if (!currentUser) {
+      setAuthDialogOpen(true);
       return;
     }
 
@@ -355,8 +360,14 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
     }
   };
 
-  // 댓글 추가 핸들러 커스텀 - 댓글 추가 후 댓글 목록 표시
+  // 댓글 추가 핸들러 커스텀 - 비로그인 시 AuthDialog 표시 추가
   const handleSubmitComment = async () => {
+    // 로그인하지 않은 경우 AuthDialog 표시
+    if (!currentUser) {
+      setAuthDialogOpen(true);
+      return;
+    }
+
     await handleAddComment();
     // 댓글 추가 후 댓글 목록 표시
     reviewState.setShowComments(true);
@@ -402,71 +413,74 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
   };
 
   return (
-    <Card className="w-full overflow-hidden border-gray-200 shadow-none">
-      <CardHeader className="p-5 pb-3">
-        <ReviewHeader
-          review={extendedReview}
-          isAuthor={isAuthor}
-          isDropdownOpen={reviewState.isDropdownOpen}
-          setIsDropdownOpen={reviewState.setIsDropdownOpen}
-          onEdit={handleEditReviewClick}
-          onDelete={() => reviewState.setDeleteDialogOpen(true)}
-        />
-      </CardHeader>
-      <CardContent className="space-y-4 px-5 pt-0 pb-4">
-        <ReviewContent
-          review={extendedReview}
-          isEditMode={reviewState.isEditMode}
-          displayContent={reviewState.displayContent}
-          isLongContent={reviewState.isLongContent}
-          expanded={reviewState.expanded}
-          setExpanded={reviewState.setExpanded}
-          editedContent={reviewState.editedContent}
-          setEditedContent={reviewState.setEditedContent}
-          editedType={reviewState.editedType}
-          editedRating={reviewState.editedRating}
-          selectedBook={reviewState.selectedBook}
-          onTypeChange={reviewState.handleTypeChange}
-          onRatingChange={reviewState.handleRatingChange}
-          onSaveEdit={handleSaveEdit}
-          onCancelEdit={() => reviewState.handleEditModeToggle(false)}
-          onBookDialogOpen={reviewState.handleBookDialogOpen}
-          onRemoveSelectedBook={reviewState.handleRemoveSelectedBook}
-          onBookClick={handleBookClick}
-        />
-      </CardContent>
-      <Separator className="bg-gray-100" />
-      {!reviewState.isEditMode && extendedReview.activityType !== 'rating' && (
-        <CardFooter className="flex flex-col gap-4 px-5 py-3">
-          <ReviewActions
-            isLiked={reviewState.isLiked || false}
-            likesCount={reviewState.likeCount || 0}
-            commentCount={review.commentCount || 0}
-            showComments={reviewState.showComments}
-            isLikeLoading={isLikeLoading}
-            onLike={handleLike}
-            onToggleComments={handleToggleComments}
+    <>
+      <Card className="w-full overflow-hidden border-gray-200 shadow-none">
+        <CardHeader className="p-5 pb-3">
+          <ReviewHeader
+            review={extendedReview}
+            isAuthor={isAuthor}
+            isDropdownOpen={reviewState.isDropdownOpen}
+            setIsDropdownOpen={reviewState.setIsDropdownOpen}
+            onEdit={handleEditReviewClick}
+            onDelete={() => reviewState.setDeleteDialogOpen(true)}
           />
-
-          {/* 댓글 섹션 */}
-          {reviewState.showComments && comments && (
-            <div ref={commentSectionRef} className="w-full min-w-0">
-              <CommentSection
-                comments={comments}
-                formatDate={formatDate}
-                currentUser={getUserForComments()}
-                commentText={commentText}
-                setCommentText={setCommentText}
-                isCommentLoading={isCommentLoading}
-                handleSubmitComment={handleSubmitComment}
-                handleDeleteComment={handleDeleteComment}
-                handleCommentLikeToggle={handleCommentLikeToggle}
-                highlightedCommentId={highlightedCommentId}
+        </CardHeader>
+        <CardContent className="space-y-4 px-5 pt-0 pb-4">
+          <ReviewContent
+            review={extendedReview}
+            isEditMode={reviewState.isEditMode}
+            displayContent={reviewState.displayContent}
+            isLongContent={reviewState.isLongContent}
+            expanded={reviewState.expanded}
+            setExpanded={reviewState.setExpanded}
+            editedContent={reviewState.editedContent}
+            setEditedContent={reviewState.setEditedContent}
+            editedType={reviewState.editedType}
+            editedRating={reviewState.editedRating}
+            selectedBook={reviewState.selectedBook}
+            onTypeChange={reviewState.handleTypeChange}
+            onRatingChange={reviewState.handleRatingChange}
+            onSaveEdit={handleSaveEdit}
+            onCancelEdit={() => reviewState.handleEditModeToggle(false)}
+            onBookDialogOpen={reviewState.handleBookDialogOpen}
+            onRemoveSelectedBook={reviewState.handleRemoveSelectedBook}
+            onBookClick={handleBookClick}
+          />
+        </CardContent>
+        <Separator className="bg-gray-100" />
+        {!reviewState.isEditMode &&
+          extendedReview.activityType !== 'rating' && (
+            <CardFooter className="flex flex-col gap-4 px-5 py-3">
+              <ReviewActions
+                isLiked={reviewState.isLiked || false}
+                likesCount={reviewState.likeCount || 0}
+                commentCount={review.commentCount || 0}
+                showComments={reviewState.showComments}
+                isLikeLoading={isLikeLoading}
+                onLike={handleLike}
+                onToggleComments={handleToggleComments}
               />
-            </div>
+
+              {/* 댓글 섹션 */}
+              {reviewState.showComments && comments && (
+                <div ref={commentSectionRef} className="w-full min-w-0">
+                  <CommentSection
+                    comments={comments}
+                    formatDate={formatDate}
+                    currentUser={getUserForComments()}
+                    commentText={commentText}
+                    setCommentText={setCommentText}
+                    isCommentLoading={isCommentLoading}
+                    handleSubmitComment={handleSubmitComment}
+                    handleDeleteComment={handleDeleteComment}
+                    handleCommentLikeToggle={handleCommentLikeToggle}
+                    highlightedCommentId={highlightedCommentId}
+                  />
+                </div>
+              )}
+            </CardFooter>
           )}
-        </CardFooter>
-      )}
+      </Card>
 
       {/* 다이얼로그 핸들러 컴포넌트 */}
       <ReviewDialogHandler
@@ -493,6 +507,9 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
         isSubmitting={reviewState.isSubmitting}
         onReviewSubmit={handleReviewDialogSubmit}
       />
-    </Card>
+
+      {/* 로그인 다이얼로그 추가 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
+    </>
   );
 }

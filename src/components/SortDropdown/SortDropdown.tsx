@@ -120,7 +120,6 @@ const SORT_LABELS: Record<string, string> = {
   latest: '최신순',
   title: '제목순',
   relevance: '관련도순',
-  'library-adds-desc': '서재에 많이 담긴 순',
   'library-desc': '서재에 많이 담긴 순',
 };
 

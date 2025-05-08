@@ -12,6 +12,7 @@ import {
 
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
+import { BarChart3 } from 'lucide-react';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { PrivateDataMessage } from '../components/PrivateDataMessage';
 import { useAuthorPublisherStats } from '../hooks';
@@ -234,8 +235,18 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
 
       <div className="relative h-[calc(100%-2.5rem)]">
         {topItems.length === 0 || topItems[0].count === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <p className="text-sm text-gray-400">데이터가 없습니다</p>
+          <div className="flex h-full flex-col items-center justify-center">
+            <div className="flex flex-col items-center text-center">
+              <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                <BarChart3 className="h-10 w-10 text-gray-300" />
+              </div>
+              <p className="mb-2 text-sm font-medium text-gray-500">
+                데이터가 없습니다
+              </p>
+              <p className="text-xs text-gray-400">
+                등록된 {labelName} 정보가 없습니다
+              </p>
+            </div>
           </div>
         ) : (
           <div className="flex h-full items-center justify-center">
@@ -286,16 +297,6 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
-          </div>
-        )}
-
-        {/* 차트 대신 항목 표시 */}
-        {topItems.length > 0 && topItems[0].count === 0 && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-            <p className="mb-1 text-sm text-gray-400">데이터가 없습니다</p>
-            <p className="text-xs text-gray-400">
-              등록된 {labelName} 데이터가 없습니다
-            </p>
           </div>
         )}
 

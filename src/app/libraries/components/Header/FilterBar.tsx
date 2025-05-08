@@ -3,7 +3,6 @@
 import { LibraryTagResponseDto } from '@/apis/library/types';
 import { libraryTagFilterAtom } from '@/atoms/library';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useQueryParams } from '@/hooks';
 import { Tag, createDefaultTag, getTagColor } from '@/utils/tags';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
@@ -35,7 +34,6 @@ function FilterBarContent({
   setTagFilter: (id: string) => void;
 }) {
   const { tags: allTags } = useAllLibraryTags(20);
-  const { updateQueryParams } = useQueryParams();
 
   // 태그 생성
   const tags: Tag[] = [
@@ -51,14 +49,6 @@ function FilterBarContent({
 
   const handleTagClick = (tagId: string) => {
     setTagFilter(tagId);
-
-    // 기본값('all')인 경우에는 URL 쿼리 파라미터 제거
-    if (tagId === DEFAULT_TAG_FILTER) {
-      updateQueryParams({ tag: undefined });
-    } else {
-      // 기본값이 아닌 경우에는 URL 쿼리 파라미터 추가
-      updateQueryParams({ tag: tagId });
-    }
   };
 
   return (

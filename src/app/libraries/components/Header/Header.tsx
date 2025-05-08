@@ -1,6 +1,6 @@
 'use client';
 
-import { TimeRange } from '@/apis/book/types';
+import { TimeRangeOptions } from '@/apis/library/types';
 import { SortOption } from '../../types';
 import { FilterBar, SearchBar, SortDropdown } from './';
 
@@ -8,9 +8,9 @@ interface HeaderProps {
   sortOption: string;
   sortOptions: SortOption[];
   searchQuery: string;
-  timeRange: TimeRange;
+  timeRange: TimeRangeOptions;
   onSortChange: (id: string) => void;
-  onTimeRangeChange: (range: TimeRange) => void;
+  onTimeRangeChange: (range: TimeRangeOptions) => void;
   onSearchChange: (value: string) => void;
 }
 

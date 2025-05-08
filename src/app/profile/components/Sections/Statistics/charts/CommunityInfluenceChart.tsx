@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { ReviewInfluenceResponse } from '@/apis/user/types';
 import { getReviewInfluence } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivateDataMessage } from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
@@ -46,23 +46,21 @@ const CommunityInfluenceChart = ({ userId }: CommunityInfluenceChartProps) => {
   // 설정 로딩 중 또는 설정 업데이트 중인지 확인
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
-  // 데이터가 없는 경우
-  if (
-    data.averageLikesPerReview === 0 &&
-    (!data.popularReviews || data.popularReviews.length === 0)
-  ) {
-    return <NoDataMessage message="커뮤니티 영향력 데이터가 없습니다." />;
-  }
-
   // 인기 게시글 데이터 가공 (최대 표시할 글자 수 제한)
-  const processedPopularPosts = data.popularReviews.slice(0, 5).map(review => ({
-    ...review,
-    // 게시글 내용 텍스트 길이 제한 (25자까지만 표시)
-    shortContent:
-      review.content.length > 25
-        ? `${review.content.substring(0, 25)}...`
-        : review.content,
-  }));
+  const processedPopularPosts = data.popularReviews
+    ? data.popularReviews.slice(0, 5).map(review => ({
+        ...review,
+        // 게시글 내용 텍스트 길이 제한 (25자까지만 표시)
+        shortContent:
+          review.content.length > 25
+            ? `${review.content.substring(0, 25)}...`
+            : review.content,
+      }))
+    : [];
+
+  // 데이터 값이 없는 경우 기본값 표시
+  const averageLikesPerReview = data.averageLikesPerReview || 0;
+  const communityContributionScore = data.communityContributionScore || 0;
 
   return (
     <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
@@ -91,7 +89,7 @@ const CommunityInfluenceChart = ({ userId }: CommunityInfluenceChartProps) => {
                   게시글당 좋아요
                 </h3>
                 <p className="text-xs font-medium text-blue-600">
-                  {data.averageLikesPerReview.toFixed(1)}개
+                  {averageLikesPerReview.toFixed(1)}개
                 </p>
               </div>
             </div>
@@ -107,7 +105,7 @@ const CommunityInfluenceChart = ({ userId }: CommunityInfluenceChartProps) => {
                   커뮤니티 기여도
                 </h3>
                 <p className="text-xs font-medium text-purple-600">
-                  {data.communityContributionScore.toFixed(0)}점
+                  {communityContributionScore.toFixed(0)}점
                 </p>
               </div>
             </div>

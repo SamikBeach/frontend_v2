@@ -4,8 +4,6 @@ import { useQueryParams } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 
-import { authUtils } from '@/apis/axios';
-import { AuthDialog } from '@/components/Auth/AuthDialog';
 import {
   Community,
   CommunitySkeleton,
@@ -34,28 +32,12 @@ export default function ProfilePage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   // 선택한 메뉴 아이템에 기반한 섹션 상태
   const [selectedSection, setSelectedSection] = useState(activeSection);
 
-  // 클라이언트 사이드에서만 인증 상태 확인
+  // 간단한 로딩 처리 (비로그인 사용자도 프로필 페이지 접근 가능)
   useEffect(() => {
-    const checkAuth = () => {
-      try {
-        const isAuth = authUtils.isAuthenticated();
-        if (!isAuth) {
-          setShowAuthDialog(true);
-        }
-      } catch (error) {
-        console.error('인증 상태 확인 중 오류 발생:', error);
-        setHasError(true);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkAuth();
     // 로딩 지연 시간을 짧게 추가하여 상태 전환 안정화
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -142,17 +124,6 @@ export default function ProfilePage() {
 
   return (
     <ErrorBoundary>
-      {/* 로그인 다이얼로그 */}
-      <AuthDialog
-        open={showAuthDialog}
-        onOpenChange={open => {
-          setShowAuthDialog(open);
-          if (!open) {
-            router.push('/');
-          }
-        }}
-      />
-
       <div className="bg-white">
         {/* 프로필 헤더 */}
         <Suspense fallback={<HeaderSkeleton />}>

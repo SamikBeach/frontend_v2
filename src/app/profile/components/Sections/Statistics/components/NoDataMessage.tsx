@@ -6,11 +6,11 @@ interface NoDataMessageProps {
 }
 
 export function NoDataMessage({
-  title = '통계 데이터',
+  title = '',
   message = '데이터가 없습니다',
 }: NoDataMessageProps) {
   return (
-    <div className="h-[240px] w-full rounded-lg bg-white p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white p-3">
       <div className="flex h-full flex-col">
         <div className="mb-2">
           <h3 className="text-sm font-medium text-gray-700">{title}</h3>
@@ -21,9 +21,6 @@ export function NoDataMessage({
               <BarChart3 className="h-10 w-10 text-gray-300" />
             </div>
             <p className="text-sm font-medium text-gray-500">{message}</p>
-            <p className="mt-1 text-xs text-gray-400">
-              나중에 다시 확인해주세요
-            </p>
           </div>
         </div>
       </div>

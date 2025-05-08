@@ -1,4 +1,5 @@
 import { Library } from '@/apis/library/types';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -7,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Bell, Edit, Eye, EyeOff, MoreHorizontal, Trash } from 'lucide-react';
-import { Dispatch, FC, SetStateAction } from 'react';
+import { Dispatch, FC, SetStateAction, useState } from 'react';
 
 interface LibraryHeaderActionsProps {
   library: Library;
@@ -19,6 +20,7 @@ interface LibraryHeaderActionsProps {
   setIsDropdownOpen: Dispatch<SetStateAction<boolean>>;
   setShowEditDialog: Dispatch<SetStateAction<boolean>>;
   setShowDeleteDialog: Dispatch<SetStateAction<boolean>>;
+  isLoggedIn: boolean;
 }
 
 export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
@@ -31,7 +33,19 @@ export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
   setIsDropdownOpen,
   setShowEditDialog,
   setShowDeleteDialog,
+  isLoggedIn,
 }) => {
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
+  // 구독 버튼 클릭 핸들러 (로그인 확인 추가)
+  const handleSubscribeClick = async () => {
+    if (!isLoggedIn) {
+      setAuthDialogOpen(true);
+      return;
+    }
+    await handleSubscriptionToggle();
+  };
+
   if (isOwner) {
     return (
       <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
@@ -89,22 +103,27 @@ export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
   }
 
   return (
-    <Button
-      variant={isSubscribed ? 'outline' : 'default'}
-      size="lg"
-      onClick={handleSubscriptionToggle}
-      className={`relative h-10 w-32 cursor-pointer rounded-full font-medium ${
-        isSubscribed
-          ? 'border-gray-300 text-gray-800 hover:bg-gray-100'
-          : 'bg-gray-900 text-white hover:bg-gray-800'
-      }`}
-    >
-      <span className="absolute left-5">
-        <Bell
-          className={`h-5 w-5 ${isSubscribed ? 'text-gray-800' : 'text-white'}`}
-        />
-      </span>
-      <span className="ml-7">{isSubscribed ? '구독중' : '구독하기'}</span>
-    </Button>
+    <>
+      <Button
+        variant={isSubscribed ? 'outline' : 'default'}
+        size="lg"
+        onClick={handleSubscribeClick}
+        className={`relative h-10 w-32 cursor-pointer rounded-full font-medium ${
+          isSubscribed
+            ? 'border-gray-300 text-gray-800 hover:bg-gray-100'
+            : 'bg-gray-900 text-white hover:bg-gray-800'
+        }`}
+      >
+        <span className="absolute left-5">
+          <Bell
+            className={`h-5 w-5 ${isSubscribed ? 'text-gray-800' : 'text-white'}`}
+          />
+        </span>
+        <span className="ml-7">{isSubscribed ? '구독중' : '구독하기'}</span>
+      </Button>
+
+      {/* 로그인 다이얼로그 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
+    </>
   );
 };

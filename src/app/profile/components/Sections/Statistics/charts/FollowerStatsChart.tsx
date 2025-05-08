@@ -168,60 +168,17 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
     return label;
   };
 
-  // 팔로워/팔로잉 데이터 처리
-  // 현재는 팔로워 증가 추이만 API에서 제공하므로, 팔로잉 증가 추이를 계산해야 함
-  const enhancedChartData =
-    chartData.length > 0
-      ? (() => {
-          // 시간의 흐름에 따른 점진적 증가 패턴을 만들기 위한 계산
-          // 가장 첫 데이터를 기준점(최소값)으로 설정
-          // 가장 마지막 데이터를 현재 상태(최대값)으로 설정
-
-          // 모든 항목의 count 값 중 최소값과 최대값 구하기
-          const minCount = Math.min(...chartData.map(item => item.count));
-          const maxCount = Math.max(...chartData.map(item => item.count));
-          const countDiff = maxCount - minCount;
-
-          // 현재 팔로워 수는 최대 count값과 같다고 가정
-          const currentFollowing = data.followingCount;
-
-          // 증가율이 비슷하다는 가정하에 팔로잉 값 계산
-          // 만약 증가량이 0이면 모든 기간에 같은 팔로워 수를 사용
-          if (countDiff === 0) {
-            return chartData.map(item => ({
-              ...item,
-              followers: item.count,
-              following: currentFollowing,
-            }));
-          }
-
-          return chartData.map(item => {
-            // 현재 데이터 포인트가 최소값에서 최대값 사이 어느 위치인지 계산 (0~1 사이 값)
-            const progressRatio = (item.count - minCount) / countDiff;
-
-            // 같은 비율로 팔로잉 값 계산 (최소 전체의 30%에서 시작한다고 가정)
-            // 초기 팔로잉 값은 현재 팔로잉의 약 30%에서 시작
-            const minFollowing = currentFollowing * 0.3;
-            const followingRange = currentFollowing - minFollowing;
-            const following = Math.round(
-              minFollowing + progressRatio * followingRange
-            );
-
-            return {
-              ...item,
-              followers: item.count, // 원래 count는 followers로 변경
-              following: following,
-            };
-          });
-        })()
-      : [];
-
   // 데이터가 없는 경우
   const hasNoFollowers = data.followersCount === 0 && data.followingCount === 0;
   const hasNoGrowthData = !chartData || chartData.length === 0;
 
   if (hasNoFollowers && hasNoGrowthData) {
-    return <NoDataMessage message="팔로워/팔로잉 데이터가 없습니다." />;
+    return (
+      <NoDataMessage
+        title={CHART_TITLE}
+        message="팔로워/팔로잉 데이터가 없습니다."
+      />
+    );
   }
 
   // 기간 옵션
@@ -272,103 +229,51 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
         </div>
 
         <div className="h-[calc(100%-2rem)]">
-          {!hasNoGrowthData ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={enhancedChartData}
-                margin={{ top: 5, right: 15, left: 0, bottom: 5 }}
-              >
-                <defs>
-                  <linearGradient
-                    id="followersGradient"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop
-                      offset="5%"
-                      stopColor={PASTEL_COLORS.FOLLOWERS}
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor={PASTEL_COLORS.FOLLOWERS}
-                      stopOpacity={0.1}
-                    />
-                  </linearGradient>
-                  <linearGradient
-                    id="followingGradient"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop
-                      offset="5%"
-                      stopColor={PASTEL_COLORS.FOLLOWING}
-                      stopOpacity={0.8}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor={PASTEL_COLORS.FOLLOWING}
-                      stopOpacity={0.1}
-                    />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="#f3f4f6"
-                />
-                <XAxis
-                  dataKey={dataKey}
-                  tick={{ fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  tickFormatter={formatXAxisLabel}
-                  height={30}
-                  angle={0}
-                  textAnchor="middle"
-                />
-                <YAxis
-                  tick={{ fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={{ stroke: '#e5e7eb' }}
-                  width={30}
-                  allowDecimals={false}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend content={<CustomLegend />} />
-                <Area
-                  type="monotone"
-                  dataKey="followers"
-                  name="팔로워"
-                  stroke={PASTEL_COLORS.FOLLOWERS}
-                  fillOpacity={1}
-                  fill="url(#followersGradient)"
-                  dot={{ fill: PASTEL_COLORS.FOLLOWERS, r: 3 }}
-                  activeDot={{ r: 5 }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="following"
-                  name="팔로잉"
-                  stroke={PASTEL_COLORS.FOLLOWING}
-                  fillOpacity={1}
-                  fill="url(#followingGradient)"
-                  dot={{ fill: PASTEL_COLORS.FOLLOWING, r: 3 }}
-                  activeDot={{ r: 5 }}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex h-full items-center justify-center">
-              <p className="text-xs text-gray-400">
-                팔로워/팔로잉 추이 데이터가 없습니다
-              </p>
-            </div>
-          )}
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={chartData}
+              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f3f4f6"
+              />
+              <XAxis
+                dataKey={dataKey}
+                tick={{ fontSize: 11 }}
+                tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }}
+                tickFormatter={formatXAxisLabel}
+                height={25}
+              />
+              <YAxis
+                tick={{ fontSize: 11 }}
+                tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }}
+                width={30}
+                allowDecimals={false}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend content={<CustomLegend />} />
+              <Area
+                type="monotone"
+                dataKey="followers"
+                name="팔로워"
+                stroke={PASTEL_COLORS.FOLLOWERS}
+                fill={PASTEL_COLORS.FOLLOWERS}
+                fillOpacity={0.3}
+              />
+              <Area
+                type="monotone"
+                dataKey="following"
+                name="팔로잉"
+                stroke={PASTEL_COLORS.FOLLOWING}
+                fill={PASTEL_COLORS.FOLLOWING}
+                fillOpacity={0.3}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </div>

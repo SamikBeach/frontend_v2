@@ -1,12 +1,18 @@
 import { categoryFilterAtom, subcategoryFilterAtom } from '@/atoms/popular';
+import { Button } from '@/components/ui/button';
 import { useCategories, useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { useState } from 'react';
 
 interface CategoryFilterProps {
   className?: string;
 }
+
+// 한 번에 표시할 카테고리 수
+const VISIBLE_CATEGORIES = 10;
 
 export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   const isMobile = useIsMobile();
@@ -17,6 +23,9 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   );
   const categories = useCategories();
 
+  // 모든 카테고리를 표시할지 여부 상태 추가
+  const [showAllCategories, setShowAllCategories] = useState(false);
+
   const DEFAULT_CATEGORY = 'all';
   const DEFAULT_SUBCATEGORY = 'all';
 
@@ -26,6 +35,14 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   );
 
   const subcategories = selectedCategoryObj?.subcategories || [];
+
+  // 표시할 카테고리 결정
+  const visibleCategories = showAllCategories
+    ? categories
+    : categories.slice(0, VISIBLE_CATEGORIES);
+
+  // 카테고리가 10개 초과인지 확인
+  const hasMoreCategories = categories.length > VISIBLE_CATEGORIES;
 
   const handleCategoryClick = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -70,8 +87,8 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
           isMobile ? 'mb-1 py-1' : 'mb-2 py-1'
         }`}
       >
-        <div className="flex gap-2 px-0.5">
-          {categories.map(category => (
+        <div className="flex flex-wrap gap-2 px-0.5">
+          {visibleCategories.map(category => (
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category.id)}
@@ -91,6 +108,29 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
               {category.name}
             </button>
           ))}
+
+          {/* 더보기 버튼 */}
+          {hasMoreCategories && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setShowAllCategories(!showAllCategories)}
+              className={cn(
+                'h-9 w-9 shrink-0 rounded-full border border-gray-200 bg-white hover:bg-gray-50',
+                showAllCategories && 'bg-gray-50'
+              )}
+              aria-label={
+                showAllCategories ? '카테고리 접기' : '카테고리 더보기'
+              }
+              title={showAllCategories ? '카테고리 접기' : '카테고리 더보기'}
+            >
+              {showAllCategories ? (
+                <ChevronUp className="h-4 w-4 text-gray-700" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-gray-700" />
+              )}
+            </Button>
+          )}
         </div>
       </div>
 

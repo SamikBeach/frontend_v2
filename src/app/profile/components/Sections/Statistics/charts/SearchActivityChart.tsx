@@ -100,7 +100,12 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
       (!data.weekly || data.weekly.length === 0) &&
       (!data.daily || data.daily.length === 0))
   ) {
-    return <NoDataMessage message="검색 활동 데이터가 없습니다." />;
+    return (
+      <NoDataMessage
+        title={CHART_TITLE}
+        message="검색 활동 데이터가 없습니다."
+      />
+    );
   }
 
   // 기간별 데이터 선택
@@ -278,8 +283,15 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
                   </BarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-gray-400">검색어 데이터가 없습니다</p>
+                <div className="flex h-full flex-col items-center justify-center">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                      <Search className="h-10 w-10 text-gray-300" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-500">
+                      검색어 데이터가 없습니다
+                    </p>
+                  </div>
                 </div>
               )}
             </div>
@@ -360,10 +372,15 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
                     </AreaChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex h-full items-center justify-center">
-                    <p className="text-gray-400">
-                      {activePeriod} 검색 데이터가 없습니다
-                    </p>
+                  <div className="flex h-full flex-col items-center justify-center">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
+                        <BarChart3 className="h-10 w-10 text-gray-300" />
+                      </div>
+                      <p className="text-sm font-medium text-gray-500">
+                        {activePeriod} 검색 데이터가 없습니다
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>

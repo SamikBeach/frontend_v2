@@ -1,21 +1,51 @@
-import { HomeReviewPreview, ReviewType } from '@/apis/review/types';
+import { ReviewType } from '@/apis/review/types';
 import { ReviewCard } from '@/components/ReviewCard/ReviewCard';
 import { ExtendedReviewResponseDto } from '@/components/ReviewCard/types';
 import { Button } from '@/components/ui/button';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useHomePopularReviewsQuery } from '../hooks';
 
-interface PopularReviewsSectionProps {
-  reviews: HomeReviewPreview[];
-  isLoading?: boolean;
+// 인기 리뷰 스켈레톤 컴포넌트
+export function PopularReviewsSkeleton() {
+  return (
+    <div className="space-y-4">
+      {[...Array(2)].map((_, index) => (
+        <Card key={index}>
+          <CardHeader className="pb-2">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-10 w-10 rounded-full" />
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-5/6" />
+              <Skeleton className="h-4 w-4/6" />
+            </div>
+            <div className="mt-4 flex justify-between">
+              <div className="flex gap-3">
+                <Skeleton className="h-5 w-16" />
+                <Skeleton className="h-5 w-16" />
+              </div>
+              <Skeleton className="h-5 w-16" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
 }
 
-export function PopularReviewsSection({
-  reviews,
-  isLoading = false,
-}: PopularReviewsSectionProps) {
+export function PopularReviewsSection() {
   const router = useRouter();
+  const { reviews, isLoading } = useHomePopularReviewsQuery();
 
   const handleMoreClick = () => {
     router.push('/community');
@@ -41,9 +71,7 @@ export function PopularReviewsSection({
       </div>
 
       {isLoading ? (
-        <div className="flex h-full w-full items-center justify-center">
-          <LoadingSpinner />
-        </div>
+        <PopularReviewsSkeleton />
       ) : (
         <div className="space-y-4">
           {reviews.slice(0, 2).map(review => (

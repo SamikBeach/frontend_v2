@@ -1,6 +1,6 @@
 import { getPopularReviewsForHome } from '@/apis/review/review';
 import { HomeReviewPreview, ReviewsResponse } from '@/apis/review/types';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 /**
@@ -8,7 +8,7 @@ import { useMemo } from 'react';
  * @param limit 가져올 리뷰 수 (기본값: 4)
  */
 export function useHomePopularReviewsQuery(limit: number = 4) {
-  const { data, isLoading } = useSuspenseQuery<ReviewsResponse>({
+  const { data, isLoading, error } = useQuery<ReviewsResponse>({
     queryKey: ['home', 'popularReviews', limit],
     queryFn: () => getPopularReviewsForHome(limit),
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시
@@ -47,6 +47,7 @@ export function useHomePopularReviewsQuery(limit: number = 4) {
   return {
     reviews,
     isLoading,
+    error,
     totalReviews: data?.total || 0,
   };
 }

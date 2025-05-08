@@ -7,6 +7,7 @@ import {
   UpdateHistoryItem,
   updateLibrary,
 } from '@/apis/library';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -19,6 +20,9 @@ interface UseLibraryDetailResult {
 }
 
 export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
+  const currentUser = useCurrentUser();
+  const isLoggedIn = !!currentUser;
+
   // 서재 데이터 가져오기
   const {
     data: library,
@@ -103,6 +107,9 @@ export function useLibraryDetail(libraryId: number): UseLibraryDetailResult {
   // 구독 토글 핸들러
   const handleSubscriptionToggle = async () => {
     if (!library) return;
+
+    // 로그인 체크는 컴포넌트에서 처리하므로 여기서는 API 호출만 처리
+    if (!isLoggedIn) return;
 
     try {
       if (library.isSubscribed) {

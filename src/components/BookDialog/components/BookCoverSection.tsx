@@ -53,42 +53,27 @@ export function BookCoverSection() {
       </div>
 
       {/* 책 정보(제목, 저자, 출판사, 출간일)는 이미지 아래에 배치 */}
-      <div className={cn('space-y-2', isMobile ? 'px-1 text-center' : '')}>
-        <div
-          className={cn(
-            'items-start gap-2',
-            isMobile ? 'flex flex-col items-center' : 'flex'
-          )}
-        >
+      <div className={cn('space-y-2', isMobile ? 'px-1' : '')}>
+        <div className={cn(isMobile ? 'text-center' : '')}>
           <h2
             className={cn(
-              'cursor-pointer font-bold text-gray-900',
-              isMobile ? 'line-clamp-2 text-lg' : 'text-xl'
+              'inline cursor-pointer font-bold text-gray-900',
+              isMobile ? 'text-lg' : 'text-xl'
             )}
             onClick={handleOpenAladin}
           >
             {book.title}
           </h2>
-
-          {/* 카테고리 태그 - 제목 우측으로 이동 */}
-          {(book.category || book.subcategory) && (
-            <div
-              className={cn(
-                'flex flex-wrap gap-1',
-                isMobile ? 'mt-1 justify-center' : 'mt-1'
-              )}
-            >
-              {book.category && (
-                <Badge className="rounded-full bg-gray-800 px-2 py-0.5 text-[10px] font-medium text-white">
-                  {book.category.name}
-                </Badge>
-              )}
-              {book.subcategory && (
-                <Badge className="rounded-full bg-gray-600 px-2 py-0.5 text-[10px] font-medium text-white">
-                  {book.subcategory.name}
-                </Badge>
-              )}
-            </div>
+          {/* 카테고리 태그 - 제목 바로 뒤에 인라인으로 배치 */}
+          {book.category && (
+            <Badge className="ml-2 rounded-full bg-gray-800 px-2 py-0.5 align-text-bottom text-[10px] font-medium text-white">
+              {book.category.name}
+            </Badge>
+          )}
+          {book.subcategory && (
+            <Badge className="ml-1 rounded-full bg-gray-600 px-2 py-0.5 align-text-bottom text-[10px] font-medium text-white">
+              {book.subcategory.name}
+            </Badge>
           )}
         </div>
 

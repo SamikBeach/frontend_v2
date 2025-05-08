@@ -16,7 +16,7 @@ import { CommunityActivityResponse } from '@/apis/user/types';
 import { getCommunityActivity } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
-import { NoDataMessage, PrivateDataMessage } from '../components';
+import { PrivateDataMessage } from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 import {
@@ -223,8 +223,168 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
   const hasNoData =
     !chartData || chartData.length === 0 || data.totalReviews === 0;
 
+  // 빈 데이터일 경우 각 기간별로 기본 데이터 생성
   if (hasNoData) {
-    return <NoDataMessage message="커뮤니티 활동 데이터가 없습니다." />;
+    switch (activePeriod) {
+      case 'yearly':
+        chartData = [
+          {
+            year: (new Date().getFullYear() - 4).toString(),
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            year: (new Date().getFullYear() - 3).toString(),
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            year: (new Date().getFullYear() - 2).toString(),
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            year: (new Date().getFullYear() - 1).toString(),
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            year: new Date().getFullYear().toString(),
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+        ];
+        dataKey = 'year';
+        break;
+      case 'monthly':
+        // 최근 5개월 데이터 생성
+        const monthNames = [];
+        for (let i = 4; i >= 0; i--) {
+          const date = new Date();
+          date.setMonth(date.getMonth() - i);
+          const year = date.getFullYear();
+          const month = date.getMonth() + 1;
+          monthNames.push(`${year}-${month.toString().padStart(2, '0')}`);
+        }
+        chartData = monthNames.map(month => ({
+          month,
+          general: 0,
+          discussion: 0,
+          question: 0,
+          meetup: 0,
+        }));
+        dataKey = 'month';
+        break;
+      case 'weekly':
+        chartData = [
+          {
+            week: '5월 1째주',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            week: '4월 4째주',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            week: '4월 3째주',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            week: '4월 2째주',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            week: '4월 1째주',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+        ];
+        dataKey = 'week';
+        break;
+      case 'daily':
+        // 최근 5일 데이터 생성
+        const dayNames = [];
+        for (let i = 4; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          const year = date.getFullYear();
+          const month = (date.getMonth() + 1).toString().padStart(2, '0');
+          const day = date.getDate().toString().padStart(2, '0');
+          dayNames.push(`${year}-${month}-${day}`);
+        }
+        chartData = dayNames.map(date => ({
+          date,
+          general: 0,
+          discussion: 0,
+          question: 0,
+          meetup: 0,
+        }));
+        dataKey = 'date';
+        break;
+      default:
+        chartData = [
+          {
+            month: '2023-08',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            month: '2023-09',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            month: '2023-10',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            month: '2023-11',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+          {
+            month: '2023-12',
+            general: 0,
+            discussion: 0,
+            question: 0,
+            meetup: 0,
+          },
+        ];
+        dataKey = 'month';
+    }
   }
 
   // 기간 옵션
@@ -244,7 +404,7 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
               커뮤니티 활동
             </h3>
             <p className="text-xs text-gray-500">
-              활동 수: {data.totalReviews}개
+              활동 수: {data.totalReviews || 0}개
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -296,6 +456,8 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
                 height={30}
                 angle={0}
                 textAnchor="middle"
+                interval={0}
+                minTickGap={5}
               />
               <YAxis
                 tick={{ fontSize: 11 }}

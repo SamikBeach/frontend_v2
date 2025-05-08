@@ -126,7 +126,7 @@ export function useBookReviews() {
                   review.id === reviewId
                     ? {
                         ...review,
-                        userLiked: !isLiked,
+                        isLiked: !isLiked,
                         likesCount: isLiked
                           ? Math.max(0, (review.likesCount || 0) - 1)
                           : (review.likesCount || 0) + 1,

@@ -46,6 +46,8 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
     setSelectedBook,
     rating,
     setRating,
+    readingStatus,
+    setReadingStatus,
   } = useCreateReview();
 
   // typeFilter가 변경될 때마다 type 상태 업데이트
@@ -127,17 +129,19 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
                 handleBookDialogOpen={handleBookDialogOpen}
                 handleSubmitReview={handleSubmitReview}
                 isLoading={isLoading}
-              />
-
-              {/* 선택된 책 정보 및 별점 표시 (리뷰 태그인 경우) */}
-              {type === 'review' && selectedBook && (
-                <SelectedBook
-                  selectedBook={selectedBook}
-                  rating={rating}
-                  handleRatingChange={handleRatingChange}
-                  handleRemoveSelectedBook={handleRemoveSelectedBook}
-                />
-              )}
+              >
+                {/* 선택된 책 정보 및 별점 표시 (리뷰 태그인 경우) */}
+                {type === 'review' && selectedBook && (
+                  <SelectedBook
+                    selectedBook={selectedBook}
+                    rating={rating}
+                    handleRatingChange={handleRatingChange}
+                    handleRemoveSelectedBook={handleRemoveSelectedBook}
+                    readingStatus={readingStatus}
+                    setReadingStatus={setReadingStatus}
+                  />
+                )}
+              </ReviewForm>
             </div>
           </div>
         </CardContent>

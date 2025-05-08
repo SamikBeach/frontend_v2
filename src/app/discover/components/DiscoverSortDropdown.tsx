@@ -1,6 +1,7 @@
 import {
   SortOption as ApiSortOption,
   PopularBooksSortOptions,
+  TimeRangeOptions,
 } from '@/apis/book/types';
 import {
   discoverSortOptionAtom,
@@ -12,12 +13,12 @@ import {
 } from '@/components/SortDropdown';
 import { useQueryParams } from '@/hooks';
 import { useAtom } from 'jotai';
-import { BarChart3, ClockIcon, Star } from 'lucide-react';
+import { BarChart3, Bookmark, ClockIcon, Star } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 
 // 기본값 상수 정의
-const DEFAULT_SORT = PopularBooksSortOptions.REVIEWS_DESC;
-const DEFAULT_TIME_RANGE = 'all';
+const DEFAULT_SORT = PopularBooksSortOptions.RATING_DESC;
+const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
 
 // 정렬 옵션 타입
 export interface SortOption {
@@ -48,6 +49,13 @@ const sortOptions: SortOption[] = [
     supportsTimeRange: true,
   },
   {
+    id: 'library',
+    label: '서재에 많이담긴 순',
+    value: PopularBooksSortOptions.LIBRARY_COUNT_DESC,
+    icon: <Bookmark className="h-4 w-4" />,
+    supportsTimeRange: true,
+  },
+  {
     id: 'latest',
     label: '최신 출간 순',
     value: PopularBooksSortOptions.PUBLISH_DATE_DESC,
@@ -58,9 +66,9 @@ const sortOptions: SortOption[] = [
 
 // 기간 필터 옵션 정의
 const timeRangeOptions = [
-  { id: 'all', label: '전체 기간', value: 'all' },
-  { id: 'month', label: '최근 1개월', value: 'month' },
-  { id: 'year', label: '최근 1년', value: 'year' },
+  { id: 'all', label: '전체 기간', value: TimeRangeOptions.ALL },
+  { id: 'month', label: '최근 1개월', value: TimeRangeOptions.MONTH },
+  { id: 'year', label: '최근 1년', value: TimeRangeOptions.YEAR },
 ];
 
 interface DiscoverSortDropdownProps {
@@ -85,6 +93,7 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
     if (
       sort === PopularBooksSortOptions.RATING_DESC ||
       sort === PopularBooksSortOptions.REVIEWS_DESC ||
+      sort === PopularBooksSortOptions.LIBRARY_COUNT_DESC ||
       sort === PopularBooksSortOptions.PUBLISH_DATE_DESC ||
       sort === PopularBooksSortOptions.TITLE_ASC
     ) {
@@ -103,11 +112,11 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
   // 기간 필터 변경 핸들러
   const handleTimeRangeChange = (range: SortTimeRange) => {
     if (
-      range === 'all' ||
-      range === 'month' ||
-      range === 'year' ||
-      range === 'today' ||
-      range === 'week'
+      range === TimeRangeOptions.ALL ||
+      range === TimeRangeOptions.MONTH ||
+      range === TimeRangeOptions.YEAR ||
+      range === TimeRangeOptions.TODAY ||
+      range === TimeRangeOptions.WEEK
     ) {
       setTimeRange(range);
 
@@ -119,7 +128,7 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
         updateQueryParams({ timeRange: undefined });
       }
     } else {
-      setTimeRange('all');
+      setTimeRange(TimeRangeOptions.ALL);
       // 기본값으로 설정된 경우 URL에서 제거
       updateQueryParams({ timeRange: undefined });
     }

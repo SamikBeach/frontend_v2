@@ -87,7 +87,12 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
   // 데이터가 없는 경우
   const totalBooks = data.readCount + data.readingCount + data.wantToReadCount;
   if (totalBooks === 0) {
-    return <NoDataMessage message="독서 활동 데이터가 없습니다." />;
+    return (
+      <NoDataMessage
+        title="독서 상태별 도서 수"
+        message="독서 활동 데이터가 없습니다."
+      />
+    );
   }
 
   // 차트 데이터 준비

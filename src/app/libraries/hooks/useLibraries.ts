@@ -39,7 +39,7 @@ interface UseLibrariesResult {
 
 export function useLibraries(): UseLibrariesResult {
   const user = useCurrentUser();
-  const [tagFilter] = useAtom(libraryTagFilterAtom);
+  const [tagFilter, setTagFilter] = useAtom(libraryTagFilterAtom);
   const [sortOption, setSortOption] = useAtom(librarySortOptionAtom);
   const [timeRange, setTimeRange] = useAtom(libraryTimeRangeAtom);
   const [searchQuery, setSearchQuery] = useAtom(librarySearchQueryAtom);
@@ -53,29 +53,37 @@ export function useLibraries(): UseLibrariesResult {
     // 기본값과 다른 경우에만 URL 파라미터에 추가
     if (tagFilter !== DEFAULT_TAG_FILTER) {
       params.tag = tagFilter;
+    } else {
+      params.tag = undefined;
     }
 
     if (sortOption !== DEFAULT_SORT_OPTION) {
       params.sort = sortOption;
+    } else {
+      params.sort = undefined;
     }
 
     if (timeRange !== DEFAULT_TIME_RANGE) {
       params.timeRange = timeRange;
+    } else {
+      params.timeRange = undefined;
     }
 
     // 검색어는 있는 경우에만 추가
     if (searchQuery) {
       params.q = searchQuery;
+    } else {
+      params.q = undefined;
     }
 
     // 파라미터가 있는 경우에만 URL 업데이트
     updateQueryParams(params);
   }, [tagFilter, sortOption, timeRange, searchQuery, updateQueryParams]);
 
-  // 컴포넌트 마운트 시에만 URL 파라미터 업데이트
+  // 필터 상태가 변경될 때마다 URL 업데이트
   useEffect(() => {
     updateUrlParams();
-  }, [updateUrlParams]);
+  }, [tagFilter, sortOption, timeRange, searchQuery, updateUrlParams]);
 
   // 정렬 옵션을 API 정렬 옵션으로 변환
   const getApiSortOption = (): LibrarySortOption | undefined => {
@@ -136,38 +144,22 @@ export function useLibraries(): UseLibrariesResult {
   const handleSortChange = useCallback(
     (sortId: string) => {
       setSortOption(sortId);
-      // URL 쿼리 파라미터 업데이트 - 기본값이 아닌 경우에만
-      if (sortId !== DEFAULT_SORT_OPTION) {
-        updateQueryParams({ sort: sortId });
-      } else {
-        // 기본값인 경우에는 쿼리 파라미터에서 제거
-        updateQueryParams({ sort: undefined });
-      }
     },
-    [setSortOption, updateQueryParams]
+    [setSortOption]
   );
 
   const handleTimeRangeChange = useCallback(
     (newTimeRange: TimeRangeOptions) => {
       setTimeRange(newTimeRange);
-      // URL 쿼리 파라미터 업데이트 - 기본값이 아닌 경우에만
-      if (newTimeRange !== DEFAULT_TIME_RANGE) {
-        updateQueryParams({ timeRange: newTimeRange });
-      } else {
-        // 기본값인 경우에는 쿼리 파라미터에서 제거
-        updateQueryParams({ timeRange: undefined });
-      }
     },
-    [setTimeRange, updateQueryParams]
+    [setTimeRange]
   );
 
   const handleSearchChange = useCallback(
     (value: string) => {
       setSearchQuery(value);
-      // 검색어는 있는 경우에만 URL에 추가
-      updateQueryParams({ q: value || undefined });
     },
-    [setSearchQuery, updateQueryParams]
+    [setSearchQuery]
   );
 
   return {
