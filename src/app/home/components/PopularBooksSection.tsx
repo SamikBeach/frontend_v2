@@ -9,7 +9,6 @@ import { Lightbulb } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useHomePopularBooksQuery } from '../hooks';
 
-// 인기 도서 스켈레톤 컴포넌트
 export function PopularBooksSkeleton() {
   return (
     <div className="flex gap-4">
