@@ -12,6 +12,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 interface ResetPasswordFormProps {
   onSuccess?: () => void;
@@ -73,6 +74,7 @@ export function ResetPasswordForm({
     onSuccess: (_, variables) => {
       setEmail(variables.email);
       setStep('verify');
+      toast.success(`인증 코드가 ${variables.email}로 발송되었습니다`);
     },
     onError: (error: any) => {
       requestForm.setError('email', {
@@ -90,6 +92,8 @@ export function ResetPasswordForm({
       resetForm.setValue('email', email);
       resetForm.setValue('token', variables.token);
       setStep('reset');
+      // 성공 시 토스트 메시지 표시
+      toast.success('인증이 완료되었습니다');
     },
     onError: (error: any) => {
       verifyForm.setError('token', {
@@ -112,6 +116,7 @@ export function ResetPasswordForm({
         newPassword: data.newPassword,
       }),
     onSuccess: () => {
+      toast.success('비밀번호가 성공적으로 재설정되었습니다');
       onSuccess?.();
     },
     onError: (error: any) => {
