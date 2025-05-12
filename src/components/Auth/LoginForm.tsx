@@ -8,6 +8,7 @@ import { useSetAtom } from 'jotai';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useController, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -78,6 +79,7 @@ export function LoginForm({
     onSuccess: response => {
       setUser(response.user);
       authUtils.setTokens(response.accessToken, response.refreshToken);
+      toast.success(`${response.user.username}님, 환영합니다!`);
       onSuccess?.(); // 로그인 성공 콜백
     },
     onError: () => {
@@ -109,6 +111,9 @@ export function LoginForm({
       authUtils.setTokens(accessToken, refreshToken);
       setUser(user);
 
+      // 성공 토스트 메시지
+      toast.success(`${user.username}님, 환영합니다!`);
+
       // 성공 콜백
       onSuccess?.();
     } catch (err) {
@@ -133,6 +138,9 @@ export function LoginForm({
       // 토큰 및 사용자 정보 저장
       authUtils.setTokens(accessToken, refreshToken);
       setUser(user);
+
+      // 성공 토스트 메시지
+      toast.success(`${user.username}님, 환영합니다!`);
 
       // 성공 콜백
       onSuccess?.();

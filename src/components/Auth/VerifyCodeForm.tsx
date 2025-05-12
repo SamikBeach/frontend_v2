@@ -80,11 +80,15 @@ export function VerifyCodeForm({ email, onSuccess }: VerifyCodeFormProps) {
     onSuccess: response => {
       setVerificationSuccess(true);
       setSuccessMessage('이메일 인증이 완료되었습니다.');
-      toast.success('이메일 인증이 완료되었습니다.');
 
       // 로그인 처리: 토큰 저장 및 사용자 정보 설정
       authUtils.setTokens(response.accessToken, response.refreshToken);
       setUser(response.user);
+
+      // 토스트 메시지 - 환영 메시지 표시
+      toast.success(
+        `${response.user.username}님, 환영합니다! 회원가입이 완료되었습니다.`
+      );
 
       // 2초 후에 다이얼로그 닫기
       setTimeout(() => {
