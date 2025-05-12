@@ -50,7 +50,7 @@ export function SignUpForm({
       privacyAgreed: false,
       marketingAgreed: false,
     },
-    mode: 'onChange',
+    mode: 'onTouched',
   });
 
   const { field: emailField } = useController({

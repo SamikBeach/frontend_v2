@@ -48,6 +48,7 @@ export function ResetPasswordForm({
     defaultValues: {
       email: '',
     },
+    mode: 'onTouched',
   });
 
   // 인증 코드 확인 단계 폼
@@ -55,6 +56,7 @@ export function ResetPasswordForm({
     defaultValues: {
       token: '',
     },
+    mode: 'onTouched',
   });
 
   // 재설정 단계 폼
@@ -65,6 +67,7 @@ export function ResetPasswordForm({
       newPassword: '',
       confirmPassword: '',
     },
+    mode: 'onTouched',
   });
 
   // 비밀번호 재설정 요청 mutation

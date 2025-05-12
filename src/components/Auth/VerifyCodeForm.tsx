@@ -55,7 +55,7 @@ export function VerifyCodeForm({ email, onSuccess }: VerifyCodeFormProps) {
     defaultValues: {
       code: '',
     },
-    mode: 'onBlur',
+    mode: 'onTouched',
   });
 
   const { field: codeField } = useController({

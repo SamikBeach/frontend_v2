@@ -33,8 +33,8 @@ export function LoginForm({
   onSuccess,
 }: LoginFormProps) {
   const setUser = useSetAtom(userAtom);
+  const [showPassword, setShowPassword] = useState(false);
 
-  // react-hook-form 설정
   const {
     control,
     handleSubmit,
@@ -46,7 +46,7 @@ export function LoginForm({
       email: '',
       password: '',
     },
-    mode: 'onChange', // 입력 변경시마다 유효성 검사 실행
+    mode: 'onTouched', // 필드가 한 번 터치된 후에는 onChange처럼 동작
   });
 
   // 이메일 필드 컨트롤러
@@ -89,8 +89,6 @@ export function LoginForm({
       });
     },
   });
-
-  const [showPassword, setShowPassword] = useState(false);
 
   // 폼 제출 핸들러
   const onSubmit = (data: FormData) => {
