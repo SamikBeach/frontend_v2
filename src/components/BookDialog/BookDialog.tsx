@@ -154,7 +154,6 @@ export function BookDialog() {
         onOpenChange={open => {
           if (!open) close();
         }}
-        snapPoints={[1]}
         shouldScaleBackground={false}
       >
         <ResponsiveDialogPortal>

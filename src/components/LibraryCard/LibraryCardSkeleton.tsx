@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function LibraryCardSkeleton() {
   return (
-    <Card className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-none">
+    <Card className="flex h-full min-h-[320px] flex-col overflow-hidden rounded-xl border border-gray-100 bg-white shadow-none">
       <CardHeader className="p-5 pb-3">
         <div className="flex items-start gap-3">
           <Skeleton className="h-10 w-10 flex-shrink-0 rounded-full" />

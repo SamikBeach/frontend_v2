@@ -7,6 +7,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
+import { useController, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -20,80 +22,83 @@ interface LoginFormProps {
   onSuccess?: () => void;
 }
 
+interface FormData {
+  email: string;
+  password: string;
+}
+
 export function LoginForm({
   onClickSignUp,
   onClickResetPassword,
   onSuccess,
 }: LoginFormProps) {
   const setUser = useSetAtom(userAtom);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    setError: setFormError,
+    clearErrors,
+  } = useForm<FormData>({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    mode: 'onTouched', // 필드가 한 번 터치된 후에는 onChange처럼 동작
+  });
+
+  // 이메일 필드 컨트롤러
+  const { field: emailField } = useController({
+    name: 'email',
+    control,
+    rules: {
+      required: '이메일을 입력해주세요',
+      pattern: {
+        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+        message: '올바른 이메일 형식이 아닙니다',
+      },
+    },
+  });
+
+  // 비밀번호 필드 컨트롤러
+  const { field: passwordField } = useController({
+    name: 'password',
+    control,
+    rules: {
+      required: '비밀번호를 입력해주세요',
+    },
+  });
 
   // 로그인 mutation
   const loginMutation = useMutation({
-    mutationFn: async ({
-      email,
-      password,
-    }: {
-      email: string;
-      password: string;
-    }) => {
+    mutationFn: async ({ email, password }: FormData) => {
       return loginApi({ email, password });
     },
     onSuccess: response => {
       setUser(response.user);
       authUtils.setTokens(response.accessToken, response.refreshToken);
+      toast.success(`${response.user.username}님, 환영합니다!`);
+      onSuccess?.(); // 로그인 성공 콜백
+    },
+    onError: () => {
+      setFormError('root', {
+        type: 'manual',
+        message: '로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.',
+      });
     },
   });
 
-  // 상태 관리
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // 이메일 인풋 핸들러
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value);
-    setError(null);
-  };
-
-  // 비밀번호 인풋 핸들러
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(e.target.value);
-    setError(null);
-  };
-
   // 폼 제출 핸들러
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-
-    // 유효성 검사
-    if (!email) {
-      setError('이메일을 입력해주세요.');
-      return;
-    }
-
-    if (!password) {
-      setError('비밀번호를 입력해주세요.');
-      return;
-    }
-
-    loginMutation.mutate(
-      { email, password },
-      {
-        onSuccess: () => {
-          onSuccess?.();
-        },
-        onError: () => {
-          setError('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
-        },
-      }
-    );
+  const onSubmit = (data: FormData) => {
+    clearErrors();
+    loginMutation.mutate(data);
   };
 
   // 구글 로그인 핸들러
   const handleGoogleLogin = async () => {
-    setError(null);
+    clearErrors();
 
     try {
       const { accessToken, refreshToken, user } = await openSocialLoginPopup(
@@ -104,19 +109,24 @@ export function LoginForm({
       authUtils.setTokens(accessToken, refreshToken);
       setUser(user);
 
+      // 성공 토스트 메시지
+      toast.success(`${user.username}님, 환영합니다!`);
+
       // 성공 콜백
       onSuccess?.();
     } catch (err) {
       console.error('구글 로그인 오류:', err);
-      setError(
-        err instanceof Error ? err.message : '구글 로그인에 실패했습니다.'
-      );
+      setFormError('root', {
+        type: 'manual',
+        message:
+          err instanceof Error ? err.message : '구글 로그인에 실패했습니다.',
+      });
     }
   };
 
   // 애플 로그인 핸들러
   const handleAppleLogin = async () => {
-    setError(null);
+    clearErrors();
 
     try {
       const { accessToken, refreshToken, user } = await openSocialLoginPopup(
@@ -127,13 +137,18 @@ export function LoginForm({
       authUtils.setTokens(accessToken, refreshToken);
       setUser(user);
 
+      // 성공 토스트 메시지
+      toast.success(`${user.username}님, 환영합니다!`);
+
       // 성공 콜백
       onSuccess?.();
     } catch (err) {
       console.error('애플 로그인 오류:', err);
-      setError(
-        err instanceof Error ? err.message : '애플 로그인에 실패했습니다.'
-      );
+      setFormError('root', {
+        type: 'manual',
+        message:
+          err instanceof Error ? err.message : '애플 로그인에 실패했습니다.',
+      });
     }
   };
 
@@ -145,17 +160,21 @@ export function LoginForm({
         </h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-3">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
         <div className="space-y-1.5">
           <Input
             id="email"
             type="email"
             placeholder="이메일"
-            value={email}
-            onChange={handleEmailChange}
+            {...emailField}
             className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-sm transition-colors focus:bg-white focus:shadow-sm"
             autoComplete="email"
           />
+          {errors.email && (
+            <p className="text-xs font-medium text-red-500">
+              {errors.email.message}
+            </p>
+          )}
         </div>
 
         <div className="space-y-1.5">
@@ -164,8 +183,7 @@ export function LoginForm({
               id="password"
               type={showPassword ? 'text' : 'password'}
               placeholder="비밀번호"
-              value={password}
-              onChange={handlePasswordChange}
+              {...passwordField}
               className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 pr-10 text-sm transition-colors focus:bg-white focus:shadow-sm"
               autoComplete="current-password"
             />
@@ -175,6 +193,7 @@ export function LoginForm({
               size="icon"
               className="absolute top-0 right-0 aspect-square h-full rounded-xl text-gray-400 hover:text-gray-900"
               onClick={() => setShowPassword(!showPassword)}
+              tabIndex={-1}
             >
               {showPassword ? (
                 <EyeOff className="h-4 w-4" />
@@ -186,6 +205,11 @@ export function LoginForm({
               </span>
             </Button>
           </div>
+          {errors.password && (
+            <p className="text-xs font-medium text-red-500">
+              {errors.password.message}
+            </p>
+          )}
         </div>
 
         <div className="text-end">
@@ -200,7 +224,11 @@ export function LoginForm({
           </Button>
         </div>
 
-        {error && <p className="text-xs font-medium text-red-500">{error}</p>}
+        {errors.root && (
+          <p className="text-xs font-medium text-red-500">
+            {errors.root.message}
+          </p>
+        )}
 
         <Button
           type="submit"

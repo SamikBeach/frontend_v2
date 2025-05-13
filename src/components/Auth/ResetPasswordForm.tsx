@@ -9,8 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { useMutation } from '@tanstack/react-query';
+import { Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 interface ResetPasswordFormProps {
   onSuccess?: () => void;
@@ -38,12 +40,15 @@ export function ResetPasswordForm({
 }: ResetPasswordFormProps) {
   const [step, setStep] = useState<'request' | 'verify' | 'reset'>('request');
   const [email, setEmail] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // 요청 단계 폼
   const requestForm = useForm<RequestResetFormData>({
     defaultValues: {
       email: '',
     },
+    mode: 'onTouched',
   });
 
   // 인증 코드 확인 단계 폼
@@ -51,6 +56,7 @@ export function ResetPasswordForm({
     defaultValues: {
       token: '',
     },
+    mode: 'onTouched',
   });
 
   // 재설정 단계 폼
@@ -61,6 +67,7 @@ export function ResetPasswordForm({
       newPassword: '',
       confirmPassword: '',
     },
+    mode: 'onTouched',
   });
 
   // 비밀번호 재설정 요청 mutation
@@ -70,6 +77,7 @@ export function ResetPasswordForm({
     onSuccess: (_, variables) => {
       setEmail(variables.email);
       setStep('verify');
+      toast.success(`인증 코드가 ${variables.email}로 발송되었습니다`);
     },
     onError: (error: any) => {
       requestForm.setError('email', {
@@ -87,6 +95,8 @@ export function ResetPasswordForm({
       resetForm.setValue('email', email);
       resetForm.setValue('token', variables.token);
       setStep('reset');
+      // 성공 시 토스트 메시지 표시
+      toast.success('인증이 완료되었습니다');
     },
     onError: (error: any) => {
       verifyForm.setError('token', {
@@ -109,6 +119,7 @@ export function ResetPasswordForm({
         newPassword: data.newPassword,
       }),
     onSuccess: () => {
+      toast.success('비밀번호가 성공적으로 재설정되었습니다');
       onSuccess?.();
     },
     onError: (error: any) => {
@@ -296,18 +307,37 @@ export function ResetPasswordForm({
             </p>
 
             <div className="mb-4">
-              <Input
-                {...resetForm.register('newPassword', {
-                  required: '새 비밀번호를 입력해주세요',
-                  minLength: {
-                    value: 8,
-                    message: '비밀번호는 8자 이상이어야 합니다',
-                  },
-                })}
-                type="password"
-                placeholder="새 비밀번호"
-                className="h-12"
-              />
+              <div className="relative">
+                <Input
+                  {...resetForm.register('newPassword', {
+                    required: '새 비밀번호를 입력해주세요',
+                    minLength: {
+                      value: 8,
+                      message: '비밀번호는 8자 이상이어야 합니다',
+                    },
+                  })}
+                  type={showNewPassword ? 'text' : 'password'}
+                  placeholder="새 비밀번호"
+                  className="h-12 pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-0 right-0 aspect-square h-full text-gray-400 hover:text-gray-900"
+                  onClick={() => setShowNewPassword(!showNewPassword)}
+                  tabIndex={-1}
+                >
+                  {showNewPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {showNewPassword ? '비밀번호 숨기기' : '비밀번호 표시'}
+                  </span>
+                </Button>
+              </div>
               {resetForm.formState.errors.newPassword && (
                 <p className="mt-1 text-sm text-red-500">
                   {resetForm.formState.errors.newPassword.message}
@@ -316,17 +346,36 @@ export function ResetPasswordForm({
             </div>
 
             <div>
-              <Input
-                {...resetForm.register('confirmPassword', {
-                  required: '비밀번호를 다시 입력해주세요',
-                  validate: value =>
-                    value === resetForm.getValues('newPassword') ||
-                    '비밀번호가 일치하지 않습니다',
-                })}
-                type="password"
-                placeholder="새 비밀번호 확인"
-                className="h-12"
-              />
+              <div className="relative">
+                <Input
+                  {...resetForm.register('confirmPassword', {
+                    required: '비밀번호를 다시 입력해주세요',
+                    validate: value =>
+                      value === resetForm.getValues('newPassword') ||
+                      '비밀번호가 일치하지 않습니다',
+                  })}
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="새 비밀번호 확인"
+                  className="h-12 pr-10"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute top-0 right-0 aspect-square h-full text-gray-400 hover:text-gray-900"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                  <span className="sr-only">
+                    {showConfirmPassword ? '비밀번호 숨기기' : '비밀번호 표시'}
+                  </span>
+                </Button>
+              </div>
               {resetForm.formState.errors.confirmPassword && (
                 <p className="mt-1 text-sm text-red-500">
                   {resetForm.formState.errors.confirmPassword.message}

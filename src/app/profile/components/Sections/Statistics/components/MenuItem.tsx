@@ -19,14 +19,16 @@ export function MenuItem({
   return (
     <button
       className={cn(
-        'flex h-8 cursor-pointer items-center rounded-full border px-3 text-[13px] font-medium transition-all',
+        'flex cursor-pointer items-center rounded-full border text-center transition-all',
+        'h-7 px-2 text-[11px] font-medium sm:h-8 sm:px-3 sm:text-[13px]',
+        'min-w-[60px] break-words whitespace-normal',
         isSelected
           ? 'border-blue-200 bg-blue-50 text-blue-600'
           : 'border-gray-200 text-gray-700 hover:bg-gray-50'
       )}
       onClick={() => onSelectSection(filter.id)}
     >
-      <span>{filter.name}</span>
+      <span className="mx-auto leading-tight">{filter.name}</span>
     </button>
   );
 }

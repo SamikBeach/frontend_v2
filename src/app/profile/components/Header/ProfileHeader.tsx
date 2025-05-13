@@ -81,9 +81,9 @@ export default function ProfileHeader() {
   return (
     <div className="bg-white">
       <div className="mx-auto w-full px-4 pb-6">
-        <div className="flex flex-col items-center sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-4">
-            <Avatar className="h-32 w-32 border-4 border-white">
+        <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+            <Avatar className="h-24 w-24 border-4 border-white sm:h-32 sm:w-32">
               <AvatarImage
                 src={user.profileImage || undefined}
                 alt={displayName}
@@ -95,7 +95,7 @@ export default function ProfileHeader() {
             </Avatar>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-bold text-gray-900">
+                <h1 className="text-xl font-bold text-gray-900 sm:text-2xl">
                   {displayName}
                 </h1>
               </div>
@@ -129,7 +129,7 @@ export default function ProfileHeader() {
           {isMyProfile ? (
             <Button
               onClick={handleOpenEditDialog}
-              className="mt-4 flex items-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0"
+              className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-full border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:w-auto"
               variant="outline"
             >
               <UserCircle className="h-4 w-4" />
@@ -138,7 +138,7 @@ export default function ProfileHeader() {
           ) : (
             <Button
               onClick={handleFollowClick}
-              className={`mt-4 flex items-center gap-1.5 rounded-full ${
+              className={`mt-4 flex w-full items-center justify-center gap-1.5 rounded-full sm:w-auto ${
                 isFollowing
                   ? 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                   : 'bg-gray-900 text-white hover:bg-gray-800'

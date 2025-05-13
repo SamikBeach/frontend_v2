@@ -37,7 +37,7 @@ export const BookCard = React.memo(({ book, onClick }: BookCardProps) => {
 
   return (
     <div
-      className="flex h-full w-full min-w-[140px] cursor-pointer flex-col overflow-hidden rounded-xl"
+      className="flex h-full w-full cursor-pointer flex-col overflow-hidden rounded-xl"
       onClick={handleBookClick}
     >
       <div className="group h-full w-full bg-white transition-all hover:bg-gray-50">
