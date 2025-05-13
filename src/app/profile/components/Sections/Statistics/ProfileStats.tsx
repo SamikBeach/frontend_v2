@@ -37,7 +37,7 @@ function SectionContent({
   switch (selectedSection) {
     case 'reading':
       return (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Suspense fallback={<ProfileSkeleton />}>
             <ReadingStatusChart userId={userId} />
           </Suspense>
@@ -58,7 +58,7 @@ function SectionContent({
 
     case 'activity':
       return (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Suspense fallback={<ProfileSkeleton />}>
             <ReviewStatsChart userId={userId} />
           </Suspense>
@@ -75,7 +75,7 @@ function SectionContent({
 
     case 'community':
       return (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Suspense fallback={<ProfileSkeleton />}>
             <UserInteractionChart userId={userId} />
           </Suspense>
@@ -96,7 +96,7 @@ function SectionContent({
 
     case 'library':
       return (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <Suspense fallback={<ProfileSkeleton />}>
             <LibraryCompositionChart userId={userId} />
           </Suspense>
@@ -113,7 +113,7 @@ function SectionContent({
 
     case 'etc':
       return (
-        <div className="grid grid-cols-1 gap-3">
+        <div className="grid grid-cols-1 gap-6">
           <Suspense fallback={<ProfileSkeleton />}>
             <SearchActivityChart userId={userId} />
           </Suspense>

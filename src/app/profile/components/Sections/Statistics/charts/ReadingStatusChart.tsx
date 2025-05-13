@@ -163,7 +163,7 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+    <div className="min-h-[400px] w-full rounded-lg bg-white p-3">
       <div className="mb-2 flex items-start justify-between">
         <h3 className="text-base font-medium text-gray-700">
           독서 상태별 도서 수
@@ -176,8 +176,8 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
           />
         )}
       </div>
-      <div className="flex h-[calc(100%-2rem)] flex-col items-center sm:flex-row">
-        <div className="h-full w-full sm:w-3/5">
+      <div className="flex h-[320px] flex-col items-center sm:flex-row">
+        <div className="h-[65%] w-full sm:h-full sm:w-3/5">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -186,8 +186,8 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
                 cy="50%"
                 labelLine={false}
                 label={renderCustomizedLabel}
-                outerRadius={85}
-                innerRadius={40}
+                outerRadius={75}
+                innerRadius={35}
                 fill="#8884d8"
                 dataKey="value"
                 nameKey="name"
@@ -206,7 +206,7 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
             </PieChart>
           </ResponsiveContainer>
         </div>
-        <div className="flex h-full w-full flex-col justify-center sm:w-2/5">
+        <div className="flex h-[35%] w-full flex-col justify-center sm:h-full sm:w-2/5">
           <ul className="space-y-2.5">
             {chartData.map((entry, index) => (
               <li key={`legend-${index}`} className="flex items-center gap-2">
