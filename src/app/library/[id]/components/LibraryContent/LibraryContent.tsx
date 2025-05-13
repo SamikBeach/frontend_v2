@@ -106,7 +106,7 @@ export function LibraryContent() {
           onAddBook={() => setShowAddBookDialog(true)}
         />
 
-        <div className="3xl:grid-cols-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="3xl:grid-cols-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
           <BookList
             books={booksWithDetails as unknown as Book[]}
             isOwner={isOwner}

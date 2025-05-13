@@ -14,7 +14,7 @@ export function LibraryContentSkeleton() {
             <div className="ml-2 h-6 w-8 animate-pulse rounded-full bg-gray-200"></div>
           </div>
         </div>
-        <div className="3xl:grid-cols-5 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="3xl:grid-cols-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
