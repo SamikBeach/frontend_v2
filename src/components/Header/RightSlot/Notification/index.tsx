@@ -2,10 +2,11 @@
 
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuTitle,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { Suspense, useState } from 'react';
 import { NotificationLoading } from './components/LoadingStates';
 import { NotificationBadge } from './components/NotificationBadge';
@@ -16,8 +17,8 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
+    <ResponsiveDropdownMenu open={open} onOpenChange={setOpen}>
+      <ResponsiveDropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
@@ -27,17 +28,24 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
             <NotificationBadge />
           </Suspense>
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
+      </ResponsiveDropdownMenuTrigger>
+      <ResponsiveDropdownMenuContent
         align="end"
-        className="max-h-[75vh] w-[480px] overflow-y-auto rounded-xl border border-gray-100 p-0"
+        className="max-h-[75vh] w-[480px] overflow-hidden rounded-xl border border-gray-100 p-0"
+        drawerClassName="h-[80vh] p-0 overflow-hidden"
         id="notification-scroll-container"
       >
+        <ResponsiveDropdownMenuTitle
+          className="sr-only"
+          drawerClassName="sr-only"
+        >
+          알림 목록
+        </ResponsiveDropdownMenuTitle>
         <Suspense fallback={<NotificationLoading />}>
           <NotificationContent onClose={() => setOpen(false)} isOpen={open} />
         </Suspense>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </ResponsiveDropdownMenuContent>
+    </ResponsiveDropdownMenu>
   );
 }
 

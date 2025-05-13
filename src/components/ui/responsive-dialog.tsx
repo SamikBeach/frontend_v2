@@ -47,9 +47,7 @@ function ResponsiveDialogRoot({
   return (
     <ResponsiveDialogContext.Provider value={{ isMobile }}>
       {isMobile ? (
-        <Drawer shouldScaleBackground={false} snapPoints={[1]} {...props}>
-          {children}
-        </Drawer>
+        <Drawer {...props}>{children}</Drawer>
       ) : (
         <Dialog {...props}>{children}</Dialog>
       )}

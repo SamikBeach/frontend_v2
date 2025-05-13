@@ -6,83 +6,56 @@ import * as React from 'react';
 
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
-  DrawerHeader,
+  DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
-
 import { cn } from '@/lib/utils';
 
 // Context to share mobile status
-const ResponsiveDropdownContext = React.createContext<{
+const ResponsiveDropdownMenuContext = React.createContext<{
   isMobile: boolean;
-  isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   isMobile: false,
-  isOpen: false,
-  setIsOpen: () => undefined,
 });
 
 // Root component
 function ResponsiveDropdownMenuRoot({
   children,
-  open,
-  onOpenChange,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Root> & {
   shouldScaleBackground?: boolean;
-  snapPoints?: Array<number>;
+  snapPoints?: Array<number | string>;
 }) {
   const isMobile = useIsMobile();
-  const [isOpen, setIsOpen] = React.useState(open || false);
-
-  React.useEffect(() => {
-    if (open !== undefined) {
-      setIsOpen(open);
-    }
-  }, [open]);
-
-  React.useEffect(() => {
-    onOpenChange?.(isOpen);
-  }, [isOpen, onOpenChange]);
 
   return (
-    <ResponsiveDropdownContext.Provider value={{ isMobile, isOpen, setIsOpen }}>
+    <ResponsiveDropdownMenuContext.Provider value={{ isMobile }}>
       {isMobile ? (
-        <Drawer
-          open={isOpen}
-          onOpenChange={setIsOpen}
-          shouldScaleBackground={false}
-          snapPoints={[1]}
-          {...props}
-        >
-          {children}
-        </Drawer>
+        <Drawer {...props}>{children}</Drawer>
       ) : (
-        <DropdownMenu open={isOpen} onOpenChange={setIsOpen} {...props}>
-          {children}
-        </DropdownMenu>
+        <DropdownMenu {...props}>{children}</DropdownMenu>
       )}
-    </ResponsiveDropdownContext.Provider>
+    </ResponsiveDropdownMenuContext.Provider>
   );
 }
 
 // Context hook
-function useResponsiveDropdown() {
-  const context = React.useContext(ResponsiveDropdownContext);
+function useResponsiveDropdownMenu() {
+  const context = React.useContext(ResponsiveDropdownMenuContext);
   if (!context) {
     throw new Error(
       'ResponsiveDropdownMenu components must be used within ResponsiveDropdownMenu'
@@ -93,22 +66,26 @@ function useResponsiveDropdown() {
 
 // Trigger component
 function ResponsiveDropdownMenuTrigger({
-  className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
-  const { isMobile, setIsOpen } = useResponsiveDropdown();
+  const { isMobile } = useResponsiveDropdownMenu();
+  return isMobile ? (
+    <DrawerTrigger {...props} />
+  ) : (
+    <DropdownMenuTrigger {...props} />
+  );
+}
 
-  if (isMobile) {
-    return (
-      <DrawerTrigger
-        className={className}
-        onClick={() => setIsOpen(true)}
-        {...props}
-      />
-    );
-  }
-
-  return <DropdownMenuTrigger className={className} {...props} />;
+// Portal component
+function ResponsiveDropdownMenuPortal({
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
+  const { isMobile } = useResponsiveDropdownMenu();
+  return isMobile ? (
+    <DrawerPortal {...props} />
+  ) : (
+    <DropdownMenuPortal {...props} />
+  );
 }
 
 // Content component
@@ -120,15 +97,15 @@ function ResponsiveDropdownMenuContent({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content> & {
   drawerClassName?: string;
 }) {
-  const { isMobile } = useResponsiveDropdown();
+  const { isMobile } = useResponsiveDropdownMenu();
 
   if (isMobile) {
     return (
-      <DrawerContent className={cn('px-4', drawerClassName)} {...props}>
-        <DrawerHeader>
-          <DrawerTitle>메뉴</DrawerTitle>
-        </DrawerHeader>
-        <div className="flex flex-col space-y-2 p-2">{children}</div>
+      <DrawerContent
+        className={cn('mt-auto h-[80vh] max-h-[80vh]', drawerClassName)}
+        {...props}
+      >
+        {children}
       </DrawerContent>
     );
   }
@@ -140,94 +117,6 @@ function ResponsiveDropdownMenuContent({
   );
 }
 
-// Item component that adapts between dropdown item and drawer item
-function ResponsiveDropdownMenuItem({
-  className,
-  drawerClassName,
-  onSelect,
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
-  drawerClassName?: string;
-}) {
-  const { isMobile, setIsOpen } = useResponsiveDropdown();
-
-  const handleClick = React.useCallback(() => {
-    if (isMobile) {
-      onSelect?.(
-        new Event('mousedown') as unknown as React.MouseEvent<
-          HTMLDivElement,
-          MouseEvent
-        >
-      );
-      setIsOpen(false);
-    }
-  }, [isMobile, onSelect, setIsOpen]);
-
-  if (isMobile) {
-    return (
-      <div
-        className={cn(
-          'hover:bg-accent flex cursor-pointer items-center rounded-md px-2 py-2 text-sm outline-none',
-          drawerClassName
-        )}
-        onClick={handleClick}
-        {...props}
-      />
-    );
-  }
-
-  return (
-    <DropdownMenuItem className={className} onSelect={onSelect} {...props} />
-  );
-}
-
-// Separator component that adapts between dropdown separator and drawer separator
-function ResponsiveDropdownMenuSeparator({
-  className,
-  drawerClassName,
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Separator> & {
-  drawerClassName?: string;
-}) {
-  const { isMobile } = useResponsiveDropdown();
-
-  if (isMobile) {
-    return (
-      <div
-        className={cn('bg-border -mx-1 my-1 h-px', drawerClassName)}
-        {...props}
-      />
-    );
-  }
-
-  return <DropdownMenuSeparator className={className} {...props} />;
-}
-
-// Label component that adapts between dropdown label and drawer text
-function ResponsiveDropdownMenuLabel({
-  className,
-  drawerClassName,
-  ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Label> & {
-  drawerClassName?: string;
-}) {
-  const { isMobile } = useResponsiveDropdown();
-
-  if (isMobile) {
-    return (
-      <div
-        className={cn(
-          'text-foreground px-2 py-1.5 text-sm font-semibold',
-          drawerClassName
-        )}
-        {...props}
-      />
-    );
-  }
-
-  return <DropdownMenuLabel className={className} {...props} />;
-}
-
 // Group component
 function ResponsiveDropdownMenuGroup({
   className,
@@ -236,55 +125,154 @@ function ResponsiveDropdownMenuGroup({
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Group> & {
   drawerClassName?: string;
 }) {
-  const { isMobile } = useResponsiveDropdown();
+  const { isMobile } = useResponsiveDropdownMenu();
 
-  if (isMobile) {
-    return (
-      <div className={cn('flex flex-col gap-1', drawerClassName)} {...props} />
-    );
-  }
-
-  return <DropdownMenuGroup className={className} {...props} />;
+  return isMobile ? (
+    <div className={cn('p-4', drawerClassName)} {...props} />
+  ) : (
+    <DropdownMenuGroup className={className} {...props} />
+  );
 }
 
-// Close component for mobile drawer
-function ResponsiveDropdownMenuClose({
+// Item component
+function ResponsiveDropdownMenuItem({
   className,
+  drawerClassName,
   ...props
-}: React.ComponentProps<typeof DrawerClose>) {
-  const { isMobile, setIsOpen } = useResponsiveDropdown();
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
+  drawerClassName?: string;
+}) {
+  const { isMobile } = useResponsiveDropdownMenu();
 
-  if (!isMobile) {
-    return null;
-  }
+  return isMobile ? (
+    <button
+      type="button"
+      className={cn(
+        'flex w-full items-center rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100',
+        drawerClassName
+      )}
+      {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+    />
+  ) : (
+    <DropdownMenuItem className={className} {...props} />
+  );
+}
 
-  return (
-    <DrawerClose
-      className={cn('absolute top-4 right-4', className)}
-      onClick={() => setIsOpen(false)}
+// Label component
+function ResponsiveDropdownMenuLabel({
+  className,
+  drawerClassName,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Label> & {
+  drawerClassName?: string;
+}) {
+  const { isMobile } = useResponsiveDropdownMenu();
+
+  return isMobile ? (
+    <div
+      className={cn('px-3 py-2 text-sm font-medium', drawerClassName)}
       {...props}
     />
+  ) : (
+    <DropdownMenuLabel className={className} {...props} />
+  );
+}
+
+// Separator component
+function ResponsiveDropdownMenuSeparator({
+  className,
+  drawerClassName,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Separator> & {
+  drawerClassName?: string;
+}) {
+  const { isMobile } = useResponsiveDropdownMenu();
+
+  return isMobile ? (
+    <div className={cn('my-1 h-px bg-gray-200', drawerClassName)} {...props} />
+  ) : (
+    <DropdownMenuSeparator className={className} {...props} />
+  );
+}
+
+// CheckboxItem component
+function ResponsiveDropdownMenuCheckboxItem({
+  className,
+  drawerClassName,
+  checked,
+  children,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.CheckboxItem> & {
+  drawerClassName?: string;
+}) {
+  const { isMobile } = useResponsiveDropdownMenu();
+
+  return isMobile ? (
+    <button
+      type="button"
+      className={cn(
+        'flex w-full items-center rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100',
+        drawerClassName
+      )}
+      {...(props as React.ButtonHTMLAttributes<HTMLButtonElement>)}
+    >
+      <span
+        className={cn('mr-2', checked ? 'text-blue-600' : 'text-transparent')}
+      >
+        ✓
+      </span>
+      {children}
+    </button>
+  ) : (
+    <DropdownMenuCheckboxItem
+      checked={checked}
+      className={className}
+      {...props}
+    >
+      {children}
+    </DropdownMenuCheckboxItem>
+  );
+}
+
+// Title component for accessibility
+function ResponsiveDropdownMenuTitle({
+  className,
+  drawerClassName,
+  ...props
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Label> & {
+  drawerClassName?: string;
+}) {
+  const { isMobile } = useResponsiveDropdownMenu();
+
+  return isMobile ? (
+    <DrawerTitle className={cn(className, drawerClassName)} {...props} />
+  ) : (
+    <DropdownMenuLabel className={className} {...props} />
   );
 }
 
 // Compound component
 const ResponsiveDropdownMenu = Object.assign(ResponsiveDropdownMenuRoot, {
   Trigger: ResponsiveDropdownMenuTrigger,
+  Portal: ResponsiveDropdownMenuPortal,
   Content: ResponsiveDropdownMenuContent,
-  Item: ResponsiveDropdownMenuItem,
-  Separator: ResponsiveDropdownMenuSeparator,
-  Label: ResponsiveDropdownMenuLabel,
   Group: ResponsiveDropdownMenuGroup,
-  Close: ResponsiveDropdownMenuClose,
+  Item: ResponsiveDropdownMenuItem,
+  Label: ResponsiveDropdownMenuLabel,
+  Separator: ResponsiveDropdownMenuSeparator,
+  CheckboxItem: ResponsiveDropdownMenuCheckboxItem,
+  Title: ResponsiveDropdownMenuTitle,
 });
 
 export {
   ResponsiveDropdownMenu,
-  ResponsiveDropdownMenuClose,
+  ResponsiveDropdownMenuCheckboxItem,
   ResponsiveDropdownMenuContent,
   ResponsiveDropdownMenuGroup,
   ResponsiveDropdownMenuItem,
   ResponsiveDropdownMenuLabel,
+  ResponsiveDropdownMenuPortal,
   ResponsiveDropdownMenuSeparator,
+  ResponsiveDropdownMenuTitle,
   ResponsiveDropdownMenuTrigger,
 };

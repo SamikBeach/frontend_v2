@@ -111,7 +111,6 @@ export function AuthDialog({
         }
         props.onOpenChange?.(open);
       }}
-      snapPoints={[1]}
       shouldScaleBackground={false}
     >
       <ResponsiveDialogContent
