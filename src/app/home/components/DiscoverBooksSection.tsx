@@ -12,10 +12,10 @@ import { useHomeDiscoverBooksQuery } from '../hooks';
 // 오늘의 발견 스켈레톤 컴포넌트
 export function DiscoverBooksSkeleton() {
   return (
-    <div className="flex gap-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
       {[...Array(3)].map((_, index) => (
-        <div key={index} className="w-1/3">
-          <div className="flex h-full w-full min-w-[140px] flex-col overflow-hidden rounded-xl">
+        <div key={index} className="w-full">
+          <div className="flex h-full w-full flex-col overflow-hidden rounded-xl">
             <div className="h-full w-full bg-white">
               <Skeleton className="relative flex aspect-[3/4.5] items-center justify-center overflow-hidden" />
               <div className="p-2.5">
@@ -77,9 +77,9 @@ export function DiscoverBooksSection() {
           <p className="text-sm text-gray-500">오늘의 발견이 없습니다.</p>
         </div>
       ) : (
-        <div className="flex gap-4">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
           {displayBooks.map(book => (
-            <div key={book.id} className="w-1/3">
+            <div key={book.id} className="w-full">
               <BookCard
                 book={book as any}
                 onClick={() => handleBookSelect(book)}

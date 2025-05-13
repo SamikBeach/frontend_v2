@@ -9,7 +9,7 @@ import { useHomePopularLibrariesQuery } from '../hooks';
 // 인기 서재 스켈레톤 컴포넌트
 export function PopularLibrariesSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4">
       {[...Array(2)].map((_, index) => (
         <LibraryCardSkeleton key={index} />
       ))}
@@ -48,14 +48,15 @@ export function PopularLibrariesSection() {
           <p className="text-sm text-gray-500">인기 서재가 없습니다.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4">
           {libraries.slice(0, 2).map(library => (
-            <LibraryCard
-              key={library.id}
-              library={library}
-              tags={dummyTags}
-              hidePublicTag={true}
-            />
+            <div key={library.id}>
+              <LibraryCard
+                library={library}
+                tags={dummyTags}
+                hidePublicTag={true}
+              />
+            </div>
           ))}
         </div>
       )}
