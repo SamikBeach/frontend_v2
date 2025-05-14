@@ -3,11 +3,11 @@ import { bookReviewSortAtom } from '@/atoms/book';
 import { reviewSortDropdownOpenAtom } from '@/atoms/book-dialog';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { useAtom } from 'jotai';
 import { Clock, Flame, MessageSquare } from 'lucide-react';
 
@@ -44,8 +44,8 @@ export function ReviewSortDropdown() {
   };
 
   return (
-    <DropdownMenu open={open} onOpenChange={setOpen}>
-      <DropdownMenuTrigger asChild>
+    <ResponsiveDropdownMenu open={open} onOpenChange={setOpen}>
+      <ResponsiveDropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="sm"
@@ -56,29 +56,27 @@ export function ReviewSortDropdown() {
           </span>
           {selectedOption.label}
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
-        disablePortal
+      </ResponsiveDropdownMenuTrigger>
+      <ResponsiveDropdownMenuContent
         align="end"
         className="w-36"
         sideOffset={8}
-        onEscapeKeyDown={() => setOpen(false)}
       >
         {sortOptions.map(option => (
-          <DropdownMenuItem
+          <ResponsiveDropdownMenuItem
             key={option.value}
             className={`cursor-pointer text-sm ${
               sort === option.value ? 'text-primary font-medium' : ''
             }`}
-            onClick={() => handleSortChange(option.value)}
+            onSelect={() => handleSortChange(option.value)}
           >
             <span className="mr-2 inline-flex h-3.5 w-3.5 items-center justify-center">
               {option.icon}
             </span>
             {option.label}
-          </DropdownMenuItem>
+          </ResponsiveDropdownMenuItem>
         ))}
-      </DropdownMenuContent>
-    </DropdownMenu>
+      </ResponsiveDropdownMenuContent>
+    </ResponsiveDropdownMenu>
   );
 }
