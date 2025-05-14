@@ -1,18 +1,18 @@
 import { updateComment } from '@/apis/review/review';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import {
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogAction,
+  ResponsiveAlertDialogCancel,
+  ResponsiveAlertDialogContent,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogTitle,
+  ResponsiveAlertDialogTrigger,
+} from '@/components/ui/responsive-alert-dialog';
 import {
   ResponsiveDropdownMenu,
   ResponsiveDropdownMenuContent,
@@ -193,8 +193,8 @@ export function CommentItem({
                     <Pencil className="h-3.5 w-3.5" />
                     수정하기
                   </ResponsiveDropdownMenuItem>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
+                  <ResponsiveAlertDialog>
+                    <ResponsiveAlertDialogTrigger asChild>
                       <ResponsiveDropdownMenuItem
                         className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
                         onSelect={e => e.preventDefault()}
@@ -202,26 +202,30 @@ export function CommentItem({
                         <Trash className="h-3.5 w-3.5 text-red-500" />
                         삭제하기
                       </ResponsiveDropdownMenuItem>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>댓글 삭제</AlertDialogTitle>
-                        <AlertDialogDescription>
+                    </ResponsiveAlertDialogTrigger>
+                    <ResponsiveAlertDialogContent>
+                      <ResponsiveAlertDialogHeader>
+                        <ResponsiveAlertDialogTitle>
+                          댓글 삭제
+                        </ResponsiveAlertDialogTitle>
+                        <ResponsiveAlertDialogDescription>
                           이 댓글을 정말 삭제하시겠습니까? 이 작업은 되돌릴 수
                           없습니다.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>취소</AlertDialogCancel>
-                        <AlertDialogAction
+                        </ResponsiveAlertDialogDescription>
+                      </ResponsiveAlertDialogHeader>
+                      <ResponsiveAlertDialogFooter>
+                        <ResponsiveAlertDialogAction
                           onClick={handleDeleteComment}
                           className="bg-red-500 text-white hover:bg-red-600"
                         >
                           {isDeleting ? '삭제 중...' : '삭제'}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                        </ResponsiveAlertDialogAction>
+                        <ResponsiveAlertDialogCancel className="cursor-pointer">
+                          취소
+                        </ResponsiveAlertDialogCancel>
+                      </ResponsiveAlertDialogFooter>
+                    </ResponsiveAlertDialogContent>
+                  </ResponsiveAlertDialog>
                 </ResponsiveDropdownMenuContent>
               </ResponsiveDropdownMenu>
             )}
