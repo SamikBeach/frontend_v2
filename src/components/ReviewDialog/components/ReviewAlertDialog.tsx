@@ -1,13 +1,13 @@
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogAction,
+  ResponsiveAlertDialogCancel,
+  ResponsiveAlertDialogContent,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogTitle,
+} from '@/components/ui/responsive-alert-dialog';
 
 interface ReviewAlertDialogProps {
   open: boolean;
@@ -29,19 +29,21 @@ export function ReviewAlertDialog({
   isDanger = false,
 }: ReviewAlertDialogProps) {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-md rounded-2xl">
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{message}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
+    <ResponsiveAlertDialog open={open} onOpenChange={onOpenChange}>
+      <ResponsiveAlertDialogContent className="max-w-md rounded-2xl">
+        <ResponsiveAlertDialogHeader>
+          <ResponsiveAlertDialogTitle>{title}</ResponsiveAlertDialogTitle>
+          <ResponsiveAlertDialogDescription>
+            {message}
+          </ResponsiveAlertDialogDescription>
+        </ResponsiveAlertDialogHeader>
+        <ResponsiveAlertDialogFooter>
           {isDanger && (
-            <AlertDialogCancel className="cursor-pointer rounded-xl">
+            <ResponsiveAlertDialogCancel className="cursor-pointer rounded-xl">
               취소
-            </AlertDialogCancel>
+            </ResponsiveAlertDialogCancel>
           )}
-          <AlertDialogAction
+          <ResponsiveAlertDialogAction
             className={`cursor-pointer rounded-xl ${
               isDanger
                 ? 'bg-red-500 hover:bg-red-600'
@@ -50,9 +52,9 @@ export function ReviewAlertDialog({
             onClick={onConfirm}
           >
             {confirmText}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </ResponsiveAlertDialogAction>
+        </ResponsiveAlertDialogFooter>
+      </ResponsiveAlertDialogContent>
+    </ResponsiveAlertDialog>
   );
 }

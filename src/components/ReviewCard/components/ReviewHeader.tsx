@@ -1,15 +1,4 @@
 import { ReviewUser } from '@/apis/review/types';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +11,6 @@ import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
 import { ExtendedReviewResponseDto } from '../types';
 import { getNameInitial, renderStarRating } from '../utils';
 import { TagName } from './TagName';
@@ -46,8 +34,6 @@ export function ReviewHeader({
   onDelete,
   onUserClick,
 }: ReviewHeaderProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
-
   // Check if author has profileImage property, otherwise cast to ReviewUser
   const author = review.author as ReviewUser;
   const avatarSrc = author.profileImage ?? undefined;
@@ -63,16 +49,6 @@ export function ReviewHeader({
     : review.rating && review.rating > 0
       ? review.rating
       : 0;
-
-  // 삭제 핸들러
-  const handleDeleteReview = () => {
-    setIsDeleting(true);
-    try {
-      onDelete();
-    } finally {
-      setIsDeleting(false);
-    }
-  };
 
   return (
     <div className="flex items-start justify-between">
@@ -148,35 +124,16 @@ export function ReviewHeader({
               <Pencil className="h-3.5 w-3.5" />
               수정하기
             </ResponsiveDropdownMenuItem>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <ResponsiveDropdownMenuItem
-                  className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
-                  onSelect={e => e.preventDefault()}
-                >
-                  <Trash className="h-3.5 w-3.5 text-red-500" />
-                  삭제하기
-                </ResponsiveDropdownMenuItem>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>리뷰 삭제</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    이 리뷰를 정말 삭제하시겠습니까? 이 작업은 되돌릴 수
-                    없습니다.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>취소</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDeleteReview}
-                    className="bg-red-500 text-white hover:bg-red-600"
-                  >
-                    {isDeleting ? '삭제 중...' : '삭제'}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <ResponsiveDropdownMenuItem
+              className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
+              onSelect={() => {
+                onDelete();
+                setIsDropdownOpen(false);
+              }}
+            >
+              <Trash className="h-3.5 w-3.5 text-red-500" />
+              삭제하기
+            </ResponsiveDropdownMenuItem>
           </ResponsiveDropdownMenuContent>
         </ResponsiveDropdownMenu>
       )}
