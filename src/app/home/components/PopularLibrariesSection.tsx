@@ -25,16 +25,18 @@ export function PopularLibrariesSection() {
   const dummyTags: Tag[] = [];
 
   return (
-    <section className="h-auto p-4">
+    <section className="h-auto p-2 sm:p-4">
       <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-[#3B82F6]" />
-          <h2 className="text-xl font-semibold text-gray-900">인기 서재</h2>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <BookOpen className="h-4 w-4 text-[#3B82F6] sm:h-5 sm:w-5" />
+          <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
+            인기 서재
+          </h2>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          className="text-sm font-medium text-gray-500 hover:text-gray-900"
+          className="text-xs font-medium text-gray-500 hover:text-gray-900 sm:text-sm"
           onClick={() => router.push('/libraries')}
         >
           더보기
@@ -48,7 +50,7 @@ export function PopularLibrariesSection() {
           <p className="text-sm text-gray-500">인기 서재가 없습니다.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:gap-4">
           {libraries.slice(0, 2).map(library => (
             <div key={library.id}>
               <LibraryCard

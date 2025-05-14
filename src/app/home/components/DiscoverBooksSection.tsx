@@ -12,9 +12,9 @@ import { useHomeDiscoverBooksQuery } from '../hooks';
 // 오늘의 발견 스켈레톤 컴포넌트
 export function DiscoverBooksSkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-      {[...Array(3)].map((_, index) => (
-        <div key={index} className="w-full">
+    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:gap-4">
+      {[...Array(4)].map((_, index) => (
+        <div key={index} className={`w-full ${index === 3 ? 'sm:hidden' : ''}`}>
           <div className="flex h-full w-full flex-col overflow-hidden rounded-xl">
             <div className="h-full w-full bg-white">
               <Skeleton className="relative flex aspect-[3/4.5] items-center justify-center overflow-hidden" />
@@ -54,16 +54,18 @@ export function DiscoverBooksSection() {
   };
 
   return (
-    <section className="h-auto p-4">
+    <section className="h-auto p-2 sm:p-4">
       <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Compass className="h-5 w-5 text-[#00C471]" />
-          <h2 className="text-xl font-semibold text-gray-900">오늘의 발견</h2>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <Compass className="h-4 w-4 text-[#00C471] sm:h-5 sm:w-5" />
+          <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
+            오늘의 발견
+          </h2>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          className="text-sm font-medium text-gray-500 hover:text-gray-900"
+          className="text-xs font-medium text-gray-500 hover:text-gray-900 sm:text-sm"
           onClick={() => router.push('/discover')}
         >
           더보기
@@ -77,9 +79,13 @@ export function DiscoverBooksSection() {
           <p className="text-sm text-gray-500">오늘의 발견이 없습니다.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-          {displayBooks.map(book => (
-            <div key={book.id} className="w-full">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:gap-4">
+          {/* 모바일에서는 4개까지 표시, 큰 화면에서는 3개까지 표시 */}
+          {allBooks.slice(0, 4).map((book, index) => (
+            <div
+              key={book.id}
+              className={`w-full ${index === 3 ? 'sm:hidden' : ''}`}
+            >
               <BookCard
                 book={book as any}
                 onClick={() => handleBookSelect(book)}
