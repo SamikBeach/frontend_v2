@@ -1,5 +1,6 @@
 export * from './BookPreview';
 export * from './CommentItem';
+export * from './CommentItemDropdown';
 export * from './CommentSection';
 export * from './DeleteReviewDialog';
 export * from './ReviewActions';
@@ -7,4 +8,5 @@ export * from './ReviewAlertDialog';
 export * from './ReviewContent';
 export * from './ReviewEditForm';
 export * from './ReviewHeader';
+export * from './ReviewHeaderDropdown';
 export * from './TagName';
