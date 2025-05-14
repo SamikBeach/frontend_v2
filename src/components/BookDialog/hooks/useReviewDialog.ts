@@ -2,6 +2,7 @@ import { createOrUpdateRating } from '@/apis/rating/rating';
 import {
   ReadingStatusType,
   createOrUpdateReadingStatus,
+  deleteReadingStatusByBookId,
 } from '@/apis/reading-status';
 import { createReview, deleteReview, updateReview } from '@/apis/review/review';
 import { Review } from '@/apis/review/types';
@@ -15,7 +16,12 @@ import { toast } from 'sonner';
 import { useBookDetails } from './useBookDetails';
 
 export function useReviewDialog() {
-  const { book, isbn, userRating: userRatingData } = useBookDetails();
+  const {
+    book,
+    isbn,
+    userRating: userRatingData,
+    userReadingStatus,
+  } = useBookDetails();
   const queryClient = useQueryClient();
   const currentUser = useCurrentUser();
   const pathname = usePathname();
@@ -32,7 +38,7 @@ export function useReviewDialog() {
     mutationFn: async (params: {
       rating: number;
       content: string;
-      readingStatus?: ReadingStatusType;
+      readingStatus?: ReadingStatusType | null;
     }): Promise<any> => {
       const { rating, content, readingStatus } = params;
 
@@ -103,14 +109,27 @@ export function useReviewDialog() {
           book.id < 0 ? isbn : undefined
         );
 
-        // 읽기 상태가 전달된 경우 읽기 상태도 업데이트
-        if (readingStatus) {
-          readingStatusResponse = await createOrUpdateReadingStatus(
-            book.id,
-            { status: readingStatus },
-            book.id < 0 ? isbn : undefined
-          );
-          readingStatusChanged = true;
+        // 읽기 상태 변경 여부 확인
+        const isReadingStatusChanged =
+          (readingStatus === null && userReadingStatus !== null) ||
+          (readingStatus !== null && readingStatus !== userReadingStatus);
+
+        // 읽기 상태가 변경된 경우에만 API 호출
+        if (isReadingStatusChanged) {
+          // 읽기 상태가 null인 경우 (선택 안함 선택 시)
+          if (readingStatus === null) {
+            await deleteReadingStatusByBookId(book.id);
+            readingStatusChanged = true;
+          }
+          // 읽기 상태가 전달된 경우 읽기 상태도 업데이트
+          else if (readingStatus) {
+            readingStatusResponse = await createOrUpdateReadingStatus(
+              book.id,
+              { status: readingStatus },
+              book.id < 0 ? isbn : undefined
+            );
+            readingStatusChanged = true;
+          }
         }
 
         // 별점과 읽기 상태 응답을 합쳐서 반환
@@ -146,17 +165,30 @@ export function useReviewDialog() {
         isbn: isbn, // ISBN 항상 포함하도록 수정
       });
 
-      // 읽기 상태가 전달된 경우 읽기 상태도 업데이트
+      // 읽기 상태 변경 여부 확인
+      const isReadingStatusChanged =
+        (readingStatus === null && userReadingStatus !== null) ||
+        (readingStatus !== null && readingStatus !== userReadingStatus);
+
+      // 읽기 상태가 null인 경우 (선택 안함 선택 시)
       let readingStatusResponse = null;
       let readingStatusChanged = false;
 
-      if (readingStatus) {
-        readingStatusResponse = await createOrUpdateReadingStatus(
-          book.id,
-          { status: readingStatus },
-          book.id < 0 ? isbn : undefined
-        );
-        readingStatusChanged = true;
+      // 읽기 상태가 변경된 경우에만 API 호출
+      if (isReadingStatusChanged) {
+        if (readingStatus === null) {
+          await deleteReadingStatusByBookId(book.id);
+          readingStatusChanged = true;
+        }
+        // 읽기 상태가 전달된 경우 읽기 상태도 업데이트
+        else if (readingStatus) {
+          readingStatusResponse = await createOrUpdateReadingStatus(
+            book.id,
+            { status: readingStatus },
+            book.id < 0 ? isbn : undefined
+          );
+          readingStatusChanged = true;
+        }
       }
 
       // 별점과 리뷰 및 읽기 상태 응답을 합쳐서 반환
@@ -216,20 +248,22 @@ export function useReviewDialog() {
           }
 
           // 읽기 상태 업데이트 (읽기 상태가 변경된 경우)
-          const updatedUserReadingStatus = data.readingStatus
-            ? (data.readingStatus as ReadingStatusType)
+          // 선택 안함(null)인 경우 userReadingStatus를 null로 설정
+          const updatedUserReadingStatus = data.readingStatusChanged
+            ? data.readingStatus === null
+              ? null
+              : (data.readingStatus as ReadingStatusType)
             : typedOldData.userReadingStatus;
 
           // 읽기 상태 카운트 업데이트 (readingStats가 있는 경우)
           let updatedReadingStats = typedOldData.readingStats || {};
 
           // readingStats가 없는 경우도 처리하도록 if 조건 제거
-          const oldStatus = typedOldData.userReadingStatus as
-            | ReadingStatusType
-            | undefined;
-          const newStatus =
-            (data.readingStatus as ReadingStatusType) ||
-            updatedUserReadingStatus;
+          const oldStatus =
+            typedOldData.userReadingStatus as ReadingStatusType | null;
+          const newStatus = data.readingStatusChanged
+            ? (data.readingStatus as ReadingStatusType | null)
+            : updatedUserReadingStatus;
 
           // 읽기 상태 카운트 복사 또는 기본값 생성
           const readingStatusCounts = typedOldData.readingStats
@@ -241,44 +275,51 @@ export function useReviewDialog() {
                 [ReadingStatusType.READ]: 0,
               };
 
-          // 이전 상태가 있으면 카운트 감소
-          if (oldStatus) {
-            readingStatusCounts[oldStatus] = Math.max(
-              0,
-              (readingStatusCounts[oldStatus] || 0) - 1
-            );
+          // 읽기 상태가 변경된 경우에만 카운트 업데이트
+          if (data.readingStatusChanged) {
+            // 이전 상태가 유효한 ReadingStatusType인 경우에만 카운트 감소
+            if (oldStatus && oldStatus in ReadingStatusType) {
+              const oldStatusKey = oldStatus as ReadingStatusType;
+              readingStatusCounts[oldStatusKey] = Math.max(
+                0,
+                (readingStatusCounts[oldStatusKey] || 0) - 1
+              );
+            }
+
+            // 새 상태가 유효한 ReadingStatusType인 경우에만 카운트 증가
+            if (newStatus && newStatus in ReadingStatusType) {
+              const newStatusKey = newStatus as ReadingStatusType;
+              readingStatusCounts[newStatusKey] =
+                (readingStatusCounts[newStatusKey] || 0) + 1;
+            }
+
+            // 현재 읽는 중인 사용자와 완료한 사용자 수 업데이트
+            let currentReaders = typedOldData.readingStats?.currentReaders || 0;
+            let completedReaders =
+              typedOldData.readingStats?.completedReaders || 0;
+
+            // 이전 상태에 따른 조정
+            if (oldStatus === ReadingStatusType.READING) {
+              currentReaders = Math.max(0, currentReaders - 1);
+            } else if (oldStatus === ReadingStatusType.READ) {
+              completedReaders = Math.max(0, completedReaders - 1);
+            }
+
+            // 새 상태에 따른 조정
+            if (newStatus === ReadingStatusType.READING) {
+              currentReaders += 1;
+            } else if (newStatus === ReadingStatusType.READ) {
+              completedReaders += 1;
+            }
+
+            // 업데이트된 읽기 상태 통계
+            updatedReadingStats = {
+              ...(typedOldData.readingStats || {}),
+              readingStatusCounts,
+              currentReaders,
+              completedReaders,
+            };
           }
-
-          // 새 상태 카운트 증가
-          readingStatusCounts[newStatus] =
-            (readingStatusCounts[newStatus] || 0) + 1;
-
-          // 현재 읽는 중인 사용자와 완료한 사용자 수 업데이트
-          let currentReaders = typedOldData.readingStats?.currentReaders || 0;
-          let completedReaders =
-            typedOldData.readingStats?.completedReaders || 0;
-
-          // 이전 상태에 따른 조정
-          if (oldStatus === ReadingStatusType.READING) {
-            currentReaders = Math.max(0, currentReaders - 1);
-          } else if (oldStatus === ReadingStatusType.READ) {
-            completedReaders = Math.max(0, completedReaders - 1);
-          }
-
-          // 새 상태에 따른 조정
-          if (newStatus === ReadingStatusType.READING) {
-            currentReaders += 1;
-          } else if (newStatus === ReadingStatusType.READ) {
-            completedReaders += 1;
-          }
-
-          // 업데이트된 읽기 상태 통계
-          updatedReadingStats = {
-            ...(typedOldData.readingStats || {}),
-            readingStatusCounts,
-            currentReaders,
-            completedReaders,
-          };
 
           // 업데이트된 데이터 반환
           return {
@@ -298,10 +339,16 @@ export function useReviewDialog() {
             userRatingData
           );
 
-          // user-reading-status 캐시 항상 업데이트
-          queryClient.setQueryData(['user-reading-status', book.id], {
-            status: data.readingStatus || book.userReadingStatus,
-          });
+          // 읽기 상태가 변경된 경우에만 user-reading-status 캐시 업데이트
+          if (data.readingStatusChanged) {
+            // 읽기 상태가 null인 경우 null로 설정
+            queryClient.setQueryData(
+              ['user-reading-status', book.id],
+              data.readingStatus === null
+                ? null
+                : { status: data.readingStatus || book.userReadingStatus }
+            );
+          }
         }
 
         // 평균 별점 정보 계산 (book-reviews 업데이트에 사용)
@@ -343,17 +390,25 @@ export function useReviewDialog() {
           });
         }
 
-        // 읽기 상태가 변경된 경우 관련 쿼리 무효화
-        queryClient.invalidateQueries({
-          queryKey: ['reading-status'],
-          refetchType: 'active',
-        });
+        // 읽기 상태가 변경된 경우에만 관련 쿼리 무효화
+        if (data.readingStatusChanged) {
+          // 읽기 상태 관련 쿼리 무효화
+          queryClient.invalidateQueries({
+            queryKey: ['reading-status'],
+            refetchType: 'active',
+          });
 
-        // 독서 상태별 도서 수 통계 쿼리 무효화
-        queryClient.invalidateQueries({
-          queryKey: ['user-statistics', currentUser?.id, 'reading-status'],
-          refetchType: 'active',
-        });
+          queryClient.invalidateQueries({
+            queryKey: ['user-reading-status', book.id],
+            exact: true,
+          });
+
+          // 독서 상태별 도서 수 통계 쿼리 무효화
+          queryClient.invalidateQueries({
+            queryKey: ['user-statistics', currentUser?.id, 'reading-status'],
+            refetchType: 'active',
+          });
+        }
 
         // book-reviews 쿼리 데이터 업데이트하여 별점 즉시 반영
         queryClient.setQueryData(['book-reviews', book.id], (oldData: any) => {
@@ -546,7 +601,11 @@ export function useReviewDialog() {
 
   // 리뷰 제출 핸들러
   const handleReviewSubmit = useCallback(
-    (rating: number, content: string, readingStatus?: ReadingStatusType) => {
+    (
+      rating: number,
+      content: string,
+      readingStatus?: ReadingStatusType | null
+    ) => {
       if (!book) {
         toast.error('책 정보가 없습니다.');
         return;

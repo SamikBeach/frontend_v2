@@ -30,7 +30,7 @@ interface ReviewDialogProps {
   onSubmit: (
     rating: number,
     content: string,
-    readingStatus?: ReadingStatusType
+    readingStatus?: ReadingStatusType | null
   ) => void;
   initialRating?: number;
   initialContent?: string;
@@ -82,9 +82,9 @@ export function ReviewDialog({
       return;
     }
 
-    // 유효성 검사 통과 시 제출 (읽기 상태는 생성 모드에서만 전달)
-    if (isCreateMode && readingStatus) {
-      // 생성 모드에서는 읽기 상태도 함께 전달
+    // 유효성 검사 통과 시 제출
+    if (isCreateMode) {
+      // 생성 모드에서는 읽기 상태도 함께 전달 (null 포함)
       onSubmit(rating, content, readingStatus);
     } else {
       // 수정 모드에서는 읽기 상태를 전달하지 않음
@@ -108,7 +108,11 @@ export function ReviewDialog({
   };
 
   // 읽기 상태별 스타일 반환
-  const getReadingStatusStyle = (status: ReadingStatusType) => {
+  const getReadingStatusStyle = (status: ReadingStatusType | null) => {
+    if (!status) {
+      return 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100';
+    }
+
     switch (status) {
       case ReadingStatusType.WANT_TO_READ:
         return 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100';
@@ -202,21 +206,23 @@ export function ReviewDialog({
                       variant="outline"
                       className={cn(
                         'w-full justify-between rounded-xl border-gray-300 hover:bg-gray-100 hover:text-gray-900',
-                        readingStatus
+                        readingStatus !== null
                           ? getReadingStatusStyle(readingStatus)
                           : 'bg-gray-50 text-gray-700'
                       )}
                       disabled={isSubmitting}
                     >
-                      {readingStatus && (
+                      {readingStatus !== null ? (
                         <span className="mr-1.5">
                           {statusIcons[readingStatus]}
                         </span>
+                      ) : (
+                        <span className="mr-1.5">{statusIcons['NONE']}</span>
                       )}
                       <span>
-                        {readingStatus
+                        {readingStatus !== null
                           ? statusTexts[readingStatus]
-                          : '읽기 상태 선택'}
+                          : statusTexts['NONE']}
                       </span>
                       <ChevronDown className="ml-auto h-4 w-4" />
                     </Button>
@@ -258,6 +264,23 @@ export function ReviewDialog({
                         </span>
                       </ResponsiveDropdownMenuItem>
                     ))}
+
+                    {/* 선택 안함 옵션 */}
+                    <ResponsiveDropdownMenuItem
+                      key="none"
+                      className={cn(
+                        'mt-1 flex cursor-pointer items-center gap-2 border-t text-sm',
+                        readingStatus === null ? 'bg-gray-100' : '',
+                        'hover:bg-red-50'
+                      )}
+                      onSelect={() => !isSubmitting && setReadingStatus(null)}
+                      disabled={isSubmitting}
+                    >
+                      <span className="text-base">{statusIcons['NONE']}</span>
+                      <span className="text-red-600">
+                        {statusTexts['NONE']}
+                      </span>
+                    </ResponsiveDropdownMenuItem>
                   </ResponsiveDropdownMenuContent>
                 </ResponsiveDropdownMenu>
               </div>
