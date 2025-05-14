@@ -116,13 +116,13 @@ function ResponsiveDropdownMenuContent({
       <DrawerPrimitive.Portal data-slot="drawer-portal">
         <DrawerPrimitive.Overlay
           className={cn(
-            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-40 bg-black/15'
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-51 bg-black/15'
           )}
         />
         <DrawerPrimitive.Content
           data-slot="drawer-content"
           className={cn(
-            'bg-popover text-popover-foreground fixed z-50 flex flex-col',
+            'bg-popover text-popover-foreground fixed z-52 flex flex-col',
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[10px] data-[vaul-drawer-direction=bottom]:border-t-0',
             'space-y-3 overflow-y-auto p-4',
             'max-h-[94%]', // Limit height to adapt to content
