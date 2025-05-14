@@ -10,7 +10,7 @@ export function Header() {
 
   return (
     <header
-      className={`fixed top-0 right-0 left-0 z-50 flex min-h-[56px] items-center justify-between border-b border-gray-200/50 bg-white ${
+      className={`fixed top-0 right-0 left-0 z-40 flex min-h-[56px] items-center justify-between border-b border-gray-200/50 bg-white ${
         isMobile ? 'px-2' : 'px-4'
       }`}
     >
