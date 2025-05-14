@@ -126,7 +126,6 @@ export function ReviewDialog({
       <ResponsiveDialog
         open={open}
         onOpenChange={isSubmitting ? undefined : onOpenChange}
-        snapPoints={[1]}
         shouldScaleBackground={false}
       >
         <ResponsiveDialogContent
