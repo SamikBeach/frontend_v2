@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 const ResponsiveDropdownMenuContext = React.createContext<{
   isMobile: boolean;
   isOpen: boolean;
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsOpen: (open: boolean) => void;
 }>({
   isMobile: false,
   isOpen: false,
@@ -30,33 +30,25 @@ function ResponsiveDropdownMenuRoot({
   snapPoints?: Array<number>;
 }) {
   const isMobile = useIsMobile();
-  const [isOpen, setIsOpen] = React.useState(open || false);
 
-  // Sync isOpen state with open prop
-  React.useEffect(() => {
-    if (open !== undefined) {
-      setIsOpen(open);
+  // Create a handler for open state changes
+  const handleOpenChange = (newOpen: boolean) => {
+    if (onOpenChange) {
+      onOpenChange(newOpen);
     }
-  }, [open]);
-
-  // Notify parent component about state changes
-  React.useEffect(() => {
-    if (onOpenChange && open !== isOpen) {
-      onOpenChange(isOpen);
-    }
-  }, [isOpen, onOpenChange, open]);
+  };
 
   return (
     <ResponsiveDropdownMenuContext.Provider
-      value={{ isMobile, isOpen, setIsOpen }}
+      value={{ isMobile, isOpen: open || false, setIsOpen: handleOpenChange }}
     >
       {isMobile ? (
         <DrawerPrimitive.Root
           data-slot="drawer"
           shouldScaleBackground={props.shouldScaleBackground}
           snapPoints={props.snapPoints}
-          open={isOpen}
-          onOpenChange={setIsOpen}
+          open={open}
+          onOpenChange={handleOpenChange}
           modal={props.modal}
         >
           {children}
@@ -64,8 +56,8 @@ function ResponsiveDropdownMenuRoot({
       ) : (
         <DropdownMenuPrimitive.Root
           data-slot="dropdown-menu"
-          open={isOpen}
-          onOpenChange={setIsOpen}
+          open={open}
+          onOpenChange={handleOpenChange}
           modal={props.modal}
         >
           {children}
@@ -132,7 +124,8 @@ function ResponsiveDropdownMenuContent({
           className={cn(
             'bg-popover text-popover-foreground fixed z-50 flex flex-col',
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[10px] data-[vaul-drawer-direction=bottom]:border-t-0',
-            'space-y-2 overflow-y-auto p-4',
+            'space-y-3 overflow-y-auto p-4',
+            'max-h-[94%]', // Limit height to adapt to content
             drawerClassName
           )}
           {...props}
@@ -141,7 +134,7 @@ function ResponsiveDropdownMenuContent({
             Menu
           </DrawerPrimitive.Title>
           <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
-          <div className="flex-1 space-y-2 overflow-auto">{children}</div>
+          <div className="flex-1 space-y-3 overflow-auto">{children}</div>
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
     );
@@ -179,23 +172,14 @@ function ResponsiveDropdownMenuItem({
 }) {
   const { isMobile, setIsOpen } = useResponsiveDropdown();
 
-  const handleClick = React.useCallback(() => {
+  const handleClick = () => {
     if (isMobile) {
       if (onSelect) {
-        const syntheticEvent = {
-          preventDefault: () => {},
-          stopPropagation: () => {},
-          currentTarget: document.createElement('div'),
-          target: document.createElement('div'),
-          bubbles: true,
-          cancelable: true,
-          defaultPrevented: false,
-        };
-        onSelect(syntheticEvent as any);
+        onSelect({} as any);
       }
       setIsOpen(false);
     }
-  }, [isMobile, onSelect, setIsOpen]);
+  };
 
   if (isMobile) {
     return (
@@ -204,7 +188,7 @@ function ResponsiveDropdownMenuItem({
         data-inset={inset}
         data-variant={variant}
         className={cn(
-          "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative my-1 flex cursor-pointer items-center gap-2 rounded-sm px-2 py-3 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+          "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative my-1 flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-3 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
           drawerClassName || className
         )}
         onClick={handleClick}
@@ -219,7 +203,7 @@ function ResponsiveDropdownMenuItem({
       data-inset={inset}
       data-variant={variant}
       className={cn(
-        "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       onSelect={onSelect}
@@ -359,7 +343,7 @@ function ResponsiveDropdownMenuSubTrigger({
     return (
       <DrawerPrimitive.Trigger
         className={cn(
-          'focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8',
+          "focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground relative my-1 flex w-full cursor-pointer items-center justify-between gap-2 rounded-sm px-2 py-3 text-sm outline-hidden select-none data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
           className
         )}
       >
@@ -374,7 +358,7 @@ function ResponsiveDropdownMenuSubTrigger({
       data-slot="dropdown-menu-sub-trigger"
       data-inset={inset}
       className={cn(
-        'focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-default items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8',
+        'focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8',
         className
       )}
       {...props}
@@ -400,7 +384,9 @@ function ResponsiveDropdownMenuSubContent({
         <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40" />
         <DrawerPrimitive.Content
           className={cn(
-            'bg-popover text-popover-foreground fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[94%] flex-col space-y-2 rounded-t-[10px] border p-4 shadow-lg',
+            'bg-popover text-popover-foreground fixed inset-x-0 bottom-0 z-50 mt-24 flex flex-col space-y-3 rounded-t-[10px] border p-4 shadow-lg',
+            'max-h-[94%]', // Limit height to adapt to content
+            'w-full', // Ensure full width
             drawerClassName || className
           )}
           {...props}
@@ -409,7 +395,9 @@ function ResponsiveDropdownMenuSubContent({
             Submenu
           </DrawerPrimitive.Title>
           <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
-          <div className="flex-1 space-y-2 overflow-auto">{props.children}</div>
+          <div className="w-full flex-1 space-y-3 overflow-auto">
+            <div className="w-full space-y-1">{props.children}</div>
+          </div>
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
     );

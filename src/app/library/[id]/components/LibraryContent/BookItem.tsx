@@ -12,6 +12,7 @@ import {
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
 import { ExternalLink, MoreHorizontal, Trash2 } from 'lucide-react';
+import { useCallback } from 'react';
 
 interface BookItemProps {
   book: Book;
@@ -38,6 +39,14 @@ export function BookItem({
   userLibraries,
   isLoadingLibraries,
 }: BookItemProps) {
+  // Create a memoized handler for moving books
+  const handleMoveBook = useCallback(
+    (targetLibraryId: number) => {
+      onMoveBook(targetLibraryId);
+    },
+    [onMoveBook]
+  );
+
   return (
     <div className="group relative">
       <BookCard book={book} onClick={() => onBookClick(book)} />
@@ -62,11 +71,11 @@ export function BookItem({
             </ResponsiveDropdownMenuTrigger>
             <ResponsiveDropdownMenuContent align="end" className="w-48">
               <ResponsiveDropdownMenuSub>
-                <ResponsiveDropdownMenuSubTrigger className="flex items-center">
+                <ResponsiveDropdownMenuSubTrigger>
                   <ExternalLink className="mr-2 h-4 w-4 flex-shrink-0" />
-                  <span className="w-full text-left">다른 서재로 옮기기</span>
+                  <span>다른 서재로 옮기기</span>
                 </ResponsiveDropdownMenuSubTrigger>
-                <ResponsiveDropdownMenuSubContent className="max-h-80 w-48 overflow-y-auto">
+                <ResponsiveDropdownMenuSubContent className="max-h-80 overflow-y-auto">
                   {isLoadingLibraries ? (
                     <ResponsiveDropdownMenuItem disabled>
                       <span className="w-full text-left">
@@ -85,10 +94,7 @@ export function BookItem({
                       .map(lib => (
                         <ResponsiveDropdownMenuItem
                           key={lib.id}
-                          onClick={e => {
-                            e.stopPropagation();
-                            onMoveBook(lib.id);
-                          }}
+                          onSelect={() => handleMoveBook(lib.id)}
                         >
                           <span className="w-full text-left">{lib.name}</span>
                         </ResponsiveDropdownMenuItem>
@@ -97,13 +103,10 @@ export function BookItem({
                 </ResponsiveDropdownMenuSubContent>
               </ResponsiveDropdownMenuSub>
               <ResponsiveDropdownMenuItem
-                onClick={e => {
-                  e.stopPropagation();
-                  onDeleteBook();
-                }}
+                onSelect={onDeleteBook}
                 variant="destructive"
               >
-                <Trash2 className="mr-2 h-4 w-4 flex-shrink-0" />
+                <Trash2 className="h-4 w-4 flex-shrink-0" />
                 <span>삭제하기</span>
               </ResponsiveDropdownMenuItem>
             </ResponsiveDropdownMenuContent>
