@@ -2,15 +2,14 @@ import { ReviewType } from '@/apis/review/types';
 import { communityCategoryColors } from '@/atoms/community';
 import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  ResponsiveSelect,
+  ResponsiveSelectContent,
+  ResponsiveSelectItem,
+  ResponsiveSelectTrigger,
+} from '@/components/ui/responsive-select';
 import { Textarea } from '@/components/ui/textarea';
 import { BookOpen, SendHorizontal } from 'lucide-react';
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 
 interface ReviewFormProps {
   content: string;
@@ -54,6 +53,16 @@ export function ReviewForm({
     }
   };
 
+  // 현재 선택된 태그 정보
+  const tagInfo = useMemo(() => {
+    return {
+      name: getTagName(type),
+      color:
+        communityCategoryColors[type as keyof typeof communityCategoryColors] ||
+        '#F9FAFB',
+    };
+  }, [type]);
+
   return (
     <>
       <Textarea
@@ -67,25 +76,18 @@ export function ReviewForm({
       {children}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <Select value={type} onValueChange={handleTypeChange}>
-          <SelectTrigger className="h-9 w-[130px] cursor-pointer rounded-xl border-gray-200 bg-white font-medium text-gray-700">
-            <SelectValue>
-              <div className="flex items-center">
-                <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
-                  style={{
-                    backgroundColor:
-                      communityCategoryColors[
-                        type as keyof typeof communityCategoryColors
-                      ] || '#F9FAFB',
-                  }}
-                ></span>
-                {getTagName(type)}
-              </div>
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="general" className="cursor-pointer">
+        <ResponsiveSelect value={type} onValueChange={handleTypeChange}>
+          <ResponsiveSelectTrigger className="h-9 w-[130px] cursor-pointer rounded-xl border-gray-200 bg-white font-medium text-gray-700">
+            <div className="flex items-center">
+              <span
+                className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: tagInfo.color }}
+              />
+              {tagInfo.name}
+            </div>
+          </ResponsiveSelectTrigger>
+          <ResponsiveSelectContent className="rounded-lg">
+            <ResponsiveSelectItem value="general" className="cursor-pointer">
               <div className="flex items-center">
                 <span
                   className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
@@ -93,11 +95,11 @@ export function ReviewForm({
                     backgroundColor:
                       communityCategoryColors.general || '#F9FAFB',
                   }}
-                ></span>
+                />
                 일반
               </div>
-            </SelectItem>
-            <SelectItem value="discussion" className="cursor-pointer">
+            </ResponsiveSelectItem>
+            <ResponsiveSelectItem value="discussion" className="cursor-pointer">
               <div className="flex items-center">
                 <span
                   className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
@@ -105,11 +107,11 @@ export function ReviewForm({
                     backgroundColor:
                       communityCategoryColors.discussion || '#F9FAFB',
                   }}
-                ></span>
+                />
                 토론
               </div>
-            </SelectItem>
-            <SelectItem value="review" className="cursor-pointer">
+            </ResponsiveSelectItem>
+            <ResponsiveSelectItem value="review" className="cursor-pointer">
               <div className="flex items-center">
                 <span
                   className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
@@ -117,11 +119,11 @@ export function ReviewForm({
                     backgroundColor:
                       communityCategoryColors.review || '#F9FAFB',
                   }}
-                ></span>
+                />
                 리뷰
               </div>
-            </SelectItem>
-            <SelectItem value="question" className="cursor-pointer">
+            </ResponsiveSelectItem>
+            <ResponsiveSelectItem value="question" className="cursor-pointer">
               <div className="flex items-center">
                 <span
                   className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
@@ -129,11 +131,11 @@ export function ReviewForm({
                     backgroundColor:
                       communityCategoryColors.question || '#F9FAFB',
                   }}
-                ></span>
+                />
                 질문
               </div>
-            </SelectItem>
-            <SelectItem value="meetup" className="cursor-pointer">
+            </ResponsiveSelectItem>
+            <ResponsiveSelectItem value="meetup" className="cursor-pointer">
               <div className="flex items-center">
                 <span
                   className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
@@ -141,12 +143,12 @@ export function ReviewForm({
                     backgroundColor:
                       communityCategoryColors.meetup || '#F9FAFB',
                   }}
-                ></span>
+                />
                 모임
               </div>
-            </SelectItem>
-          </SelectContent>
-        </Select>
+            </ResponsiveSelectItem>
+          </ResponsiveSelectContent>
+        </ResponsiveSelect>
 
         <Button
           variant="outline"
