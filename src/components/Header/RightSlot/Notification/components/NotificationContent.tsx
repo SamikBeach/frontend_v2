@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { ResponsiveDropdownMenuItem } from '@/components/ui/responsive-dropdown-menu';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Bell } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -15,6 +16,7 @@ export function NotificationContent({
   isOpen,
 }: NotificationContentProps) {
   const router = useRouter();
+  const isMobile = useIsMobile();
   const {
     notifications,
     unreadCount,
@@ -134,15 +136,23 @@ export function NotificationContent({
           next={loadMoreNotifications}
           hasMore={!!hasNextPage}
           loader={<ScrollLoader />}
-          scrollableTarget="notification-scroll-container"
-          className="divide-y divide-gray-50"
+          scrollableTarget={
+            isMobile ? undefined : 'notification-scroll-container'
+          }
+          className="h-full divide-y divide-gray-50 overflow-auto"
+          height={isMobile ? '72vh' : undefined}
+          endMessage={
+            <p className="py-4 pb-8 text-center text-xs text-gray-400">
+              모든 알림을 불러왔습니다
+            </p>
+          }
         >
           {enhancedNotifications.map(notification => (
-            <DropdownMenuItem
+            <ResponsiveDropdownMenuItem
               key={notification.id}
-              className={`flex cursor-pointer flex-col gap-0 px-4 py-3.5 transition-colors ${
-                !notification.isRead ? 'bg-blue-50/40' : 'hover:bg-gray-50'
-              }`}
+              className="flex w-full cursor-pointer flex-col gap-0 px-4 py-3 transition-colors hover:bg-gray-50 data-[unread=true]:bg-blue-50/40"
+              drawerClassName="flex cursor-pointer flex-col gap-0 px-4 py-3 transition-colors hover:bg-gray-50 data-[unread=true]:bg-blue-50/40 w-full text-left"
+              data-unread={!notification.isRead}
               onClick={() => handleNotificationClick(notification)}
               onSelect={e => e.preventDefault()} // 자동 닫힘 방지
             >
@@ -178,7 +188,7 @@ export function NotificationContent({
                   </div>
                 </div>
               </div>
-            </DropdownMenuItem>
+            </ResponsiveDropdownMenuItem>
           ))}
         </InfiniteScroll>
       )}

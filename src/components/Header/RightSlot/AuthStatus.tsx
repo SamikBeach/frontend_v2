@@ -2,7 +2,7 @@
 
 import { useCurrentUser } from '@/hooks';
 import { LoginButton } from './LoginButton';
-import { NotificationDropdown } from './Notification';
+import { Notification } from './Notification';
 import { UserDropdown } from './UserDropdown';
 
 export function AuthStatus() {
@@ -11,7 +11,7 @@ export function AuthStatus() {
   if (user) {
     return (
       <div className="flex items-center gap-4">
-        <NotificationDropdown />
+        <Notification />
         <UserDropdown user={user} />
       </div>
     );
