@@ -136,6 +136,9 @@ function ResponsiveDropdownMenuContent({
           )}
           {...props}
         >
+          <DrawerPrimitive.Title className="sr-only">
+            Menu
+          </DrawerPrimitive.Title>
           <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
           <div className="flex-1 overflow-auto">{children}</div>
         </DrawerPrimitive.Content>
@@ -375,6 +378,9 @@ function ResponsiveDropdownMenuSubContent({
           )}
           {...props}
         >
+          <DrawerPrimitive.Title className="sr-only">
+            Submenu
+          </DrawerPrimitive.Title>
           <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
           <div className="flex-1 overflow-auto p-4">{props.children}</div>
         </DrawerPrimitive.Content>
