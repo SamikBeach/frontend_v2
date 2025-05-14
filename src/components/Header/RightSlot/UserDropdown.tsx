@@ -7,12 +7,12 @@ import { userAtom } from '@/atoms/user';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuSeparator,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { useMutation } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
@@ -58,8 +58,8 @@ export function UserDropdown({ user }: UserDropdownProps) {
   const avatarUrl = user.profileImage || null;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+    <ResponsiveDropdownMenu>
+      <ResponsiveDropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar className="h-8 w-8 cursor-pointer">
             <AvatarImage src={avatarUrl || undefined} alt={displayName} />
@@ -68,39 +68,50 @@ export function UserDropdown({ user }: UserDropdownProps) {
             </AvatarFallback>
           </Avatar>
         </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <div className="flex items-center gap-2 p-2">
+      </ResponsiveDropdownMenuTrigger>
+      <ResponsiveDropdownMenuContent
+        align="end"
+        className="w-56"
+        drawerClassName="w-full"
+      >
+        <div className="flex w-full items-center justify-start gap-2 p-2">
           <Avatar className="h-8 w-8">
             <AvatarImage src={avatarUrl || undefined} alt={displayName} />
             <AvatarFallback className="bg-gray-200 text-gray-700">
               {initial}
             </AvatarFallback>
           </Avatar>
-          <div className="flex flex-col space-y-0.5">
+          <div className="flex flex-col space-y-0.5 text-left">
             <p className="text-sm leading-none font-medium">{displayName}</p>
             <p className="text-xs leading-none text-gray-500">{user.email}</p>
           </div>
         </div>
-        <DropdownMenuSeparator />
-        <Link href={`/profile/${user.id}`}>
-          <DropdownMenuItem className="cursor-pointer">
-            <UserIcon className="mr-2 h-4 w-4" />
-            <span>내 프로필</span>
-          </DropdownMenuItem>
+        <ResponsiveDropdownMenuSeparator />
+        <Link href={`/profile/${user.id}`} passHref legacyBehavior>
+          <ResponsiveDropdownMenuItem className="cursor-pointer" asChild>
+            <a className="flex w-full items-center">
+              <UserIcon className="mr-2 h-4 w-4" />
+              <span>내 프로필</span>
+            </a>
+          </ResponsiveDropdownMenuItem>
         </Link>
-        <Link href="/profile/settings">
-          <DropdownMenuItem className="cursor-pointer">
-            <Settings className="mr-2 h-4 w-4" />
-            <span>설정</span>
-          </DropdownMenuItem>
+        <Link href="/profile/settings" passHref legacyBehavior>
+          <ResponsiveDropdownMenuItem className="cursor-pointer" asChild>
+            <a className="flex w-full items-center">
+              <Settings className="mr-2 h-4 w-4" />
+              <span>설정</span>
+            </a>
+          </ResponsiveDropdownMenuItem>
         </Link>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+        <ResponsiveDropdownMenuSeparator />
+        <ResponsiveDropdownMenuItem
+          onSelect={handleLogout}
+          className="cursor-pointer"
+        >
           <LogOut className="mr-2 h-4 w-4" />
           <span>로그아웃</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </ResponsiveDropdownMenuItem>
+      </ResponsiveDropdownMenuContent>
+    </ResponsiveDropdownMenu>
   );
 }
