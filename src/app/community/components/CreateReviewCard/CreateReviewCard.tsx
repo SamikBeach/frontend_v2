@@ -170,7 +170,10 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
             </ResponsiveAlertDialogDescription>
           </ResponsiveAlertDialogHeader>
           <ResponsiveAlertDialogFooter className="mt-4">
-            <ResponsiveAlertDialogAction className="rounded-xl bg-gray-900 hover:bg-gray-800">
+            <ResponsiveAlertDialogAction
+              className="rounded-xl bg-gray-900 hover:bg-gray-800"
+              onClick={() => setAlertDialogOpen(false)}
+            >
               확인
             </ResponsiveAlertDialogAction>
           </ResponsiveAlertDialogFooter>

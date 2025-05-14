@@ -11,8 +11,10 @@ import { cn } from '@/lib/utils';
 // Context to share mobile status
 const ResponsiveAlertDialogContext = React.createContext<{
   isMobile: boolean;
+  onOpenChange?: (open: boolean) => void;
 }>({
   isMobile: false,
+  onOpenChange: undefined,
 });
 
 // Root component
@@ -27,7 +29,12 @@ function ResponsiveAlertDialogRoot({
   const isMobile = useIsMobile();
 
   return (
-    <ResponsiveAlertDialogContext.Provider value={{ isMobile }}>
+    <ResponsiveAlertDialogContext.Provider
+      value={{
+        isMobile,
+        onOpenChange: props.onOpenChange,
+      }}
+    >
       {isMobile ? (
         <DrawerPrimitive.Root
           data-slot="drawer"
@@ -260,21 +267,37 @@ function ResponsiveAlertDialogDescription({
 function ResponsiveAlertDialogAction({
   className,
   drawerClassName,
+  onClick,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Action> & {
   drawerClassName?: string;
 }) {
-  const { isMobile } = useResponsiveAlertDialog();
+  const { isMobile, onOpenChange } = useResponsiveAlertDialog();
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // 기존 onClick 핸들러 호출
+    if (onClick) {
+      onClick(e);
+    }
+
+    // Context에서 제공된 onOpenChange 함수가 있으면 호출하여 다이얼로그 닫기
+    if (isMobile && onOpenChange) {
+      onOpenChange(false);
+    }
+  };
+
   return isMobile ? (
     <Button
       data-slot="drawer-action"
       className={cn(drawerClassName)}
+      onClick={handleClick}
       {...props}
     />
   ) : (
     <AlertDialogPrimitive.Action
       data-slot="alert-dialog-action"
       className={cn(buttonVariants(), className)}
+      onClick={handleClick}
       {...props}
     />
   );
@@ -284,22 +307,38 @@ function ResponsiveAlertDialogAction({
 function ResponsiveAlertDialogCancel({
   className,
   drawerClassName,
+  onClick,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel> & {
   drawerClassName?: string;
 }) {
-  const { isMobile } = useResponsiveAlertDialog();
+  const { isMobile, onOpenChange } = useResponsiveAlertDialog();
+
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // 기존 onClick 핸들러 호출
+    if (onClick) {
+      onClick(e);
+    }
+
+    // Context에서 제공된 onOpenChange 함수가 있으면 호출하여 다이얼로그 닫기
+    if (isMobile && onOpenChange) {
+      onOpenChange(false);
+    }
+  };
+
   return isMobile ? (
     <Button
       variant="outline"
       data-slot="drawer-cancel"
       className={cn(drawerClassName)}
+      onClick={handleClick}
       {...props}
     />
   ) : (
     <AlertDialogPrimitive.Cancel
       data-slot="alert-dialog-cancel"
       className={cn(buttonVariants({ variant: 'outline' }), className)}
+      onClick={handleClick}
       {...props}
     />
   );

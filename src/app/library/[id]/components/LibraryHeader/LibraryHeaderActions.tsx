@@ -51,72 +51,68 @@ export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
         {/* 구독 버튼 */}
         {!isOwner && (
           <Button
-            size="sm"
             variant={isSubscribed ? 'outline' : 'default'}
-            className="gap-1.5 rounded-full"
+            className="gap-1.5 rounded-full text-xs"
             onClick={handleSubscribeClick}
           >
-            <Bell className="h-4 w-4" />
+            <Bell className="h-3.5! w-3.5!" />
             {isSubscribed ? '구독 중' : '구독하기'}
           </Button>
         )}
 
-        {/* 더보기 버튼 */}
-        <ResponsiveDropdownMenu
-          open={isDropdownOpen}
-          onOpenChange={setIsDropdownOpen}
-        >
-          <ResponsiveDropdownMenuTrigger asChild>
-            <Button
-              size="icon"
-              variant="outline"
-              className="h-9 w-9 rounded-full"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </ResponsiveDropdownMenuTrigger>
-          <ResponsiveDropdownMenuContent align="end">
-            {isOwner && (
-              <>
-                <ResponsiveDropdownMenuItem
-                  onSelect={() => {
-                    setShowEditDialog(true);
-                    setIsDropdownOpen(false);
-                  }}
-                >
-                  <Edit className="mr-2 h-4 w-4" />
-                  서재 수정하기
-                </ResponsiveDropdownMenuItem>
+        {/* 더보기 버튼 - 소유자인 경우에만 표시 */}
+        {isOwner && (
+          <ResponsiveDropdownMenu
+            open={isDropdownOpen}
+            onOpenChange={setIsDropdownOpen}
+          >
+            <ResponsiveDropdownMenuTrigger asChild>
+              <Button
+                size="icon"
+                variant="outline"
+                className="h-9 w-9 rounded-full"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </ResponsiveDropdownMenuTrigger>
+            <ResponsiveDropdownMenuContent align="end">
+              <ResponsiveDropdownMenuItem
+                onSelect={() => {
+                  setShowEditDialog(true);
+                  setIsDropdownOpen(false);
+                }}
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                서재 수정하기
+              </ResponsiveDropdownMenuItem>
 
-                <ResponsiveDropdownMenuItem onSelect={handleVisibilityToggle}>
-                  {library.isPublic ? (
-                    <>
-                      <EyeOff className="mr-2 h-4 w-4" />
-                      비공개로 변경하기
-                    </>
-                  ) : (
-                    <>
-                      <Eye className="mr-2 h-4 w-4" />
-                      공개로 변경하기
-                    </>
-                  )}
-                </ResponsiveDropdownMenuItem>
+              <ResponsiveDropdownMenuItem onSelect={handleVisibilityToggle}>
+                {library.isPublic ? (
+                  <>
+                    <EyeOff className="mr-2 h-4 w-4" />
+                    비공개로 변경하기
+                  </>
+                ) : (
+                  <>
+                    <Eye className="mr-2 h-4 w-4" />
+                    공개로 변경하기
+                  </>
+                )}
+              </ResponsiveDropdownMenuItem>
 
-                <ResponsiveDropdownMenuItem
-                  onSelect={() => {
-                    setShowDeleteDialog(true);
-                    setIsDropdownOpen(false);
-                  }}
-                  variant="destructive"
-                >
-                  <Trash className="mr-2 h-4 w-4" />
-                  서재 삭제하기
-                </ResponsiveDropdownMenuItem>
-              </>
-            )}
-            {/* Close button will only appear on mobile */}
-          </ResponsiveDropdownMenuContent>
-        </ResponsiveDropdownMenu>
+              <ResponsiveDropdownMenuItem
+                onSelect={() => {
+                  setShowDeleteDialog(true);
+                  setIsDropdownOpen(false);
+                }}
+                variant="destructive"
+              >
+                <Trash className="mr-2 h-4 w-4" />
+                서재 삭제하기
+              </ResponsiveDropdownMenuItem>
+            </ResponsiveDropdownMenuContent>
+          </ResponsiveDropdownMenu>
+        )}
       </div>
 
       <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />

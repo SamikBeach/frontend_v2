@@ -125,14 +125,12 @@ export function Libraries({ setSearchQuery }: LibrariesProps) {
       </div>
 
       {/* 새 서재 만들기 다이얼로그 */}
-      {showLibraryDialog && (
-        <LibraryDialog
-          open={showLibraryDialog}
-          onOpenChange={setShowLibraryDialog}
-          mode="create"
-          onCreateLibrary={handleCreateNewLibrary}
-        />
-      )}
+      <LibraryDialog
+        open={showLibraryDialog}
+        onOpenChange={setShowLibraryDialog}
+        mode="create"
+        onCreateLibrary={handleCreateNewLibrary}
+      />
 
       {/* 우측 하단 고정 플러스 버튼 (채널톡 버튼처럼) */}
       {currentUser && (

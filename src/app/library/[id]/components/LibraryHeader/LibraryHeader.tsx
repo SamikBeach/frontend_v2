@@ -103,31 +103,25 @@ export function LibraryHeader() {
       </div>
 
       {/* 다이얼로그 표시 */}
-      {showEditDialog && library && (
-        <LibraryDialog
-          open={showEditDialog}
-          onOpenChange={setShowEditDialog}
-          mode="edit"
-          library={library}
-          onUpdateLibrary={handleUpdateLibrary}
-        />
-      )}
+      <LibraryDialog
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        mode="edit"
+        library={library}
+        onUpdateLibrary={handleUpdateLibrary}
+      />
 
-      {showAddBookDialog && (
-        <AddBookDialog
-          isOpen={showAddBookDialog}
-          onOpenChange={setShowAddBookDialog}
-          libraryId={libraryId}
-        />
-      )}
+      <AddBookDialog
+        isOpen={showAddBookDialog}
+        onOpenChange={setShowAddBookDialog}
+        libraryId={libraryId}
+      />
 
-      {showDeleteDialog && library && (
-        <DeleteLibraryDialog
-          isOpen={showDeleteDialog}
-          onOpenChange={setShowDeleteDialog}
-          library={library}
-        />
-      )}
+      <DeleteLibraryDialog
+        isOpen={showDeleteDialog}
+        onOpenChange={setShowDeleteDialog}
+        library={library}
+      />
     </>
   );
 }
