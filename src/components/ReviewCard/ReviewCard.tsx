@@ -1,4 +1,6 @@
+import { AddBookDialog } from '@/app/library/[id]/components';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
+import { ReviewDialog } from '@/components/ReviewDialog';
 import {
   Card,
   CardContent,
@@ -10,11 +12,14 @@ import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { CommentSection } from './components';
-import { ReviewActions } from './components/ReviewActions';
-import { ReviewContent } from './components/ReviewContent';
-import { ReviewDialogHandler } from './components/ReviewDialogHandler';
-import { ReviewHeader } from './components/ReviewHeader';
+import {
+  CommentSection,
+  DeleteReviewDialog,
+  ReviewActions,
+  ReviewAlertDialog,
+  ReviewContent,
+  ReviewHeader,
+} from './components';
 import {
   useCommentLike,
   useReviewComments,
@@ -482,33 +487,45 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
           )}
       </Card>
 
-      {/* 다이얼로그 핸들러 컴포넌트 */}
-      <ReviewDialogHandler
-        // 알림 다이얼로그
-        alertDialogOpen={reviewState.alertDialogOpen}
-        setAlertDialogOpen={reviewState.setAlertDialogOpen}
-        alertTitle={reviewState.alertTitle}
-        alertMessage={reviewState.alertMessage}
-        // 삭제 다이얼로그
-        deleteDialogOpen={reviewState.deleteDialogOpen}
-        setDeleteDialogOpen={reviewState.setDeleteDialogOpen}
+      {/* 다이얼로그 컴포넌트들 (이전의 ReviewDialogHandler 대신) */}
+      {/* 리뷰 삭제 다이얼로그 */}
+      <DeleteReviewDialog
+        open={reviewState.deleteDialogOpen}
+        onOpenChange={reviewState.setDeleteDialogOpen}
         onDeleteConfirm={handleDeleteReview}
         isRatingActivity={extendedReview.activityType === 'rating'}
-        // 책 선택 다이얼로그
-        bookDialogOpen={reviewState.bookDialogOpen}
-        setBookDialogOpen={reviewState.setBookDialogOpen}
-        onBookSelect={reviewState.handleBookSelect}
-        // 리뷰 편집 다이얼로그
-        reviewDialogOpen={reviewState.reviewDialogOpen}
-        setReviewDialogOpen={reviewState.setReviewDialogOpen}
-        selectedBookTitle={reviewState.selectedBook?.title || '리뷰 수정'}
-        initialContent={reviewState.editedContent}
-        initialRating={reviewState.editedRating}
-        isSubmitting={reviewState.isSubmitting}
-        onReviewSubmit={handleReviewDialogSubmit}
       />
 
-      {/* 로그인 다이얼로그 추가 */}
+      {/* 알림 다이얼로그 */}
+      <ReviewAlertDialog
+        open={reviewState.alertDialogOpen}
+        onOpenChange={reviewState.setAlertDialogOpen}
+        title={reviewState.alertTitle}
+        message={reviewState.alertMessage}
+      />
+
+      {/* 책 선택 다이얼로그 */}
+      <AddBookDialog
+        isOpen={reviewState.bookDialogOpen}
+        onOpenChange={reviewState.setBookDialogOpen}
+        libraryId={0} // Dummy value since we're just using for book selection
+        onBookSelect={reviewState.handleBookSelect}
+      />
+
+      {/* 리뷰 편집 다이얼로그 */}
+      <ReviewDialog
+        open={reviewState.reviewDialogOpen}
+        onOpenChange={reviewState.setReviewDialogOpen}
+        bookTitle={reviewState.selectedBook?.title || '리뷰 수정'}
+        initialRating={reviewState.editedRating}
+        initialContent={reviewState.editedContent}
+        isEditMode={true}
+        isSubmitting={reviewState.isSubmitting}
+        onSubmit={handleReviewDialogSubmit}
+        onCancel={() => reviewState.setReviewDialogOpen(false)}
+      />
+
+      {/* 로그인 다이얼로그 */}
       <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </>
   );
