@@ -2,15 +2,15 @@ import { SearchResult } from '@/apis/search/types';
 import { AddBookDialog } from '@/app/library/[id]/components';
 import { ReviewDialog } from '@/components/ReviewDialog';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogAction,
+  ResponsiveAlertDialogCancel,
+  ResponsiveAlertDialogContent,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogTitle,
+} from '@/components/ui/responsive-alert-dialog';
 
 interface ReviewAlertDialogProps {
   open: boolean;
@@ -32,21 +32,18 @@ export function ReviewAlertDialog({
   isDanger = false,
 }: ReviewAlertDialogProps) {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent
+    <ResponsiveAlertDialog open={open} onOpenChange={onOpenChange}>
+      <ResponsiveAlertDialogContent
         className={`max-w-md rounded-2xl ${isDanger ? '' : ''}`}
       >
-        <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{message}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          {isDanger && (
-            <AlertDialogCancel className="cursor-pointer rounded-xl">
-              취소
-            </AlertDialogCancel>
-          )}
-          <AlertDialogAction
+        <ResponsiveAlertDialogHeader>
+          <ResponsiveAlertDialogTitle>{title}</ResponsiveAlertDialogTitle>
+          <ResponsiveAlertDialogDescription>
+            {message}
+          </ResponsiveAlertDialogDescription>
+        </ResponsiveAlertDialogHeader>
+        <ResponsiveAlertDialogFooter>
+          <ResponsiveAlertDialogAction
             className={`cursor-pointer rounded-xl ${
               isDanger
                 ? 'bg-red-500 hover:bg-red-600'
@@ -55,10 +52,15 @@ export function ReviewAlertDialog({
             onClick={onConfirm}
           >
             {confirmText}
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </ResponsiveAlertDialogAction>
+          {isDanger && (
+            <ResponsiveAlertDialogCancel className="cursor-pointer rounded-xl">
+              취소
+            </ResponsiveAlertDialogCancel>
+          )}
+        </ResponsiveAlertDialogFooter>
+      </ResponsiveAlertDialogContent>
+    </ResponsiveAlertDialog>
   );
 }
 
