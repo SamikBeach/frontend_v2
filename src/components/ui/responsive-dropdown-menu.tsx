@@ -124,7 +124,7 @@ function ResponsiveDropdownMenuContent({
           className={cn(
             'bg-popover text-popover-foreground fixed z-52 flex flex-col',
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[10px] data-[vaul-drawer-direction=bottom]:border-t-0',
-            'space-y-3 overflow-y-auto p-4',
+            'space-y-3 p-4',
             'max-h-[94%]', // Limit height to adapt to content
             drawerClassName
           )}
@@ -133,8 +133,8 @@ function ResponsiveDropdownMenuContent({
           <DrawerPrimitive.Title className="sr-only">
             Menu
           </DrawerPrimitive.Title>
-          <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
-          <div className="flex-1 space-y-3 overflow-auto">{children}</div>
+          <div className="mx-auto h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
+          <div className="space-y-2">{children}</div>
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
     );
@@ -395,10 +395,8 @@ function ResponsiveDropdownMenuSubContent({
           <DrawerPrimitive.Title className="sr-only">
             Submenu
           </DrawerPrimitive.Title>
-          <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
-          <div className="w-full flex-1 space-y-3 overflow-auto">
-            <div className="w-full space-y-1">{props.children}</div>
-          </div>
+          <div className="mx-auto h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
+          <div className="w-full space-y-1">{props.children}</div>
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
     );
