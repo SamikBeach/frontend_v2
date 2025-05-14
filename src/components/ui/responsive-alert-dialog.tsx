@@ -11,15 +11,19 @@ import { cn } from '@/lib/utils';
 // Context to share mobile status
 const ResponsiveAlertDialogContext = React.createContext<{
   isMobile: boolean;
-  onOpenChange?: (open: boolean) => void;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 }>({
   isMobile: false,
-  onOpenChange: undefined,
+  isOpen: false,
+  setIsOpen: () => undefined,
 });
 
 // Root component
 function ResponsiveAlertDialogRoot({
   children,
+  open,
+  onOpenChange,
   ...props
 }: React.ComponentProps<typeof AlertDialogPrimitive.Root> & {
   shouldScaleBackground?: boolean;
@@ -27,12 +31,31 @@ function ResponsiveAlertDialogRoot({
   modal?: boolean;
 }) {
   const isMobile = useIsMobile();
+  const [internalOpen, setInternalOpen] = React.useState(false);
+
+  // open prop이 명시적으로 전달되었는지 여부 확인
+  const isControlled = open !== undefined;
+  const isOpen = isControlled ? open : internalOpen;
+
+  // Create a handler for open state changes
+  const handleOpenChange = (newOpen: boolean) => {
+    // 내부 상태 관리가 필요한 경우 업데이트
+    if (!isControlled) {
+      setInternalOpen(newOpen);
+    }
+
+    // 외부에서 onOpenChange가 제공된 경우 호출
+    if (onOpenChange) {
+      onOpenChange(newOpen);
+    }
+  };
 
   return (
     <ResponsiveAlertDialogContext.Provider
       value={{
         isMobile,
-        onOpenChange: props.onOpenChange,
+        isOpen: isOpen || false,
+        setIsOpen: handleOpenChange,
       }}
     >
       {isMobile ? (
@@ -40,8 +63,8 @@ function ResponsiveAlertDialogRoot({
           data-slot="drawer"
           shouldScaleBackground={props.shouldScaleBackground}
           snapPoints={props.snapPoints}
-          open={props.open}
-          onOpenChange={props.onOpenChange}
+          open={isOpen}
+          onOpenChange={handleOpenChange}
           modal={props.modal}
         >
           {children}
@@ -49,8 +72,8 @@ function ResponsiveAlertDialogRoot({
       ) : (
         <AlertDialogPrimitive.Root
           data-slot="alert-dialog"
-          open={props.open}
-          onOpenChange={props.onOpenChange}
+          open={isOpen}
+          onOpenChange={handleOpenChange}
         >
           {children}
         </AlertDialogPrimitive.Root>
@@ -114,14 +137,14 @@ function ResponsiveAlertDialogContent({
       <DrawerPrimitive.Portal data-slot="drawer-portal">
         <DrawerPrimitive.Overlay
           className={cn(
-            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/15',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-53 bg-black/15',
             drawerOverlayClassName
           )}
         />
         <DrawerPrimitive.Content
           data-slot="drawer-content"
           className={cn(
-            'group/drawer-content bg-background fixed z-50 flex flex-col',
+            'group/drawer-content bg-background fixed z-54 flex flex-col',
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[20px] data-[vaul-drawer-direction=bottom]:border-t-0',
             // Height adapts to content
             'max-h-[80dvh]',
@@ -272,7 +295,7 @@ function ResponsiveAlertDialogAction({
 }: React.ComponentProps<typeof AlertDialogPrimitive.Action> & {
   drawerClassName?: string;
 }) {
-  const { isMobile, onOpenChange } = useResponsiveAlertDialog();
+  const { isMobile, setIsOpen } = useResponsiveAlertDialog();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     // 기존 onClick 핸들러 호출
@@ -280,10 +303,8 @@ function ResponsiveAlertDialogAction({
       onClick(e);
     }
 
-    // Context에서 제공된 onOpenChange 함수가 있으면 호출하여 다이얼로그 닫기
-    if (isMobile && onOpenChange) {
-      onOpenChange(false);
-    }
+    // Context에서 제공된 setIsOpen 함수 호출하여 다이얼로그 닫기
+    setIsOpen(false);
   };
 
   return isMobile ? (
@@ -312,7 +333,7 @@ function ResponsiveAlertDialogCancel({
 }: React.ComponentProps<typeof AlertDialogPrimitive.Cancel> & {
   drawerClassName?: string;
 }) {
-  const { isMobile, onOpenChange } = useResponsiveAlertDialog();
+  const { isMobile, setIsOpen } = useResponsiveAlertDialog();
 
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     // 기존 onClick 핸들러 호출
@@ -320,10 +341,8 @@ function ResponsiveAlertDialogCancel({
       onClick(e);
     }
 
-    // Context에서 제공된 onOpenChange 함수가 있으면 호출하여 다이얼로그 닫기
-    if (isMobile && onOpenChange) {
-      onOpenChange(false);
-    }
+    // Context에서 제공된 setIsOpen 함수 호출하여 다이얼로그 닫기
+    setIsOpen(false);
   };
 
   return isMobile ? (
