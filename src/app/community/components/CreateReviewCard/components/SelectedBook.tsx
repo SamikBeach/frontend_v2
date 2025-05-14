@@ -2,11 +2,11 @@ import { ReadingStatusType } from '@/apis/reading-status';
 import { SearchResult } from '@/apis/search/types';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { cn } from '@/lib/utils';
 import { ChevronDown, Star, X } from 'lucide-react';
 
@@ -117,8 +117,8 @@ export function SelectedBook({
         </div>
 
         {/* 읽기 상태 드롭다운 버튼 */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <ResponsiveDropdownMenu>
+          <ResponsiveDropdownMenuTrigger asChild>
             <Button
               variant="outline"
               className={cn(
@@ -132,10 +132,10 @@ export function SelectedBook({
               {readingStatus ? statusTexts[readingStatus] : statusTexts.NONE}
               <ChevronDown className="ml-1 h-3 w-3" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent disablePortal className="min-w-48 rounded-xl">
+          </ResponsiveDropdownMenuTrigger>
+          <ResponsiveDropdownMenuContent className="min-w-48 rounded-xl">
             {Object.values(ReadingStatusType).map(status => (
-              <DropdownMenuItem
+              <ResponsiveDropdownMenuItem
                 key={status}
                 className={cn(
                   'flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2',
@@ -145,7 +145,7 @@ export function SelectedBook({
                   status === ReadingStatusType.READING && 'hover:bg-blue-50',
                   status === ReadingStatusType.READ && 'hover:bg-green-50'
                 )}
-                onClick={() => setReadingStatus(status)}
+                onSelect={() => setReadingStatus(status)}
               >
                 <span className="text-base">{statusIcons[status]}</span>
                 <span
@@ -158,24 +158,24 @@ export function SelectedBook({
                 >
                   {statusTexts[status]}
                 </span>
-              </DropdownMenuItem>
+              </ResponsiveDropdownMenuItem>
             ))}
 
             {/* 선택 안함 옵션 */}
-            <DropdownMenuItem
+            <ResponsiveDropdownMenuItem
               key="none"
               className={cn(
                 'mt-1 flex cursor-pointer items-center gap-2 rounded-lg border-t px-3 py-2',
                 readingStatus === null ? 'bg-gray-100' : '',
                 'hover:bg-red-50'
               )}
-              onClick={() => setReadingStatus(null)}
+              onSelect={() => setReadingStatus(null)}
             >
               <span className="text-base">{statusIcons.NONE}</span>
               <span className="text-red-600">{statusTexts.NONE}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </ResponsiveDropdownMenuItem>
+          </ResponsiveDropdownMenuContent>
+        </ResponsiveDropdownMenu>
       </div>
     </div>
   );

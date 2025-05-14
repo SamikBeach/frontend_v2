@@ -31,11 +31,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { invalidateUserProfileQueries } from '@/utils/query';
@@ -287,8 +287,8 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                         </span>
                       </div>
                       {isMyComment(comment) && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                        <ResponsiveDropdownMenu>
+                          <ResponsiveDropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -296,24 +296,27 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-36">
-                            <DropdownMenuItem
+                          </ResponsiveDropdownMenuTrigger>
+                          <ResponsiveDropdownMenuContent
+                            align="end"
+                            className="w-36"
+                          >
+                            <ResponsiveDropdownMenuItem
                               className="flex cursor-pointer items-center gap-2 text-sm"
-                              onClick={() => handleStartEditComment(comment)}
+                              onSelect={() => handleStartEditComment(comment)}
                             >
                               <Pencil className="h-3.5 w-3.5" />
                               수정하기
-                            </DropdownMenuItem>
+                            </ResponsiveDropdownMenuItem>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <DropdownMenuItem
+                                <ResponsiveDropdownMenuItem
                                   className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
                                   onSelect={e => e.preventDefault()}
                                 >
                                   <Trash className="h-3.5 w-3.5 text-red-500" />
                                   삭제하기
-                                </DropdownMenuItem>
+                                </ResponsiveDropdownMenuItem>
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
@@ -336,8 +339,8 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                          </ResponsiveDropdownMenuContent>
+                        </ResponsiveDropdownMenu>
                       )}
                     </div>
                     <p className="text-[15px] leading-relaxed whitespace-pre-line text-gray-700">
@@ -631,8 +634,8 @@ function ReviewsList({
 
                     {/* 내 리뷰일 경우 액션 버튼 */}
                     {isMyReview(review) && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                      <ResponsiveDropdownMenu>
+                        <ResponsiveDropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -640,24 +643,27 @@ function ReviewsList({
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-36">
-                          <DropdownMenuItem
+                        </ResponsiveDropdownMenuTrigger>
+                        <ResponsiveDropdownMenuContent
+                          align="end"
+                          className="w-36"
+                        >
+                          <ResponsiveDropdownMenuItem
                             className="flex cursor-pointer items-center gap-2 text-sm"
-                            onClick={() => handleEditReview(review)}
+                            onSelect={() => handleEditReview(review)}
                           >
                             <Pencil className="h-3.5 w-3.5" />
                             수정하기
-                          </DropdownMenuItem>
+                          </ResponsiveDropdownMenuItem>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <DropdownMenuItem
+                              <ResponsiveDropdownMenuItem
                                 className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
                                 onSelect={e => e.preventDefault()}
                               >
                                 <Trash className="h-3.5 w-3.5 text-red-500" />
                                 삭제하기
-                              </DropdownMenuItem>
+                              </ResponsiveDropdownMenuItem>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
@@ -683,8 +689,8 @@ function ReviewsList({
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                        </ResponsiveDropdownMenuContent>
+                      </ResponsiveDropdownMenu>
                     )}
                   </div>
 
