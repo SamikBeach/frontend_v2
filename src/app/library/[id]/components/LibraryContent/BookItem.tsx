@@ -60,34 +60,21 @@ export function BookItem({
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </ResponsiveDropdownMenuTrigger>
-            <ResponsiveDropdownMenuContent
-              align="end"
-              className="w-48"
-              drawerClassName="w-full p-4 space-y-3"
-            >
+            <ResponsiveDropdownMenuContent align="end" className="w-48">
               <ResponsiveDropdownMenuSub>
-                <ResponsiveDropdownMenuSubTrigger className="flex w-full cursor-pointer items-center">
+                <ResponsiveDropdownMenuSubTrigger className="flex items-center">
                   <ExternalLink className="mr-2 h-4 w-4 flex-shrink-0" />
                   <span className="w-full text-left">다른 서재로 옮기기</span>
                 </ResponsiveDropdownMenuSubTrigger>
-                <ResponsiveDropdownMenuSubContent
-                  className="max-h-80 w-48 overflow-y-auto p-3"
-                  drawerClassName="w-full p-4 space-y-3"
-                >
+                <ResponsiveDropdownMenuSubContent className="max-h-80 w-48 overflow-y-auto">
                   {isLoadingLibraries ? (
-                    <ResponsiveDropdownMenuItem
-                      disabled
-                      className="my-2 flex w-full"
-                    >
+                    <ResponsiveDropdownMenuItem disabled>
                       <span className="w-full text-left">
                         서재 목록 불러오는 중...
                       </span>
                     </ResponsiveDropdownMenuItem>
                   ) : userLibraries.length === 0 ? (
-                    <ResponsiveDropdownMenuItem
-                      disabled
-                      className="my-2 flex w-full"
-                    >
+                    <ResponsiveDropdownMenuItem disabled>
                       <span className="w-full text-left">
                         이동할 서재가 없습니다
                       </span>
@@ -102,8 +89,6 @@ export function BookItem({
                             e.stopPropagation();
                             onMoveBook(lib.id);
                           }}
-                          className="my-1 flex w-full cursor-pointer"
-                          drawerClassName="flex w-full cursor-pointer my-2 rounded-md py-3"
                         >
                           <span className="w-full text-left">{lib.name}</span>
                         </ResponsiveDropdownMenuItem>
@@ -116,13 +101,10 @@ export function BookItem({
                   e.stopPropagation();
                   onDeleteBook();
                 }}
-                className="flex w-full cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-600"
-                drawerClassName="flex w-full cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-600 my-2 rounded-md py-3"
+                variant="destructive"
               >
-                <Trash2 className="mr-2 h-4 w-4 flex-shrink-0 text-red-600" />
-                <span className="w-full text-left text-red-600 hover:text-red-600">
-                  삭제하기
-                </span>
+                <Trash2 className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span>삭제하기</span>
               </ResponsiveDropdownMenuItem>
             </ResponsiveDropdownMenuContent>
           </ResponsiveDropdownMenu>
