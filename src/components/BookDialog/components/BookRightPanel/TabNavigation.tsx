@@ -70,8 +70,13 @@ export function TabNavigation({
         </button>
       </div>
 
-      {activeTab === 'reviews' && !isMobile && (
-        <div className="absolute -top-1 right-0">
+      {activeTab === 'reviews' && (
+        <div
+          className={cn(
+            'right-0',
+            isMobile ? 'absolute -top-0.5 right-0' : 'absolute -top-1 right-0'
+          )}
+        >
           <ErrorBoundary FallbackComponent={() => null}>
             <Suspense
               fallback={
@@ -84,8 +89,13 @@ export function TabNavigation({
         </div>
       )}
 
-      {activeTab === 'libraries' && onLibrarySortChange && !isMobile && (
-        <div className="absolute -top-1 right-0">
+      {activeTab === 'libraries' && onLibrarySortChange && (
+        <div
+          className={cn(
+            'right-0',
+            isMobile ? 'absolute -top-0.5 right-0' : 'absolute -top-1 right-0'
+          )}
+        >
           <LibrarySortDropdown
             onChange={onLibrarySortChange}
             value={librarySortValue}
