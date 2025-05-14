@@ -72,7 +72,7 @@ export function BookItem({
             <ResponsiveDropdownMenuContent align="end" className="w-48">
               <ResponsiveDropdownMenuSub>
                 <ResponsiveDropdownMenuSubTrigger>
-                  <ExternalLink className="mr-2 h-4 w-4 flex-shrink-0" />
+                  <ExternalLink className="h-4 w-4 flex-shrink-0" />
                   <span>다른 서재로 옮기기</span>
                 </ResponsiveDropdownMenuSubTrigger>
                 <ResponsiveDropdownMenuSubContent className="max-h-80 overflow-y-auto">
