@@ -3,6 +3,7 @@ import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Button } from '@/components/ui/button';
 import {
   ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuClose,
   ResponsiveDropdownMenuContent,
   ResponsiveDropdownMenuItem,
   ResponsiveDropdownMenuTrigger,
@@ -109,7 +110,7 @@ export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
             </span>
           </ResponsiveDropdownMenuItem>
 
-          <ResponsiveDropdownMenu.Close className="sm:hidden" />
+          <ResponsiveDropdownMenuClose className="sm:hidden" />
         </ResponsiveDropdownMenuContent>
       </ResponsiveDropdownMenu>
     );

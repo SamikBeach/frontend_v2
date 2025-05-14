@@ -293,8 +293,27 @@ function ResponsiveDropdownMenuClose({
   className,
   ...props
 }: React.ComponentProps<typeof DrawerPrimitive.Close>) {
+  const { isMobile } = useResponsiveDropdown();
+
+  if (isMobile) {
+    return (
+      <DrawerPrimitive.Close
+        className={cn(
+          'ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none',
+          className
+        )}
+        {...props}
+      >
+        <XIcon className="h-4 w-4" />
+        <span className="sr-only">Close</span>
+      </DrawerPrimitive.Close>
+    );
+  }
+
+  // For desktop, return a regular button that can be used outside of Drawer context
   return (
-    <DrawerPrimitive.Close
+    <button
+      type="button"
       className={cn(
         'ring-offset-background focus:ring-ring absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none',
         className
@@ -303,7 +322,7 @@ function ResponsiveDropdownMenuClose({
     >
       <XIcon className="h-4 w-4" />
       <span className="sr-only">Close</span>
-    </DrawerPrimitive.Close>
+    </button>
   );
 }
 
