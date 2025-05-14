@@ -122,13 +122,15 @@ function ResponsiveDialogContent({
   className,
   drawerClassName,
   children,
-  overlayClassName,
+  drawerOverlayClassName,
+  dialogOverlayClassName,
   hideCloseButton = false,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  overlayClassName?: string;
   hideCloseButton?: boolean;
   drawerClassName?: string;
+  drawerOverlayClassName?: string;
+  dialogOverlayClassName?: string;
 }) {
   const { isMobile } = useResponsiveDialog();
 
@@ -138,7 +140,7 @@ function ResponsiveDialogContent({
         <DrawerPrimitive.Overlay
           className={cn(
             'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-40 bg-black/15',
-            overlayClassName
+            drawerOverlayClassName
           )}
         />
         <DrawerPrimitive.Content
@@ -164,7 +166,7 @@ function ResponsiveDialogContent({
       <DialogPrimitive.Overlay
         className={cn(
           'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
-          overlayClassName
+          dialogOverlayClassName
         )}
       />
       <DialogPrimitive.Content

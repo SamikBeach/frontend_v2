@@ -5,18 +5,18 @@ import {
 } from '@/components/BookDialog/hooks/useReadingStatus';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
   ResponsiveDialog,
   ResponsiveDialogContent,
   ResponsiveDialogDescription,
   ResponsiveDialogFooter,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
+import {
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { ChevronDown, PenLine, Star, Trash2, X } from 'lucide-react';
@@ -130,7 +130,7 @@ export function ReviewDialog({
         <ResponsiveDialogContent
           className="max-w-md rounded-2xl border-none p-0"
           drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0 z-52"
-          overlayClassName="z-51"
+          drawerOverlayClassName="z-51"
         >
           <div className="sticky top-0 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
             <ResponsiveDialogTitle
@@ -205,8 +205,8 @@ export function ReviewDialog({
             {/* 생성 모드에서만 읽기 상태 선택 UI 표시 - 별점 아래로 이동 */}
             {isCreateMode && (
               <div className="mb-6">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                <ResponsiveDropdownMenu>
+                  <ResponsiveDropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
@@ -229,16 +229,16 @@ export function ReviewDialog({
                       </span>
                       <ChevronDown className="ml-auto h-4 w-4" />
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    disablePortal
+                  </ResponsiveDropdownMenuTrigger>
+                  <ResponsiveDropdownMenuContent
                     className="min-w-48 rounded-xl"
+                    drawerOverlayClassName="z-52"
                   >
                     {Object.values(ReadingStatusType).map(status => (
-                      <DropdownMenuItem
+                      <ResponsiveDropdownMenuItem
                         key={status}
                         className={cn(
-                          'flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2',
+                          'flex cursor-pointer items-center gap-2 text-sm',
                           readingStatus === status ? 'bg-gray-100' : '',
                           status === ReadingStatusType.WANT_TO_READ &&
                             'hover:bg-purple-50',
@@ -247,7 +247,7 @@ export function ReviewDialog({
                           status === ReadingStatusType.READ &&
                             'hover:bg-green-50'
                         )}
-                        onClick={() =>
+                        onSelect={() =>
                           !isSubmitting && setReadingStatus(status)
                         }
                         disabled={isSubmitting}
@@ -265,10 +265,10 @@ export function ReviewDialog({
                         >
                           {statusTexts[status]}
                         </span>
-                      </DropdownMenuItem>
+                      </ResponsiveDropdownMenuItem>
                     ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  </ResponsiveDropdownMenuContent>
+                </ResponsiveDropdownMenu>
               </div>
             )}
 

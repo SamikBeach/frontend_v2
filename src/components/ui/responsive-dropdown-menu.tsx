@@ -103,11 +103,15 @@ function ResponsiveDropdownMenuTrigger({
 function ResponsiveDropdownMenuContent({
   className,
   drawerClassName,
+  drawerOverlayClassName,
+  dialogOverlayClassName,
   children,
   sideOffset = 4,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content> & {
   drawerClassName?: string;
+  drawerOverlayClassName?: string;
+  dialogOverlayClassName?: string;
 }) {
   const { isMobile } = useResponsiveDropdown();
 
@@ -116,7 +120,8 @@ function ResponsiveDropdownMenuContent({
       <DrawerPrimitive.Portal data-slot="drawer-portal">
         <DrawerPrimitive.Overlay
           className={cn(
-            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-51 bg-black/15'
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-51 bg-black/15',
+            drawerOverlayClassName
           )}
         />
         <DrawerPrimitive.Content

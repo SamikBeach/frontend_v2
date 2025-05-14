@@ -127,7 +127,8 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
           )}
           drawerClassName="animate-expandUp gap-1 p-0 shadow-none outline-none z-[100]"
           hideCloseButton
-          overlayClassName="bg-black/5"
+          dialogOverlayClassName="bg-black/5"
+          drawerOverlayClassName="bg-black/5"
           onOpenAutoFocus={e => {
             e.preventDefault();
             setTimeout(() => {
