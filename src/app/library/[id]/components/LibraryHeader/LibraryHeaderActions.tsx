@@ -2,11 +2,11 @@ import { Library } from '@/apis/library/types';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { Bell, Edit, Eye, EyeOff, MoreHorizontal, Trash } from 'lucide-react';
 import { Dispatch, FC, SetStateAction, useState } from 'react';
 
@@ -48,8 +48,12 @@ export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
 
   if (isOwner) {
     return (
-      <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-        <DropdownMenuTrigger asChild>
+      <ResponsiveDropdownMenu
+        open={isDropdownOpen}
+        onOpenChange={setIsDropdownOpen}
+        shouldScaleBackground={false}
+      >
+        <ResponsiveDropdownMenuTrigger asChild>
           <Button
             variant="outline"
             size="icon"
@@ -57,21 +61,27 @@ export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
           >
             <MoreHorizontal className="h-5 w-5 text-gray-600" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          <DropdownMenuItem
+        </ResponsiveDropdownMenuTrigger>
+        <ResponsiveDropdownMenuContent
+          align="end"
+          className="rounded-xl shadow-lg"
+          drawerClassName="w-full rounded-t-[16px] bg-white p-4 pb-8"
+        >
+          <ResponsiveDropdownMenuItem
             onSelect={() => {
               setShowEditDialog(true);
               setIsDropdownOpen(false);
             }}
-            className="cursor-pointer"
+            className="cursor-pointer rounded-lg py-3"
+            drawerClassName="flex items-center py-3 cursor-pointer rounded-lg"
           >
             <Edit className="mr-2 h-4 w-4" />
             서재 정보 수정
-          </DropdownMenuItem>
-          <DropdownMenuItem
+          </ResponsiveDropdownMenuItem>
+          <ResponsiveDropdownMenuItem
             onSelect={handleVisibilityToggle}
-            className="cursor-pointer"
+            className="cursor-pointer rounded-lg py-3"
+            drawerClassName="flex items-center py-3 cursor-pointer rounded-lg"
           >
             {library.isPublic ? (
               <>
@@ -84,21 +94,24 @@ export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
                 공개로 변경
               </>
             )}
-          </DropdownMenuItem>
-          <DropdownMenuItem
+          </ResponsiveDropdownMenuItem>
+          <ResponsiveDropdownMenuItem
             onSelect={() => {
               setShowDeleteDialog(true);
               setIsDropdownOpen(false);
             }}
-            className="cursor-pointer text-red-600 hover:bg-red-50"
+            className="cursor-pointer rounded-lg py-3 text-red-600 hover:bg-red-50"
+            drawerClassName="flex items-center py-3 cursor-pointer rounded-lg text-red-600"
           >
             <Trash className="mr-2 h-4 w-4 text-red-600 group-hover:text-red-600" />
             <span className="text-red-600 group-hover:text-red-600">
               서재 삭제
             </span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+          </ResponsiveDropdownMenuItem>
+
+          <ResponsiveDropdownMenu.Close className="sm:hidden" />
+        </ResponsiveDropdownMenuContent>
+      </ResponsiveDropdownMenu>
     );
   }
 
