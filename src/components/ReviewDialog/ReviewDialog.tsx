@@ -126,13 +126,13 @@ export function ReviewDialog({
       <ResponsiveDialog
         open={open}
         onOpenChange={isSubmitting ? undefined : onOpenChange}
-        shouldScaleBackground={false}
       >
         <ResponsiveDialogContent
           className="max-w-md rounded-2xl border-none p-0"
-          drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0"
+          drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0 z-52"
+          overlayClassName="z-51"
         >
-          <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
+          <div className="sticky top-0 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
             <ResponsiveDialogTitle
               className="text-base font-medium"
               drawerClassName="text-base font-medium"
