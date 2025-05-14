@@ -3,16 +3,6 @@
 import { changePassword, deleteAccount } from '@/apis/auth';
 import { AuthProvider } from '@/apis/auth/types';
 import { authUtils } from '@/apis/axios';
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -22,6 +12,17 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import {
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogAction,
+  ResponsiveAlertDialogCancel,
+  ResponsiveAlertDialogContent,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogTitle,
+  ResponsiveAlertDialogTrigger,
+} from '@/components/ui/responsive-alert-dialog';
 import { useCurrentUser } from '@/hooks';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -286,23 +287,23 @@ export default function ProfileSettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AlertDialog
+          <ResponsiveAlertDialog
             open={deleteDialogOpen}
             onOpenChange={setDeleteDialogOpen}
           >
-            <AlertDialogTrigger asChild>
+            <ResponsiveAlertDialogTrigger asChild>
               <Button variant="destructive">계정 삭제</Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>
+            </ResponsiveAlertDialogTrigger>
+            <ResponsiveAlertDialogContent>
+              <ResponsiveAlertDialogHeader>
+                <ResponsiveAlertDialogTitle>
                   계정을 정말 삭제하시겠습니까?
-                </AlertDialogTitle>
-                <AlertDialogDescription>
+                </ResponsiveAlertDialogTitle>
+                <ResponsiveAlertDialogDescription>
                   이 작업은 되돌릴 수 없습니다. 계정을 삭제하면 모든 데이터가
                   영구적으로 삭제됩니다.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
+                </ResponsiveAlertDialogDescription>
+              </ResponsiveAlertDialogHeader>
               <form
                 onSubmit={accountDeleteForm.handleSubmit(onAccountDeleteSubmit)}
                 className="space-y-4"
@@ -332,19 +333,20 @@ export default function ProfileSettingsPage() {
                   </div>
                 )}
 
-                <AlertDialogFooter>
-                  <AlertDialogCancel>취소</AlertDialogCancel>
-                  <Button
+                <ResponsiveAlertDialogFooter>
+                  <ResponsiveAlertDialogCancel>
+                    취소
+                  </ResponsiveAlertDialogCancel>
+                  <ResponsiveAlertDialogAction
                     type="submit"
-                    variant="destructive"
                     disabled={isDeletingAccount}
                   >
                     {isDeletingAccount ? '삭제 중...' : '삭제'}
-                  </Button>
-                </AlertDialogFooter>
+                  </ResponsiveAlertDialogAction>
+                </ResponsiveAlertDialogFooter>
               </form>
-            </AlertDialogContent>
-          </AlertDialog>
+            </ResponsiveAlertDialogContent>
+          </ResponsiveAlertDialog>
         </CardContent>
       </Card>
     </div>
