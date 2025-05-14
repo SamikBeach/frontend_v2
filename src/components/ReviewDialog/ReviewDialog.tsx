@@ -20,6 +20,7 @@ import {
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { ChevronDown, PenLine, Star, Trash2, X } from 'lucide-react';
+import { useState } from 'react';
 import { ReviewAlertDialog } from './components/ReviewAlertDialog';
 import { useReviewDialogState } from './hooks/useReviewDialogState';
 
@@ -51,6 +52,9 @@ export function ReviewDialog({
   onCancel,
 }: ReviewDialogProps) {
   const isMobile = useIsMobile();
+  const [readingStatusDropdownOpen, setReadingStatusDropdownOpen] =
+    useState(false);
+
   const {
     rating,
     setRating,
@@ -73,6 +77,13 @@ export function ReviewDialog({
     isEditMode,
     open,
   });
+
+  const handleReadingStatusChange = (status: ReadingStatusType | null) => {
+    if (!isSubmitting) {
+      setReadingStatus(status);
+      setReadingStatusDropdownOpen(false);
+    }
+  };
 
   const handleSubmit = () => {
     // 별점이 입력되지 않은 경우 경고 표시
@@ -200,7 +211,10 @@ export function ReviewDialog({
             {/* 생성 모드에서만 읽기 상태 선택 UI 표시 - 별점 아래로 이동 */}
             {isCreateMode && (
               <div className="mb-6">
-                <ResponsiveDropdownMenu>
+                <ResponsiveDropdownMenu
+                  open={readingStatusDropdownOpen}
+                  onOpenChange={setReadingStatusDropdownOpen}
+                >
                   <ResponsiveDropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
@@ -244,9 +258,7 @@ export function ReviewDialog({
                           status === ReadingStatusType.READ &&
                             'hover:bg-green-50'
                         )}
-                        onSelect={() =>
-                          !isSubmitting && setReadingStatus(status)
-                        }
+                        onSelect={e => handleReadingStatusChange(status)}
                         disabled={isSubmitting}
                       >
                         <span className="text-base">{statusIcons[status]}</span>
@@ -273,7 +285,7 @@ export function ReviewDialog({
                         readingStatus === null ? 'bg-gray-100' : '',
                         'hover:bg-red-50'
                       )}
-                      onSelect={() => !isSubmitting && setReadingStatus(null)}
+                      onSelect={e => handleReadingStatusChange(null)}
                       disabled={isSubmitting}
                     >
                       <span className="text-base">{statusIcons['NONE']}</span>
