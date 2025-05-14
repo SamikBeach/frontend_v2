@@ -1,17 +1,28 @@
 import { ReviewUser } from '@/apis/review/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { ExtendedReviewResponseDto } from '../types';
 import { getNameInitial, renderStarRating } from '../utils';
 import { TagName } from './TagName';
@@ -35,6 +46,8 @@ export function ReviewHeader({
   onDelete,
   onUserClick,
 }: ReviewHeaderProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Check if author has profileImage property, otherwise cast to ReviewUser
   const author = review.author as ReviewUser;
   const avatarSrc = author.profileImage ?? undefined;
@@ -50,6 +63,16 @@ export function ReviewHeader({
     : review.rating && review.rating > 0
       ? review.rating
       : 0;
+
+  // 삭제 핸들러
+  const handleDeleteReview = () => {
+    setIsDeleting(true);
+    try {
+      onDelete();
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <div className="flex items-start justify-between">
@@ -101,40 +124,61 @@ export function ReviewHeader({
         </div>
       </div>
       {isAuthor && (
-        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-          <DropdownMenuTrigger asChild>
+        <ResponsiveDropdownMenu
+          open={isDropdownOpen}
+          onOpenChange={setIsDropdownOpen}
+        >
+          <ResponsiveDropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+              className="h-7 w-7 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
             >
               <MoreHorizontal className="h-4 w-4" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 rounded-xl">
-            <DropdownMenuItem
-              className="cursor-pointer rounded-lg py-2"
+          </ResponsiveDropdownMenuTrigger>
+          <ResponsiveDropdownMenuContent align="end" className="w-36">
+            <ResponsiveDropdownMenuItem
+              className="flex cursor-pointer items-center gap-2 text-sm"
               onSelect={() => {
                 onEdit();
                 setIsDropdownOpen(false);
               }}
             >
-              <Pencil className="mr-2 h-4 w-4" />
+              <Pencil className="h-3.5 w-3.5" />
               수정하기
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="cursor-pointer rounded-lg py-2 text-red-500 hover:bg-red-50 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
-              onSelect={() => {
-                onDelete();
-                setIsDropdownOpen(false);
-              }}
-            >
-              <Trash className="mr-2 h-4 w-4 text-red-500" />
-              삭제하기
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </ResponsiveDropdownMenuItem>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <ResponsiveDropdownMenuItem
+                  className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
+                  onSelect={e => e.preventDefault()}
+                >
+                  <Trash className="h-3.5 w-3.5 text-red-500" />
+                  삭제하기
+                </ResponsiveDropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>리뷰 삭제</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    이 리뷰를 정말 삭제하시겠습니까? 이 작업은 되돌릴 수
+                    없습니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleDeleteReview}
+                    className="bg-red-500 text-white hover:bg-red-600"
+                  >
+                    {isDeleting ? '삭제 중...' : '삭제'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </ResponsiveDropdownMenuContent>
+        </ResponsiveDropdownMenu>
       )}
     </div>
   );
