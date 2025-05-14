@@ -1,11 +1,11 @@
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogAction,
+  ResponsiveAlertDialogContent,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogTitle,
+} from '@/components/ui/responsive-alert-dialog';
 
 interface ConflictAlertDialogProps {
   open: boolean;
@@ -22,17 +22,19 @@ export function ConflictAlertDialog({
   libraryName,
 }: ConflictAlertDialogProps) {
   return (
-    <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent onEscapeKeyDown={() => onOpenChange(false)}>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-base font-normal text-gray-700">
+    <ResponsiveAlertDialog open={open} onOpenChange={onOpenChange}>
+      <ResponsiveAlertDialogContent onEscapeKeyDown={() => onOpenChange(false)}>
+        <ResponsiveAlertDialogHeader>
+          <ResponsiveAlertDialogTitle className="text-base font-normal text-gray-700">
             이 책은 이미 &quot;{libraryName}&quot; 서재에 담겨 있습니다.
-          </AlertDialogTitle>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogAction className="cursor-pointer">확인</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+          </ResponsiveAlertDialogTitle>
+        </ResponsiveAlertDialogHeader>
+        <ResponsiveAlertDialogFooter>
+          <ResponsiveAlertDialogAction className="cursor-pointer">
+            확인
+          </ResponsiveAlertDialogAction>
+        </ResponsiveAlertDialogFooter>
+      </ResponsiveAlertDialogContent>
+    </ResponsiveAlertDialog>
   );
 }
