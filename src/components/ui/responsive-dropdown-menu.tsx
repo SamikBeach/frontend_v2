@@ -30,9 +30,20 @@ function ResponsiveDropdownMenuRoot({
   snapPoints?: Array<number>;
 }) {
   const isMobile = useIsMobile();
+  const [internalOpen, setInternalOpen] = React.useState(false);
+
+  // open prop이 명시적으로 전달되었는지 여부 확인
+  const isControlled = open !== undefined;
+  const isOpen = isControlled ? open : internalOpen;
 
   // Create a handler for open state changes
   const handleOpenChange = (newOpen: boolean) => {
+    // 내부 상태 관리가 필요한 경우 업데이트
+    if (!isControlled) {
+      setInternalOpen(newOpen);
+    }
+
+    // 외부에서 onOpenChange가 제공된 경우 호출
     if (onOpenChange) {
       onOpenChange(newOpen);
     }
@@ -40,14 +51,14 @@ function ResponsiveDropdownMenuRoot({
 
   return (
     <ResponsiveDropdownMenuContext.Provider
-      value={{ isMobile, isOpen: open || false, setIsOpen: handleOpenChange }}
+      value={{ isMobile, isOpen: isOpen || false, setIsOpen: handleOpenChange }}
     >
       {isMobile ? (
         <DrawerPrimitive.Root
           data-slot="drawer"
           shouldScaleBackground={props.shouldScaleBackground}
           snapPoints={props.snapPoints}
-          open={open}
+          open={isOpen}
           onOpenChange={handleOpenChange}
           modal={props.modal}
         >
@@ -56,7 +67,7 @@ function ResponsiveDropdownMenuRoot({
       ) : (
         <DropdownMenuPrimitive.Root
           data-slot="dropdown-menu"
-          open={open}
+          open={isOpen}
           onOpenChange={handleOpenChange}
           modal={props.modal}
         >
@@ -179,10 +190,15 @@ function ResponsiveDropdownMenuItem({
 
   const handleClick = () => {
     if (isMobile) {
+      // onSelect 핸들러가 있으면 호출
       if (onSelect) {
         onSelect({} as any);
       }
-      setIsOpen(false);
+
+      // 드롭다운 닫기 - 약간의 지연을 줘서 액션 완료 후 닫히도록 함
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 100);
     }
   };
 

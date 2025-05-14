@@ -15,11 +15,11 @@ import React, { useMemo } from 'react';
 import { Book } from '@/apis/book/types';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 
 // API와 일치하는 타입 사용
 import { TimeRange as ApiTimeRange, TimeRangeOptions } from '@/apis/book/types';
@@ -150,8 +150,8 @@ export function SortDropdown<T = Book>({
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       {showTimeRangeFilter && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+        <ResponsiveDropdownMenu>
+          <ResponsiveDropdownMenuTrigger asChild>
             <Button variant="outline" className="h-9 border-gray-200 bg-white">
               {React.cloneElement(currentTimeRange.icon, {
                 className: 'mr-2 h-4 w-4 text-gray-500',
@@ -159,51 +159,51 @@ export function SortDropdown<T = Book>({
               <span>{currentTimeRange.label}</span>
               <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align={align} className="w-[140px]">
+          </ResponsiveDropdownMenuTrigger>
+          <ResponsiveDropdownMenuContent align={align} className="w-[140px]">
             {timeRangeOptions.map(option => (
-              <DropdownMenuItem
+              <ResponsiveDropdownMenuItem
                 key={option.id}
                 className={`flex cursor-pointer items-center ${
                   option.id === selectedTimeRange
                     ? 'bg-gray-50 font-medium text-blue-600'
                     : ''
                 }`}
-                onClick={() => onTimeRangeChange?.(option.id as TimeRange)}
+                onSelect={() => onTimeRangeChange?.(option.id as TimeRange)}
               >
                 {option.icon}
                 {option.label}
-              </DropdownMenuItem>
+              </ResponsiveDropdownMenuItem>
             ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+          </ResponsiveDropdownMenuContent>
+        </ResponsiveDropdownMenu>
       )}
 
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+      <ResponsiveDropdownMenu>
+        <ResponsiveDropdownMenuTrigger asChild>
           <Button variant="outline" className="h-9 border-gray-200 bg-white">
             {currentSortOption.icon}
             <span>{sortButtonText}</span>
             <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align={align} className="w-[180px]">
+        </ResponsiveDropdownMenuTrigger>
+        <ResponsiveDropdownMenuContent align={align} className="w-[180px]">
           {sortOptions.map(option => (
-            <DropdownMenuItem
+            <ResponsiveDropdownMenuItem
               key={option.id}
               className={`flex cursor-pointer items-center ${
                 option.id === selectedSort
                   ? 'bg-gray-50 font-medium text-blue-600'
                   : ''
               }`}
-              onClick={() => onSortChange(option.id)}
+              onSelect={() => onSortChange(option.id)}
             >
               {option.icon}
               {option.label}
-            </DropdownMenuItem>
+            </ResponsiveDropdownMenuItem>
           ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        </ResponsiveDropdownMenuContent>
+      </ResponsiveDropdownMenu>
     </div>
   );
 }
