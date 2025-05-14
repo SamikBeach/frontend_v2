@@ -3,15 +3,14 @@ import { LibraryListItem } from '@/apis/library/types';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuSub,
+  ResponsiveDropdownMenuSubContent,
+  ResponsiveDropdownMenuSubTrigger,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { ExternalLink, MoreHorizontal, Trash2 } from 'lucide-react';
 
 interface BookItemProps {
@@ -44,11 +43,11 @@ export function BookItem({
       <BookCard book={book} onClick={() => onBookClick(book)} />
       {isOwner && (
         <div className="absolute top-2 right-2 z-10">
-          <DropdownMenu
+          <ResponsiveDropdownMenu
             open={isDropdownOpen}
             onOpenChange={onDropdownOpenChange}
           >
-            <DropdownMenuTrigger asChild>
+            <ResponsiveDropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
                 size="icon"
@@ -60,60 +59,73 @@ export function BookItem({
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger className="flex w-full cursor-pointer items-center">
-                  <ExternalLink className="mr-4 h-4 w-4 flex-shrink-0" />
+            </ResponsiveDropdownMenuTrigger>
+            <ResponsiveDropdownMenuContent
+              align="end"
+              className="w-48"
+              drawerClassName="w-full p-4 space-y-3"
+            >
+              <ResponsiveDropdownMenuSub>
+                <ResponsiveDropdownMenuSubTrigger className="flex w-full cursor-pointer items-center">
+                  <ExternalLink className="mr-2 h-4 w-4 flex-shrink-0" />
                   <span className="w-full text-left">다른 서재로 옮기기</span>
-                </DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent className="max-h-80 w-48 overflow-y-auto">
-                    {isLoadingLibraries ? (
-                      <DropdownMenuItem disabled className="flex w-full">
-                        <span className="w-full text-left">
-                          서재 목록 불러오는 중...
-                        </span>
-                      </DropdownMenuItem>
-                    ) : userLibraries.length === 0 ? (
-                      <DropdownMenuItem disabled className="flex w-full">
-                        <span className="w-full text-left">
-                          이동할 서재가 없습니다
-                        </span>
-                      </DropdownMenuItem>
-                    ) : (
-                      userLibraries
-                        .filter(lib => lib.id !== libraryId) // 현재 서재 제외
-                        .map(lib => (
-                          <DropdownMenuItem
-                            key={lib.id}
-                            onClick={e => {
-                              e.stopPropagation();
-                              onMoveBook(lib.id);
-                            }}
-                            className="flex w-full cursor-pointer"
-                          >
-                            <span className="w-full text-left">{lib.name}</span>
-                          </DropdownMenuItem>
-                        ))
-                    )}
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
-              <DropdownMenuItem
+                </ResponsiveDropdownMenuSubTrigger>
+                <ResponsiveDropdownMenuSubContent
+                  className="max-h-80 w-48 overflow-y-auto p-3"
+                  drawerClassName="w-full p-4 space-y-3"
+                >
+                  {isLoadingLibraries ? (
+                    <ResponsiveDropdownMenuItem
+                      disabled
+                      className="my-2 flex w-full"
+                    >
+                      <span className="w-full text-left">
+                        서재 목록 불러오는 중...
+                      </span>
+                    </ResponsiveDropdownMenuItem>
+                  ) : userLibraries.length === 0 ? (
+                    <ResponsiveDropdownMenuItem
+                      disabled
+                      className="my-2 flex w-full"
+                    >
+                      <span className="w-full text-left">
+                        이동할 서재가 없습니다
+                      </span>
+                    </ResponsiveDropdownMenuItem>
+                  ) : (
+                    userLibraries
+                      .filter(lib => lib.id !== libraryId) // 현재 서재 제외
+                      .map(lib => (
+                        <ResponsiveDropdownMenuItem
+                          key={lib.id}
+                          onClick={e => {
+                            e.stopPropagation();
+                            onMoveBook(lib.id);
+                          }}
+                          className="my-1 flex w-full cursor-pointer"
+                          drawerClassName="flex w-full cursor-pointer my-2 rounded-md py-3"
+                        >
+                          <span className="w-full text-left">{lib.name}</span>
+                        </ResponsiveDropdownMenuItem>
+                      ))
+                  )}
+                </ResponsiveDropdownMenuSubContent>
+              </ResponsiveDropdownMenuSub>
+              <ResponsiveDropdownMenuItem
                 onClick={e => {
                   e.stopPropagation();
                   onDeleteBook();
                 }}
                 className="flex w-full cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-600"
+                drawerClassName="flex w-full cursor-pointer text-red-600 hover:bg-red-50 hover:text-red-600 my-2 rounded-md py-3"
               >
                 <Trash2 className="mr-2 h-4 w-4 flex-shrink-0 text-red-600" />
                 <span className="w-full text-left text-red-600 hover:text-red-600">
                   삭제하기
                 </span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              </ResponsiveDropdownMenuItem>
+            </ResponsiveDropdownMenuContent>
+          </ResponsiveDropdownMenu>
         </div>
       )}
     </div>

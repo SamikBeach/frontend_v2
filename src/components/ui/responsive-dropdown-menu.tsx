@@ -132,6 +132,7 @@ function ResponsiveDropdownMenuContent({
             'group/drawer-content bg-background fixed z-50 flex flex-col',
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[20px] data-[vaul-drawer-direction=bottom]:border-t-0',
             'max-h-[100dvh]',
+            'space-y-4 p-4',
             drawerClassName
           )}
           {...props}
@@ -140,7 +141,7 @@ function ResponsiveDropdownMenuContent({
             Menu
           </DrawerPrimitive.Title>
           <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
-          <div className="flex-1 overflow-auto">{children}</div>
+          <div className="flex-1 space-y-3 overflow-auto">{children}</div>
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
     );
@@ -196,7 +197,7 @@ function ResponsiveDropdownMenuItem({
       <div
         role="menuitem"
         className={cn(
-          'focus:bg-accent focus:text-accent-foreground relative flex cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
+          'focus:bg-accent focus:text-accent-foreground relative flex cursor-pointer items-center rounded-md px-4 py-3 text-sm font-medium transition-colors outline-none select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
           drawerClassName || className
         )}
         onClick={handleClick}
@@ -313,7 +314,7 @@ function ResponsiveDropdownMenuSub({
   const { isMobile } = useResponsiveDropdown();
 
   if (isMobile) {
-    return <DrawerPrimitive.Root data-slot="drawer-nested" {...props} />;
+    return <DrawerPrimitive.NestedRoot {...props} />;
   }
 
   return <DropdownMenuPrimitive.Sub {...props} />;
@@ -327,23 +328,16 @@ function ResponsiveDropdownMenuSubTrigger({
   const { isMobile } = useResponsiveDropdown();
 
   if (isMobile) {
-    // Use a div with onClick instead of DrawerPrimitive.Trigger for mobile
     return (
-      <div
-        role="button"
+      <DrawerPrimitive.Trigger
         className={cn(
-          'flex w-full cursor-pointer items-center rounded-sm px-2 py-1.5 text-sm outline-none select-none',
+          'flex w-full cursor-pointer items-center rounded-md px-4 py-3 text-sm font-medium outline-none',
           className
         )}
-        onClick={() => {
-          // You would typically trigger a drawer open here
-          // For now, we just use a div that looks like a trigger
-        }}
-        {...props}
       >
         {children}
         <ChevronRightIcon className="ml-auto h-4 w-4" />
-      </div>
+      </DrawerPrimitive.Trigger>
     );
   }
 
@@ -363,8 +357,11 @@ function ResponsiveDropdownMenuSubTrigger({
 
 function ResponsiveDropdownMenuSubContent({
   className,
+  drawerClassName,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent> & {
+  drawerClassName?: string;
+}) {
   const { isMobile } = useResponsiveDropdown();
 
   if (isMobile) {
@@ -373,8 +370,8 @@ function ResponsiveDropdownMenuSubContent({
         <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40" />
         <DrawerPrimitive.Content
           className={cn(
-            'fixed right-0 bottom-0 left-0 z-50 mt-24 flex max-h-[94%] flex-col rounded-t-[10px] bg-white',
-            className
+            'fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[94%] flex-col rounded-t-[10px] bg-white',
+            drawerClassName || className
           )}
           {...props}
         >
@@ -382,7 +379,9 @@ function ResponsiveDropdownMenuSubContent({
             Submenu
           </DrawerPrimitive.Title>
           <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
-          <div className="flex-1 overflow-auto p-4">{props.children}</div>
+          <div className="flex-1 space-y-3 overflow-auto p-4">
+            {props.children}
+          </div>
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
     );
