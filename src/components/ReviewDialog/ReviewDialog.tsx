@@ -130,7 +130,7 @@ export function ReviewDialog({
       >
         <ResponsiveDialogContent
           className="max-w-md rounded-2xl border-none p-0"
-          drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0 h-[100dvh]"
+          drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0"
         >
           <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
             <ResponsiveDialogTitle
