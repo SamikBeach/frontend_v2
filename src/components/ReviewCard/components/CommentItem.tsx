@@ -1,14 +1,24 @@
 import { updateComment } from '@/apis/review/review';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MoreHorizontal, Pencil, ThumbsUp, Trash } from 'lucide-react';
@@ -32,6 +42,7 @@ export function CommentItem({
   const [likeCount, setLikeCount] = useState(comment.likeCount || 0);
   const [highlightBg, setHighlightBg] = useState(isHighlighted);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
 
   // 하이라이트 효과 관리 - 3초 후 사라짐
@@ -95,9 +106,13 @@ export function CommentItem({
   // 댓글 삭제 핸들러
   const handleDeleteComment = () => {
     if (onDelete) {
-      onDelete(comment.id);
+      setIsDeleting(true);
+      try {
+        onDelete(comment.id);
+      } finally {
+        setIsDeleting(false);
+      }
     }
-    setIsDropdownOpen(false);
   };
 
   // 댓글 좋아요 토글 핸들러
@@ -157,37 +172,58 @@ export function CommentItem({
             </div>
 
             {isAuthor && (
-              <DropdownMenu
+              <ResponsiveDropdownMenu
                 open={isDropdownOpen}
                 onOpenChange={setIsDropdownOpen}
               >
-                <DropdownMenuTrigger asChild>
+                <ResponsiveDropdownMenuTrigger asChild>
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-6 w-6 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                    className="h-6 w-6 p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                   >
-                    <MoreHorizontal className="h-3.5 w-3.5" />
+                    <MoreHorizontal className="h-4 w-4" />
                   </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-36 rounded-xl">
-                  <DropdownMenuItem
-                    className="cursor-pointer rounded-lg py-1.5 text-xs"
+                </ResponsiveDropdownMenuTrigger>
+                <ResponsiveDropdownMenuContent align="end" className="w-36">
+                  <ResponsiveDropdownMenuItem
+                    className="flex cursor-pointer items-center gap-2 text-sm"
                     onSelect={handleEditComment}
                   >
-                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
+                    <Pencil className="h-3.5 w-3.5" />
                     수정하기
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer rounded-lg py-1.5 text-xs text-red-500 hover:bg-red-50 hover:text-red-500"
-                    onSelect={handleDeleteComment}
-                  >
-                    <Trash className="mr-1.5 h-3.5 w-3.5 text-red-500" />
-                    삭제하기
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  </ResponsiveDropdownMenuItem>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <ResponsiveDropdownMenuItem
+                        className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
+                        onSelect={e => e.preventDefault()}
+                      >
+                        <Trash className="h-3.5 w-3.5 text-red-500" />
+                        삭제하기
+                      </ResponsiveDropdownMenuItem>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>댓글 삭제</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          이 댓글을 정말 삭제하시겠습니까? 이 작업은 되돌릴 수
+                          없습니다.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>취소</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDeleteComment}
+                          className="bg-red-500 text-white hover:bg-red-600"
+                        >
+                          {isDeleting ? '삭제 중...' : '삭제'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </ResponsiveDropdownMenuContent>
+              </ResponsiveDropdownMenu>
             )}
           </div>
 
