@@ -13,14 +13,13 @@ import {
   discoverSubcategoryFilterAtom,
   discoverTimeRangeAtom,
 } from '@/atoms/discover';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
 import { useSetAtom } from 'jotai';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import {
   AdminBookManageButton,
   BooksContent,
@@ -69,28 +68,12 @@ const noScrollbarStyles = `
 
 // 책 컨텐츠 로딩 스켈레톤
 function BooksLoading() {
-  const isMobile = useIsMobile();
-
   return (
-    <div
-      className={`grid gap-4 ${
-        isMobile
-          ? 'grid-cols-2'
-          : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6'
-      }`}
-    >
-      {[...Array(12)].map((_, i) => (
-        <div key={i} className="flex flex-col gap-2">
-          <Skeleton className="aspect-[3/4] w-full rounded-lg" />
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-3 w-1/2" />
-        </div>
-      ))}
+    <div className="flex h-[calc(100vh-250px)] w-full items-center justify-center">
+      <LoadingSpinner />
     </div>
   );
 }
-
-// 카테고리 필터 로딩 스켈레톤 컴포넌트 제거 - 이제 CategoryFilter에서 import함
 
 // 기본값 상수 정의
 const DEFAULT_CATEGORY = 'all';
@@ -99,7 +82,6 @@ const DEFAULT_SORT = PopularBooksSortOptions.RATING_DESC;
 const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
 
 export default function DiscoverPage() {
-  const isMobile = useIsMobile();
   const searchParams = useSearchParams();
   const { updateQueryParams, clearQueryParams } = useQueryParams();
 
@@ -144,37 +126,34 @@ export default function DiscoverPage() {
   ]);
 
   return (
-    <div className="bg-white pb-6">
+    <div className="w-full bg-white pb-1">
       {/* CSS 스타일 추가 */}
       <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
 
-      {/* 브레드크럼 */}
-      <div className="mx-auto w-full px-4 py-2">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <Suspense fallback={<div className="h-6" />}>
-              <DiscoverBreadcrumb />
-            </Suspense>
-          </div>
-
-          {/* 관리자 버튼 */}
-          <AdminBookManageButton />
-        </div>
-      </div>
-
-      {/* 필터 영역 - 스크롤 시 상단에 고정 */}
-      <div className={`sticky top-[56px] z-30 bg-white`}>
-        {/* 카테고리 필터와 정렬 옵션 */}
-        <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} py-2`}>
-          <div className="relative">
-            {/* xl 이상 화면에서 보이는 정렬 버튼 - 오른쪽에 배치하지만 카테고리 필터와 겹치지 않도록 함 */}
-            <div className="mb-2 flex items-start justify-between">
+      {/* 필터 영역 및 브레드크럼 - 스크롤 시 상단에 고정 */}
+      <div className={`sticky top-[56px] z-30 w-full bg-white`}>
+        {/* 브레드크럼 */}
+        <div className="mx-auto w-full px-2 py-2 sm:px-4 sm:py-2 sm:pt-4">
+          <Suspense fallback={<div className="h-5 md:h-6" />}>
+            <div className="flex items-center justify-between">
               <div className="flex-1">
-                {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
-                <Suspense fallback={<CategoryFilterSkeleton />}>
-                  <CategoryFilter className="w-full" />
-                </Suspense>
+                <DiscoverBreadcrumb />
               </div>
+              {/* 관리자 버튼 */}
+              <AdminBookManageButton />
+            </div>
+          </Suspense>
+        </div>
+
+        {/* 카테고리 필터와 정렬 옵션 */}
+        <div className="mx-auto w-full px-1 py-0.5 sm:px-4 sm:py-1">
+          <div className="relative w-full">
+            {/* 정렬 버튼과 카테고리 필터 배치 */}
+            <div className="flex w-full items-start justify-between">
+              {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
+              <Suspense fallback={<CategoryFilterSkeleton />}>
+                <CategoryFilter className="w-full max-w-[calc(100vw-24px)]" />
+              </Suspense>
               <div className="ml-4 hidden flex-shrink-0 xl:block">
                 <DiscoverSortDropdown />
               </div>
@@ -189,7 +168,7 @@ export default function DiscoverPage() {
       </div>
 
       {/* 도서 목록 - 로딩 상태일 때 스켈레톤 표시 */}
-      <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} pt-4`}>
+      <div className="mx-auto w-full px-1 pt-1 sm:px-4">
         <Suspense fallback={<BooksLoading />}>
           <BooksContent />
         </Suspense>

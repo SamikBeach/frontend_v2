@@ -1,94 +1,37 @@
-import {
-  SortOption as ApiSortOption,
-  PopularBooksSortOptions,
-  TimeRangeOptions,
-} from '@/apis/book/types';
+import { PopularBooksSortOptions, TimeRangeOptions } from '@/apis/book/types';
 import {
   discoverSortOptionAtom,
   discoverTimeRangeAtom,
 } from '@/atoms/discover';
-import {
-  SortDropdown,
-  TimeRange as SortTimeRange,
-} from '@/components/SortDropdown';
+import { SortDropdown, TimeRange } from '@/components/SortDropdown';
 import { useQueryParams } from '@/hooks';
 import { useAtom } from 'jotai';
-import { BarChart3, Bookmark, ClockIcon, Star } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 // 기본값 상수 정의
 const DEFAULT_SORT = PopularBooksSortOptions.RATING_DESC;
 const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
-
-// 정렬 옵션 타입
-export interface SortOption {
-  id: string;
-  label: string;
-  value: ApiSortOption;
-  icon: React.ReactNode;
-  supportsTimeRange?: boolean;
-}
-
-// 기간 필터 타입
-export type TimeRange = 'all' | 'month' | 'year';
-
-// 정렬 옵션 정의
-const sortOptions: SortOption[] = [
-  {
-    id: 'reviews',
-    label: '리뷰 많은 순',
-    value: PopularBooksSortOptions.REVIEWS_DESC,
-    icon: <BarChart3 className="h-4 w-4" />,
-    supportsTimeRange: true,
-  },
-  {
-    id: 'rating',
-    label: '평점 높은 순',
-    value: PopularBooksSortOptions.RATING_DESC,
-    icon: <Star className="h-4 w-4" />,
-    supportsTimeRange: true,
-  },
-  {
-    id: 'library',
-    label: '서재에 많이담긴 순',
-    value: PopularBooksSortOptions.LIBRARY_COUNT_DESC,
-    icon: <Bookmark className="h-4 w-4" />,
-    supportsTimeRange: true,
-  },
-  {
-    id: 'latest',
-    label: '최신 출간 순',
-    value: PopularBooksSortOptions.PUBLISH_DATE_DESC,
-    icon: <ClockIcon className="h-4 w-4" />,
-    supportsTimeRange: false,
-  },
-];
-
-// 기간 필터 옵션 정의
-const timeRangeOptions = [
-  { id: 'all', label: '전체 기간', value: TimeRangeOptions.ALL },
-  { id: 'month', label: '최근 1개월', value: TimeRangeOptions.MONTH },
-  { id: 'year', label: '최근 1년', value: TimeRangeOptions.YEAR },
-];
 
 interface DiscoverSortDropdownProps {
   className?: string;
 }
 
 export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
-  const [isOpen, setIsOpen] = useState(false);
   const [sortOption, setSortOption] = useAtom(discoverSortOptionAtom);
   const [timeRange, setTimeRange] = useAtom(discoverTimeRangeAtom);
-  const [displaySortLabel, setDisplaySortLabel] = useState('정렬');
   const { updateQueryParams } = useQueryParams();
 
-  // 정렬 옵션이 변경되면 표시 레이블 업데이트
-  useEffect(() => {
-    const option = sortOptions.find(opt => opt.value === sortOption);
-    setDisplaySortLabel(option?.label || '정렬');
+  // 정렬 옵션에 따라 TimeRange 필터 표시 여부 결정
+  const showTimeRangeFilter = useMemo(() => {
+    // 평점 높은순, 리뷰 많은순, 서재에 많이 담긴 순에서만 시간 필터 표시
+    return [
+      PopularBooksSortOptions.RATING_DESC,
+      PopularBooksSortOptions.REVIEWS_DESC,
+      PopularBooksSortOptions.LIBRARY_COUNT_DESC,
+      'library-adds-desc', // 기존 호환성을 위해 유지
+    ].includes(sortOption as any);
   }, [sortOption]);
 
-  // 정렬 옵션 변경 핸들러
   const handleSortChange = (sort: string) => {
     if (
       sort === PopularBooksSortOptions.RATING_DESC ||
@@ -109,8 +52,7 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
     }
   };
 
-  // 기간 필터 변경 핸들러
-  const handleTimeRangeChange = (range: SortTimeRange) => {
+  const handleTimeRangeChange = (range: TimeRange) => {
     if (
       range === TimeRangeOptions.ALL ||
       range === TimeRangeOptions.MONTH ||
@@ -128,7 +70,7 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
         updateQueryParams({ timeRange: undefined });
       }
     } else {
-      setTimeRange(TimeRangeOptions.ALL);
+      setTimeRange(DEFAULT_TIME_RANGE);
       // 기본값으로 설정된 경우 URL에서 제거
       updateQueryParams({ timeRange: undefined });
     }
@@ -139,7 +81,9 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
       selectedSort={sortOption}
       onSortChange={handleSortChange}
       selectedTimeRange={timeRange}
-      onTimeRangeChange={handleTimeRangeChange}
+      onTimeRangeChange={
+        showTimeRangeFilter ? handleTimeRangeChange : undefined
+      }
       className={className}
     />
   );

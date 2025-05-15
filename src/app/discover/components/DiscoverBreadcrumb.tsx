@@ -43,7 +43,7 @@ export function DiscoverBreadcrumb() {
   };
 
   return (
-    <div className="flex items-center text-[14px] text-gray-500">
+    <div className="flex items-center text-[12px] text-gray-500 md:text-[14px]">
       <Link
         href="/discover"
         onClick={e => {
@@ -60,7 +60,7 @@ export function DiscoverBreadcrumb() {
       </Link>
       {selectedCategory !== 'all' && (
         <>
-          <ChevronRight className="mx-1 h-4 w-4" />
+          <ChevronRight className="mx-1 h-3 w-3 md:h-4 md:w-4" />
           <Link
             href={`/discover?category=${selectedCategory}`}
             onClick={e => {
@@ -79,7 +79,7 @@ export function DiscoverBreadcrumb() {
       )}
       {selectedSubcategory !== 'all' && (
         <>
-          <ChevronRight className="mx-1 h-4 w-4" />
+          <ChevronRight className="mx-1 h-3 w-3 md:h-4 md:w-4" />
           <span className="font-medium text-gray-900">
             {
               currentCategory?.subCategories.find(
