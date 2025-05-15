@@ -8,6 +8,7 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { useSearchParams } from 'next/navigation';
@@ -33,6 +34,7 @@ import { formatDate } from './utils';
 export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
   // Cast to our extended type
   const extendedReview = review as ExtendedReviewResponseDto;
+  const isMobile = useIsMobile();
 
   // 검색 파라미터에서 commentId 가져오기 (알림으로부터 이동한 경우)
   const searchParams = useSearchParams();
@@ -417,10 +419,15 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
     };
   };
 
+  // 모바일 및 데스크톱 환경에 따른 패딩 조정
+  const cardHeaderPadding = isMobile ? 'p-3 pb-2' : 'p-5 pb-3';
+  const cardContentPadding = isMobile ? 'px-3 pt-0 pb-3' : 'px-5 pt-0 pb-4';
+  const cardFooterPadding = isMobile ? 'px-3 py-2 gap-3' : 'px-5 py-3 gap-4';
+
   return (
     <>
       <Card className="w-full overflow-hidden border-gray-200 shadow-none">
-        <CardHeader className="p-5 pb-3">
+        <CardHeader className={cardHeaderPadding}>
           <ReviewHeader
             review={extendedReview}
             isAuthor={isAuthor}
@@ -430,7 +437,7 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
             onDelete={() => reviewState.setDeleteDialogOpen(true)}
           />
         </CardHeader>
-        <CardContent className="space-y-4 px-5 pt-0 pb-4">
+        <CardContent className={`space-y-3 ${cardContentPadding}`}>
           <ReviewContent
             review={extendedReview}
             isEditMode={reviewState.isEditMode}
@@ -455,7 +462,7 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
         <Separator className="bg-gray-100" />
         {!reviewState.isEditMode &&
           extendedReview.activityType !== 'rating' && (
-            <CardFooter className="flex flex-col gap-4 px-5 py-3">
+            <CardFooter className={`flex flex-col ${cardFooterPadding}`}>
               <ReviewActions
                 isLiked={reviewState.isLiked || false}
                 likesCount={reviewState.likeCount || 0}
@@ -504,25 +511,34 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
         message={reviewState.alertMessage}
       />
 
-      {/* 책 선택 다이얼로그 */}
-      <AddBookDialog
-        isOpen={reviewState.bookDialogOpen}
-        onOpenChange={reviewState.setBookDialogOpen}
-        libraryId={0} // Dummy value since we're just using for book selection
-        onBookSelect={reviewState.handleBookSelect}
-      />
-
-      {/* 리뷰 편집 다이얼로그 */}
+      {/* 리뷰 다이얼로그 */}
       <ReviewDialog
         open={reviewState.reviewDialogOpen}
         onOpenChange={reviewState.setReviewDialogOpen}
-        bookTitle={reviewState.selectedBook?.title || '리뷰 수정'}
-        initialRating={reviewState.editedRating}
-        initialContent={reviewState.editedContent}
+        bookTitle={
+          reviewState.selectedBook?.title ||
+          (review.books && review.books[0]
+            ? (review.books[0] as any).title
+            : '')
+        }
+        initialRating={
+          extendedReview.rating ||
+          (extendedReview.userRating
+            ? (extendedReview.userRating.rating as number)
+            : 0)
+        }
+        initialContent={extendedReview.content}
         isEditMode={true}
-        isSubmitting={reviewState.isSubmitting}
         onSubmit={handleReviewDialogSubmit}
-        onCancel={() => reviewState.setReviewDialogOpen(false)}
+        isSubmitting={reviewState.isSubmitting}
+      />
+
+      {/* 책 선택 대화상자 */}
+      <AddBookDialog
+        isOpen={reviewState.bookDialogOpen}
+        onOpenChange={reviewState.setBookDialogOpen}
+        libraryId={0}
+        onBookSelect={reviewState.handleBookSelect}
       />
 
       {/* 로그인 다이얼로그 */}

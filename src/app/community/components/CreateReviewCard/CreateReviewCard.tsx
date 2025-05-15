@@ -11,6 +11,7 @@ import {
   ResponsiveAlertDialogHeader,
   ResponsiveAlertDialogTitle,
 } from '@/components/ui/responsive-alert-dialog';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useCreateReview } from '../../hooks';
@@ -34,6 +35,7 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
   const typeFilter = useAtomValue(communityTypeFilterAtom);
+  const isMobile = useIsMobile();
 
   const {
     content,
@@ -114,11 +116,14 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
     }
   };
 
+  // 모바일 환경에 맞는 패딩 값 설정
+  const cardPadding = isMobile ? 'p-3' : 'p-4';
+
   return (
     <>
-      <Card className="mb-6 overflow-hidden border-gray-200 bg-white shadow-none">
-        <CardContent className="space-y-3 p-4">
-          <div className="flex items-start gap-3">
+      <Card className="mb-4 overflow-hidden border-gray-200 bg-white shadow-none">
+        <CardContent className={`space-y-3 ${cardPadding}`}>
+          <div className="flex items-start gap-2.5">
             <UserAvatar user={user} />
             <div className="flex-1">
               <ReviewForm
@@ -129,6 +134,7 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
                 handleBookDialogOpen={handleBookDialogOpen}
                 handleSubmitReview={handleSubmitReview}
                 isLoading={isLoading}
+                isMobile={isMobile}
               >
                 {/* 선택된 책 정보 및 별점 표시 (리뷰 태그인 경우) */}
                 {type === 'review' && selectedBook && (
@@ -139,6 +145,7 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
                     handleRemoveSelectedBook={handleRemoveSelectedBook}
                     readingStatus={readingStatus}
                     setReadingStatus={setReadingStatus}
+                    isMobile={isMobile}
                   />
                 )}
               </ReviewForm>

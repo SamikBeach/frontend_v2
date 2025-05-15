@@ -33,6 +33,7 @@ interface SelectedBookProps {
   handleRemoveSelectedBook: () => void;
   readingStatus: ReadingStatusType | null;
   setReadingStatus: (status: ReadingStatusType | null) => void;
+  isMobile?: boolean;
 }
 
 export function SelectedBook({
@@ -42,6 +43,7 @@ export function SelectedBook({
   handleRemoveSelectedBook,
   readingStatus,
   setReadingStatus,
+  isMobile = false,
 }: SelectedBookProps) {
   // 읽기 상태별 스타일 반환
   const getReadingStatusStyle = (status: ReadingStatusType | null) => {
@@ -61,13 +63,29 @@ export function SelectedBook({
     }
   };
 
+  // 모바일 환경에 따른 스타일 및 크기 조정
+  const containerSpacing = isMobile
+    ? 'mt-2 mb-2 space-y-2'
+    : 'mt-3 mb-3 space-y-3';
+  const bookPadding = isMobile ? 'p-2.5' : 'p-3';
+  const bookImageSize = isMobile ? 'h-14 w-10' : 'h-16 w-12';
+  const buttonSize = isMobile ? 'h-6 w-6' : 'h-7 w-7';
+  const statusButtonHeight = isMobile ? 'h-7' : 'h-8';
+  const statusButtonFontSize = isMobile ? 'text-[10px]' : 'text-xs';
+  const starSize = isMobile ? 'h-4 w-4' : 'h-5 w-5';
+  const ratingTextSize = isMobile ? 'text-xs' : 'text-sm';
+  const gapSize = isMobile ? 'gap-2' : 'gap-3';
+  const paddingX = isMobile ? 'px-1.5' : 'px-2';
+
   return (
-    <div className="mt-3 mb-3 space-y-3">
-      <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-3">
+    <div className={containerSpacing}>
+      <div
+        className={`flex items-center rounded-lg border border-gray-200 bg-gray-50 ${bookPadding}`}
+      >
         <img
           src={selectedBook.image || selectedBook.coverImage}
           alt={selectedBook.title}
-          className="h-16 w-12 rounded object-cover"
+          className={`${bookImageSize} rounded object-cover`}
         />
         <div className="ml-3 flex-1">
           <div className="flex items-center justify-between">
@@ -75,7 +93,7 @@ export function SelectedBook({
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 rounded-full p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              className={`${buttonSize} rounded-full p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600`}
               onClick={handleRemoveSelectedBook}
             >
               <X className="h-4 w-4" />
@@ -85,14 +103,14 @@ export function SelectedBook({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 px-2">
+      <div className={`flex flex-wrap items-center ${gapSize} ${paddingX}`}>
         <div className="flex flex-grow items-center">
           <span className="mr-1 text-sm font-medium text-gray-700">별점:</span>
           <div className="flex">
             {[1, 2, 3, 4, 5].map(star => (
               <Star
                 key={star}
-                className={`h-5 w-5 cursor-pointer ${
+                className={`${starSize} cursor-pointer ${
                   star <= rating
                     ? 'fill-yellow-400 text-yellow-400'
                     : 'fill-gray-200 text-gray-200'
@@ -102,7 +120,7 @@ export function SelectedBook({
             ))}
           </div>
           {rating > 0 && (
-            <span className="ml-2 text-sm text-gray-500">
+            <span className={`ml-2 ${ratingTextSize} text-gray-500`}>
               {rating === 1
                 ? '별로예요'
                 : rating === 2
@@ -122,7 +140,7 @@ export function SelectedBook({
             <Button
               variant="outline"
               className={cn(
-                'h-8 rounded-full border-gray-300 px-3 text-xs',
+                `${statusButtonHeight} rounded-full border-gray-300 px-3 ${statusButtonFontSize}`,
                 getReadingStatusStyle(readingStatus)
               )}
             >

@@ -25,6 +25,7 @@ interface CommentSectionProps {
     isLiked: boolean
   ) => Promise<void>;
   highlightedCommentId?: number | null;
+  isMobile?: boolean;
 }
 
 export function CommentSection({
@@ -38,12 +39,29 @@ export function CommentSection({
   handleDeleteComment,
   handleCommentLikeToggle,
   highlightedCommentId,
+  isMobile = false,
 }: CommentSectionProps) {
+  // 모바일 환경에 따른 스타일 및 크기 조정
+  const avatarSize = isMobile ? 'h-6 w-6' : 'h-7 w-7';
+  const inputHeight = isMobile ? 'h-8' : 'h-9';
+  const inputRadius = isMobile ? 'rounded-lg' : 'rounded-xl';
+  const buttonSize = isMobile ? 'h-8 w-8' : 'h-9 w-9';
+  const buttonRadius = isMobile ? 'rounded-lg' : 'rounded-xl';
+  const iconSize = isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4';
+  const commentSpacing = isMobile ? 'space-y-2.5 pl-7' : 'space-y-3 pl-9';
+  const emptyStateIconSize = isMobile ? 'h-10 w-10' : 'h-12 w-12';
+  const emptyStatePadding = isMobile ? 'px-3 py-5' : 'px-4 py-6';
+  const emptyStateButtonHeight = isMobile ? 'h-7' : 'h-8';
+  const emptyStateIconMargin = isMobile ? 'mb-2' : 'mb-3';
+  const emptyStateButtonIconSize = isMobile ? 'h-3 w-3' : 'h-3.5 w-3.5';
+  const sectionSpacing = isMobile ? 'space-y-2.5' : 'space-y-3';
+  const inputGap = isMobile ? 'gap-1.5' : 'gap-2';
+
   return (
-    <div className="w-full space-y-3">
+    <div className={`w-full ${sectionSpacing}`}>
       {/* 댓글 입력 */}
       <div className="flex w-full gap-2">
-        <Avatar className="mt-1 h-7 w-7 flex-shrink-0">
+        <Avatar className={`mt-1 ${avatarSize} flex-shrink-0`}>
           {currentUser.avatar && (
             <AvatarImage
               src={currentUser.avatar}
@@ -56,13 +74,13 @@ export function CommentSection({
           </AvatarFallback>
         </Avatar>
         <div className="w-full flex-1">
-          <div className="flex w-full gap-2">
+          <div className={`flex w-full ${inputGap}`}>
             <div className="flex-1">
               <Input
                 placeholder="댓글을 입력하세요..."
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
-                className="h-9 w-full flex-1 rounded-xl border-gray-200 bg-gray-50 text-sm shadow-none"
+                className={`${inputHeight} w-full flex-1 ${inputRadius} border-gray-200 bg-gray-50 text-sm shadow-none`}
                 disabled={isCommentLoading}
                 onKeyDown={e => {
                   // Cmd+Enter(Mac) 또는 Ctrl+Enter(Windows)로 댓글 제출
@@ -77,11 +95,11 @@ export function CommentSection({
             </div>
             <Button
               size="icon"
-              className="h-9 w-9 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+              className={`${buttonSize} ${buttonRadius} bg-gray-900 text-white hover:bg-gray-800`}
               onClick={handleSubmitComment}
               disabled={!commentText.trim() || isCommentLoading}
             >
-              <SendHorizontal className="h-4 w-4" />
+              <SendHorizontal className={iconSize} />
             </Button>
           </div>
         </div>
@@ -94,7 +112,7 @@ export function CommentSection({
           <p className="mt-3 text-xs text-gray-500">댓글을 불러오는 중...</p>
         </div>
       ) : comments && comments.length > 0 ? (
-        <div className="w-full space-y-3 pl-9">
+        <div className={`w-full ${commentSpacing}`}>
           {comments.map(comment => (
             <CommentItem
               key={comment.id}
@@ -110,12 +128,17 @@ export function CommentSection({
               onDelete={handleDeleteComment}
               onLike={handleCommentLikeToggle}
               isHighlighted={highlightedCommentId === comment.id}
+              isMobile={isMobile}
             />
           ))}
         </div>
       ) : (
-        <div className="my-2 flex flex-col items-center justify-center rounded-xl bg-gray-50 px-4 py-6 text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+        <div
+          className={`my-2 flex flex-col items-center justify-center rounded-xl bg-gray-50 ${emptyStatePadding} text-center`}
+        >
+          <div
+            className={`${emptyStateIconMargin} flex ${emptyStateIconSize} items-center justify-center rounded-full bg-gray-100`}
+          >
             <MessageCircle className="h-6 w-6 text-gray-400" />
           </div>
           <h4 className="text-sm font-medium text-gray-800">
@@ -126,7 +149,7 @@ export function CommentSection({
           </p>
           <Button
             variant="outline"
-            className="mt-4 h-8 rounded-full border-gray-300 bg-white px-4 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+            className={`mt-4 ${emptyStateButtonHeight} rounded-full border-gray-300 bg-white px-4 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100`}
             onClick={() => {
               // 댓글 입력창에 포커스
               const commentInput = document.querySelector(
@@ -135,7 +158,7 @@ export function CommentSection({
               if (commentInput) commentInput.focus();
             }}
           >
-            <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
+            <MessageCircle className={`mr-1.5 ${emptyStateButtonIconSize}`} />
             댓글 작성하기
           </Button>
         </div>

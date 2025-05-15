@@ -19,6 +19,7 @@ interface ReviewFormProps {
   handleBookDialogOpen: () => void;
   handleSubmitReview: () => Promise<void>;
   isLoading: boolean;
+  isMobile?: boolean;
   children?: ReactNode;
 }
 
@@ -30,6 +31,7 @@ export function ReviewForm({
   handleBookDialogOpen,
   handleSubmitReview,
   isLoading,
+  isMobile = false,
   children,
 }: ReviewFormProps) {
   // 태그 변경 핸들러
@@ -63,11 +65,21 @@ export function ReviewForm({
     };
   }, [type]);
 
+  // 모바일 환경에 따른 버튼 크기 및 텍스트 조정
+  const buttonHeight = isMobile ? 'h-8' : 'h-9';
+  const buttonRadius = isMobile ? 'rounded-lg' : 'rounded-xl';
+  const selectWidth = isMobile ? 'w-[120px]' : 'w-[130px]';
+  const textareaHeight = isMobile ? 'min-h-[90px]' : 'min-h-[100px]';
+  const selectTriggerHeight = isMobile ? 'h-8' : 'h-9';
+  const selectTriggerRadius = isMobile ? 'rounded-lg' : 'rounded-xl';
+  const buttonPadding = isMobile ? 'px-3' : 'px-4';
+  const iconSize = isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4';
+
   return (
     <>
       <Textarea
         placeholder="어떤 책에 대해 이야기하고 싶으신가요?"
-        className="min-h-[100px] resize-none rounded-xl border-gray-200 bg-[#F9FAFB] text-[15px]"
+        className={`${textareaHeight} resize-none rounded-xl border-gray-200 bg-[#F9FAFB] text-[15px]`}
         value={content}
         onChange={e => setContent(e.target.value)}
       />
@@ -75,9 +87,13 @@ export function ReviewForm({
       {/* 선택된 책 정보 및 별점/읽기 상태 표시 (children으로 받음) */}
       {children}
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
+      <div
+        className={`mt-${isMobile ? '2' : '3'} flex flex-wrap items-center gap-${isMobile ? '1.5' : '2'}`}
+      >
         <ResponsiveSelect value={type} onValueChange={handleTypeChange}>
-          <ResponsiveSelectTrigger className="h-9 w-[130px] cursor-pointer rounded-xl border-gray-200 bg-white font-medium text-gray-700">
+          <ResponsiveSelectTrigger
+            className={`${selectTriggerHeight} ${selectWidth} cursor-pointer ${selectTriggerRadius} border-gray-200 bg-white font-medium text-gray-700`}
+          >
             <div className="flex items-center">
               <span
                 className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
@@ -153,19 +169,19 @@ export function ReviewForm({
         <Button
           variant="outline"
           size="sm"
-          className="h-9 rounded-xl border-gray-200 bg-white font-medium text-gray-700"
+          className={`${buttonHeight} ${buttonRadius} border-gray-200 bg-white font-medium text-gray-700`}
           onClick={handleBookDialogOpen}
           disabled={type !== 'review'}
         >
-          <BookOpen className="mr-1.5 h-4 w-4 text-gray-500" />책 추가
+          <BookOpen className={`mr-1.5 ${iconSize} text-gray-500`} />책 추가
         </Button>
 
         <Button
-          className="ml-auto h-9 rounded-xl bg-gray-900 px-4 font-medium text-white hover:bg-gray-800"
+          className={`ml-auto ${buttonHeight} ${buttonRadius} bg-gray-900 ${buttonPadding} font-medium text-white hover:bg-gray-800`}
           onClick={handleSubmitReview}
           disabled={!content.trim() || isLoading}
         >
-          <SendHorizontal className="mr-1.5 h-4 w-4" />
+          <SendHorizontal className={`mr-1.5 ${iconSize}`} />
           제출하기
         </Button>
       </div>
