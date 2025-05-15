@@ -95,7 +95,7 @@ export function CommentSection({
             </div>
             <Button
               size="icon"
-              className={`${buttonSize} ${buttonRadius} bg-gray-900 text-white hover:bg-gray-800`}
+              className={`${buttonSize} ${buttonRadius} cursor-pointer bg-gray-900 text-white hover:bg-gray-800`}
               onClick={handleSubmitComment}
               disabled={!commentText.trim() || isCommentLoading}
             >
@@ -149,7 +149,7 @@ export function CommentSection({
           </p>
           <Button
             variant="outline"
-            className={`mt-4 ${emptyStateButtonHeight} rounded-full border-gray-300 bg-white px-4 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100`}
+            className={`mt-4 ${emptyStateButtonHeight} cursor-pointer rounded-full border-gray-300 bg-white px-4 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100`}
             onClick={() => {
               // 댓글 입력창에 포커스
               const commentInput = document.querySelector(

@@ -194,14 +194,14 @@ export function CommentItem({
                 <Button
                   variant="outline"
                   size="sm"
-                  className={`${buttonHeight} rounded-full ${buttonPadding} py-1 text-xs`}
+                  className={`${buttonHeight} cursor-pointer rounded-full ${buttonPadding} py-1 text-xs`}
                   onClick={handleCancelEdit}
                 >
                   취소
                 </Button>
                 <Button
                   size="sm"
-                  className={`${buttonHeight} rounded-full bg-gray-900 ${buttonPadding} py-1 text-xs text-white hover:bg-gray-800`}
+                  className={`${buttonHeight} cursor-pointer rounded-full bg-gray-900 ${buttonPadding} py-1 text-xs text-white hover:bg-gray-800`}
                   onClick={handleSaveEdit}
                   disabled={!editedContent.trim()}
                 >

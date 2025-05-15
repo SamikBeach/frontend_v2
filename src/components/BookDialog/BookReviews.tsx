@@ -292,7 +292,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6 p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                              className="h-6 w-6 cursor-pointer p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
@@ -786,7 +786,7 @@ function ReviewsList({
         <div className="mt-6 flex justify-center">
           <Button
             variant="outline"
-            className="rounded-full text-sm font-medium"
+            className="cursor-pointer rounded-full text-sm font-medium"
             onClick={handleLoadMore}
             disabled={isFetchingNextPage}
           >

@@ -29,7 +29,7 @@ export function ReviewHeaderDropdown({
         <Button
           variant="ghost"
           size="icon"
-          className="h-7 w-7 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+          className="h-7 w-7 cursor-pointer p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>

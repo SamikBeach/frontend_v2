@@ -42,7 +42,7 @@ export function CommentItemDropdown({
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6 p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          className="h-6 w-6 cursor-pointer p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
         >
           <MoreHorizontal className="h-4 w-4" />
         </Button>
