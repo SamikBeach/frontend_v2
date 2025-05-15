@@ -8,7 +8,6 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { useSearchParams } from 'next/navigation';
@@ -34,7 +33,6 @@ import { formatDate } from './utils';
 export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
   // Cast to our extended type
   const extendedReview = review as ExtendedReviewResponseDto;
-  const isMobile = useIsMobile();
 
   // 검색 파라미터에서 commentId 가져오기 (알림으로부터 이동한 경우)
   const searchParams = useSearchParams();
@@ -419,15 +417,10 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
     };
   };
 
-  // 모바일 및 데스크톱 환경에 따른 패딩 조정
-  const cardHeaderPadding = isMobile ? 'p-3 pb-2' : 'p-5 pb-3';
-  const cardContentPadding = isMobile ? 'px-3 pt-0 pb-3' : 'px-5 pt-0 pb-4';
-  const cardFooterPadding = isMobile ? 'px-3 py-2 gap-3' : 'px-5 py-3 gap-4';
-
   return (
     <>
       <Card className="w-full overflow-hidden border-gray-200 shadow-none">
-        <CardHeader className={cardHeaderPadding}>
+        <CardHeader className="p-5 pb-3 sm:p-3 sm:pb-2">
           <ReviewHeader
             review={extendedReview}
             isAuthor={isAuthor}
@@ -437,7 +430,7 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
             onDelete={() => reviewState.setDeleteDialogOpen(true)}
           />
         </CardHeader>
-        <CardContent className={`space-y-3 ${cardContentPadding}`}>
+        <CardContent className="space-y-3 px-5 pt-0 pb-4 sm:px-3 sm:pb-3">
           <ReviewContent
             review={extendedReview}
             isEditMode={reviewState.isEditMode}
@@ -462,7 +455,7 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
         <Separator className="bg-gray-100" />
         {!reviewState.isEditMode &&
           extendedReview.activityType !== 'rating' && (
-            <CardFooter className={`flex flex-col ${cardFooterPadding}`}>
+            <CardFooter className="flex flex-col gap-4 px-5 py-3 sm:gap-3 sm:px-3 sm:py-2">
               <ReviewActions
                 isLiked={reviewState.isLiked || false}
                 likesCount={reviewState.likeCount || 0}

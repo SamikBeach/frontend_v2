@@ -28,7 +28,7 @@ export function FilterArea({
   };
 
   return (
-    <div className="no-scrollbar flex w-full flex-col gap-2 py-0.5 md:flex-row md:justify-between md:gap-4 md:py-1">
+    <div className="no-scrollbar flex w-full flex-col gap-2 py-0.5 md:flex-row md:items-center md:justify-between md:gap-4 md:py-1">
       <CategoryFilter
         selectedCategory={selectedCategory}
         onCategoryClick={handleCategoryClick}

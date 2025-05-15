@@ -27,7 +27,7 @@ export function SortFilter({
           key={option.id}
           onClick={() => onSortClick(option.id as SortOption)}
           className={cn(
-            'flex cursor-pointer items-center rounded-full border px-2.5 text-xs font-medium transition-all md:px-3 md:text-[13px]',
+            'flex min-w-[50px] cursor-pointer items-center justify-center rounded-full border text-xs font-medium transition-all md:min-w-[60px] md:text-sm',
             'h-7 md:h-8',
             selectedSort === option.id
               ? 'border-blue-200 bg-blue-50 text-blue-600'
