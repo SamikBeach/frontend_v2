@@ -4,7 +4,6 @@ import {
   Calendar,
   CalendarClock,
   CalendarDays,
-  ChevronDown,
   Clock,
   Clock3,
   Star,
@@ -39,21 +38,21 @@ export const defaultSortOptions: SortOption<Book>[] = [
   {
     id: 'rating-desc',
     label: '평점 높은순',
-    icon: <Star className="mr-2 h-4 w-4 text-[#FFAB00]" />,
+    icon: <Star className="h-3.5 w-3.5 text-[#FFAB00]" />,
     sortFn: (a, b) => b.rating - a.rating,
     supportsTimeRange: true,
   },
   {
     id: 'reviews-desc',
     label: '리뷰 많은순',
-    icon: <Users className="mr-2 h-4 w-4 text-gray-500" />,
+    icon: <Users className="h-3.5 w-3.5 text-gray-500" />,
     sortFn: (a, b) => b.reviews - a.reviews,
     supportsTimeRange: true,
   },
   {
     id: 'library-desc',
     label: '서재에 많이 담긴 순',
-    icon: <Bookmark className="mr-2 h-4 w-4 text-gray-500" />,
+    icon: <Bookmark className="h-3.5 w-3.5 text-gray-500" />,
     sortFn: (a, b) =>
       ((b as any).libraryAdds || 0) - ((a as any).libraryAdds || 0),
     supportsTimeRange: true,
@@ -61,14 +60,14 @@ export const defaultSortOptions: SortOption<Book>[] = [
   {
     id: 'publishDate-desc',
     label: '출간일 최신순',
-    icon: <Calendar className="mr-2 h-4 w-4 text-gray-500" />,
+    icon: <Calendar className="h-3.5 w-3.5 text-gray-500" />,
     sortFn: (a, b) =>
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime(),
   },
   {
     id: 'title-asc',
     label: '제목 가나다순',
-    icon: <ArrowDownAZ className="mr-2 h-4 w-4 text-gray-500" />,
+    icon: <ArrowDownAZ className="h-3.5 w-3.5 text-gray-500" />,
     sortFn: (a, b) => a.title.localeCompare(b.title, 'ko'),
   },
 ];
@@ -78,27 +77,27 @@ export const timeRangeOptions = [
   {
     id: TimeRangeOptions.ALL,
     label: '전체 기간',
-    icon: <CalendarDays className="mr-2 h-4 w-4 text-gray-500" />,
+    icon: <CalendarDays className="h-3.5 w-3.5 text-gray-500" />,
   },
   {
     id: TimeRangeOptions.TODAY,
     label: '오늘',
-    icon: <Clock className="mr-2 h-4 w-4 text-gray-500" />,
+    icon: <Clock className="h-3.5 w-3.5 text-gray-500" />,
   },
   {
     id: TimeRangeOptions.WEEK,
     label: '이번 주',
-    icon: <Clock3 className="mr-2 h-4 w-4 text-gray-500" />,
+    icon: <Clock3 className="h-3.5 w-3.5 text-gray-500" />,
   },
   {
     id: TimeRangeOptions.MONTH,
     label: '이번 달',
-    icon: <Calendar className="mr-2 h-4 w-4 text-gray-500" />,
+    icon: <Calendar className="h-3.5 w-3.5 text-gray-500" />,
   },
   {
     id: TimeRangeOptions.YEAR,
     label: '올해',
-    icon: <CalendarClock className="mr-2 h-4 w-4 text-gray-500" />,
+    icon: <CalendarClock className="h-3.5 w-3.5 text-gray-500" />,
   },
 ];
 
@@ -148,30 +147,41 @@ export function SortDropdown<T = Book>({
   const sortButtonText = SORT_LABELS[selectedSort] || currentSortOption.label;
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
+    <div
+      className={`flex flex-wrap items-center gap-2 pt-2 pb-2 md:pt-0 md:pb-0 ${className}`}
+    >
       {showTimeRangeFilter && (
         <ResponsiveDropdownMenu>
           <ResponsiveDropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-9 border-gray-200 bg-white">
-              {React.cloneElement(currentTimeRange.icon, {
-                className: 'mr-2 h-4 w-4 text-gray-500',
-              })}
-              <span>{currentTimeRange.label}</span>
-              <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="flex h-7 items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100"
+            >
+              <span className="mr-1 flex h-3 w-3 items-center justify-center">
+                {currentTimeRange.icon}
+              </span>
+              {currentTimeRange.label}
             </Button>
           </ResponsiveDropdownMenuTrigger>
-          <ResponsiveDropdownMenuContent align={align} className="w-[140px]">
+          <ResponsiveDropdownMenuContent
+            align={align}
+            className="w-[140px]"
+            sideOffset={8}
+          >
             {timeRangeOptions.map(option => (
               <ResponsiveDropdownMenuItem
                 key={option.id}
-                className={`flex cursor-pointer items-center ${
+                className={`cursor-pointer text-sm ${
                   option.id === selectedTimeRange
-                    ? 'bg-gray-50 font-medium text-blue-600'
+                    ? 'text-primary font-medium'
                     : ''
                 }`}
                 onSelect={() => onTimeRangeChange?.(option.id as TimeRange)}
               >
-                {option.icon}
+                <span className="mr-2 inline-flex h-3.5 w-3.5 items-center justify-center">
+                  {option.icon}
+                </span>
                 {option.label}
               </ResponsiveDropdownMenuItem>
             ))}
@@ -181,24 +191,33 @@ export function SortDropdown<T = Book>({
 
       <ResponsiveDropdownMenu>
         <ResponsiveDropdownMenuTrigger asChild>
-          <Button variant="outline" className="h-9 border-gray-200 bg-white">
-            {currentSortOption.icon}
-            <span>{sortButtonText}</span>
-            <ChevronDown className="ml-2 h-4 w-4 text-gray-500" />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex h-7 items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100"
+          >
+            <span className="mr-1 flex h-3 w-3 items-center justify-center">
+              {currentSortOption.icon}
+            </span>
+            {sortButtonText}
           </Button>
         </ResponsiveDropdownMenuTrigger>
-        <ResponsiveDropdownMenuContent align={align} className="w-[180px]">
+        <ResponsiveDropdownMenuContent
+          align={align}
+          className="w-[180px]"
+          sideOffset={8}
+        >
           {sortOptions.map(option => (
             <ResponsiveDropdownMenuItem
               key={option.id}
-              className={`flex cursor-pointer items-center ${
-                option.id === selectedSort
-                  ? 'bg-gray-50 font-medium text-blue-600'
-                  : ''
+              className={`cursor-pointer text-sm ${
+                option.id === selectedSort ? 'text-primary font-medium' : ''
               }`}
               onSelect={() => onSortChange(option.id)}
             >
-              {option.icon}
+              <span className="mr-2 inline-flex h-3.5 w-3.5 items-center justify-center">
+                {option.icon}
+              </span>
               {option.label}
             </ResponsiveDropdownMenuItem>
           ))}

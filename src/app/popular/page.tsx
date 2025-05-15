@@ -143,14 +143,14 @@ export default function PopularPage() {
   ]);
 
   return (
-    <div className="w-full bg-white pb-6">
+    <div className="w-full bg-white pb-1">
       {/* CSS 스타일 추가 */}
       <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
 
       {/* 필터 영역 및 브레드크럼 - 스크롤 시 상단에 고정 */}
       <div className={`sticky top-[56px] z-30 w-full bg-white`}>
         {/* 브레드크럼 */}
-        <div className="mx-auto w-full px-2 py-1 sm:px-4 sm:py-2 sm:pt-4">
+        <div className="mx-auto w-full px-2 py-2 sm:px-4 sm:py-2 sm:pt-4">
           <Suspense fallback={<div className="h-5 md:h-6" />}>
             <PopularBreadcrumb />
           </Suspense>
@@ -179,7 +179,7 @@ export default function PopularPage() {
       </div>
 
       {/* 도서 목록 - 로딩 상태일 때 스켈레톤 표시 */}
-      <div className="mx-auto w-full px-1 pt-4 sm:px-4">
+      <div className="mx-auto w-full px-1 pt-1 sm:px-4">
         <Suspense fallback={<BooksLoading />}>
           <BooksContent />
         </Suspense>
