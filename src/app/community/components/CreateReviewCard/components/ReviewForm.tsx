@@ -8,6 +8,7 @@ import {
   ResponsiveSelectTrigger,
 } from '@/components/ui/responsive-select';
 import { Textarea } from '@/components/ui/textarea';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { BookOpen, SendHorizontal } from 'lucide-react';
 import { ReactNode, useMemo } from 'react';
 
@@ -19,7 +20,6 @@ interface ReviewFormProps {
   handleBookDialogOpen: () => void;
   handleSubmitReview: () => Promise<void>;
   isLoading: boolean;
-  isMobile?: boolean;
   children?: ReactNode;
 }
 
@@ -31,9 +31,9 @@ export function ReviewForm({
   handleBookDialogOpen,
   handleSubmitReview,
   isLoading,
-  isMobile = false,
   children,
 }: ReviewFormProps) {
+  const isMobile = useIsMobile();
   // 태그 변경 핸들러
   const handleTypeChange = (newType: string) => {
     setType(newType as ReviewType);
@@ -65,21 +65,11 @@ export function ReviewForm({
     };
   }, [type]);
 
-  // 모바일 환경에 따른 버튼 크기 및 텍스트 조정
-  const buttonHeight = isMobile ? 'h-8' : 'h-9';
-  const buttonRadius = isMobile ? 'rounded-lg' : 'rounded-xl';
-  const selectWidth = isMobile ? 'w-[120px]' : 'w-[130px]';
-  const textareaHeight = isMobile ? 'min-h-[90px]' : 'min-h-[100px]';
-  const selectTriggerHeight = isMobile ? 'h-8' : 'h-9';
-  const selectTriggerRadius = isMobile ? 'rounded-lg' : 'rounded-xl';
-  const buttonPadding = isMobile ? 'px-3' : 'px-4';
-  const iconSize = isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4';
-
   return (
     <>
       <Textarea
         placeholder="어떤 책에 대해 이야기하고 싶으신가요?"
-        className={`${textareaHeight} resize-none rounded-xl border-gray-200 bg-[#F9FAFB] text-[15px]`}
+        className="min-h-[80px] resize-none rounded-lg border-gray-200 bg-[#F9FAFB] text-[14px] sm:min-h-[100px] sm:rounded-xl sm:text-[15px]"
         value={content}
         onChange={e => setContent(e.target.value)}
       />
@@ -87,16 +77,15 @@ export function ReviewForm({
       {/* 선택된 책 정보 및 별점/읽기 상태 표시 (children으로 받음) */}
       {children}
 
-      <div
-        className={`mt-${isMobile ? '2' : '3'} flex flex-wrap items-center gap-${isMobile ? '1.5' : '2'}`}
-      >
+      <div className="mt-2 flex flex-wrap items-center gap-1 sm:mt-3 sm:gap-2">
         <ResponsiveSelect value={type} onValueChange={handleTypeChange}>
           <ResponsiveSelectTrigger
-            className={`${selectTriggerHeight} ${selectWidth} cursor-pointer ${selectTriggerRadius} border-gray-200 bg-white font-medium text-gray-700`}
+            size={isMobile ? 'sm' : 'default'}
+            className="h-7 w-[110px] cursor-pointer rounded-lg border-gray-200 bg-white text-xs font-medium text-gray-700 sm:h-9 sm:w-[130px] sm:rounded-xl sm:text-sm"
           >
             <div className="flex items-center">
               <span
-                className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                 style={{ backgroundColor: tagInfo.color }}
               />
               {tagInfo.name}
@@ -106,7 +95,7 @@ export function ReviewForm({
             <ResponsiveSelectItem value="general" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.general || '#F9FAFB',
@@ -118,7 +107,7 @@ export function ReviewForm({
             <ResponsiveSelectItem value="discussion" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.discussion || '#F9FAFB',
@@ -130,7 +119,7 @@ export function ReviewForm({
             <ResponsiveSelectItem value="review" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.review || '#F9FAFB',
@@ -142,7 +131,7 @@ export function ReviewForm({
             <ResponsiveSelectItem value="question" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.question || '#F9FAFB',
@@ -154,7 +143,7 @@ export function ReviewForm({
             <ResponsiveSelectItem value="meetup" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.meetup || '#F9FAFB',
@@ -169,19 +158,20 @@ export function ReviewForm({
         <Button
           variant="outline"
           size="sm"
-          className={`${buttonHeight} ${buttonRadius} border-gray-200 bg-white font-medium text-gray-700`}
+          className="h-8 rounded-lg border-gray-200 bg-white text-xs font-medium text-gray-700 sm:h-9 sm:rounded-xl sm:text-sm"
           onClick={handleBookDialogOpen}
           disabled={type !== 'review'}
         >
-          <BookOpen className={`mr-1.5 ${iconSize} text-gray-500`} />책 추가
+          <BookOpen className="mr-1 h-3 w-3 text-gray-500 sm:mr-1.5 sm:h-4 sm:w-4" />
+          책 추가
         </Button>
 
         <Button
-          className={`ml-auto ${buttonHeight} ${buttonRadius} bg-gray-900 ${buttonPadding} font-medium text-white hover:bg-gray-800`}
+          className="ml-auto h-8 rounded-lg bg-gray-900 px-2.5 text-xs font-medium text-white hover:bg-gray-800 sm:h-9 sm:rounded-xl sm:px-4 sm:text-sm"
           onClick={handleSubmitReview}
           disabled={!content.trim() || isLoading}
         >
-          <SendHorizontal className={`mr-1.5 ${iconSize}`} />
+          <SendHorizontal className="mr-1 h-3 w-3 sm:mr-1.5 sm:h-4 sm:w-4" />
           제출하기
         </Button>
       </div>

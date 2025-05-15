@@ -11,7 +11,6 @@ import {
   ResponsiveAlertDialogHeader,
   ResponsiveAlertDialogTitle,
 } from '@/components/ui/responsive-alert-dialog';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useCreateReview } from '../../hooks';
@@ -35,7 +34,6 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertTitle, setAlertTitle] = useState('');
   const typeFilter = useAtomValue(communityTypeFilterAtom);
-  const isMobile = useIsMobile();
 
   const {
     content,
@@ -116,14 +114,11 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
     }
   };
 
-  // 모바일 환경에 맞는 패딩 값 설정
-  const cardPadding = isMobile ? 'p-3' : 'p-4';
-
   return (
     <>
-      <Card className="mb-4 overflow-hidden border-gray-200 bg-white shadow-none">
-        <CardContent className={`space-y-3 ${cardPadding}`}>
-          <div className="flex items-start gap-2.5">
+      <Card className="mb-3 overflow-hidden border-gray-200 bg-white sm:mb-4">
+        <CardContent className="space-y-2 p-2.5 sm:space-y-3 sm:p-4">
+          <div className="flex items-start gap-2 sm:gap-3">
             <UserAvatar user={user} />
             <div className="flex-1">
               <ReviewForm
@@ -134,7 +129,6 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
                 handleBookDialogOpen={handleBookDialogOpen}
                 handleSubmitReview={handleSubmitReview}
                 isLoading={isLoading}
-                isMobile={isMobile}
               >
                 {/* 선택된 책 정보 및 별점 표시 (리뷰 태그인 경우) */}
                 {type === 'review' && selectedBook && (
@@ -145,7 +139,6 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
                     handleRemoveSelectedBook={handleRemoveSelectedBook}
                     readingStatus={readingStatus}
                     setReadingStatus={setReadingStatus}
-                    isMobile={isMobile}
                   />
                 )}
               </ReviewForm>
@@ -167,18 +160,18 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
         open={alertDialogOpen}
         onOpenChange={setAlertDialogOpen}
       >
-        <ResponsiveAlertDialogContent className="max-w-md rounded-2xl">
+        <ResponsiveAlertDialogContent className="max-w-md rounded-xl sm:rounded-2xl">
           <ResponsiveAlertDialogHeader>
             <ResponsiveAlertDialogTitle>
               {alertTitle}
             </ResponsiveAlertDialogTitle>
-            <ResponsiveAlertDialogDescription className="mb-3">
+            <ResponsiveAlertDialogDescription className="mb-2 sm:mb-3">
               {alertMessage}
             </ResponsiveAlertDialogDescription>
           </ResponsiveAlertDialogHeader>
-          <ResponsiveAlertDialogFooter className="mt-4">
+          <ResponsiveAlertDialogFooter className="mt-3 sm:mt-4">
             <ResponsiveAlertDialogAction
-              className="rounded-xl bg-gray-900 hover:bg-gray-800"
+              className="rounded-lg bg-gray-900 text-sm hover:bg-gray-800 sm:rounded-xl"
               onClick={() => setAlertDialogOpen(false)}
             >
               확인

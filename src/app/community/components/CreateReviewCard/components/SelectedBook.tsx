@@ -33,7 +33,6 @@ interface SelectedBookProps {
   handleRemoveSelectedBook: () => void;
   readingStatus: ReadingStatusType | null;
   setReadingStatus: (status: ReadingStatusType | null) => void;
-  isMobile?: boolean;
 }
 
 export function SelectedBook({
@@ -43,7 +42,6 @@ export function SelectedBook({
   handleRemoveSelectedBook,
   readingStatus,
   setReadingStatus,
-  isMobile = false,
 }: SelectedBookProps) {
   // 읽기 상태별 스타일 반환
   const getReadingStatusStyle = (status: ReadingStatusType | null) => {
@@ -63,54 +61,44 @@ export function SelectedBook({
     }
   };
 
-  // 모바일 환경에 따른 스타일 및 크기 조정
-  const containerSpacing = isMobile
-    ? 'mt-2 mb-2 space-y-2'
-    : 'mt-3 mb-3 space-y-3';
-  const bookPadding = isMobile ? 'p-2.5' : 'p-3';
-  const bookImageSize = isMobile ? 'h-14 w-10' : 'h-16 w-12';
-  const buttonSize = isMobile ? 'h-6 w-6' : 'h-7 w-7';
-  const statusButtonHeight = isMobile ? 'h-7' : 'h-8';
-  const statusButtonFontSize = isMobile ? 'text-[10px]' : 'text-xs';
-  const starSize = isMobile ? 'h-4 w-4' : 'h-5 w-5';
-  const ratingTextSize = isMobile ? 'text-xs' : 'text-sm';
-  const gapSize = isMobile ? 'gap-2' : 'gap-3';
-  const paddingX = isMobile ? 'px-1.5' : 'px-2';
-
   return (
-    <div className={containerSpacing}>
-      <div
-        className={`flex items-center rounded-lg border border-gray-200 bg-gray-50 ${bookPadding}`}
-      >
+    <div className="mt-2 mb-2 space-y-2 sm:mt-3 sm:mb-3 sm:space-y-3">
+      <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-2 sm:p-3">
         <img
           src={selectedBook.image || selectedBook.coverImage}
           alt={selectedBook.title}
-          className={`${bookImageSize} rounded object-cover`}
+          className="h-12 w-9 rounded object-cover sm:h-16 sm:w-12"
         />
-        <div className="ml-3 flex-1">
+        <div className="ml-2 flex-1 sm:ml-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-medium text-gray-900">{selectedBook.title}</h3>
+            <h3 className="line-clamp-1 text-xs font-medium text-gray-900 sm:text-base">
+              {selectedBook.title}
+            </h3>
             <Button
               variant="ghost"
               size="icon"
-              className={`${buttonSize} rounded-full p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600`}
+              className="h-5 w-5 rounded-full p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600 sm:h-7 sm:w-7"
               onClick={handleRemoveSelectedBook}
             >
-              <X className="h-4 w-4" />
+              <X className="h-3 w-3 sm:h-4 sm:w-4" />
             </Button>
           </div>
-          <p className="text-sm text-gray-500">{selectedBook.author}</p>
+          <p className="line-clamp-1 text-[10px] text-gray-500 sm:text-sm">
+            {selectedBook.author}
+          </p>
         </div>
       </div>
 
-      <div className={`flex flex-wrap items-center ${gapSize} ${paddingX}`}>
+      <div className="flex flex-wrap items-center gap-1.5 px-1 sm:gap-3 sm:px-2">
         <div className="flex flex-grow items-center">
-          <span className="mr-1 text-sm font-medium text-gray-700">별점:</span>
+          <span className="mr-1 text-[10px] font-medium text-gray-700 sm:mr-1 sm:text-sm">
+            별점:
+          </span>
           <div className="flex">
             {[1, 2, 3, 4, 5].map(star => (
               <Star
                 key={star}
-                className={`${starSize} cursor-pointer ${
+                className={`h-3.5 w-3.5 cursor-pointer sm:h-5 sm:w-5 ${
                   star <= rating
                     ? 'fill-yellow-400 text-yellow-400'
                     : 'fill-gray-200 text-gray-200'
@@ -120,7 +108,7 @@ export function SelectedBook({
             ))}
           </div>
           {rating > 0 && (
-            <span className={`ml-2 ${ratingTextSize} text-gray-500`}>
+            <span className="ml-1.5 text-[10px] text-gray-500 sm:ml-2 sm:text-sm">
               {rating === 1
                 ? '별로예요'
                 : rating === 2
@@ -140,23 +128,25 @@ export function SelectedBook({
             <Button
               variant="outline"
               className={cn(
-                `${statusButtonHeight} rounded-full border-gray-300 px-3 ${statusButtonFontSize}`,
+                'h-6 rounded-full border px-2 text-[10px] sm:h-8 sm:px-3 sm:text-xs',
                 getReadingStatusStyle(readingStatus)
               )}
             >
-              <span className="mr-1">
+              <span className="mr-0.5 text-xs sm:mr-1 sm:text-sm">
                 {readingStatus ? statusIcons[readingStatus] : statusIcons.NONE}
               </span>
-              {readingStatus ? statusTexts[readingStatus] : statusTexts.NONE}
-              <ChevronDown className="ml-1 h-3 w-3" />
+              <span className="max-w-[60px] truncate sm:max-w-[90px]">
+                {readingStatus ? statusTexts[readingStatus] : statusTexts.NONE}
+              </span>
+              <ChevronDown className="ml-0.5 h-2.5 w-2.5 sm:ml-1 sm:h-3 sm:w-3" />
             </Button>
           </ResponsiveDropdownMenuTrigger>
-          <ResponsiveDropdownMenuContent className="min-w-48 rounded-xl">
+          <ResponsiveDropdownMenuContent className="min-w-[130px] rounded-lg sm:min-w-48 sm:rounded-xl">
             {Object.values(ReadingStatusType).map(status => (
               <ResponsiveDropdownMenuItem
                 key={status}
                 className={cn(
-                  'flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2',
+                  'flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1 text-[11px] sm:gap-2 sm:px-3 sm:py-2 sm:text-sm',
                   readingStatus === status ? 'bg-gray-100' : '',
                   status === ReadingStatusType.WANT_TO_READ &&
                     'hover:bg-purple-50',
@@ -165,7 +155,9 @@ export function SelectedBook({
                 )}
                 onSelect={() => setReadingStatus(status)}
               >
-                <span className="text-base">{statusIcons[status]}</span>
+                <span className="text-sm sm:text-base">
+                  {statusIcons[status]}
+                </span>
                 <span
                   className={cn(
                     status === ReadingStatusType.WANT_TO_READ &&
@@ -183,13 +175,13 @@ export function SelectedBook({
             <ResponsiveDropdownMenuItem
               key="none"
               className={cn(
-                'mt-1 flex cursor-pointer items-center gap-2 rounded-lg border-t px-3 py-2',
+                'mt-1 flex cursor-pointer items-center gap-1.5 rounded-lg border-t px-2.5 py-1 text-[11px] sm:gap-2 sm:px-3 sm:py-2 sm:text-sm',
                 readingStatus === null ? 'bg-gray-100' : '',
                 'hover:bg-red-50'
               )}
               onSelect={() => setReadingStatus(null)}
             >
-              <span className="text-base">{statusIcons.NONE}</span>
+              <span className="text-sm sm:text-base">{statusIcons.NONE}</span>
               <span className="text-red-600">{statusTexts.NONE}</span>
             </ResponsiveDropdownMenuItem>
           </ResponsiveDropdownMenuContent>
