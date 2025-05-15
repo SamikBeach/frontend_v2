@@ -77,16 +77,16 @@ export default function ReviewDetailPage({
   // 로딩 중 상태 표시
   if (isLoading) {
     return (
-      <main>
+      <div>
         <ReviewDetailSkeleton />
-      </main>
+      </div>
     );
   }
 
   // 에러 상태 표시
   if (isError) {
     return (
-      <main>
+      <div>
         <ErrorBoundary FallbackComponent={ErrorFallback}>
           <div className="flex min-h-[80vh] w-full flex-col items-center justify-center">
             <div className="rounded-lg border border-red-100 bg-red-50 p-6 text-center">
@@ -103,24 +103,24 @@ export default function ReviewDetailPage({
             </div>
           </div>
         </ErrorBoundary>
-      </main>
+      </div>
     );
   }
 
   // 데이터가 없는 경우
   if (!review) {
     return (
-      <main>
+      <div>
         <div className="py-20 text-center text-gray-500">
           리뷰를 찾을 수 없습니다.
         </div>
-      </main>
+      </div>
     );
   }
 
   // 데이터가 있는 경우 정상 표시
   return (
-    <main>
+    <div>
       <div className="mx-auto max-w-3xl px-4 py-0 sm:px-6 lg:px-8">
         <div className="mb-4">
           <Link
@@ -133,6 +133,6 @@ export default function ReviewDetailPage({
         </div>
         <ReviewCard review={review} isDetailed={true} />
       </div>
-    </main>
+    </div>
   );
 }

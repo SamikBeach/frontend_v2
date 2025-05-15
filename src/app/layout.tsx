@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <SidebarProvider>
                 <Header />
                 <AppSidebar />
-                <main className="w-full">{children}</main>
+                <div className="w-full">{children}</div>
               </SidebarProvider>
               <Toaster />
             </DialogProvider>
