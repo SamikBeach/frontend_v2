@@ -1,5 +1,6 @@
 'use client';
 
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Search } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -12,6 +13,7 @@ export function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const searchBarRef = useRef<HTMLDivElement | null>(null);
+  const isMobile = useIsMobile();
 
   // 키보드 단축키 설정 ('/')
   useEffect(() => {
@@ -48,14 +50,24 @@ export function SearchBar() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
-  // 다이얼로그가 열릴 때 검색바 스타일 변경
-  const searchBarClasses = cn(
-    'flex cursor-pointer items-center gap-2 rounded-full border px-4 text-sm text-gray-500 transition-all duration-300',
-    isOpen
-      ? 'h-10 w-[600px] border-gray-200 bg-white max-md:w-[90%]'
-      : 'h-10 w-64 border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100 max-md:w-48 max-sm:w-10 max-sm:px-0 max-sm:justify-center',
-    isFocused && !isOpen && 'border-gray-300'
-  );
+  // 모바일과 데스크톱에 따라 다른 클래스 적용
+  const searchBarClasses = isMobile
+    ? cn(
+        // 모바일 - 애니메이션, transition 없음, 크기 고정
+        'flex cursor-pointer items-center justify-center rounded-full border',
+        isOpen
+          ? 'h-10 w-10 border-gray-200 bg-white'
+          : 'h-10 w-10 border-gray-200 bg-gray-50',
+        isFocused && !isOpen && 'border-gray-300'
+      )
+    : cn(
+        // 데스크톱 - 기존 애니메이션 유지
+        'flex cursor-pointer items-center gap-2 rounded-full border px-4 text-sm text-gray-500 transition-all duration-300',
+        isOpen
+          ? 'h-10 w-[600px] border-gray-200 bg-white'
+          : 'h-10 w-64 border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-gray-100',
+        isFocused && !isOpen && 'border-gray-300'
+      );
 
   return (
     <>
@@ -74,12 +86,14 @@ export function SearchBar() {
         }}
       >
         <Search className="h-4 w-4 flex-shrink-0 text-gray-400" />
-        <span className="flex flex-1 items-center truncate max-sm:hidden">
-          <kbd className="mr-1.5 rounded bg-gray-100 px-1.5 py-0.5 font-sans text-xs text-gray-400 md:inline-block">
-            /
-          </kbd>
-          <span>를 눌러 검색하기</span>
-        </span>
+        {!isMobile && (
+          <span className="flex flex-1 items-center truncate">
+            <kbd className="mr-1.5 rounded bg-gray-100 px-1.5 py-0.5 font-sans text-xs text-gray-400 md:inline-block">
+              /
+            </kbd>
+            <span>를 눌러 검색하기</span>
+          </span>
+        )}
       </div>
 
       <BookSearchDialog
