@@ -33,7 +33,7 @@ export function PopularBreadcrumb() {
   };
 
   return (
-    <div className="flex items-center text-[14px] text-gray-500">
+    <div className="flex items-center text-[12px] text-gray-500 md:text-[14px]">
       <Link
         href="/popular"
         onClick={e => {
@@ -50,7 +50,7 @@ export function PopularBreadcrumb() {
       </Link>
       {selectedCategory !== 'all' && (
         <>
-          <ChevronRight className="mx-1 h-4 w-4" />
+          <ChevronRight className="mx-1 h-3 w-3 md:h-4 md:w-4" />
           <Link
             href={`/popular?category=${selectedCategory}`}
             onClick={e => {
@@ -69,7 +69,7 @@ export function PopularBreadcrumb() {
       )}
       {selectedSubcategory !== 'all' && (
         <>
-          <ChevronRight className="mx-1 h-4 w-4" />
+          <ChevronRight className="mx-1 h-3 w-3 md:h-4 md:w-4" />
           <span className="font-medium text-gray-900">
             {
               currentCategory?.subcategories.find(

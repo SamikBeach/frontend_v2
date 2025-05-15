@@ -1,7 +1,6 @@
 import { categoryFilterAtom, subcategoryFilterAtom } from '@/atoms/popular';
 import { Button } from '@/components/ui/button';
 import { useCategories, useQueryParams } from '@/hooks';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -15,7 +14,6 @@ interface CategoryFilterProps {
 const VISIBLE_CATEGORIES = 10;
 
 export const CategoryFilter = ({ className }: CategoryFilterProps) => {
-  const isMobile = useIsMobile();
   const { updateQueryParams } = useQueryParams();
   const [selectedCategory, setSelectedCategory] = useAtom(categoryFilterAtom);
   const [selectedSubcategory, setSelectedSubcategory] = useAtom(
@@ -82,70 +80,93 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   return (
     <div className={className}>
       {/* 카테고리 목록 */}
-      <div
-        className={`no-scrollbar flex w-full overflow-x-auto ${
-          isMobile ? 'mb-1 py-1' : 'mb-2 py-1'
-        }`}
-      >
-        <div className="flex flex-wrap gap-2 px-0.5">
-          {visibleCategories.map(category => (
-            <button
-              key={category.id}
-              onClick={() => handleCategoryClick(category.id)}
-              className={cn(
-                'flex h-9 shrink-0 cursor-pointer items-center justify-center rounded-full px-4 text-sm font-medium transition-all',
-                category.id === selectedCategory
-                  ? 'bg-gray-900 text-white'
-                  : 'hover:bg-gray-50'
-              )}
-              style={{
-                backgroundColor:
+      <div className="no-scrollbar w-full overflow-x-auto pt-0.5 pb-2 md:mb-2 md:pt-1 md:pb-1">
+        {/* 모바일에서는 항상 모든 카테고리 표시, 데스크탑에서는 visibleCategories 기반으로 표시 */}
+        <div className="flex gap-1.5 px-0.5 md:flex-wrap md:gap-2">
+          {/* 모바일에서는 모든 카테고리 표시 */}
+          <div className="flex gap-2 md:hidden">
+            {categories.map(category => (
+              <button
+                key={category.id}
+                onClick={() => handleCategoryClick(category.id)}
+                className={cn(
+                  'flex shrink-0 cursor-pointer items-center justify-center rounded-full px-3 text-xs font-medium transition-all md:px-3 md:text-sm',
+                  'h-8 md:h-8',
                   category.id === selectedCategory
-                    ? undefined
-                    : category.color || '#F9FAFB',
-              }}
-            >
-              {category.name}
-            </button>
-          ))}
+                    ? 'bg-gray-900 text-white'
+                    : 'hover:bg-gray-50'
+                )}
+                style={{
+                  backgroundColor:
+                    category.id === selectedCategory
+                      ? undefined
+                      : category.color || '#F9FAFB',
+                }}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
 
-          {/* 더보기 버튼 */}
-          {hasMoreCategories && (
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setShowAllCategories(!showAllCategories)}
-              className={cn(
-                'h-9 w-9 shrink-0 rounded-full border border-gray-200 bg-white hover:bg-gray-50',
-                showAllCategories && 'bg-gray-50'
-              )}
-              aria-label={
-                showAllCategories ? '카테고리 접기' : '카테고리 더보기'
-              }
-              title={showAllCategories ? '카테고리 접기' : '카테고리 더보기'}
-            >
-              {showAllCategories ? (
-                <ChevronUp className="h-4 w-4 text-gray-700" />
-              ) : (
-                <ChevronDown className="h-4 w-4 text-gray-700" />
-              )}
-            </Button>
-          )}
+          {/* 데스크탑에서는 visibleCategories 기반으로 표시 */}
+          <div className="hidden gap-2 md:flex md:flex-wrap">
+            {visibleCategories.map(category => (
+              <button
+                key={category.id}
+                onClick={() => handleCategoryClick(category.id)}
+                className={cn(
+                  'flex shrink-0 cursor-pointer items-center justify-center rounded-full px-4 text-sm font-medium transition-all',
+                  'h-9',
+                  category.id === selectedCategory
+                    ? 'bg-gray-900 text-white'
+                    : 'hover:bg-gray-50'
+                )}
+                style={{
+                  backgroundColor:
+                    category.id === selectedCategory
+                      ? undefined
+                      : category.color || '#F9FAFB',
+                }}
+              >
+                {category.name}
+              </button>
+            ))}
+
+            {/* 더보기 버튼 - 데스크탑에서만 표시 */}
+            {hasMoreCategories && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowAllCategories(!showAllCategories)}
+                className={cn(
+                  'h-9 w-9 shrink-0 rounded-full border border-gray-200 bg-white hover:bg-gray-50',
+                  showAllCategories && 'bg-gray-50'
+                )}
+                aria-label={
+                  showAllCategories ? '카테고리 접기' : '카테고리 더보기'
+                }
+                title={showAllCategories ? '카테고리 접기' : '카테고리 더보기'}
+              >
+                {showAllCategories ? (
+                  <ChevronUp className="h-4 w-4 text-gray-700" />
+                ) : (
+                  <ChevronDown className="h-4 w-4 text-gray-700" />
+                )}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* 선택한 카테고리의 서브카테고리 목록 */}
       {subcategories.length > 0 && (
-        <div
-          className={`no-scrollbar flex w-full overflow-x-auto ${
-            isMobile ? 'mb-0.5 py-0' : 'mb-1 py-0'
-          }`}
-        >
-          <div className="flex gap-2 px-0.5">
+        <div className="no-scrollbar w-full overflow-x-auto pb-1 md:pb-1">
+          <div className="flex gap-2 px-0.5 md:gap-2">
             <button
               onClick={() => handleSubcategoryClick('all')}
               className={cn(
-                'flex h-8 shrink-0 cursor-pointer items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors',
+                'flex shrink-0 cursor-pointer items-center justify-center rounded-full border px-2.5 text-xs font-medium transition-colors md:px-3 md:text-sm',
+                'h-7 md:h-8',
                 selectedSubcategory === 'all'
                   ? 'border-blue-200 bg-blue-50 text-blue-700'
                   : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
@@ -158,7 +179,8 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
                 key={subcategory.id}
                 onClick={() => handleSubcategoryClick(subcategory.id)}
                 className={cn(
-                  'flex h-8 shrink-0 cursor-pointer items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors',
+                  'flex shrink-0 cursor-pointer items-center justify-center rounded-full border px-2.5 text-xs font-medium transition-colors md:px-3 md:text-sm',
+                  'h-7 md:h-8',
                   subcategory.id === selectedSubcategory
                     ? 'border-blue-200 bg-blue-50 text-blue-700'
                     : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'

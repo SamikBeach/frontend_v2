@@ -77,11 +77,14 @@ function BooksLoading() {
 // 카테고리 필터 로딩 스켈레톤
 function CategoryFilterSkeleton() {
   return (
-    <div className="w-full">
-      <div className="no-scrollbar flex w-full overflow-x-auto py-1">
-        <div className="flex gap-2 px-0.5">
+    <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-4rem)]">
+      <div className="no-scrollbar w-full pt-0.5 pb-0.5 md:mb-2 md:pt-1 md:pb-1">
+        <div className="flex gap-1.5 px-0.5 md:gap-2">
           {[...Array(6)].map((_, i) => (
-            <Skeleton key={i} className="h-9 w-20 rounded-full" />
+            <Skeleton
+              key={i}
+              className="h-8 w-16 rounded-full md:h-9 md:w-20"
+            />
           ))}
         </div>
       </div>
@@ -140,27 +143,27 @@ export default function PopularPage() {
   ]);
 
   return (
-    <div className="bg-white pb-6">
+    <div className="w-full bg-white pb-6">
       {/* CSS 스타일 추가 */}
       <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
 
       {/* 필터 영역 및 브레드크럼 - 스크롤 시 상단에 고정 */}
-      <div className={`sticky top-[56px] z-30 bg-white`}>
+      <div className={`sticky top-[56px] z-30 w-full bg-white`}>
         {/* 브레드크럼 */}
-        <div className="mx-auto w-full px-2 py-2 sm:px-4 sm:pt-4">
-          <Suspense fallback={<div className="h-6" />}>
+        <div className="mx-auto w-full px-2 py-1 sm:px-4 sm:py-2 sm:pt-4">
+          <Suspense fallback={<div className="h-5 md:h-6" />}>
             <PopularBreadcrumb />
           </Suspense>
         </div>
 
         {/* 카테고리 필터와 정렬 옵션 */}
-        <div className="mx-auto w-full px-1 py-1 sm:px-4">
-          <div className="relative">
+        <div className="mx-auto w-full px-1 py-0.5 sm:px-4 sm:py-1">
+          <div className="relative w-full">
             {/* 정렬 버튼과 카테고리 필터 배치 */}
-            <div className="flex items-start justify-between">
+            <div className="flex w-full items-start justify-between">
               {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
               <Suspense fallback={<CategoryFilterSkeleton />}>
-                <CategoryFilter className="w-full" />
+                <CategoryFilter className="w-full max-w-[calc(100vw-24px)]" />
               </Suspense>
               <div className="ml-4 hidden flex-shrink-0 xl:block">
                 <PopularSortDropdown />
