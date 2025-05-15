@@ -79,7 +79,7 @@ function BooksLoading() {
 function CategoryFilterSkeleton() {
   return (
     <div className="w-full">
-      <div className="no-scrollbar mb-2 flex w-full overflow-x-auto py-1">
+      <div className="no-scrollbar flex w-full overflow-x-auto py-1">
         <div className="flex gap-2 px-0.5">
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-9 w-20 rounded-full" />
@@ -146,26 +146,24 @@ export default function PopularPage() {
       {/* CSS 스타일 추가 */}
       <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
 
-      {/* 브레드크럼 */}
-      <div className="mx-auto w-full px-4 py-2">
-        <Suspense fallback={<div className="h-6" />}>
-          <PopularBreadcrumb />
-        </Suspense>
-      </div>
-
-      {/* 필터 영역 - 스크롤 시 상단에 고정 */}
+      {/* 필터 영역 및 브레드크럼 - 스크롤 시 상단에 고정 */}
       <div className={`sticky top-[56px] z-30 bg-white`}>
+        {/* 브레드크럼 */}
+        <div className="mx-auto w-full px-4 pt-4">
+          <Suspense fallback={<div className="h-6" />}>
+            <PopularBreadcrumb />
+          </Suspense>
+        </div>
+
         {/* 카테고리 필터와 정렬 옵션 */}
-        <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} py-2`}>
+        <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} py-1`}>
           <div className="relative">
             {/* xl 이상 화면에서 보이는 정렬 버튼 - 오른쪽에 배치하지만 카테고리 필터와 겹치지 않도록 함 */}
-            <div className="mb-2 flex items-start justify-between">
-              <div className="flex-1">
-                {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
-                <Suspense fallback={<CategoryFilterSkeleton />}>
-                  <CategoryFilter className="w-full" />
-                </Suspense>
-              </div>
+            <div className="flex items-start justify-between">
+              {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
+              <Suspense fallback={<CategoryFilterSkeleton />}>
+                <CategoryFilter className="w-full" />
+              </Suspense>
               <div className="ml-4 hidden flex-shrink-0 xl:block">
                 <PopularSortDropdown />
               </div>
