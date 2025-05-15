@@ -135,7 +135,7 @@ export default function DiscoverPage() {
       {/* 필터 영역 및 브레드크럼 - 스크롤 시 상단에 고정 */}
       <div className={`sticky top-[56px] z-30 w-full bg-white`}>
         {/* 브레드크럼 */}
-        <div className="mx-auto w-full px-2 py-2 sm:px-4 sm:py-2 sm:pt-4">
+        <div className="mx-auto w-full px-3 py-2 sm:px-4 sm:py-2 sm:pt-4">
           <Suspense fallback={<div className="h-5 md:h-6" />}>
             <div className="flex items-center justify-between">
               <div className="flex-1">
@@ -148,13 +148,13 @@ export default function DiscoverPage() {
         </div>
 
         {/* 카테고리 필터와 정렬 옵션 */}
-        <div className="mx-auto w-full px-1 py-0.5 sm:px-4 sm:py-1">
+        <div className="mx-auto w-full py-0.5 sm:px-4 sm:py-1">
           <div className="relative w-full">
             {/* 정렬 버튼과 카테고리 필터 배치 */}
             <div className="flex w-full items-start justify-between">
               {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
               <Suspense fallback={<CategoryFilterSkeleton />}>
-                <CategoryFilter className="w-full max-w-[calc(100vw-24px)]" />
+                <CategoryFilter className="w-full max-w-[100vw] pl-2" />
               </Suspense>
               <div className="ml-4 hidden flex-shrink-0 xl:block">
                 <DiscoverSortDropdown />
@@ -170,7 +170,7 @@ export default function DiscoverPage() {
       </div>
 
       {/* 도서 목록 - 로딩 상태일 때 스켈레톤 표시 */}
-      <div className="mx-auto w-full px-1 pt-1 sm:px-4">
+      <div className="mx-auto w-full px-2 pt-1 sm:px-4">
         <Suspense fallback={<BooksLoading />}>
           <BooksContent />
         </Suspense>
