@@ -109,7 +109,7 @@ function CommunityContent() {
   };
 
   return (
-    <div className="px-4 pb-3">
+    <div className="pb-3">
       {/* 필터 바 - 스크롤 시 상단에 고정 */}
       <div className="sticky top-[56px] z-30 bg-white pt-4 pb-2">
         <FilterArea

@@ -3,11 +3,12 @@
 import { BookOpen, Compass, Home, Lightbulb, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Logo } from '@/components/Logo';
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetTitle,
   SheetTrigger,
@@ -48,6 +49,7 @@ interface MobileSideSheetProps {
 
 export function MobileSideSheet({ trigger }: MobileSideSheetProps) {
   const pathname = usePathname();
+  const [open, setOpen] = useState(false);
 
   const isActive = (href: string) => {
     if (href === '/') {
@@ -57,7 +59,7 @@ export function MobileSideSheet({ trigger }: MobileSideSheetProps) {
   };
 
   return (
-    <Sheet>
+    <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
       <SheetContent side="left" className="p-0 sm:max-w-xs">
         <SheetTitle>
@@ -65,26 +67,30 @@ export function MobileSideSheet({ trigger }: MobileSideSheetProps) {
         </SheetTitle>
         <div className="flex h-full flex-col">
           <div className="flex h-[52px] items-center border-b border-gray-100 px-5">
-            <Link href="/" className="flex items-center gap-2">
-              <Logo />
-            </Link>
+            <SheetClose asChild>
+              <Link href="/" className="flex items-center gap-2">
+                <Logo />
+              </Link>
+            </SheetClose>
           </div>
           <div className="flex-1 overflow-auto py-2">
             <nav className="px-1">
               <ul className="flex flex-col gap-1">
                 {mainMenuItems.map(item => (
                   <li key={item.title}>
-                    <Link
-                      href={item.href}
-                      className={`flex h-11 items-center gap-3 rounded-xl px-4 text-[15px] font-medium transition-colors hover:bg-gray-100/80 ${
-                        isActive(item.href)
-                          ? 'bg-gray-100 font-semibold text-gray-900'
-                          : 'text-gray-600'
-                      }`}
-                    >
-                      <item.icon className="h-[21px] w-[21px]" />
-                      <span>{item.title}</span>
-                    </Link>
+                    <SheetClose asChild>
+                      <Link
+                        href={item.href}
+                        className={`flex h-11 items-center gap-3 rounded-xl px-4 text-[15px] font-medium transition-colors hover:bg-gray-100/80 ${
+                          isActive(item.href)
+                            ? 'bg-gray-100 font-semibold text-gray-900'
+                            : 'text-gray-600'
+                        }`}
+                      >
+                        <item.icon className="h-[21px] w-[21px]" />
+                        <span>{item.title}</span>
+                      </Link>
+                    </SheetClose>
                   </li>
                 ))}
               </ul>
