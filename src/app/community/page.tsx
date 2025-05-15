@@ -134,7 +134,7 @@ function CommunityContent() {
 
 export default function CommunityPage() {
   return (
-    <div className={cn('mx-auto max-w-3xl bg-white pb-8')}>
+    <div className={cn('mx-auto max-w-2xl bg-white pb-8')}>
       <CommunityContent />
     </div>
   );
