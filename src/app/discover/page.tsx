@@ -69,8 +69,10 @@ const noScrollbarStyles = `
 // 책 컨텐츠 로딩 스켈레톤
 function BooksLoading() {
   return (
-    <div className="flex h-[calc(100vh-250px)] w-full items-center justify-center">
-      <LoadingSpinner />
+    <div className="min-h-[calc(100vh-250px)] w-full">
+      <div className="flex h-full w-full items-center justify-center py-20">
+        <LoadingSpinner />
+      </div>
     </div>
   );
 }
