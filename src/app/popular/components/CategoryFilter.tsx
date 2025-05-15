@@ -139,7 +139,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
                 size="icon"
                 onClick={() => setShowAllCategories(!showAllCategories)}
                 className={cn(
-                  'h-9 w-9 shrink-0 rounded-full border border-gray-200 bg-white hover:bg-gray-50',
+                  'h-9 w-9 shrink-0 cursor-pointer rounded-full border border-gray-200 bg-white hover:bg-gray-50',
                   showAllCategories && 'bg-gray-50'
                 )}
                 aria-label={
