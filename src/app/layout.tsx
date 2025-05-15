@@ -1,6 +1,6 @@
 import { Header } from '@/components/Header';
 import { Initializer } from '@/components/Initializer';
-import { AppSidebar } from '@/components/Sidebar/AppSidebar';
+import { AppSidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { AtomsProvider } from '@/providers/AtomsProvider';
