@@ -420,7 +420,7 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
   return (
     <>
       <Card className="w-full overflow-hidden border-gray-200 shadow-none">
-        <CardHeader className="p-5 pb-3 sm:p-3 sm:pb-2">
+        <CardHeader className="p-3 pb-3 sm:p-5 sm:pb-3">
           <ReviewHeader
             review={extendedReview}
             isAuthor={isAuthor}
@@ -430,7 +430,7 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
             onDelete={() => reviewState.setDeleteDialogOpen(true)}
           />
         </CardHeader>
-        <CardContent className="space-y-3 px-5 pt-0 pb-4 sm:px-3 sm:pb-3">
+        <CardContent className="space-y-3 px-5 pt-0 pb-3 sm:space-y-4 sm:px-5 sm:pt-0 sm:pb-4">
           <ReviewContent
             review={extendedReview}
             isEditMode={reviewState.isEditMode}
@@ -455,7 +455,7 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
         <Separator className="bg-gray-100" />
         {!reviewState.isEditMode &&
           extendedReview.activityType !== 'rating' && (
-            <CardFooter className="flex flex-col gap-4 px-5 py-3 sm:gap-3 sm:px-3 sm:py-2">
+            <CardFooter className="flex flex-col gap-3 px-5 py-3 sm:flex-col sm:gap-4 sm:px-5 sm:py-3">
               <ReviewActions
                 isLiked={reviewState.isLiked || false}
                 likesCount={reviewState.likeCount || 0}
@@ -504,34 +504,25 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
         message={reviewState.alertMessage}
       />
 
-      {/* 리뷰 다이얼로그 */}
-      <ReviewDialog
-        open={reviewState.reviewDialogOpen}
-        onOpenChange={reviewState.setReviewDialogOpen}
-        bookTitle={
-          reviewState.selectedBook?.title ||
-          (review.books && review.books[0]
-            ? (review.books[0] as any).title
-            : '')
-        }
-        initialRating={
-          extendedReview.rating ||
-          (extendedReview.userRating
-            ? (extendedReview.userRating.rating as number)
-            : 0)
-        }
-        initialContent={extendedReview.content}
-        isEditMode={true}
-        onSubmit={handleReviewDialogSubmit}
-        isSubmitting={reviewState.isSubmitting}
-      />
-
-      {/* 책 선택 대화상자 */}
+      {/* 책 선택 다이얼로그 */}
       <AddBookDialog
         isOpen={reviewState.bookDialogOpen}
         onOpenChange={reviewState.setBookDialogOpen}
-        libraryId={0}
+        libraryId={0} // Dummy value since we're just using for book selection
         onBookSelect={reviewState.handleBookSelect}
+      />
+
+      {/* 리뷰 편집 다이얼로그 */}
+      <ReviewDialog
+        open={reviewState.reviewDialogOpen}
+        onOpenChange={reviewState.setReviewDialogOpen}
+        bookTitle={reviewState.selectedBook?.title || '리뷰 수정'}
+        initialRating={reviewState.editedRating}
+        initialContent={reviewState.editedContent}
+        isEditMode={true}
+        isSubmitting={reviewState.isSubmitting}
+        onSubmit={handleReviewDialogSubmit}
+        onCancel={() => reviewState.setReviewDialogOpen(false)}
       />
 
       {/* 로그인 다이얼로그 */}

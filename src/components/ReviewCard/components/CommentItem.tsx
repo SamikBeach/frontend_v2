@@ -18,7 +18,6 @@ export function CommentItem({
   onDelete,
   onLike,
   isHighlighted = false,
-  isMobile = false,
 }: CommentItemProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -125,24 +124,13 @@ export function CommentItem({
     }
   };
 
-  // 모바일 환경에 따른 스타일 및 크기 조정
-  const avatarSize = isMobile ? 'h-6 w-6' : 'h-7 w-7';
-  const commentPadding = isMobile ? 'p-2' : 'p-2.5';
-  const usernameSize = isMobile ? 'text-xs' : 'text-sm';
-  const dateSize = isMobile ? 'text-[10px]' : 'text-xs';
-  const contentSize = isMobile ? 'text-xs' : 'text-sm';
-  const buttonHeight = isMobile ? 'h-6' : 'h-7';
-  const buttonPadding = isMobile ? 'px-2.5' : 'px-3';
-  const iconSize = isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3';
-  const gap = isMobile ? 'gap-1' : 'gap-1.5';
-  const textareaHeight = isMobile ? 'min-h-[50px]' : 'min-h-[60px]';
-  const buttonGap = isMobile ? 'gap-1.5' : 'gap-2';
-  const commentGap = isMobile ? 'gap-1.5' : 'gap-2';
-
   return (
     <>
-      <div id={`comment-${comment.id}`} className={`flex w-full ${commentGap}`}>
-        <Avatar className={`${avatarSize} flex-shrink-0`}>
+      <div
+        id={`comment-${comment.id}`}
+        className="flex w-full gap-1.5 sm:gap-2"
+      >
+        <Avatar className="h-6 w-6 flex-shrink-0 sm:h-7 sm:w-7">
           {comment.author.profileImage && (
             <AvatarImage
               src={comment.author.profileImage}
@@ -155,17 +143,17 @@ export function CommentItem({
           </AvatarFallback>
         </Avatar>
         <div
-          className={`flex-1 rounded-xl ${highlightBg ? 'bg-blue-50' : 'bg-gray-50'} ${commentPadding} transition-colors duration-3000 ease-in-out`}
+          className={`flex-1 rounded-xl ${highlightBg ? 'bg-blue-50' : 'bg-gray-50'} p-2 transition-colors duration-3000 ease-in-out sm:p-2.5`}
         >
           <div className="flex items-center justify-between">
-            <div className={`flex items-center ${gap}`}>
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <Link
                 href={`/profile/${comment.author.username}`}
-                className={`${usernameSize} font-medium text-gray-900 hover:underline`}
+                className="text-xs font-medium text-gray-900 hover:underline sm:text-sm"
               >
                 {comment.author.username}
               </Link>
-              <span className={`${dateSize} text-gray-500`}>
+              <span className="text-[10px] text-gray-500 sm:text-xs">
                 {formatDate(comment.createdAt)}
               </span>
             </div>
@@ -188,20 +176,20 @@ export function CommentItem({
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                   setEditedContent(e.target.value)
                 }
-                className={`${textareaHeight} w-full resize-none rounded-lg border-gray-200 bg-white text-xs`}
+                className="min-h-[50px] w-full resize-none rounded-lg border-gray-200 bg-white text-xs sm:min-h-[60px]"
               />
-              <div className={`mt-2 flex justify-end ${buttonGap}`}>
+              <div className="mt-2 flex justify-end gap-1.5 sm:gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className={`${buttonHeight} cursor-pointer rounded-full ${buttonPadding} py-1 text-xs`}
+                  className="h-6 cursor-pointer rounded-full px-2.5 py-1 text-xs sm:h-7 sm:px-3"
                   onClick={handleCancelEdit}
                 >
                   취소
                 </Button>
                 <Button
                   size="sm"
-                  className={`${buttonHeight} cursor-pointer rounded-full bg-gray-900 ${buttonPadding} py-1 text-xs text-white hover:bg-gray-800`}
+                  className="h-6 cursor-pointer rounded-full bg-gray-900 px-2.5 py-1 text-xs text-white hover:bg-gray-800 sm:h-7 sm:px-3"
                   onClick={handleSaveEdit}
                   disabled={!editedContent.trim()}
                 >
@@ -211,7 +199,7 @@ export function CommentItem({
             </div>
           ) : (
             <>
-              <p className={`mt-1 ${contentSize} text-gray-800`}>
+              <p className="mt-1 text-xs text-gray-800 sm:text-sm">
                 {comment.content}
               </p>
 
@@ -226,7 +214,7 @@ export function CommentItem({
                   }`}
                 >
                   <ThumbsUp
-                    className={`${iconSize} ${isLiked ? 'fill-pink-500' : ''}`}
+                    className={`h-2.5 w-2.5 sm:h-3 sm:w-3 ${isLiked ? 'fill-pink-500' : ''}`}
                   />
                   <span>{likeCount}</span>
                 </button>
