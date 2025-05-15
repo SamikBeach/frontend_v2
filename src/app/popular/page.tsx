@@ -15,7 +15,6 @@ import {
 } from '@/atoms/popular';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
 import { useSetAtom } from 'jotai';
 import { useSearchParams } from 'next/navigation';
@@ -97,7 +96,6 @@ const DEFAULT_SORT = PopularBooksSortOptions.RATING_DESC;
 const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
 
 export default function PopularPage() {
-  const isMobile = useIsMobile();
   const searchParams = useSearchParams();
   const { updateQueryParams, clearQueryParams } = useQueryParams();
 
@@ -149,16 +147,16 @@ export default function PopularPage() {
       {/* 필터 영역 및 브레드크럼 - 스크롤 시 상단에 고정 */}
       <div className={`sticky top-[56px] z-30 bg-white`}>
         {/* 브레드크럼 */}
-        <div className="mx-auto w-full px-4 pt-4">
+        <div className="mx-auto w-full px-2 py-2 sm:px-4 sm:pt-4">
           <Suspense fallback={<div className="h-6" />}>
             <PopularBreadcrumb />
           </Suspense>
         </div>
 
         {/* 카테고리 필터와 정렬 옵션 */}
-        <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} py-1`}>
+        <div className="mx-auto w-full px-1 py-1 sm:px-4">
           <div className="relative">
-            {/* xl 이상 화면에서 보이는 정렬 버튼 - 오른쪽에 배치하지만 카테고리 필터와 겹치지 않도록 함 */}
+            {/* 정렬 버튼과 카테고리 필터 배치 */}
             <div className="flex items-start justify-between">
               {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
               <Suspense fallback={<CategoryFilterSkeleton />}>
@@ -178,7 +176,7 @@ export default function PopularPage() {
       </div>
 
       {/* 도서 목록 - 로딩 상태일 때 스켈레톤 표시 */}
-      <div className={`mx-auto w-full ${isMobile ? 'px-1' : 'px-4'} pt-4`}>
+      <div className="mx-auto w-full px-1 pt-4 sm:px-4">
         <Suspense fallback={<BooksLoading />}>
           <BooksContent />
         </Suspense>
