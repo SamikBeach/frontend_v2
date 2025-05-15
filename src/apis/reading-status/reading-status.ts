@@ -61,21 +61,11 @@ export const deleteReadingStatus = async (
 };
 
 /**
- * 책 ID로 해당 책의 읽기 상태 ID 조회 후 삭제
+ * 책 ID로 해당 책의 읽기 상태 직접 삭제
+ * @param bookId 책 ID
  */
 export const deleteReadingStatusByBookId = async (
   bookId: number
 ): Promise<void> => {
-  try {
-    // 먼저 해당 책의 읽기 상태 조회
-    const readingStatus = await getUserBookReadingStatus(bookId);
-
-    // 읽기 상태가 있으면 해당 ID로 삭제
-    if (readingStatus && readingStatus.id) {
-      await deleteReadingStatus(readingStatus.id);
-    }
-  } catch (error) {
-    console.error('책 ID로 읽기 상태 삭제 중 오류:', error);
-    throw error;
-  }
+  await api.delete(`/reading-status/book/${bookId}`);
 };

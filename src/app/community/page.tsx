@@ -109,9 +109,9 @@ function CommunityContent() {
   };
 
   return (
-    <div className="px-4 pb-3">
+    <div className="pb-3">
       {/* 필터 바 - 스크롤 시 상단에 고정 */}
-      <div className="sticky top-[56px] z-30 bg-white pt-4 pb-2">
+      <div className="sticky top-[56px] z-30 bg-white pt-2 pb-1 md:pt-4 md:pb-2">
         <FilterArea
           selectedCategory={typeFilter}
           selectedSort={sortOption}
@@ -134,7 +134,7 @@ function CommunityContent() {
 
 export default function CommunityPage() {
   return (
-    <div className={cn('mx-auto max-w-3xl bg-white pb-8')}>
+    <div className={cn('mx-auto max-w-2xl bg-white pb-8')}>
       <CommunityContent />
     </div>
   );

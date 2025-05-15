@@ -158,7 +158,7 @@ export function BookDialog() {
       >
         <ResponsiveDialogPortal>
           <ResponsiveDialogContent
-            drawerClassName="w-full bg-white p-0 rounded-t-[16px] overflow-hidden h-[92vh] shadow-lg"
+            drawerClassName="w-full bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg"
             hideCloseButton
           >
             <div className="flex h-full flex-col">

@@ -5,11 +5,13 @@ import { cn } from '@/lib/utils';
 interface CategoryFilterProps {
   selectedCategory: ReviewType | 'all';
   onCategoryClick: (categoryId: ReviewType | 'all') => void;
+  className?: string;
 }
 
 export function CategoryFilter({
   selectedCategory,
   onCategoryClick,
+  className,
 }: CategoryFilterProps) {
   // 카테고리 목록 생성
   const mainCategories = [
@@ -22,29 +24,34 @@ export function CategoryFilter({
   ];
 
   return (
-    <div className="flex gap-2">
-      {mainCategories.map(category => (
-        <button
-          key={category.id}
-          onClick={() => onCategoryClick(category.id as ReviewType | 'all')}
-          className={cn(
-            'flex h-9 cursor-pointer items-center rounded-full px-4 text-[14px] font-medium transition-colors',
-            selectedCategory === category.id
-              ? 'bg-gray-900 text-white'
-              : 'text-gray-700 hover:opacity-90'
-          )}
-          style={{
-            backgroundColor:
-              selectedCategory === category.id
-                ? undefined
-                : communityCategoryColors[
-                    category.id as keyof typeof communityCategoryColors
-                  ] || '#F9FAFB',
-          }}
-        >
-          {category.name}
-        </button>
-      ))}
+    <div className={cn('w-full', className)}>
+      <div className="no-scrollbar w-full overflow-x-auto pt-0.5 pb-0.5 md:pt-1 md:pb-1">
+        <div className="flex gap-1.5 px-0.5 md:gap-2">
+          {mainCategories.map(category => (
+            <button
+              key={category.id}
+              onClick={() => onCategoryClick(category.id as ReviewType | 'all')}
+              className={cn(
+                'flex shrink-0 cursor-pointer items-center justify-center rounded-full px-3 text-xs font-medium transition-colors md:px-4 md:text-sm',
+                'h-8 md:h-9',
+                selectedCategory === category.id
+                  ? 'bg-gray-900 text-white'
+                  : 'text-gray-700 hover:opacity-90'
+              )}
+              style={{
+                backgroundColor:
+                  selectedCategory === category.id
+                    ? undefined
+                    : communityCategoryColors[
+                        category.id as keyof typeof communityCategoryColors
+                      ] || '#F9FAFB',
+              }}
+            >
+              {category.name}
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

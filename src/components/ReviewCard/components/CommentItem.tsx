@@ -2,20 +2,14 @@ import { updateComment } from '@/apis/review/review';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { MoreHorizontal, Pencil, ThumbsUp, Trash } from 'lucide-react';
+import { ThumbsUp } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { CommentItemProps } from '../types';
+import { CommentItemDropdown } from './CommentItemDropdown';
 
 export function CommentItem({
   comment,
@@ -32,6 +26,7 @@ export function CommentItem({
   const [likeCount, setLikeCount] = useState(comment.likeCount || 0);
   const [highlightBg, setHighlightBg] = useState(isHighlighted);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
 
   // 하이라이트 효과 관리 - 3초 후 사라짐
@@ -95,9 +90,13 @@ export function CommentItem({
   // 댓글 삭제 핸들러
   const handleDeleteComment = () => {
     if (onDelete) {
-      onDelete(comment.id);
+      setIsDeleting(true);
+      try {
+        onDelete(comment.id);
+      } finally {
+        setIsDeleting(false);
+      }
     }
-    setIsDropdownOpen(false);
   };
 
   // 댓글 좋아요 토글 핸들러
@@ -127,8 +126,11 @@ export function CommentItem({
 
   return (
     <>
-      <div id={`comment-${comment.id}`} className="flex w-full gap-2">
-        <Avatar className="h-7 w-7 flex-shrink-0">
+      <div
+        id={`comment-${comment.id}`}
+        className="flex w-full gap-1.5 sm:gap-2"
+      >
+        <Avatar className="h-6 w-6 flex-shrink-0 sm:h-7 sm:w-7">
           {comment.author.profileImage && (
             <AvatarImage
               src={comment.author.profileImage}
@@ -141,53 +143,29 @@ export function CommentItem({
           </AvatarFallback>
         </Avatar>
         <div
-          className={`flex-1 rounded-xl ${highlightBg ? 'bg-blue-50' : 'bg-gray-50'} p-2.5 transition-colors duration-3000 ease-in-out`}
+          className={`flex-1 rounded-xl ${highlightBg ? 'bg-blue-50' : 'bg-gray-50'} p-2 transition-colors duration-3000 ease-in-out sm:p-2.5`}
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 sm:gap-1.5">
               <Link
                 href={`/profile/${comment.author.username}`}
-                className="text-sm font-medium text-gray-900 hover:underline"
+                className="text-xs font-medium text-gray-900 hover:underline sm:text-sm"
               >
                 {comment.author.username}
               </Link>
-              <span className="text-xs text-gray-500">
+              <span className="text-[10px] text-gray-500 sm:text-xs">
                 {formatDate(comment.createdAt)}
               </span>
             </div>
 
             {isAuthor && (
-              <DropdownMenu
-                open={isDropdownOpen}
-                onOpenChange={setIsDropdownOpen}
-              >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                  >
-                    <MoreHorizontal className="h-3.5 w-3.5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-36 rounded-xl">
-                  <DropdownMenuItem
-                    className="cursor-pointer rounded-lg py-1.5 text-xs"
-                    onSelect={handleEditComment}
-                  >
-                    <Pencil className="mr-1.5 h-3.5 w-3.5" />
-                    수정하기
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="cursor-pointer rounded-lg py-1.5 text-xs text-red-500 hover:bg-red-50 hover:text-red-500"
-                    onSelect={handleDeleteComment}
-                  >
-                    <Trash className="mr-1.5 h-3.5 w-3.5 text-red-500" />
-                    삭제하기
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <CommentItemDropdown
+                isDropdownOpen={isDropdownOpen}
+                setIsDropdownOpen={setIsDropdownOpen}
+                onEditComment={handleEditComment}
+                onDeleteComment={handleDeleteComment}
+                isDeleting={isDeleting}
+              />
             )}
           </div>
 
@@ -198,20 +176,20 @@ export function CommentItem({
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                   setEditedContent(e.target.value)
                 }
-                className="min-h-[60px] w-full resize-none rounded-lg border-gray-200 bg-white text-xs"
+                className="min-h-[50px] w-full resize-none rounded-lg border-gray-200 bg-white text-xs sm:min-h-[60px]"
               />
-              <div className="mt-2 flex justify-end gap-2">
+              <div className="mt-2 flex justify-end gap-1.5 sm:gap-2">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-7 rounded-full px-3 py-1 text-xs"
+                  className="h-6 cursor-pointer rounded-full px-2.5 py-1 text-xs sm:h-7 sm:px-3"
                   onClick={handleCancelEdit}
                 >
                   취소
                 </Button>
                 <Button
                   size="sm"
-                  className="h-7 rounded-full bg-gray-900 px-3 py-1 text-xs text-white hover:bg-gray-800"
+                  className="h-6 cursor-pointer rounded-full bg-gray-900 px-2.5 py-1 text-xs text-white hover:bg-gray-800 sm:h-7 sm:px-3"
                   onClick={handleSaveEdit}
                   disabled={!editedContent.trim()}
                 >
@@ -221,7 +199,9 @@ export function CommentItem({
             </div>
           ) : (
             <>
-              <p className="mt-1 text-sm text-gray-800">{comment.content}</p>
+              <p className="mt-1 text-xs text-gray-800 sm:text-sm">
+                {comment.content}
+              </p>
 
               {/* 좋아요 버튼 */}
               <div className="mt-1 flex justify-start">
@@ -234,7 +214,7 @@ export function CommentItem({
                   }`}
                 >
                   <ThumbsUp
-                    className={`h-3 w-3 ${isLiked ? 'fill-pink-500' : ''}`}
+                    className={`h-2.5 w-2.5 sm:h-3 sm:w-3 ${isLiked ? 'fill-pink-500' : ''}`}
                   />
                   <span>{likeCount}</span>
                 </button>

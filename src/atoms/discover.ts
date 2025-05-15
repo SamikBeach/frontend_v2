@@ -3,6 +3,7 @@ import {
   SortOption,
   TimeRangeOptions,
 } from '@/apis/book/types';
+import { pastelColors } from '@/atoms/popular';
 import { TimeRange } from '@/components/SortDropdown';
 import { atom } from 'jotai';
 
@@ -26,3 +27,6 @@ export const discoverSubcategoryMetaAtom = atom<{
   name: string;
   description?: string;
 } | null>(null);
+
+// Export pastelColors for easy access
+export { pastelColors };

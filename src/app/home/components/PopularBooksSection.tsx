@@ -49,18 +49,18 @@ export function PopularBooksSection() {
   };
 
   return (
-    <section className="h-auto p-4">
+    <section className="h-auto p-2 sm:p-4">
       <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-[#3182F6]" />
-          <h2 className="text-xl font-semibold text-gray-900">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <Lightbulb className="h-4 w-4 text-[#3182F6] sm:h-5 sm:w-5" />
+          <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
             지금 인기 있는 책
           </h2>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          className="text-sm font-medium text-gray-500 hover:text-gray-900"
+          className="text-xs font-medium text-gray-500 hover:text-gray-900 sm:text-sm"
           onClick={() => router.push('/popular')}
         >
           더보기
@@ -74,9 +74,12 @@ export function PopularBooksSection() {
           <p className="text-sm text-gray-500">인기 도서가 없습니다.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
-          {books.slice(0, 3).map(book => (
-            <div key={book.id} className="w-full">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:gap-4">
+          {books.slice(0, 4).map((book, index) => (
+            <div
+              key={book.id}
+              className={`w-full ${index === 3 ? 'sm:hidden' : ''}`}
+            >
               <BookCard
                 book={book as any}
                 onClick={() => handleBookSelect(book)}

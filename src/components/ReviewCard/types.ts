@@ -74,4 +74,5 @@ export interface CommentItemProps {
   onDelete?: (commentId: number) => Promise<void>;
   isReply?: boolean;
   isHighlighted?: boolean;
+  isMobile?: boolean;
 }

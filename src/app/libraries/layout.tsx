@@ -1,7 +1,5 @@
-export default function LibrariesLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return <div className="-m-4">{children}</div>;
+import { ReactNode } from 'react';
+
+export default function LibrariesLayout({ children }: { children: ReactNode }) {
+  return <div className="mt-[56px] w-full px-2 py-4 sm:px-4">{children}</div>;
 }

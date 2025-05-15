@@ -5,21 +5,22 @@ import {
 } from '@/components/BookDialog/hooks/useReadingStatus';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
   ResponsiveDialog,
   ResponsiveDialogContent,
   ResponsiveDialogDescription,
   ResponsiveDialogFooter,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
+import {
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { ChevronDown, PenLine, Star, Trash2, X } from 'lucide-react';
+import { useState } from 'react';
 import { ReviewAlertDialog } from './components/ReviewAlertDialog';
 import { useReviewDialogState } from './hooks/useReviewDialogState';
 
@@ -30,7 +31,7 @@ interface ReviewDialogProps {
   onSubmit: (
     rating: number,
     content: string,
-    readingStatus?: ReadingStatusType
+    readingStatus?: ReadingStatusType | null
   ) => void;
   initialRating?: number;
   initialContent?: string;
@@ -51,6 +52,9 @@ export function ReviewDialog({
   onCancel,
 }: ReviewDialogProps) {
   const isMobile = useIsMobile();
+  const [readingStatusDropdownOpen, setReadingStatusDropdownOpen] =
+    useState(false);
+
   const {
     rating,
     setRating,
@@ -74,6 +78,13 @@ export function ReviewDialog({
     open,
   });
 
+  const handleReadingStatusChange = (status: ReadingStatusType | null) => {
+    if (!isSubmitting) {
+      setReadingStatus(status);
+      setReadingStatusDropdownOpen(false);
+    }
+  };
+
   const handleSubmit = () => {
     // 별점이 입력되지 않은 경우 경고 표시
     if (rating === 0) {
@@ -82,9 +93,9 @@ export function ReviewDialog({
       return;
     }
 
-    // 유효성 검사 통과 시 제출 (읽기 상태는 생성 모드에서만 전달)
-    if (isCreateMode && readingStatus) {
-      // 생성 모드에서는 읽기 상태도 함께 전달
+    // 유효성 검사 통과 시 제출
+    if (isCreateMode) {
+      // 생성 모드에서는 읽기 상태도 함께 전달 (null 포함)
       onSubmit(rating, content, readingStatus);
     } else {
       // 수정 모드에서는 읽기 상태를 전달하지 않음
@@ -108,7 +119,11 @@ export function ReviewDialog({
   };
 
   // 읽기 상태별 스타일 반환
-  const getReadingStatusStyle = (status: ReadingStatusType) => {
+  const getReadingStatusStyle = (status: ReadingStatusType | null) => {
+    if (!status) {
+      return 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100';
+    }
+
     switch (status) {
       case ReadingStatusType.WANT_TO_READ:
         return 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100';
@@ -126,28 +141,19 @@ export function ReviewDialog({
       <ResponsiveDialog
         open={open}
         onOpenChange={isSubmitting ? undefined : onOpenChange}
-        shouldScaleBackground={false}
       >
         <ResponsiveDialogContent
           className="max-w-md rounded-2xl border-none p-0"
-          drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0 h-[100dvh]"
+          drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0 z-52"
+          drawerOverlayClassName="z-51"
         >
-          <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
+          <div className="sticky top-0 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
             <ResponsiveDialogTitle
               className="text-base font-medium"
               drawerClassName="text-base font-medium"
             >
               {getDialogTitle()}
             </ResponsiveDialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
 
           <div className="px-5">
@@ -205,40 +211,45 @@ export function ReviewDialog({
             {/* 생성 모드에서만 읽기 상태 선택 UI 표시 - 별점 아래로 이동 */}
             {isCreateMode && (
               <div className="mb-6">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
+                <ResponsiveDropdownMenu
+                  open={readingStatusDropdownOpen}
+                  onOpenChange={setReadingStatusDropdownOpen}
+                >
+                  <ResponsiveDropdownMenuTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
                         'w-full justify-between rounded-xl border-gray-300 hover:bg-gray-100 hover:text-gray-900',
-                        readingStatus
+                        readingStatus !== null
                           ? getReadingStatusStyle(readingStatus)
                           : 'bg-gray-50 text-gray-700'
                       )}
                       disabled={isSubmitting}
                     >
-                      {readingStatus && (
+                      {readingStatus !== null ? (
                         <span className="mr-1.5">
                           {statusIcons[readingStatus]}
                         </span>
+                      ) : (
+                        <span className="mr-1.5">{statusIcons['NONE']}</span>
                       )}
                       <span>
-                        {readingStatus
+                        {readingStatus !== null
                           ? statusTexts[readingStatus]
-                          : '읽기 상태 선택'}
+                          : statusTexts['NONE']}
                       </span>
                       <ChevronDown className="ml-auto h-4 w-4" />
                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    disablePortal
+                  </ResponsiveDropdownMenuTrigger>
+                  <ResponsiveDropdownMenuContent
                     className="min-w-48 rounded-xl"
+                    drawerOverlayClassName="z-52"
                   >
                     {Object.values(ReadingStatusType).map(status => (
-                      <DropdownMenuItem
+                      <ResponsiveDropdownMenuItem
                         key={status}
                         className={cn(
-                          'flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2',
+                          'flex cursor-pointer items-center gap-2 text-sm',
                           readingStatus === status ? 'bg-gray-100' : '',
                           status === ReadingStatusType.WANT_TO_READ &&
                             'hover:bg-purple-50',
@@ -247,9 +258,7 @@ export function ReviewDialog({
                           status === ReadingStatusType.READ &&
                             'hover:bg-green-50'
                         )}
-                        onClick={() =>
-                          !isSubmitting && setReadingStatus(status)
-                        }
+                        onSelect={e => handleReadingStatusChange(status)}
                         disabled={isSubmitting}
                       >
                         <span className="text-base">{statusIcons[status]}</span>
@@ -265,10 +274,27 @@ export function ReviewDialog({
                         >
                           {statusTexts[status]}
                         </span>
-                      </DropdownMenuItem>
+                      </ResponsiveDropdownMenuItem>
                     ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+
+                    {/* 선택 안함 옵션 */}
+                    <ResponsiveDropdownMenuItem
+                      key="none"
+                      className={cn(
+                        'mt-1 flex cursor-pointer items-center gap-2 border-t text-sm',
+                        readingStatus === null ? 'bg-gray-100' : '',
+                        'hover:bg-red-50'
+                      )}
+                      onSelect={e => handleReadingStatusChange(null)}
+                      disabled={isSubmitting}
+                    >
+                      <span className="text-base">{statusIcons['NONE']}</span>
+                      <span className="text-red-600">
+                        {statusTexts['NONE']}
+                      </span>
+                    </ResponsiveDropdownMenuItem>
+                  </ResponsiveDropdownMenuContent>
+                </ResponsiveDropdownMenu>
               </div>
             )}
 

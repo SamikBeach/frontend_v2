@@ -11,7 +11,7 @@ export default function HomePage() {
   return (
     <div className="bg-white">
       {/* Main content - 2x2 grid structure*/}
-      <div className="grid auto-rows-auto grid-cols-1 gap-2 lg:grid-cols-2">
+      <div className="grid auto-rows-auto grid-cols-1 gap-1 sm:gap-2 lg:grid-cols-2 lg:gap-3">
         {/* 인기 있는 책 섹션 */}
         <PopularBooksSection />
 

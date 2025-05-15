@@ -3,7 +3,6 @@ import { ResponsiveDropdownMenuItem } from '@/components/ui/responsive-dropdown-
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Bell } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useRef } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useNotifications } from '../hooks';
 import { Notification, NotificationContentProps } from '../types';
@@ -18,7 +17,6 @@ export function NotificationContent({
 }: NotificationContentProps) {
   const router = useRouter();
   const isMobile = useIsMobile();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const {
     notifications,
     unreadCount,
@@ -90,7 +88,7 @@ export function NotificationContent({
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <>
       <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white p-3">
         <h3 className="font-medium text-gray-900">알림</h3>
         <div className="flex gap-2">
@@ -125,91 +123,75 @@ export function NotificationContent({
         </div>
       </div>
 
-      <div
-        className="flex-1 overflow-auto"
-        id={
-          isMobile
-            ? 'mobile-notification-container'
-            : 'notification-scroll-container'
-        }
-        ref={scrollContainerRef}
-        style={{ height: 'calc(100% - 48px)' }}
-      >
-        {enhancedNotifications.length === 0 ? (
-          <div className="flex h-full flex-col items-center justify-center py-10">
-            <div className="rounded-full bg-gray-50 p-4">
-              <Bell className="h-8 w-8 text-gray-300" />
-            </div>
-            <p className="mt-3 text-sm text-gray-500">알림이 없습니다</p>
+      {enhancedNotifications.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-10">
+          <div className="rounded-full bg-gray-50 p-4">
+            <Bell className="h-8 w-8 text-gray-300" />
           </div>
-        ) : (
-          <InfiniteScroll
-            dataLength={enhancedNotifications.length}
-            next={loadMoreNotifications}
-            hasMore={!!hasNextPage}
-            loader={<ScrollLoader />}
-            scrollableTarget={
-              isMobile
-                ? 'mobile-notification-container'
-                : 'notification-scroll-container'
-            }
-            scrollThreshold={0.7}
-            className="divide-y divide-gray-50"
-            endMessage={
-              <p className="py-10 text-center text-xs text-gray-400">
-                모든 알림을 불러왔습니다
-              </p>
-            }
-          >
-            {enhancedNotifications.map(notification => (
-              <ResponsiveDropdownMenuItem
-                key={notification.id}
-                className={`flex cursor-pointer flex-col gap-0 px-4 py-3.5 transition-colors ${
-                  !notification.isRead ? 'bg-blue-50/40' : 'hover:bg-gray-50'
-                }`}
-                drawerClassName={`flex cursor-pointer flex-col gap-0 px-4 py-3.5 transition-colors ${
-                  !notification.isRead ? 'bg-blue-50/40' : 'hover:bg-gray-50'
-                }`}
-                onClick={() => handleNotificationClick(notification)}
-                onSelect={e => e.preventDefault()} // 자동 닫힘 방지
-              >
-                <div className="flex w-full items-start gap-3">
-                  {/* 아바타 또는 아이콘 */}
-                  {renderNotificationIcon(notification)}
+          <p className="mt-3 text-sm text-gray-500">알림이 없습니다</p>
+        </div>
+      ) : (
+        <InfiniteScroll
+          dataLength={enhancedNotifications.length}
+          next={loadMoreNotifications}
+          hasMore={!!hasNextPage}
+          loader={<ScrollLoader />}
+          scrollableTarget={
+            isMobile ? undefined : 'notification-scroll-container'
+          }
+          className="h-full divide-y divide-gray-50 overflow-auto"
+          height={isMobile ? '72vh' : undefined}
+          endMessage={
+            <p className="py-4 pb-8 text-center text-xs text-gray-400">
+              모든 알림을 불러왔습니다
+            </p>
+          }
+        >
+          {enhancedNotifications.map(notification => (
+            <ResponsiveDropdownMenuItem
+              key={notification.id}
+              className="flex w-full cursor-pointer flex-col gap-0 px-4 py-3 transition-colors hover:bg-gray-50 data-[unread=true]:bg-blue-50/40"
+              drawerClassName="flex cursor-pointer flex-col gap-0 px-4 py-3 transition-colors hover:bg-gray-50 data-[unread=true]:bg-blue-50/40 w-full text-left"
+              data-unread={!notification.isRead}
+              onClick={() => handleNotificationClick(notification)}
+              onSelect={e => e.preventDefault()} // 자동 닫힘 방지
+            >
+              <div className="flex w-full items-start gap-3">
+                {/* 아바타 또는 아이콘 */}
+                {renderNotificationIcon(notification)}
 
-                  <div className="min-w-0 flex-1">
-                    {/* 태그와 메시지 */}
-                    <div className="mb-1.5 flex items-center gap-2">
-                      <NotificationTypeBadge type={notification.type} />
+                <div className="min-w-0 flex-1">
+                  {/* 태그와 메시지 */}
+                  <div className="mb-1.5 flex items-center gap-2">
+                    <NotificationTypeBadge type={notification.type} />
 
-                      {notification.sourceType && (
-                        <PostTypeBadge sourceType={notification.sourceType} />
-                      )}
+                    {notification.sourceType && (
+                      <PostTypeBadge sourceType={notification.sourceType} />
+                    )}
 
-                      {/* 읽지 않음 표시 */}
-                      {!notification.isRead && (
-                        <div className="ml-auto h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
-                      )}
-                    </div>
+                    {/* 읽지 않음 표시 */}
+                    {!notification.isRead && (
+                      <div className="ml-auto h-2 w-2 flex-shrink-0 rounded-full bg-blue-500" />
+                    )}
+                  </div>
 
-                    {/* 알림 메시지 */}
-                    <div className="text-sm leading-normal break-words whitespace-normal text-gray-700">
-                      {renderNotificationContent(notification)}
-                    </div>
+                  {/* 알림 메시지 */}
+                  <div className="text-sm leading-normal break-words whitespace-normal text-gray-700">
+                    {renderNotificationContent(notification)}
+                  </div>
 
-                    {/* 타임스탬프 */}
-                    <div className="mt-1.5 flex items-center justify-between">
-                      <span className="text-[11px] text-gray-400">
-                        {notification.timestamp}
-                      </span>
-                    </div>
+                  {/* 타임스탬프 */}
+                  <div className="mt-1.5 flex items-center justify-between">
+                    <span className="text-[11px] text-gray-400">
+                      {notification.timestamp}
+                    </span>
                   </div>
                 </div>
-              </ResponsiveDropdownMenuItem>
-            ))}
-          </InfiniteScroll>
-        )}
-      </div>
-    </div>
+              </div>
+            </ResponsiveDropdownMenuItem>
+          ))}
+        </InfiniteScroll>
+      )}
+    </>
   );
 }

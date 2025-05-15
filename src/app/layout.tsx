@@ -1,6 +1,6 @@
 import { Header } from '@/components/Header';
 import { Initializer } from '@/components/Initializer';
-import { AppSidebar } from '@/components/Sidebar/AppSidebar';
+import { AppSidebar } from '@/components/Sidebar';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { Toaster } from '@/components/ui/sonner';
 import { AtomsProvider } from '@/providers/AtomsProvider';
@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <SidebarProvider>
                 <Header />
                 <AppSidebar />
-                <main className="mt-[56px] w-full p-4">{children}</main>
+                <div className="w-full">{children}</div>
               </SidebarProvider>
               <Toaster />
             </DialogProvider>

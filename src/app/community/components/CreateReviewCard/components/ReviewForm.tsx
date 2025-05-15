@@ -2,15 +2,15 @@ import { ReviewType } from '@/apis/review/types';
 import { communityCategoryColors } from '@/atoms/community';
 import { Button } from '@/components/ui/button';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  ResponsiveSelect,
+  ResponsiveSelectContent,
+  ResponsiveSelectItem,
+  ResponsiveSelectTrigger,
+} from '@/components/ui/responsive-select';
 import { Textarea } from '@/components/ui/textarea';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { BookOpen, SendHorizontal } from 'lucide-react';
-import { ReactNode } from 'react';
+import { ReactNode, useMemo } from 'react';
 
 interface ReviewFormProps {
   content: string;
@@ -33,6 +33,7 @@ export function ReviewForm({
   isLoading,
   children,
 }: ReviewFormProps) {
+  const isMobile = useIsMobile();
   // 태그 변경 핸들러
   const handleTypeChange = (newType: string) => {
     setType(newType as ReviewType);
@@ -54,11 +55,21 @@ export function ReviewForm({
     }
   };
 
+  // 현재 선택된 태그 정보
+  const tagInfo = useMemo(() => {
+    return {
+      name: getTagName(type),
+      color:
+        communityCategoryColors[type as keyof typeof communityCategoryColors] ||
+        '#F9FAFB',
+    };
+  }, [type]);
+
   return (
     <>
       <Textarea
         placeholder="어떤 책에 대해 이야기하고 싶으신가요?"
-        className="min-h-[100px] resize-none rounded-xl border-gray-200 bg-[#F9FAFB] text-[15px]"
+        className="min-h-[80px] resize-none rounded-lg border-gray-200 bg-[#F9FAFB] text-[14px] sm:min-h-[100px] sm:rounded-xl sm:text-[15px]"
         value={content}
         onChange={e => setContent(e.target.value)}
       />
@@ -66,104 +77,101 @@ export function ReviewForm({
       {/* 선택된 책 정보 및 별점/읽기 상태 표시 (children으로 받음) */}
       {children}
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <Select value={type} onValueChange={handleTypeChange}>
-          <SelectTrigger className="h-9 w-[130px] cursor-pointer rounded-xl border-gray-200 bg-white font-medium text-gray-700">
-            <SelectValue>
+      <div className="mt-2 flex flex-wrap items-center gap-1 sm:mt-3 sm:gap-2">
+        <ResponsiveSelect value={type} onValueChange={handleTypeChange}>
+          <ResponsiveSelectTrigger
+            size={isMobile ? 'sm' : 'default'}
+            className="h-7 w-[110px] cursor-pointer rounded-lg border-gray-200 bg-white text-xs font-medium text-gray-700 sm:h-9 sm:w-[130px] sm:rounded-xl sm:text-sm"
+          >
+            <div className="flex items-center">
+              <span
+                className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
+                style={{ backgroundColor: tagInfo.color }}
+              />
+              {tagInfo.name}
+            </div>
+          </ResponsiveSelectTrigger>
+          <ResponsiveSelectContent className="rounded-lg">
+            <ResponsiveSelectItem value="general" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
-                  style={{
-                    backgroundColor:
-                      communityCategoryColors[
-                        type as keyof typeof communityCategoryColors
-                      ] || '#F9FAFB',
-                  }}
-                ></span>
-                {getTagName(type)}
-              </div>
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="general" className="cursor-pointer">
-              <div className="flex items-center">
-                <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.general || '#F9FAFB',
                   }}
-                ></span>
+                />
                 일반
               </div>
-            </SelectItem>
-            <SelectItem value="discussion" className="cursor-pointer">
+            </ResponsiveSelectItem>
+            <ResponsiveSelectItem value="discussion" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.discussion || '#F9FAFB',
                   }}
-                ></span>
+                />
                 토론
               </div>
-            </SelectItem>
-            <SelectItem value="review" className="cursor-pointer">
+            </ResponsiveSelectItem>
+            <ResponsiveSelectItem value="review" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.review || '#F9FAFB',
                   }}
-                ></span>
+                />
                 리뷰
               </div>
-            </SelectItem>
-            <SelectItem value="question" className="cursor-pointer">
+            </ResponsiveSelectItem>
+            <ResponsiveSelectItem value="question" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.question || '#F9FAFB',
                   }}
-                ></span>
+                />
                 질문
               </div>
-            </SelectItem>
-            <SelectItem value="meetup" className="cursor-pointer">
+            </ResponsiveSelectItem>
+            <ResponsiveSelectItem value="meetup" className="cursor-pointer">
               <div className="flex items-center">
                 <span
-                  className="mr-1.5 inline-block h-2.5 w-2.5 rounded-full"
+                  className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor:
                       communityCategoryColors.meetup || '#F9FAFB',
                   }}
-                ></span>
+                />
                 모임
               </div>
-            </SelectItem>
-          </SelectContent>
-        </Select>
+            </ResponsiveSelectItem>
+          </ResponsiveSelectContent>
+        </ResponsiveSelect>
 
         <Button
           variant="outline"
           size="sm"
-          className="h-9 rounded-xl border-gray-200 bg-white font-medium text-gray-700"
+          className="h-8 rounded-lg border-gray-200 bg-white text-xs font-medium text-gray-700 sm:h-9 sm:rounded-xl sm:text-sm"
           onClick={handleBookDialogOpen}
           disabled={type !== 'review'}
         >
-          <BookOpen className="mr-1.5 h-4 w-4 text-gray-500" />책 추가
+          <BookOpen className="mr-1 h-3 w-3 text-gray-500 sm:mr-1.5 sm:h-4 sm:w-4" />
+          책 추가
         </Button>
 
         <Button
-          className="ml-auto h-9 rounded-xl bg-gray-900 px-4 font-medium text-white hover:bg-gray-800"
+          className="ml-auto h-8 rounded-lg bg-gray-900 px-2.5 text-xs font-medium text-white hover:bg-gray-800 sm:h-9 sm:rounded-xl sm:px-4 sm:text-sm"
           onClick={handleSubmitReview}
           disabled={!content.trim() || isLoading}
         >
-          <SendHorizontal className="mr-1.5 h-4 w-4" />
+          <SendHorizontal className="mr-1 h-3 w-3 sm:mr-1.5 sm:h-4 sm:w-4" />
           제출하기
         </Button>
       </div>

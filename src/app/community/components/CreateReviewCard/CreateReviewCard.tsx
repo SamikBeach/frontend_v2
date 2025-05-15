@@ -1,16 +1,16 @@
 import { SearchResult } from '@/apis/search/types';
 import { AddBookDialog } from '@/app/library/[id]/components';
 import { communityTypeFilterAtom } from '@/atoms/community';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { Card, CardContent } from '@/components/ui/card';
+import {
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogAction,
+  ResponsiveAlertDialogContent,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogTitle,
+} from '@/components/ui/responsive-alert-dialog';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useCreateReview } from '../../hooks';
@@ -116,9 +116,9 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
 
   return (
     <>
-      <Card className="mb-6 overflow-hidden border-gray-200 bg-white shadow-none">
-        <CardContent className="space-y-3 p-4">
-          <div className="flex items-start gap-3">
+      <Card className="mb-3 overflow-hidden border-gray-200 bg-white sm:mb-4">
+        <CardContent className="space-y-2 p-2.5 sm:space-y-3 sm:p-4">
+          <div className="flex items-start gap-2 sm:gap-3">
             <UserAvatar user={user} />
             <div className="flex-1">
               <ReviewForm
@@ -156,19 +156,29 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
       />
 
       {/* 알림 다이얼로그 */}
-      <AlertDialog open={alertDialogOpen} onOpenChange={setAlertDialogOpen}>
-        <AlertDialogContent className="max-w-md rounded-2xl">
-          <AlertDialogHeader>
-            <AlertDialogTitle>{alertTitle}</AlertDialogTitle>
-            <AlertDialogDescription>{alertMessage}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction className="rounded-xl bg-gray-900 hover:bg-gray-800">
+      <ResponsiveAlertDialog
+        open={alertDialogOpen}
+        onOpenChange={setAlertDialogOpen}
+      >
+        <ResponsiveAlertDialogContent className="max-w-md rounded-xl sm:rounded-2xl">
+          <ResponsiveAlertDialogHeader>
+            <ResponsiveAlertDialogTitle>
+              {alertTitle}
+            </ResponsiveAlertDialogTitle>
+            <ResponsiveAlertDialogDescription className="mb-2 sm:mb-3">
+              {alertMessage}
+            </ResponsiveAlertDialogDescription>
+          </ResponsiveAlertDialogHeader>
+          <ResponsiveAlertDialogFooter className="mt-3 sm:mt-4">
+            <ResponsiveAlertDialogAction
+              className="rounded-lg bg-gray-900 text-sm hover:bg-gray-800 sm:rounded-xl"
+              onClick={() => setAlertDialogOpen(false)}
+            >
               확인
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </ResponsiveAlertDialogAction>
+          </ResponsiveAlertDialogFooter>
+        </ResponsiveAlertDialogContent>
+      </ResponsiveAlertDialog>
     </>
   );
 }

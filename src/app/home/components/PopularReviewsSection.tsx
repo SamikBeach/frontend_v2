@@ -52,18 +52,18 @@ export function PopularReviewsSection() {
   };
 
   return (
-    <section className="h-auto p-4">
+    <section className="h-auto p-2 sm:p-4">
       <div className="mb-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Users className="h-5 w-5 text-blue-500" />
-          <h2 className="text-xl font-semibold text-gray-900">
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <Users className="h-4 w-4 text-blue-500 sm:h-5 sm:w-5" />
+          <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
             커뮤니티 인기글
           </h2>
         </div>
         <Button
           variant="ghost"
           size="sm"
-          className="text-sm font-medium text-gray-500 hover:text-gray-900"
+          className="cursor-pointer text-xs font-medium text-gray-500 hover:text-gray-900 sm:text-sm"
           onClick={handleMoreClick}
         >
           더보기
@@ -73,7 +73,7 @@ export function PopularReviewsSection() {
       {isLoading ? (
         <PopularReviewsSkeleton />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {reviews.slice(0, 2).map(review => (
             <ReviewCard
               key={review.id}

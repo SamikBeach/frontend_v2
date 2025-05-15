@@ -17,25 +17,25 @@ import {
 } from '@/apis/review/types';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { ReviewDialog } from '@/components/ReviewDialog/ReviewDialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveAlertDialog,
+  ResponsiveAlertDialogAction,
+  ResponsiveAlertDialogCancel,
+  ResponsiveAlertDialogContent,
+  ResponsiveAlertDialogDescription,
+  ResponsiveAlertDialogFooter,
+  ResponsiveAlertDialogHeader,
+  ResponsiveAlertDialogTitle,
+  ResponsiveAlertDialogTrigger,
+} from '@/components/ui/responsive-alert-dialog';
+import {
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { invalidateUserProfileQueries } from '@/utils/query';
@@ -287,57 +287,64 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                         </span>
                       </div>
                       {isMyComment(comment) && (
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                        <ResponsiveDropdownMenu>
+                          <ResponsiveDropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="h-6 w-6 p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                              className="h-6 w-6 cursor-pointer p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                             >
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-36">
-                            <DropdownMenuItem
+                          </ResponsiveDropdownMenuTrigger>
+                          <ResponsiveDropdownMenuContent
+                            align="end"
+                            className="w-36"
+                          >
+                            <ResponsiveDropdownMenuItem
                               className="flex cursor-pointer items-center gap-2 text-sm"
-                              onClick={() => handleStartEditComment(comment)}
+                              onSelect={() => handleStartEditComment(comment)}
                             >
                               <Pencil className="h-3.5 w-3.5" />
                               수정하기
-                            </DropdownMenuItem>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <DropdownMenuItem
+                            </ResponsiveDropdownMenuItem>
+                            <ResponsiveAlertDialog>
+                              <ResponsiveAlertDialogTrigger asChild>
+                                <ResponsiveDropdownMenuItem
                                   className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
                                   onSelect={e => e.preventDefault()}
                                 >
                                   <Trash className="h-3.5 w-3.5 text-red-500" />
                                   삭제하기
-                                </DropdownMenuItem>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>댓글 삭제</AlertDialogTitle>
-                                  <AlertDialogDescription>
+                                </ResponsiveDropdownMenuItem>
+                              </ResponsiveAlertDialogTrigger>
+                              <ResponsiveAlertDialogContent>
+                                <ResponsiveAlertDialogHeader>
+                                  <ResponsiveAlertDialogTitle>
+                                    댓글 삭제
+                                  </ResponsiveAlertDialogTitle>
+                                  <ResponsiveAlertDialogDescription>
                                     이 댓글을 정말 삭제하시겠습니까? 이 작업은
                                     되돌릴 수 없습니다.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>취소</AlertDialogCancel>
-                                  <AlertDialogAction
+                                  </ResponsiveAlertDialogDescription>
+                                </ResponsiveAlertDialogHeader>
+                                <ResponsiveAlertDialogFooter>
+                                  <ResponsiveAlertDialogAction
                                     onClick={() =>
                                       handleDeleteComment(comment.id)
                                     }
                                     className="bg-red-500 text-white hover:bg-red-600"
                                   >
                                     {isDeleting ? '삭제 중...' : '삭제'}
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                                  </ResponsiveAlertDialogAction>
+                                  <ResponsiveAlertDialogCancel className="cursor-pointer">
+                                    취소
+                                  </ResponsiveAlertDialogCancel>
+                                </ResponsiveAlertDialogFooter>
+                              </ResponsiveAlertDialogContent>
+                            </ResponsiveAlertDialog>
+                          </ResponsiveDropdownMenuContent>
+                        </ResponsiveDropdownMenu>
                       )}
                     </div>
                     <p className="text-[15px] leading-relaxed whitespace-pre-line text-gray-700">
@@ -631,8 +638,8 @@ function ReviewsList({
 
                     {/* 내 리뷰일 경우 액션 버튼 */}
                     {isMyReview(review) && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
+                      <ResponsiveDropdownMenu>
+                        <ResponsiveDropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -640,36 +647,40 @@ function ReviewsList({
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-36">
-                          <DropdownMenuItem
+                        </ResponsiveDropdownMenuTrigger>
+                        <ResponsiveDropdownMenuContent
+                          align="end"
+                          className="w-36"
+                        >
+                          <ResponsiveDropdownMenuItem
                             className="flex cursor-pointer items-center gap-2 text-sm"
-                            onClick={() => handleEditReview(review)}
+                            onSelect={() => handleEditReview(review)}
                           >
                             <Pencil className="h-3.5 w-3.5" />
                             수정하기
-                          </DropdownMenuItem>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <DropdownMenuItem
+                          </ResponsiveDropdownMenuItem>
+                          <ResponsiveAlertDialog>
+                            <ResponsiveAlertDialogTrigger asChild>
+                              <ResponsiveDropdownMenuItem
                                 className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
                                 onSelect={e => e.preventDefault()}
                               >
                                 <Trash className="h-3.5 w-3.5 text-red-500" />
                                 삭제하기
-                              </DropdownMenuItem>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>리뷰 삭제</AlertDialogTitle>
-                                <AlertDialogDescription>
+                              </ResponsiveDropdownMenuItem>
+                            </ResponsiveAlertDialogTrigger>
+                            <ResponsiveAlertDialogContent>
+                              <ResponsiveAlertDialogHeader>
+                                <ResponsiveAlertDialogTitle>
+                                  리뷰 삭제
+                                </ResponsiveAlertDialogTitle>
+                                <ResponsiveAlertDialogDescription>
                                   이 리뷰를 정말 삭제하시겠습니까? 이 작업은
                                   되돌릴 수 없습니다.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>취소</AlertDialogCancel>
-                                <AlertDialogAction
+                                </ResponsiveAlertDialogDescription>
+                              </ResponsiveAlertDialogHeader>
+                              <ResponsiveAlertDialogFooter>
+                                <ResponsiveAlertDialogAction
                                   onClick={() =>
                                     handleDeleteReviewClick(review.id)
                                   }
@@ -679,12 +690,15 @@ function ReviewsList({
                                   deleteReviewMutation.variables === review.id
                                     ? '삭제 중...'
                                     : '삭제'}
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                                </ResponsiveAlertDialogAction>
+                                <ResponsiveAlertDialogCancel className="cursor-pointer">
+                                  취소
+                                </ResponsiveAlertDialogCancel>
+                              </ResponsiveAlertDialogFooter>
+                            </ResponsiveAlertDialogContent>
+                          </ResponsiveAlertDialog>
+                        </ResponsiveDropdownMenuContent>
+                      </ResponsiveDropdownMenu>
                     )}
                   </div>
 
@@ -772,7 +786,7 @@ function ReviewsList({
         <div className="mt-6 flex justify-center">
           <Button
             variant="outline"
-            className="rounded-full text-sm font-medium"
+            className="cursor-pointer rounded-full text-sm font-medium"
             onClick={handleLoadMore}
             disabled={isFetchingNextPage}
           >

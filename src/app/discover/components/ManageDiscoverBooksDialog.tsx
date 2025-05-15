@@ -15,14 +15,14 @@ import {
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  ResponsiveSelect,
+  ResponsiveSelectContent,
+  ResponsiveSelectItem,
+  ResponsiveSelectTrigger,
+  ResponsiveSelectValue,
+} from '@/components/ui/responsive-select';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
@@ -467,32 +467,32 @@ export function ManageDiscoverBooksDialog({
                   >
                     카테고리
                   </Label>
-                  <Select
+                  <ResponsiveSelect
                     value={selectedCategoryId}
                     onValueChange={value => {
                       handleCategoryChange(value);
                     }}
                   >
-                    <SelectTrigger
+                    <ResponsiveSelectTrigger
                       id="category"
                       className="h-10 cursor-pointer border-gray-200 transition-all hover:border-gray-300 focus:ring-2 focus:ring-blue-100"
                     >
-                      <SelectValue placeholder="카테고리 선택" />
-                    </SelectTrigger>
-                    <SelectContent className="border border-gray-100 shadow-md">
+                      <ResponsiveSelectValue placeholder="카테고리 선택" />
+                    </ResponsiveSelectTrigger>
+                    <ResponsiveSelectContent className="border border-gray-100 shadow-md">
                       {categories.map(category => {
                         return (
-                          <SelectItem
+                          <ResponsiveSelectItem
                             key={category.id}
                             value={category.id.toString()}
                             className="cursor-pointer hover:bg-gray-50"
                           >
                             {category.name}
-                          </SelectItem>
+                          </ResponsiveSelectItem>
                         );
                       })}
-                    </SelectContent>
-                  </Select>
+                    </ResponsiveSelectContent>
+                  </ResponsiveSelect>
                 </div>
 
                 {selectedCategory &&
@@ -504,32 +504,32 @@ export function ManageDiscoverBooksDialog({
                       >
                         서브카테고리
                       </Label>
-                      <Select
+                      <ResponsiveSelect
                         value={selectedSubcategoryId}
                         onValueChange={value => {
                           setSelectedSubcategoryId(value);
                         }}
                       >
-                        <SelectTrigger
+                        <ResponsiveSelectTrigger
                           id="subcategory"
                           className="h-10 cursor-pointer border-gray-200 transition-all hover:border-gray-300 focus:ring-2 focus:ring-blue-100"
                         >
-                          <SelectValue placeholder="서브카테고리 선택" />
-                        </SelectTrigger>
-                        <SelectContent className="border border-gray-100 shadow-md">
+                          <ResponsiveSelectValue placeholder="서브카테고리 선택" />
+                        </ResponsiveSelectTrigger>
+                        <ResponsiveSelectContent className="border border-gray-100 shadow-md">
                           {selectedCategory.subCategories.map(subcategory => {
                             return (
-                              <SelectItem
+                              <ResponsiveSelectItem
                                 key={subcategory.id}
                                 value={subcategory.id.toString()}
                                 className="cursor-pointer hover:bg-gray-50"
                               >
                                 {subcategory.name}
-                              </SelectItem>
+                              </ResponsiveSelectItem>
                             );
                           })}
-                        </SelectContent>
-                      </Select>
+                        </ResponsiveSelectContent>
+                      </ResponsiveSelect>
                     </div>
                   )}
               </div>

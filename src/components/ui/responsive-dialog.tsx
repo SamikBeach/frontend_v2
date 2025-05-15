@@ -2,32 +2,11 @@
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { XIcon } from 'lucide-react';
 import * as React from 'react';
+import { Drawer as DrawerPrimitive } from 'vaul';
 
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogOverlay,
-  DialogPortal,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerPortal,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
+import { cn } from '@/lib/utils';
 
 // Context to share mobile status
 const ResponsiveDialogContext = React.createContext<{ isMobile: boolean }>({
@@ -47,9 +26,25 @@ function ResponsiveDialogRoot({
   return (
     <ResponsiveDialogContext.Provider value={{ isMobile }}>
       {isMobile ? (
-        <Drawer {...props}>{children}</Drawer>
+        <DrawerPrimitive.Root
+          data-slot="drawer"
+          shouldScaleBackground={props.shouldScaleBackground}
+          snapPoints={props.snapPoints}
+          open={props.open}
+          onOpenChange={props.onOpenChange}
+          modal={props.modal}
+        >
+          {children}
+        </DrawerPrimitive.Root>
       ) : (
-        <Dialog {...props}>{children}</Dialog>
+        <DialogPrimitive.Root
+          data-slot="dialog"
+          open={props.open}
+          onOpenChange={props.onOpenChange}
+          modal={props.modal}
+        >
+          {children}
+        </DialogPrimitive.Root>
       )}
     </ResponsiveDialogContext.Provider>
   );
@@ -71,7 +66,11 @@ function ResponsiveDialogPortal({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
   const { isMobile } = useResponsiveDialog();
-  return isMobile ? <DrawerPortal {...props} /> : <DialogPortal {...props} />;
+  return isMobile ? (
+    <DrawerPrimitive.Portal data-slot="drawer-portal" {...props} />
+  ) : (
+    <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
+  );
 }
 
 // Overlay component
@@ -81,12 +80,29 @@ function ResponsiveDialogOverlay({
 }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
   const { isMobile } = useResponsiveDialog();
 
-  // 모바일에서는 오버레이를 렌더링하지 않음 (Drawer에서 자체적으로 처리)
   if (isMobile) {
-    return null;
+    return (
+      <DrawerPrimitive.Overlay
+        data-slot="drawer-overlay"
+        className={cn(
+          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-40 bg-black/15',
+          className
+        )}
+        {...props}
+      />
+    );
   }
 
-  return <DialogOverlay className={className} {...props} />;
+  return (
+    <DialogPrimitive.Overlay
+      data-slot="dialog-overlay"
+      className={cn(
+        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
+        className
+      )}
+      {...props}
+    />
+  );
 }
 
 // Trigger component
@@ -94,7 +110,11 @@ function ResponsiveDialogTrigger({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
   const { isMobile } = useResponsiveDialog();
-  return isMobile ? <DrawerTrigger {...props} /> : <DialogTrigger {...props} />;
+  return isMobile ? (
+    <DrawerPrimitive.Trigger data-slot="drawer-trigger" {...props} />
+  ) : (
+    <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
+  );
 }
 
 // Content component
@@ -102,33 +122,70 @@ function ResponsiveDialogContent({
   className,
   drawerClassName,
   children,
-  overlayClassName,
+  drawerOverlayClassName,
+  dialogOverlayClassName,
   hideCloseButton = false,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  overlayClassName?: string;
   hideCloseButton?: boolean;
   drawerClassName?: string;
+  drawerOverlayClassName?: string;
+  dialogOverlayClassName?: string;
 }) {
   const { isMobile } = useResponsiveDialog();
 
   if (isMobile) {
     return (
-      <DrawerContent className={drawerClassName} {...props}>
-        {children}
-      </DrawerContent>
+      <DrawerPrimitive.Portal data-slot="drawer-portal">
+        <DrawerPrimitive.Overlay
+          className={cn(
+            'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-40 bg-black/15',
+            drawerOverlayClassName
+          )}
+        />
+        <DrawerPrimitive.Content
+          data-slot="drawer-content"
+          className={cn(
+            'group/drawer-content bg-background fixed z-50 flex flex-col',
+            'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[20px] data-[vaul-drawer-direction=bottom]:border-t-0',
+            // Height adapts to content
+            'max-h-[100dvh]',
+            drawerClassName
+          )}
+          {...props}
+        >
+          <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
+          <div className="flex-1 overflow-auto">{children}</div>
+        </DrawerPrimitive.Content>
+      </DrawerPrimitive.Portal>
     );
   }
 
   return (
-    <DialogContent
-      className={className}
-      overlayClassName={overlayClassName}
-      hideCloseButton={hideCloseButton}
-      {...props}
-    >
-      {children}
-    </DialogContent>
+    <DialogPrimitive.Portal data-slot="dialog-portal">
+      <DialogPrimitive.Overlay
+        className={cn(
+          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
+          dialogOverlayClassName
+        )}
+      />
+      <DialogPrimitive.Content
+        data-slot="dialog-content"
+        className={cn(
+          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg',
+          className
+        )}
+        {...props}
+      >
+        {children}
+        {!hideCloseButton && (
+          <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4">
+            <XIcon />
+            <span className="sr-only">Close</span>
+          </DialogPrimitive.Close>
+        )}
+      </DialogPrimitive.Content>
+    </DialogPrimitive.Portal>
   );
 }
 
@@ -141,10 +198,16 @@ function ResponsiveDialogHeader({
   drawerClassName?: string;
 }) {
   const { isMobile } = useResponsiveDialog();
-  return isMobile ? (
-    <DrawerHeader className={drawerClassName} {...props} />
-  ) : (
-    <DialogHeader className={className} {...props} />
+  return (
+    <div
+      data-slot={isMobile ? 'drawer-header' : 'dialog-header'}
+      className={cn(
+        isMobile
+          ? cn('flex flex-col gap-1.5 p-4', drawerClassName)
+          : cn('flex flex-col gap-2 text-center sm:text-left', className)
+      )}
+      {...props}
+    />
   );
 }
 
@@ -157,10 +220,19 @@ function ResponsiveDialogFooter({
   drawerClassName?: string;
 }) {
   const { isMobile } = useResponsiveDialog();
-  return isMobile ? (
-    <DrawerFooter className={drawerClassName} {...props} />
-  ) : (
-    <DialogFooter className={className} {...props} />
+  return (
+    <div
+      data-slot={isMobile ? 'drawer-footer' : 'dialog-footer'}
+      className={cn(
+        isMobile
+          ? cn('mt-auto flex flex-col gap-2 p-4', drawerClassName)
+          : cn(
+              'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
+              className
+            )
+      )}
+      {...props}
+    />
   );
 }
 
@@ -173,10 +245,23 @@ function ResponsiveDialogTitle({
   drawerClassName?: string;
 }) {
   const { isMobile } = useResponsiveDialog();
-  return isMobile ? (
-    <DrawerTitle className={drawerClassName} {...props} />
-  ) : (
-    <DialogTitle className={className} {...props} />
+
+  if (isMobile) {
+    return (
+      <DrawerPrimitive.Title
+        data-slot="drawer-title"
+        className={cn('text-foreground font-semibold', drawerClassName)}
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <DialogPrimitive.Title
+      data-slot="dialog-title"
+      className={cn('text-lg leading-none font-semibold', className)}
+      {...props}
+    />
   );
 }
 
@@ -189,10 +274,23 @@ function ResponsiveDialogDescription({
   drawerClassName?: string;
 }) {
   const { isMobile } = useResponsiveDialog();
-  return isMobile ? (
-    <DrawerDescription className={drawerClassName} {...props} />
-  ) : (
-    <DialogDescription className={className} {...props} />
+
+  if (isMobile) {
+    return (
+      <DrawerPrimitive.Description
+        data-slot="drawer-description"
+        className={cn('text-muted-foreground text-sm', drawerClassName)}
+        {...props}
+      />
+    );
+  }
+
+  return (
+    <DialogPrimitive.Description
+      data-slot="dialog-description"
+      className={cn('text-muted-foreground text-sm', className)}
+      {...props}
+    />
   );
 }
 
@@ -206,9 +304,17 @@ function ResponsiveDialogClose({
 }) {
   const { isMobile } = useResponsiveDialog();
   return isMobile ? (
-    <DrawerClose className={drawerClassName} {...props} />
+    <DrawerPrimitive.Close
+      data-slot="drawer-close"
+      className={cn(drawerClassName)}
+      {...props}
+    />
   ) : (
-    <DialogClose className={className} {...props} />
+    <DialogPrimitive.Close
+      data-slot="dialog-close"
+      className={cn(className)}
+      {...props}
+    />
   );
 }
 

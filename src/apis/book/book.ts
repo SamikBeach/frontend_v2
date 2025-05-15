@@ -151,7 +151,7 @@ export const getPopularBooksForHome = async (
  * 홈화면용 오늘의 발견 도서 조회
  */
 export const getDiscoverBooksForHome = async (
-  limit: number = 6
+  limit: number = 4
 ): Promise<HomeDiscoverBooksResponse[]> => {
   const response = await api.get<HomeDiscoverBooksResponse[]>(
     '/book/discover/home',

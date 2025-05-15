@@ -8,11 +8,11 @@ import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { LibraryDialog } from '@/components/Library';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
@@ -119,11 +119,11 @@ export function BookActionButtons() {
   return (
     <>
       <div className="grid grid-cols-2 gap-2">
-        <DropdownMenu
+        <ResponsiveDropdownMenu
           open={readingStatusOpen}
           onOpenChange={setReadingStatusOpen}
         >
-          <DropdownMenuTrigger asChild>
+          <ResponsiveDropdownMenuTrigger asChild>
             <Button
               variant="outline"
               className={cn(
@@ -140,14 +140,10 @@ export function BookActionButtons() {
               <span>{displayStatusText}</span>
               <ChevronDown className="ml-auto h-4 w-4" />
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            disablePortal
-            className="min-w-48 rounded-xl"
-            onEscapeKeyDown={() => setReadingStatusOpen(false)}
-          >
+          </ResponsiveDropdownMenuTrigger>
+          <ResponsiveDropdownMenuContent className="min-w-48 rounded-xl">
             {Object.values(ReadingStatusType).map(status => (
-              <DropdownMenuItem
+              <ResponsiveDropdownMenuItem
                 key={status}
                 className={cn(
                   'flex cursor-pointer items-center gap-2 rounded-lg px-3 py-2',
@@ -157,7 +153,7 @@ export function BookActionButtons() {
                   status === ReadingStatusType.READING && 'hover:bg-blue-50',
                   status === ReadingStatusType.READ && 'hover:bg-green-50'
                 )}
-                onClick={() => onReadingStatusChange(status)}
+                onSelect={() => onReadingStatusChange(status)}
                 disabled={isPending}
               >
                 <span className="text-base">{statusIcons[status]}</span>
@@ -171,28 +167,31 @@ export function BookActionButtons() {
                 >
                   {statusTexts[status]}
                 </span>
-              </DropdownMenuItem>
+              </ResponsiveDropdownMenuItem>
             ))}
 
             {/* 선택 안함 옵션 */}
-            <DropdownMenuItem
+            <ResponsiveDropdownMenuItem
               key="none"
               className={cn(
                 'mt-1 flex cursor-pointer items-center gap-2 rounded-lg border-t px-3 py-2',
                 readingStatus === null ? 'bg-gray-100' : '',
                 'hover:bg-red-50'
               )}
-              onClick={() => onReadingStatusChange('NONE' as any)}
+              onSelect={() => onReadingStatusChange('NONE' as any)}
               disabled={isPending}
             >
               <span className="text-base">{statusIcons['NONE']}</span>
               <span className="text-red-600">{statusTexts['NONE']}</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </ResponsiveDropdownMenuItem>
+          </ResponsiveDropdownMenuContent>
+        </ResponsiveDropdownMenu>
 
-        <DropdownMenu open={libraryAddOpen} onOpenChange={setLibraryAddOpen}>
-          <DropdownMenuTrigger asChild>
+        <ResponsiveDropdownMenu
+          open={libraryAddOpen}
+          onOpenChange={setLibraryAddOpen}
+        >
+          <ResponsiveDropdownMenuTrigger asChild>
             <Button
               variant="outline"
               className="w-full rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
@@ -200,38 +199,34 @@ export function BookActionButtons() {
               <ListPlus className="mr-1.5 h-4 w-4" />
               <span className="text-sm">서재에 담기</span>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            disablePortal
-            className="min-w-48 rounded-xl"
-            onEscapeKeyDown={() => setLibraryAddOpen(false)}
-          >
+          </ResponsiveDropdownMenuTrigger>
+          <ResponsiveDropdownMenuContent className="min-w-48 rounded-xl">
             {userLibraries && userLibraries.length > 0 ? (
               userLibraries.map(library => (
-                <DropdownMenuItem
+                <ResponsiveDropdownMenuItem
                   key={library.id}
                   className="cursor-pointer rounded-lg py-2 transition-colors hover:bg-gray-100"
-                  onClick={() => handleAddToLibraryWithAuth(library.id)}
+                  onSelect={() => handleAddToLibraryWithAuth(library.id)}
                 >
                   {library.name}
                   <span className="ml-1 text-xs text-gray-500">
                     {library.bookCount || 0}
                   </span>
-                </DropdownMenuItem>
+                </ResponsiveDropdownMenuItem>
               ))
             ) : (
               <div className="px-3 py-2 text-sm text-gray-500">
                 서재가 없습니다.
               </div>
             )}
-            <DropdownMenuItem
+            <ResponsiveDropdownMenuItem
               className="cursor-pointer rounded-lg py-2 text-black hover:bg-gray-100"
-              onClick={handleShowNewLibraryDialog}
+              onSelect={handleShowNewLibraryDialog}
             >
               <Plus className="mr-1.5 h-4 w-4" />새 서재 만들기
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </ResponsiveDropdownMenuItem>
+          </ResponsiveDropdownMenuContent>
+        </ResponsiveDropdownMenu>
       </div>
 
       {/* LibraryDialog 컴포넌트로 대체 */}

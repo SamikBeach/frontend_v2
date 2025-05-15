@@ -72,15 +72,12 @@ export default function Libraries() {
         hasNextPage={hasNextPage}
       />
 
-      {/* 새 서재 만들기 다이얼로그 */}
-      {showLibraryDialog && (
-        <LibraryDialog
-          open={showLibraryDialog}
-          onOpenChange={setShowLibraryDialog}
-          mode="create"
-          onCreateLibrary={handleCreateNewLibrary}
-        />
-      )}
+      <LibraryDialog
+        open={showLibraryDialog}
+        onOpenChange={setShowLibraryDialog}
+        mode="create"
+        onCreateLibrary={handleCreateNewLibrary}
+      />
     </>
   );
 }

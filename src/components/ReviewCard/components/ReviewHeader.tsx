@@ -1,19 +1,11 @@
 import { ReviewUser } from '@/apis/review/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 import Link from 'next/link';
 import { ExtendedReviewResponseDto } from '../types';
 import { getNameInitial, renderStarRating } from '../utils';
+import { ReviewHeaderDropdown } from './ReviewHeaderDropdown';
 import { TagName } from './TagName';
 
 interface ReviewHeaderProps {
@@ -101,40 +93,12 @@ export function ReviewHeader({
         </div>
       </div>
       {isAuthor && (
-        <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48 rounded-xl">
-            <DropdownMenuItem
-              className="cursor-pointer rounded-lg py-2"
-              onSelect={() => {
-                onEdit();
-                setIsDropdownOpen(false);
-              }}
-            >
-              <Pencil className="mr-2 h-4 w-4" />
-              수정하기
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="cursor-pointer rounded-lg py-2 text-red-500 hover:bg-red-50 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
-              onSelect={() => {
-                onDelete();
-                setIsDropdownOpen(false);
-              }}
-            >
-              <Trash className="mr-2 h-4 w-4 text-red-500" />
-              삭제하기
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ReviewHeaderDropdown
+          isDropdownOpen={isDropdownOpen}
+          setIsDropdownOpen={setIsDropdownOpen}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       )}
     </div>
   );

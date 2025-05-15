@@ -9,11 +9,11 @@ import { LibraryDialog } from '@/components/Library';
 import { LibraryCard } from '@/components/LibraryCard';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+  ResponsiveDropdownMenu,
+  ResponsiveDropdownMenuContent,
+  ResponsiveDropdownMenuItem,
+  ResponsiveDropdownMenuTrigger,
+} from '@/components/ui/responsive-dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { getTagColor } from '@/utils/tags';
@@ -115,8 +115,11 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
         <p className="text-sm text-gray-500">
           아직 이 책이 등록된 서재가 없습니다.
         </p>
-        <DropdownMenu open={libraryAddOpen} onOpenChange={setLibraryAddOpen}>
-          <DropdownMenuTrigger asChild>
+        <ResponsiveDropdownMenu
+          open={libraryAddOpen}
+          onOpenChange={setLibraryAddOpen}
+        >
+          <ResponsiveDropdownMenuTrigger asChild>
             <Button
               variant="outline"
               className="mt-3 w-44 max-w-xs rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
@@ -124,38 +127,34 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
               <ListPlus className="mr-1.5 h-4 w-4" />
               <span className="text-sm">내 서재에 담기</span>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            disablePortal
-            className="min-w-44 rounded-xl"
-            onEscapeKeyDown={() => setLibraryAddOpen(false)}
-          >
+          </ResponsiveDropdownMenuTrigger>
+          <ResponsiveDropdownMenuContent className="min-w-44 rounded-xl">
             {userLibraries && userLibraries.length > 0 ? (
               userLibraries.map(library => (
-                <DropdownMenuItem
+                <ResponsiveDropdownMenuItem
                   key={library.id}
                   className="cursor-pointer rounded-lg py-2"
-                  onClick={() => handleAddToLibraryWithAuth(library.id)}
+                  onSelect={() => handleAddToLibraryWithAuth(library.id)}
                 >
                   {library.name}
                   <span className="ml-1 text-xs text-gray-500">
                     {library.bookCount || 0}
                   </span>
-                </DropdownMenuItem>
+                </ResponsiveDropdownMenuItem>
               ))
             ) : (
               <div className="px-3 py-2 text-sm text-gray-500">
                 서재가 없습니다.
               </div>
             )}
-            <DropdownMenuItem
+            <ResponsiveDropdownMenuItem
               className="cursor-pointer rounded-lg py-2 text-black hover:bg-gray-100"
-              onClick={handleShowNewLibraryDialog}
+              onSelect={handleShowNewLibraryDialog}
             >
               <Plus className="mr-1.5 h-4 w-4" />새 서재 만들기
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+            </ResponsiveDropdownMenuItem>
+          </ResponsiveDropdownMenuContent>
+        </ResponsiveDropdownMenu>
 
         {/* 충돌 알림 다이얼로그 */}
         <ConflictAlertDialog

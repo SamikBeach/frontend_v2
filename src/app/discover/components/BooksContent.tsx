@@ -10,12 +10,14 @@ import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useDialogQuery, useQueryParams } from '@/hooks';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useAtom, useAtomValue } from 'jotai';
 import { useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useDiscoverBooksQuery } from '../hooks';
 
 export function BooksContent() {
+  const isMobile = useIsMobile();
   const { clearQueryParams } = useQueryParams();
 
   // Atom values
@@ -65,11 +67,28 @@ export function BooksContent() {
           endMessage={null}
           scrollThreshold={0.8}
         >
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {books.map(book => (
-              <BookCard key={book.id} book={book} onClick={handleBookSelect} />
-            ))}
-          </div>
+          {isMobile ? (
+            <div className="flex flex-col gap-4 px-0.5 py-1">
+              {books.map(book => (
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  onClick={handleBookSelect}
+                  horizontal={true}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+              {books.map(book => (
+                <BookCard
+                  key={book.id}
+                  book={book}
+                  onClick={handleBookSelect}
+                />
+              ))}
+            </div>
+          )}
         </InfiniteScroll>
       ) : (
         <div className="mt-8 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-12 text-center">

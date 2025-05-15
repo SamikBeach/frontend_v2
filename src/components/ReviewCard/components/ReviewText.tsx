@@ -19,7 +19,7 @@ export function ReviewText({
       {isLongContent && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="mt-2 text-sm text-gray-500 hover:text-gray-700"
+          className="mt-2 cursor-pointer text-sm text-gray-500 hover:text-gray-700"
         >
           {expanded ? '접기' : '더보기'}
         </button>

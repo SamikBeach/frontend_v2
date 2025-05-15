@@ -25,6 +25,7 @@ interface CommentSectionProps {
     isLiked: boolean
   ) => Promise<void>;
   highlightedCommentId?: number | null;
+  isMobile?: boolean;
 }
 
 export function CommentSection({
@@ -40,10 +41,10 @@ export function CommentSection({
   highlightedCommentId,
 }: CommentSectionProps) {
   return (
-    <div className="w-full space-y-3">
+    <div className="w-full space-y-2.5 sm:space-y-3">
       {/* 댓글 입력 */}
       <div className="flex w-full gap-2">
-        <Avatar className="mt-1 h-7 w-7 flex-shrink-0">
+        <Avatar className="mt-1 h-6 w-6 flex-shrink-0 sm:h-7 sm:w-7">
           {currentUser.avatar && (
             <AvatarImage
               src={currentUser.avatar}
@@ -56,13 +57,13 @@ export function CommentSection({
           </AvatarFallback>
         </Avatar>
         <div className="w-full flex-1">
-          <div className="flex w-full gap-2">
+          <div className="flex w-full gap-1.5 sm:gap-2">
             <div className="flex-1">
               <Input
                 placeholder="댓글을 입력하세요..."
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
-                className="h-9 w-full flex-1 rounded-xl border-gray-200 bg-gray-50 text-sm shadow-none"
+                className="h-8 w-full flex-1 rounded-lg border-gray-200 bg-gray-50 text-sm shadow-none sm:h-9 sm:rounded-xl"
                 disabled={isCommentLoading}
                 onKeyDown={e => {
                   // Cmd+Enter(Mac) 또는 Ctrl+Enter(Windows)로 댓글 제출
@@ -77,11 +78,11 @@ export function CommentSection({
             </div>
             <Button
               size="icon"
-              className="h-9 w-9 rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+              className="h-8 w-8 cursor-pointer rounded-lg bg-gray-900 text-white hover:bg-gray-800 sm:h-9 sm:w-9 sm:rounded-xl"
               onClick={handleSubmitComment}
               disabled={!commentText.trim() || isCommentLoading}
             >
-              <SendHorizontal className="h-4 w-4" />
+              <SendHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>
@@ -94,7 +95,7 @@ export function CommentSection({
           <p className="mt-3 text-xs text-gray-500">댓글을 불러오는 중...</p>
         </div>
       ) : comments && comments.length > 0 ? (
-        <div className="w-full space-y-3 pl-9">
+        <div className="w-full space-y-2.5 pl-7 sm:space-y-3 sm:pl-9">
           {comments.map(comment => (
             <CommentItem
               key={comment.id}
@@ -114,8 +115,8 @@ export function CommentSection({
           ))}
         </div>
       ) : (
-        <div className="my-2 flex flex-col items-center justify-center rounded-xl bg-gray-50 px-4 py-6 text-center">
-          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+        <div className="my-2 flex flex-col items-center justify-center rounded-xl bg-gray-50 px-3 py-5 text-center sm:px-4 sm:py-6">
+          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 sm:mb-3 sm:h-12 sm:w-12">
             <MessageCircle className="h-6 w-6 text-gray-400" />
           </div>
           <h4 className="text-sm font-medium text-gray-800">
@@ -126,7 +127,7 @@ export function CommentSection({
           </p>
           <Button
             variant="outline"
-            className="mt-4 h-8 rounded-full border-gray-300 bg-white px-4 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100"
+            className="mt-4 h-7 cursor-pointer rounded-full border-gray-300 bg-white px-4 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100 sm:h-8"
             onClick={() => {
               // 댓글 입력창에 포커스
               const commentInput = document.querySelector(
@@ -135,7 +136,7 @@ export function CommentSection({
               if (commentInput) commentInput.focus();
             }}
           >
-            <MessageCircle className="mr-1.5 h-3.5 w-3.5" />
+            <MessageCircle className="mr-1.5 h-3 w-3 sm:h-3.5 sm:w-3.5" />
             댓글 작성하기
           </Button>
         </div>
