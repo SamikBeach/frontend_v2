@@ -51,7 +51,7 @@ export function ReviewContentSkeleton() {
 export function ReviewSkeleton() {
   return (
     <div>
-      <div className="mb-6 flex flex-wrap gap-3">
+      <div className="mb-0 flex flex-wrap gap-3 sm:mb-6">
         {Array.from({ length: 3 }).map((_, index) => (
           <Skeleton key={index} className="h-8 w-16 rounded-full" />
         ))}

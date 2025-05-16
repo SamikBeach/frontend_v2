@@ -15,7 +15,7 @@ export function FilterMenu({
   onSelectType,
 }: FilterMenuProps) {
   return (
-    <div className="mb-6 flex flex-wrap gap-3">
+    <div className="mb-0 flex flex-wrap gap-3 sm:mb-6">
       {reviewTypeFilters.map(filter => (
         <MenuItem
           key={filter.id}

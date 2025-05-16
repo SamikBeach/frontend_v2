@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 // 필터 메뉴 스켈레톤 컴포넌트
 export function FilterMenuSkeleton() {
   return (
-    <div className="mb-6 flex flex-wrap gap-3">
+    <div className="mb-0 flex flex-wrap gap-3 sm:mb-6">
       {Array.from({ length: 5 }).map((_, index) => (
         <Skeleton key={index} className="h-8 w-24 rounded-full" />
       ))}
