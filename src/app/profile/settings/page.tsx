@@ -24,6 +24,8 @@ import {
   ResponsiveAlertDialogTrigger,
 } from '@/components/ui/responsive-alert-dialog';
 import { useCurrentUser } from '@/hooks';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -55,6 +57,7 @@ export default function ProfileSettingsPage() {
   const [isLocalProvider, setIsLocalProvider] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   // 비밀번호 변경 폼 초기화
   const passwordChangeForm = useForm<PasswordChangeFormValues>({
@@ -158,19 +161,21 @@ export default function ProfileSettingsPage() {
   };
 
   return (
-    <div className="container mx-auto max-w-3xl p-6">
-      <h1 className="mb-8 text-3xl font-bold">계정 설정</h1>
+    <div className="w-full bg-white px-2 sm:container sm:mx-auto sm:mt-0 sm:max-w-3xl sm:p-6">
+      <h1 className="mb-2 text-xl font-bold sm:mb-8 sm:text-3xl">계정 설정</h1>
 
       {/* 비밀번호 변경 섹션 */}
       {isLocalProvider && (
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>비밀번호 변경</CardTitle>
-            <CardDescription>
+        <Card className="mb-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm sm:mb-8">
+          <CardHeader className="bg-white px-4 py-4 sm:px-6 sm:py-6">
+            <CardTitle className="text-lg font-semibold sm:text-xl">
+              비밀번호 변경
+            </CardTitle>
+            <CardDescription className="mt-1 text-sm text-gray-500">
               안전한 비밀번호로 계정을 보호하세요.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 py-4 sm:px-6 sm:py-6">
             <form
               onSubmit={passwordChangeForm.handleSubmit(onPasswordChangeSubmit)}
               className="space-y-4"
@@ -186,6 +191,7 @@ export default function ProfileSettingsPage() {
                   id="currentPassword"
                   type="password"
                   placeholder="현재 비밀번호"
+                  className="h-11 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   {...passwordChangeForm.register('currentPassword', {
                     required: '현재 비밀번호를 입력해주세요',
                     minLength: {
@@ -212,6 +218,7 @@ export default function ProfileSettingsPage() {
                   id="newPassword"
                   type="password"
                   placeholder="새 비밀번호"
+                  className="h-11 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   {...passwordChangeForm.register('newPassword', {
                     required: '새 비밀번호를 입력해주세요',
                     minLength: {
@@ -241,6 +248,7 @@ export default function ProfileSettingsPage() {
                   id="confirmPassword"
                   type="password"
                   placeholder="새 비밀번호 확인"
+                  className="h-11 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                   {...passwordChangeForm.register('confirmPassword', {
                     required: '새 비밀번호 확인을 입력해주세요',
                     minLength: {
@@ -260,7 +268,7 @@ export default function ProfileSettingsPage() {
               </div>
 
               {serverError && (
-                <div className="rounded-md border border-red-100 bg-red-50 p-2 text-sm text-red-500">
+                <div className="rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-600">
                   {serverError}
                 </div>
               )}
@@ -268,9 +276,19 @@ export default function ProfileSettingsPage() {
               <Button
                 type="submit"
                 disabled={isChangingPassword}
-                className="mt-2"
+                className={cn(
+                  'mt-4 h-11 w-full cursor-pointer rounded-lg bg-gray-900 text-white transition-colors hover:bg-gray-800 sm:w-auto',
+                  isChangingPassword && 'opacity-70'
+                )}
               >
-                {isChangingPassword ? '변경 중...' : '비밀번호 변경'}
+                {isChangingPassword ? (
+                  <>
+                    <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                    변경 중...
+                  </>
+                ) : (
+                  '비밀번호 변경'
+                )}
               </Button>
             </form>
           </CardContent>
@@ -278,38 +296,45 @@ export default function ProfileSettingsPage() {
       )}
 
       {/* 계정 삭제 섹션 */}
-      <Card className="mb-8">
-        <CardHeader>
-          <CardTitle>계정 삭제</CardTitle>
-          <CardDescription>
+      <Card className="mb-6 overflow-hidden rounded-xl border border-gray-200 shadow-sm sm:mb-8">
+        <CardHeader className="bg-white px-4 py-4 sm:px-6 sm:py-6">
+          <CardTitle className="text-lg font-semibold sm:text-xl">
+            계정 삭제
+          </CardTitle>
+          <CardDescription className="mt-1 text-sm text-gray-500">
             계정을 삭제하면 모든 데이터가 영구적으로 삭제됩니다. 이 작업은
             되돌릴 수 없습니다.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 py-4 sm:px-6 sm:py-6">
           <ResponsiveAlertDialog
             open={deleteDialogOpen}
             onOpenChange={setDeleteDialogOpen}
           >
             <ResponsiveAlertDialogTrigger asChild>
-              <Button variant="destructive">계정 삭제</Button>
+              <Button
+                variant="destructive"
+                className="h-11 w-full cursor-pointer rounded-lg bg-red-500 text-white hover:bg-red-600 sm:w-auto"
+              >
+                계정 삭제
+              </Button>
             </ResponsiveAlertDialogTrigger>
-            <ResponsiveAlertDialogContent>
-              <ResponsiveAlertDialogHeader>
-                <ResponsiveAlertDialogTitle>
+            <ResponsiveAlertDialogContent className="max-w-md border-none bg-white p-0 sm:max-w-lg">
+              <ResponsiveAlertDialogHeader className="border-b border-gray-100 px-6 py-4 sm:py-5">
+                <ResponsiveAlertDialogTitle className="text-lg font-semibold sm:text-xl">
                   계정을 정말 삭제하시겠습니까?
                 </ResponsiveAlertDialogTitle>
-                <ResponsiveAlertDialogDescription>
+                <ResponsiveAlertDialogDescription className="mt-2 text-sm text-gray-500">
                   이 작업은 되돌릴 수 없습니다. 계정을 삭제하면 모든 데이터가
                   영구적으로 삭제됩니다.
                 </ResponsiveAlertDialogDescription>
               </ResponsiveAlertDialogHeader>
               <form
                 onSubmit={accountDeleteForm.handleSubmit(onAccountDeleteSubmit)}
-                className="space-y-4"
+                className="px-6 py-4"
               >
                 {isLocalProvider && (
-                  <div className="space-y-2">
+                  <div className="mb-6 space-y-2">
                     <label htmlFor="password" className="text-sm font-medium">
                       비밀번호 확인
                     </label>
@@ -317,6 +342,7 @@ export default function ProfileSettingsPage() {
                       id="password"
                       type="password"
                       placeholder="비밀번호를 입력하세요"
+                      className="h-11 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                       {...accountDeleteForm.register('password', {
                         required: '비밀번호를 입력해주세요',
                         minLength: {
@@ -333,16 +359,30 @@ export default function ProfileSettingsPage() {
                   </div>
                 )}
 
-                <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
-                  <ResponsiveAlertDialogCancel>
+                <ResponsiveAlertDialogFooter
+                  className="flex items-center justify-end gap-3 border-t border-gray-100 px-0 py-4"
+                  drawerClassName="flex flex-col-reverse gap-3 border-t border-gray-100 pt-4"
+                >
+                  <ResponsiveAlertDialogCancel className="h-11 cursor-pointer rounded-lg border-gray-200 bg-white text-gray-700 hover:bg-gray-50">
                     취소
                   </ResponsiveAlertDialogCancel>
                   <ResponsiveAlertDialogAction
                     type="submit"
                     disabled={isDeletingAccount}
-                    drawerClassName="cursor-pointer bg-gray-900 hover:bg-gray-800"
+                    className={cn(
+                      'h-11 cursor-pointer rounded-lg bg-red-500 text-white hover:bg-red-600',
+                      isDeletingAccount && 'opacity-70'
+                    )}
+                    drawerClassName="h-11 cursor-pointer rounded-lg bg-red-500 text-white hover:bg-red-600"
                   >
-                    {isDeletingAccount ? '삭제 중...' : '삭제'}
+                    {isDeletingAccount ? (
+                      <>
+                        <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                        삭제 중...
+                      </>
+                    ) : (
+                      '삭제'
+                    )}
                   </ResponsiveAlertDialogAction>
                 </ResponsiveAlertDialogFooter>
               </form>
