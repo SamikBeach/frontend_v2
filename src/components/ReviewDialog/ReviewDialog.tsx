@@ -324,6 +324,20 @@ export function ReviewDialog({
             drawerClassName="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
           >
             <Button
+              variant="outline"
+              className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
+              onClick={() => {
+                if (onCancel) {
+                  onCancel();
+                } else {
+                  onOpenChange(false);
+                }
+              }}
+              disabled={isSubmitting}
+            >
+              취소
+            </Button>
+            <Button
               onClick={handleSubmit}
               disabled={rating === 0 || isSubmitting}
               className={`rounded-xl text-white ${
@@ -340,20 +354,6 @@ export function ReviewDialog({
                 <PenLine className="mr-1.5 h-4 w-4" />
               )}
               {getButtonText()}
-            </Button>
-            <Button
-              variant="outline"
-              className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
-              onClick={() => {
-                if (onCancel) {
-                  onCancel();
-                } else {
-                  onOpenChange(false);
-                }
-              }}
-              disabled={isSubmitting}
-            >
-              취소
             </Button>
           </ResponsiveDialogFooter>
         </ResponsiveDialogContent>
