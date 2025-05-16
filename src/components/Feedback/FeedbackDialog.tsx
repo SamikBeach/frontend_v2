@@ -89,7 +89,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
         </div>
 
         <div className="px-5">
-          <ResponsiveDialogDescription className="mb-6 text-sm text-gray-600">
+          <ResponsiveDialogDescription className="mb-8 text-sm text-gray-600 sm:mb-7 md:mb-6">
             서비스 개선을 위한 의견이나 문제점을 알려주세요.
           </ResponsiveDialogDescription>
 
@@ -113,7 +113,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
             type="submit"
             onClick={handleSubmit(onSubmit)}
             disabled={isPending}
-            className="rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+            className="cursor-pointer rounded-xl bg-gray-900 text-white hover:bg-gray-800"
           >
             {isPending ? (
               <span className="flex items-center">제출 중...</span>
@@ -128,7 +128,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isPending}
-            className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
+            className="cursor-pointer rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
           >
             취소
           </Button>
