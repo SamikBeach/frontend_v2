@@ -18,7 +18,11 @@ import { SearchActivityResponse } from '@/apis/user/types';
 import { getSearchActivity } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
-import { NoDataMessage, PrivateDataMessage } from '../components';
+import {
+  ChartContainer,
+  NoDataMessage,
+  PrivateDataMessage,
+} from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
@@ -188,34 +192,48 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white md:p-3">
+    <ChartContainer>
       <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-start justify-between">
-          <div className="flex items-center gap-2">
-            <div className="rounded-full bg-blue-100 p-1.5">
-              {activePeriod === 'keywords' ? (
-                <Search className="h-4 w-4 text-blue-600" />
-              ) : (
-                <BarChart3 className="h-4 w-4 text-blue-600" />
-              )}
+        <div className="mb-2 flex flex-col space-y-2 sm:space-y-3">
+          {/* 제목과 공개/비공개 토글 */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="rounded-full bg-blue-100 p-1.5">
+                {activePeriod === 'keywords' ? (
+                  <Search className="h-4 w-4 text-blue-600" />
+                ) : (
+                  <BarChart3 className="h-4 w-4 text-blue-600" />
+                )}
+              </div>
+              <div>
+                <h3 className="text-base font-medium text-gray-700">
+                  {CHART_TITLE}
+                </h3>
+                <p className="text-xs text-gray-500">
+                  총 {data.searchCount.toLocaleString()}회 검색
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-base font-medium text-gray-700">
-                {CHART_TITLE}
-              </h3>
-              <p className="text-xs text-gray-500">
-                총 {data.searchCount.toLocaleString()}회 검색
-              </p>
-            </div>
+
+            {/* 타이틀 우측에 PrivacyToggle 배치 */}
+            {isMyProfile && (
+              <PrivacyToggle
+                isPublic={settings?.isSearchActivityPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            )}
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
+
+          {/* 기간 옵션 버튼 - 모바일/데스크톱 모두 동일하게 표시 */}
+          <div className="overflow-x-auto">
+            <div className="flex gap-1.5 pb-1">
               {periodOptions.map(option => (
                 <button
                   key={option.id}
                   onClick={() => setActivePeriod(option.id)}
                   className={cn(
-                    'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                    'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium whitespace-nowrap transition-colors',
                     activePeriod === option.id
                       ? 'border-blue-200 bg-blue-50 text-blue-600'
                       : 'border-gray-200 text-gray-700 hover:bg-gray-50'
@@ -225,17 +243,10 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
                 </button>
               ))}
             </div>
-            {isMyProfile && (
-              <PrivacyToggle
-                isPublic={settings?.isSearchActivityPublic || false}
-                isLoading={showLoading}
-                onToggle={handlePrivacyToggle}
-              />
-            )}
           </div>
         </div>
 
-        <div className="h-[calc(100%-3rem)] overflow-hidden">
+        <div className="h-[calc(100%-5rem)] overflow-hidden">
           {activePeriod === 'keywords' ? (
             // 키워드 모드 - 바 차트 표시
             <div className="h-full">
@@ -388,7 +399,7 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
           )}
         </div>
       </div>
-    </div>
+    </ChartContainer>
   );
 };
 
