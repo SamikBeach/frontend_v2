@@ -302,7 +302,7 @@ const ReadingStatusByPeriodChart = ({
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={periodData}
-              margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+              margin={{ top: 5, right: 5, bottom: 5, left: -20 }}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
