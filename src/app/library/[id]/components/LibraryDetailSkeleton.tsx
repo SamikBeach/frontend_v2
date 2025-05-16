@@ -3,7 +3,7 @@ import { LibraryContentSkeleton } from './LibraryContent';
 export function LibraryDetailSkeleton() {
   return (
     <div className="mx-auto w-full max-w-[1920px] px-4">
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-white pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-white md:pt-3">
         <div className="flex-1">
           <div className="mb-2 flex flex-wrap items-center gap-3">
             {/* 서재 제목 (text-2xl font-bold) */}
@@ -36,7 +36,7 @@ export function LibraryDetailSkeleton() {
         <div>
           <LibraryContentSkeleton />
         </div>
-        <div className="w-full min-w-[400px]">
+        <div className="w-full lg:min-w-[400px]">
           <div className="rounded-xl bg-white p-5">
             <div className="h-12 w-12 animate-pulse rounded-full bg-gray-200"></div>
             <div className="mt-3 h-5 w-32 animate-pulse rounded-lg bg-gray-200"></div>
