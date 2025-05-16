@@ -116,11 +116,11 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   return (
     <div className={className}>
       {/* 카테고리 목록 */}
-      <div className="no-scrollbar w-full overflow-x-auto pt-0.5 pb-1 md:pt-1 md:pb-1">
+      <div className="no-scrollbar mr-2 w-full overflow-x-auto pt-0.5 pb-1 md:pt-1 md:pb-1">
         {/* 모바일에서는 항상 모든 카테고리 표시, 데스크탑에서는 visibleCategories 기반으로 표시 */}
         <div className="flex gap-1.5 md:flex-wrap md:gap-2">
           {/* 모바일에서는 모든 카테고리 표시 */}
-          <div className="flex gap-2 md:hidden">
+          <div className="flex gap-2 px-2 md:hidden">
             <button
               key="all-mobile"
               onClick={() => handleCategoryClick('all')}

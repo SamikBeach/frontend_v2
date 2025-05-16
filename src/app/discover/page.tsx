@@ -154,7 +154,7 @@ export default function DiscoverPage() {
             <div className="flex w-full items-start justify-between">
               {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
               <Suspense fallback={<CategoryFilterSkeleton />}>
-                <CategoryFilter className="w-full max-w-[100vw] pl-2" />
+                <CategoryFilter className="w-full max-w-[100vw]" />
               </Suspense>
               <div className="ml-4 hidden flex-shrink-0 xl:block">
                 <DiscoverSortDropdown />
