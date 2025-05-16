@@ -29,7 +29,7 @@ export function BookInfo() {
           <Button
             variant="ghost"
             size="sm"
-            className="mt-1 h-auto p-0 text-xs text-gray-500 hover:bg-transparent hover:text-gray-700"
+            className="mt-1 h-auto cursor-pointer p-0 text-xs text-gray-500 hover:bg-transparent hover:text-gray-700"
             onClick={toggleExpand}
           >
             {expanded ? '접기' : '더 보기'}

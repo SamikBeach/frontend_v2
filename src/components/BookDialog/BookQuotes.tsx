@@ -24,7 +24,7 @@ export function BookQuotes() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 rounded-full px-2.5 text-gray-600 hover:bg-gray-100"
+                  className="h-7 cursor-pointer rounded-full px-2.5 text-gray-600 hover:bg-gray-100"
                 >
                   <ThumbsUp className="mr-1 h-3.5 w-3.5" />
                   <span>{quote.likes}</span>
@@ -32,7 +32,7 @@ export function BookQuotes() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-7 rounded-full px-2.5 text-gray-600 hover:bg-gray-100"
+                  className="h-7 cursor-pointer rounded-full px-2.5 text-gray-600 hover:bg-gray-100"
                 >
                   <Share2 className="mr-1 h-3.5 w-3.5" />
                   <span>공유</span>

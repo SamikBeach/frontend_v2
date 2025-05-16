@@ -407,7 +407,7 @@ function ErrorFallback({
       <Button
         variant="outline"
         size="sm"
-        className="mt-2 border-red-200 text-red-600 hover:bg-red-100"
+        className="mt-2 cursor-pointer border-red-200 text-red-600 hover:bg-red-100"
         onClick={resetErrorBoundary}
       >
         다시 시도
@@ -554,7 +554,7 @@ function ReviewsList({
         <p className="text-sm text-gray-500">아직 리뷰가 없습니다</p>
         <Button
           variant="outline"
-          className="mt-3 rounded-full text-sm font-medium"
+          className="mt-3 cursor-pointer rounded-full text-sm font-medium"
           onClick={handleReviewDialogWithAuth}
         >
           첫 리뷰를 작성해보세요
