@@ -84,7 +84,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
         {/* 모바일에서는 항상 모든 카테고리 표시, 데스크탑에서는 visibleCategories 기반으로 표시 */}
         <div className="flex gap-1.5 md:flex-wrap md:gap-2">
           {/* 모바일에서는 모든 카테고리 표시 */}
-          <div className="flex gap-2 md:hidden px-2">
+          <div className="flex gap-2 px-2 md:hidden">
             {categories.map(category => (
               <button
                 key={category.id}
@@ -161,7 +161,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
       {/* 선택한 카테고리의 서브카테고리 목록 */}
       {subcategories.length > 0 && (
         <div className="no-scrollbar w-full overflow-x-auto py-1 md:py-1">
-          <div className="flex gap-2 px-0.5 md:gap-2">
+          <div className="flex gap-2 px-2 md:gap-2">
             <button
               onClick={() => handleSubcategoryClick('all')}
               className={cn(
