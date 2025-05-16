@@ -67,7 +67,7 @@ export const LibrarySidebarOwner: FC<LibrarySidebarOwnerProps> = ({
           <Button
             variant={isFollowing ? 'outline' : 'default'}
             size="sm"
-            className={`h-7 rounded-full text-xs ${
+            className={`h-7 cursor-pointer rounded-full text-xs ${
               isFollowing
                 ? 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                 : 'bg-gray-900 text-white hover:bg-gray-800'
