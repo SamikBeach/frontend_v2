@@ -12,7 +12,7 @@ export function StatsTabsSkeleton() {
   };
 
   return (
-    <div className="mb-0 flex flex-wrap gap-3 sm:mb-6">
+    <div className="mb-3 flex flex-wrap gap-3 sm:mb-6">
       {statsSections.map((section, index) => (
         <Skeleton
           key={index}

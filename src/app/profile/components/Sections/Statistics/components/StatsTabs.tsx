@@ -19,7 +19,7 @@ export function StatsTabs({
   onSelectSection,
 }: StatsTabsProps) {
   return (
-    <div className="mb-0 flex flex-wrap gap-3 sm:mb-6">
+    <div className="mb-3 flex flex-wrap gap-3 sm:mb-6">
       {statsSections.map(section => (
         <StatsMenuItem
           key={section.id}

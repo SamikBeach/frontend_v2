@@ -4,7 +4,7 @@ import { readingStatusFilters } from './components/FilterMenu';
 // 필터 메뉴 스켈레톤 컴포넌트
 export function FilterMenuSkeleton() {
   return (
-    <div className="mb-0 flex flex-wrap gap-3 sm:mb-6">
+    <div className="mb-3 flex flex-wrap gap-3 sm:mb-6">
       {readingStatusFilters.map(filter => (
         <div key={filter.id} className="flex items-center">
           <Skeleton

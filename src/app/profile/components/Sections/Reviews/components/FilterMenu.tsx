@@ -23,7 +23,7 @@ export function FilterMenu({ selectedTab, setSelectedTab }: FilterMenuProps) {
     profileData.reviewCount.total + profileData.ratingCount;
 
   return (
-    <div className="mb-0 flex flex-wrap gap-3 sm:mb-6">
+    <div className="mb-3 flex flex-wrap gap-3 sm:mb-6">
       <MenuItem
         id="all"
         name="전체"
