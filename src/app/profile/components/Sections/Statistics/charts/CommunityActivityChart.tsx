@@ -16,7 +16,7 @@ import { CommunityActivityResponse } from '@/apis/user/types';
 import { getCommunityActivity } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
-import { PrivateDataMessage } from '../components';
+import { ChartContainer, PrivateDataMessage } from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 import {
@@ -41,14 +41,6 @@ interface CommunityActivityDataItem {
   question: number;
   meetup: number;
   [key: string]: any; // 동적 필드 처리를 위한 인덱스 시그니처
-}
-
-// API 응답 확장 타입
-interface ExtendedCommunityActivityResponse extends CommunityActivityResponse {
-  yearly?: CommunityActivityDataItem[];
-  monthly?: CommunityActivityDataItem[];
-  weekly?: CommunityActivityDataItem[];
-  daily?: CommunityActivityDataItem[];
 }
 
 // 리뷰 타입별 색상 정의 (리뷰 타입 제외)
@@ -132,11 +124,10 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
     ? useStatisticsSettings(id)
     : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
 
-  const { data, isLoading } =
-    useSuspenseQuery<ExtendedCommunityActivityResponse>({
-      queryKey: ['communityActivity', id],
-      queryFn: () => getCommunityActivity(id),
-    });
+  const { data, isLoading } = useSuspenseQuery<CommunityActivityResponse>({
+    queryKey: ['communityActivity', id],
+    queryFn: () => getCommunityActivity(id),
+  });
 
   // 데이터가 비공개인 경우
   if (!data.isPublic && !isMyProfile) {
@@ -156,52 +147,97 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
   // 설정 로딩 중 또는 설정 업데이트 중인지 확인
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
-  // 기간별 데이터 선택
-  let chartData: CommunityActivityDataItem[] = [];
-  let dataKey = '';
+  // 주어진 기간에 따라 차트 데이터 생성
+  const getChartData = () => {
+    if (!data) return [];
 
-  switch (activePeriod) {
-    case 'yearly':
-      chartData = [...(data.yearly || [])].sort(
-        (a, b) => a.year?.localeCompare(b.year || '') || 0
-      );
-      dataKey = 'year';
-      break;
-    case 'monthly':
-      chartData = [...(data.monthly || [])].sort(
-        (a, b) => a.month?.localeCompare(b.month || '') || 0
-      );
-      dataKey = 'month';
-      break;
-    case 'weekly':
-      // 주별 데이터 정렬 (n월 m째주 형식)
-      chartData = [...(data.weekly || [])].sort((a, b) => {
-        if (!a.week || !b.week) return 0;
+    // 데이터 배열 선언
+    let chartData: CommunityActivityDataItem[] = [];
 
-        // 월이 다르면 월로 비교
-        const aMonth = parseInt(a.week.split('월')[0]);
-        const bMonth = parseInt(b.week.split('월')[0]);
-        if (aMonth !== bMonth) return aMonth - bMonth;
+    // 월 이름과 날짜 이름을 저장할 배열
+    const monthNames: string[] = [];
+    const dayNames: string[] = [];
 
-        // 월이 같으면 주차로 비교
-        const aWeek = parseInt(a.week.split('째주')[0].split('월 ')[1]);
-        const bWeek = parseInt(b.week.split('째주')[0].split('월 ')[1]);
-        return aWeek - bWeek;
-      });
-      dataKey = 'week';
-      break;
-    case 'daily':
-      chartData = [...(data.daily || [])].sort(
-        (a, b) => a.date?.localeCompare(b.date || '') || 0
-      );
-      dataKey = 'date';
-      break;
-    default:
-      chartData = [...(data.monthly || [])].sort(
-        (a, b) => a.month?.localeCompare(b.month || '') || 0
-      );
-      dataKey = 'month';
-  }
+    switch (activePeriod) {
+      case 'yearly':
+        return data.yearly || [];
+
+      case 'monthly':
+        // 최근 5개월 데이터 생성
+        for (let i = 4; i >= 0; i--) {
+          const date = new Date();
+          date.setMonth(date.getMonth() - i);
+          monthNames.push(
+            `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`
+          );
+        }
+
+        // 서버 데이터에서 해당 월 데이터 찾아서 매핑
+        chartData = monthNames.map(monthKey => {
+          const monthData = data.monthly.find(item => item.month === monthKey);
+          return (
+            monthData || {
+              month: monthKey,
+              general: 0,
+              discussion: 0,
+              question: 0,
+              meetup: 0,
+            }
+          );
+        });
+        return chartData;
+
+      case 'weekly':
+        return data.weekly || [];
+
+      case 'daily':
+        // 최근 5일 데이터 생성
+        for (let i = 4; i >= 0; i--) {
+          const date = new Date();
+          date.setDate(date.getDate() - i);
+          dayNames.push(
+            `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+              2,
+              '0'
+            )}-${String(date.getDate()).padStart(2, '0')}`
+          );
+        }
+
+        // 서버 데이터에서 해당 일자 데이터 찾아서 매핑
+        chartData = dayNames.map(dateKey => {
+          const dayData = data.daily.find(item => item.date === dateKey);
+          return (
+            dayData || {
+              date: dateKey,
+              general: 0,
+              discussion: 0,
+              question: 0,
+              meetup: 0,
+            }
+          );
+        });
+        return chartData;
+
+      default:
+        return [];
+    }
+  };
+
+  // 현재 기간에 따른 X축 데이터 키 결정
+  const getDataKey = () => {
+    switch (activePeriod) {
+      case 'yearly':
+        return 'year';
+      case 'monthly':
+        return 'month';
+      case 'weekly':
+        return 'week';
+      case 'daily':
+        return 'date';
+      default:
+        return 'month';
+    }
+  };
 
   // X축 레이블 포맷터
   const formatXAxisLabel = (label: string) => {
@@ -220,172 +256,10 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
   };
 
   // 데이터가 없는 경우
-  const hasNoData =
-    !chartData || chartData.length === 0 || data.totalReviews === 0;
-
-  // 빈 데이터일 경우 각 기간별로 기본 데이터 생성
-  if (hasNoData) {
-    switch (activePeriod) {
-      case 'yearly':
-        chartData = [
-          {
-            year: (new Date().getFullYear() - 4).toString(),
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            year: (new Date().getFullYear() - 3).toString(),
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            year: (new Date().getFullYear() - 2).toString(),
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            year: (new Date().getFullYear() - 1).toString(),
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            year: new Date().getFullYear().toString(),
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-        ];
-        dataKey = 'year';
-        break;
-      case 'monthly':
-        // 최근 5개월 데이터 생성
-        const monthNames = [];
-        for (let i = 4; i >= 0; i--) {
-          const date = new Date();
-          date.setMonth(date.getMonth() - i);
-          const year = date.getFullYear();
-          const month = date.getMonth() + 1;
-          monthNames.push(`${year}-${month.toString().padStart(2, '0')}`);
-        }
-        chartData = monthNames.map(month => ({
-          month,
-          general: 0,
-          discussion: 0,
-          question: 0,
-          meetup: 0,
-        }));
-        dataKey = 'month';
-        break;
-      case 'weekly':
-        chartData = [
-          {
-            week: '5월 1째주',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            week: '4월 4째주',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            week: '4월 3째주',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            week: '4월 2째주',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            week: '4월 1째주',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-        ];
-        dataKey = 'week';
-        break;
-      case 'daily':
-        // 최근 5일 데이터 생성
-        const dayNames = [];
-        for (let i = 4; i >= 0; i--) {
-          const date = new Date();
-          date.setDate(date.getDate() - i);
-          const year = date.getFullYear();
-          const month = (date.getMonth() + 1).toString().padStart(2, '0');
-          const day = date.getDate().toString().padStart(2, '0');
-          dayNames.push(`${year}-${month}-${day}`);
-        }
-        chartData = dayNames.map(date => ({
-          date,
-          general: 0,
-          discussion: 0,
-          question: 0,
-          meetup: 0,
-        }));
-        dataKey = 'date';
-        break;
-      default:
-        chartData = [
-          {
-            month: '2023-08',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            month: '2023-09',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            month: '2023-10',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            month: '2023-11',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-          {
-            month: '2023-12',
-            general: 0,
-            discussion: 0,
-            question: 0,
-            meetup: 0,
-          },
-        ];
-        dataKey = 'month';
-    }
-  }
+  const hasNoData = () => {
+    const chartData = getChartData();
+    return !chartData || chartData.length === 0 || data.totalReviews === 0;
+  };
 
   // 기간 옵션
   const periodOptions = [
@@ -396,51 +270,62 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
   ];
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white md:p-3">
-      <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-start justify-between">
-          <div>
-            <h3 className="text-base font-medium text-gray-700">
-              커뮤니티 활동
-            </h3>
-            <p className="text-xs text-gray-500">
-              활동 수: {data.totalReviews || 0}개
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
-              {periodOptions.map(option => (
-                <button
-                  key={option.id}
-                  onClick={() => setActivePeriod(option.id)}
-                  className={cn(
-                    'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                    activePeriod === option.id
-                      ? 'border-blue-200 bg-blue-50 text-blue-600'
-                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                  )}
-                >
-                  {option.name}
-                </button>
-              ))}
-            </div>
-            {isMyProfile && (
+    <ChartContainer>
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:min-w-[120px]">
+          <h3 className="text-base font-medium text-gray-700">커뮤니티 활동</h3>
+          {isMyProfile && (
+            <div className="sm:hidden">
               <PrivacyToggle
                 isPublic={settings?.isCommunityActivityPublic || false}
                 isLoading={showLoading}
                 onToggle={handlePrivacyToggle}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        <div className="h-[calc(100%-2rem)]">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-1">
+            {periodOptions.map(option => (
+              <button
+                key={option.id}
+                onClick={() => setActivePeriod(option.id)}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activePeriod === option.id
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                {option.name}
+              </button>
+            ))}
+          </div>
+          {isMyProfile && (
+            <div className="hidden sm:block">
+              <PrivacyToggle
+                isPublic={settings?.isCommunityActivityPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="h-[320px]">
+        {hasNoData() ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <p className="text-sm text-gray-500">데이터가 없습니다</p>
+          </div>
+        ) : (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
-              data={chartData}
-              margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+              data={getChartData()}
+              margin={{ top: 10, right: 10, left: -15, bottom: 10 }}
               barGap={0}
-              barSize={8}
+              barCategoryGap="20%"
             >
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -448,26 +333,24 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
                 stroke="#f3f4f6"
               />
               <XAxis
-                dataKey={dataKey}
+                dataKey={getDataKey()}
                 tick={{ fontSize: 11 }}
                 tickLine={false}
                 axisLine={{ stroke: '#e5e7eb' }}
                 tickFormatter={formatXAxisLabel}
-                height={30}
-                angle={0}
-                textAnchor="middle"
-                interval={0}
-                minTickGap={5}
+                height={25}
               />
               <YAxis
                 tick={{ fontSize: 11 }}
                 tickLine={false}
-                axisLine={{ stroke: '#e5e7eb' }}
-                width={30}
-                allowDecimals={false}
+                axisLine={false}
+                tickFormatter={value => value}
               />
               <Tooltip content={<CustomTooltip />} />
-              <Legend content={<CustomLegend />} />
+              <Legend
+                content={<CustomLegend />}
+                wrapperStyle={{ paddingTop: '10px' }}
+              />
               <Bar
                 dataKey="general"
                 name="일반"
@@ -498,9 +381,9 @@ const CommunityActivityChart = ({ userId }: CommunityActivityChartProps) => {
               />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        )}
       </div>
-    </div>
+    </ChartContainer>
   );
 };
 
