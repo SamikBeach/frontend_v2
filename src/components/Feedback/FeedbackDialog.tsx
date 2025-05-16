@@ -95,9 +95,6 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-3">
-              <label htmlFor="content" className="text-sm font-medium">
-                내용
-              </label>
               <Textarea
                 id="content"
                 placeholder="피드백 내용을 자세히 입력해주세요"
