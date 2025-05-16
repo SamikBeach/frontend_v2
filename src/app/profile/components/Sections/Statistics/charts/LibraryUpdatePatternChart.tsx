@@ -1,5 +1,4 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BarChart3, BookOpen } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import {
@@ -20,7 +19,11 @@ import { LibraryUpdatePatternResponse } from '@/apis/user/types';
 import { getLibraryUpdatePattern } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
-import { NoDataMessage, PrivateDataMessage } from '../components';
+import {
+  ChartContainer,
+  NoDataMessage,
+  PrivateDataMessage,
+} from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
@@ -225,150 +228,163 @@ const LibraryUpdatePatternChart = ({
   );
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
-      <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-start justify-between">
-          <div>
-            <h3 className="text-base font-medium text-gray-700">
-              서재 업데이트 패턴
-            </h3>
-            <p className="text-xs text-gray-500">
-              가장 활발한 서재: {data.mostActiveLibrary || '데이터 없음'}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
-              <button
-                onClick={() => setActiveTab('frequency')}
-                className={cn(
-                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                  activeTab === 'frequency'
-                    ? 'border-blue-200 bg-blue-50 text-blue-600'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                )}
-              >
-                업데이트 빈도
-              </button>
-              <button
-                onClick={() => setActiveTab('weekday')}
-                className={cn(
-                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                  activeTab === 'weekday'
-                    ? 'border-blue-200 bg-blue-50 text-blue-600'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                )}
-              >
-                요일별 활동
-              </button>
-            </div>
-            {isMyProfile && (
+    <ChartContainer>
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:min-w-[120px]">
+          <h3 className="text-base font-medium text-gray-700">
+            서재 업데이트 패턴
+          </h3>
+          {isMyProfile && (
+            <div className="sm:hidden">
               <PrivacyToggle
                 isPublic={settings?.isLibraryUpdatePatternPublic || false}
                 isLoading={showLoading}
                 onToggle={handlePrivacyToggle}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        <div className="flex-1">
-          {activeTab === 'frequency' ? (
-            <div className="h-full pt-2">
-              {data.updateFrequency.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={sortedFrequencyData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                      outerRadius={90}
-                      innerRadius={35}
-                      dataKey="displayValue"
-                      nameKey="library"
-                      paddingAngle={2}
-                    >
-                      {sortedFrequencyData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      content={
-                        totalUpdatesPerMonth === 0 ? (
-                          <ZeroFrequencyTooltip />
-                        ) : (
-                          <CustomTooltip />
-                        )
-                      }
-                    />
-                    <Legend
-                      content={<CustomLegend />}
-                      verticalAlign="middle"
-                      align="right"
-                      layout="vertical"
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
-                      <BookOpen className="h-10 w-10 text-gray-300" />
-                    </div>
-                    <p className="text-sm font-medium text-gray-500">
-                      업데이트 빈도 데이터가 없습니다
-                    </p>
-                  </div>
-                </div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab('frequency')}
+              className={cn(
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                activeTab === 'frequency'
+                  ? 'border-blue-200 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
               )}
-            </div>
-          ) : (
-            <div className="h-full pt-2">
-              {data.weekdayActivity.length > 0 ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={weekdayData}
-                    margin={{ top: 5, right: 25, left: 5, bottom: 5 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-                    <XAxis
-                      dataKey="day"
-                      tickFormatter={formatDay}
-                      tick={{ fontSize: 11 }}
-                      tickLine={false}
-                      axisLine={{ stroke: '#e5e7eb' }}
-                    />
-                    <YAxis
-                      tick={{ fontSize: 11 }}
-                      tickLine={false}
-                      axisLine={{ stroke: '#e5e7eb' }}
-                    />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Bar dataKey="count" name="활동 횟수" radius={[4, 4, 0, 0]}>
-                      {weekdayData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
-                      <BarChart3 className="h-10 w-10 text-gray-300" />
-                    </div>
-                    <p className="text-sm font-medium text-gray-500">
-                      요일별 활동 데이터가 없습니다
-                    </p>
-                  </div>
-                </div>
+            >
+              업데이트 빈도
+            </button>
+            <button
+              onClick={() => setActiveTab('weekday')}
+              className={cn(
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                activeTab === 'weekday'
+                  ? 'border-blue-200 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
               )}
+            >
+              요일별 활동
+            </button>
+          </div>
+          {isMyProfile && (
+            <div className="hidden sm:block">
+              <PrivacyToggle
+                isPublic={settings?.isLibraryUpdatePatternPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
             </div>
           )}
         </div>
       </div>
-    </div>
+
+      <div className="h-[320px]">
+        {activeTab === 'frequency' ? (
+          <div className="h-full pt-2">
+            {sortedFrequencyData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={sortedFrequencyData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={renderCustomizedLabel}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="displayValue"
+                    nameKey="library"
+                  >
+                    {sortedFrequencyData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                        stroke="#fff"
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    content={
+                      totalUpdatesPerMonth === 0 ? (
+                        <ZeroFrequencyTooltip />
+                      ) : (
+                        <CustomTooltip />
+                      )
+                    }
+                  />
+                  <Legend
+                    layout="vertical"
+                    align="right"
+                    verticalAlign="middle"
+                    content={<CustomLegend />}
+                    wrapperStyle={{ right: 30 }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <p className="text-sm text-gray-500">
+                  서재 업데이트 빈도 데이터가 없습니다
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="h-full pt-2">
+            {weekdayData.length > 0 && totalWeekdayActivity > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={weekdayData}
+                  margin={{ top: 10, right: 10, left: -15, bottom: 10 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#f3f4f6"
+                  />
+                  <XAxis
+                    dataKey="day"
+                    tick={{ fontSize: 11 }}
+                    tickLine={false}
+                    axisLine={{ stroke: '#e5e7eb' }}
+                    tickFormatter={formatDay}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11 }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar
+                    dataKey="count"
+                    name="활동 빈도"
+                    fill="#93c5fd"
+                    radius={[4, 4, 0, 0]}
+                  >
+                    {weekdayData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={CHART_COLORS[index % CHART_COLORS.length]}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <p className="text-sm text-gray-500">
+                  요일별 활동 데이터가 없습니다
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </ChartContainer>
   );
 };
 
