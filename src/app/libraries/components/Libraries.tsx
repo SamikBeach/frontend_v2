@@ -95,7 +95,7 @@ export function Libraries({ setSearchQuery }: LibrariesProps) {
   };
 
   return (
-    <>
+    <div className="w-full">
       {/* Header 컴포넌트로 필터 영역 분리 */}
       <Header
         sortOption={sortOption}
@@ -149,6 +149,6 @@ export function Libraries({ setSearchQuery }: LibrariesProps) {
           </TooltipContent>
         </Tooltip>
       )}
-    </>
+    </div>
   );
 }
