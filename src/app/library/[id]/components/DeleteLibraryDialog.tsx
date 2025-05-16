@@ -73,13 +73,6 @@ export function DeleteLibraryDialog({
           </ResponsiveAlertDialogDescription>
         </ResponsiveAlertDialogHeader>
         <ResponsiveAlertDialogFooter>
-          <ResponsiveAlertDialogAction
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="cursor-pointer bg-red-500 hover:bg-red-600"
-          >
-            {isDeleting ? '삭제 중...' : '삭제하기'}
-          </ResponsiveAlertDialogAction>
           <ResponsiveAlertDialogCancel
             disabled={isDeleting}
             className="cursor-pointer"
@@ -87,6 +80,13 @@ export function DeleteLibraryDialog({
           >
             취소
           </ResponsiveAlertDialogCancel>
+          <ResponsiveAlertDialogAction
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="cursor-pointer bg-red-500 hover:bg-red-600"
+          >
+            {isDeleting ? '삭제 중...' : '삭제하기'}
+          </ResponsiveAlertDialogAction>
         </ResponsiveAlertDialogFooter>
       </ResponsiveAlertDialogContent>
     </ResponsiveAlertDialog>

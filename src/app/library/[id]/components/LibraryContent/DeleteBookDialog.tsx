@@ -55,6 +55,12 @@ export function DeleteBookDialog({
           </ResponsiveAlertDialogDescription>
         </ResponsiveAlertDialogHeader>
         <ResponsiveAlertDialogFooter>
+          <ResponsiveAlertDialogCancel
+            className="cursor-pointer rounded-lg border-gray-200"
+            disabled={isDeleting}
+          >
+            취소
+          </ResponsiveAlertDialogCancel>
           <ResponsiveAlertDialogAction
             className="cursor-pointer rounded-lg bg-red-600 hover:bg-red-700 focus:ring-red-600"
             onClick={handleDelete}
@@ -62,12 +68,6 @@ export function DeleteBookDialog({
           >
             {isDeleting ? '삭제 중...' : '삭제'}
           </ResponsiveAlertDialogAction>
-          <ResponsiveAlertDialogCancel
-            className="cursor-pointer rounded-lg border-gray-200"
-            disabled={isDeleting}
-          >
-            취소
-          </ResponsiveAlertDialogCancel>
         </ResponsiveAlertDialogFooter>
       </ResponsiveAlertDialogContent>
     </ResponsiveAlertDialog>

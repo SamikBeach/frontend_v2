@@ -73,15 +73,15 @@ export function CommentItemDropdown({
               </ResponsiveAlertDialogDescription>
             </ResponsiveAlertDialogHeader>
             <ResponsiveAlertDialogFooter>
+              <ResponsiveAlertDialogCancel className="cursor-pointer">
+                취소
+              </ResponsiveAlertDialogCancel>
               <ResponsiveAlertDialogAction
                 onClick={onDeleteComment}
                 className="bg-red-500 text-white hover:bg-red-600"
               >
                 {isDeleting ? '삭제 중...' : '삭제'}
               </ResponsiveAlertDialogAction>
-              <ResponsiveAlertDialogCancel className="cursor-pointer">
-                취소
-              </ResponsiveAlertDialogCancel>
             </ResponsiveAlertDialogFooter>
           </ResponsiveAlertDialogContent>
         </ResponsiveAlertDialog>

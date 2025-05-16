@@ -329,6 +329,9 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                                   </ResponsiveAlertDialogDescription>
                                 </ResponsiveAlertDialogHeader>
                                 <ResponsiveAlertDialogFooter>
+                                  <ResponsiveAlertDialogCancel className="cursor-pointer">
+                                    취소
+                                  </ResponsiveAlertDialogCancel>
                                   <ResponsiveAlertDialogAction
                                     onClick={() =>
                                       handleDeleteComment(comment.id)
@@ -337,9 +340,6 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                                   >
                                     {isDeleting ? '삭제 중...' : '삭제'}
                                   </ResponsiveAlertDialogAction>
-                                  <ResponsiveAlertDialogCancel className="cursor-pointer">
-                                    취소
-                                  </ResponsiveAlertDialogCancel>
                                 </ResponsiveAlertDialogFooter>
                               </ResponsiveAlertDialogContent>
                             </ResponsiveAlertDialog>
@@ -680,6 +680,9 @@ function ReviewsList({
                                 </ResponsiveAlertDialogDescription>
                               </ResponsiveAlertDialogHeader>
                               <ResponsiveAlertDialogFooter>
+                                <ResponsiveAlertDialogCancel className="cursor-pointer">
+                                  취소
+                                </ResponsiveAlertDialogCancel>
                                 <ResponsiveAlertDialogAction
                                   onClick={() =>
                                     handleDeleteReviewClick(review.id)
@@ -691,9 +694,6 @@ function ReviewsList({
                                     ? '삭제 중...'
                                     : '삭제'}
                                 </ResponsiveAlertDialogAction>
-                                <ResponsiveAlertDialogCancel className="cursor-pointer">
-                                  취소
-                                </ResponsiveAlertDialogCancel>
                               </ResponsiveAlertDialogFooter>
                             </ResponsiveAlertDialogContent>
                           </ResponsiveAlertDialog>
