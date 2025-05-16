@@ -70,7 +70,7 @@ export function RatingStars() {
           <Button
             variant="ghost"
             size="icon"
-            className="ml-1 h-7 w-7 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 cursor-pointer"
+            className="ml-1 h-7 w-7 cursor-pointer rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
             onClick={handleRemoveRating}
             title="별점 취소"
           >
