@@ -1,6 +1,6 @@
 'use client';
 
-import { changePassword, deleteAccount } from '@/apis/auth';
+import { changePassword } from '@/apis/auth';
 import { AuthProvider } from '@/apis/auth/types';
 import { authUtils } from '@/apis/axios';
 import { Button } from '@/components/ui/button';
@@ -12,36 +12,20 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import {
-  ResponsiveAlertDialog,
-  ResponsiveAlertDialogAction,
-  ResponsiveAlertDialogCancel,
-  ResponsiveAlertDialogContent,
-  ResponsiveAlertDialogDescription,
-  ResponsiveAlertDialogFooter,
-  ResponsiveAlertDialogHeader,
-  ResponsiveAlertDialogTitle,
-  ResponsiveAlertDialogTrigger,
-} from '@/components/ui/responsive-alert-dialog';
 import { useCurrentUser } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { useMutation } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { DeleteAccountDialog } from './components';
 
 // 비밀번호 변경 폼 데이터 타입
 interface PasswordChangeFormValues {
   currentPassword: string;
   newPassword: string;
   confirmPassword: string;
-}
-
-// 계정 삭제 폼 데이터 타입
-interface AccountDeleteFormValues {
-  password: string;
 }
 
 // 서버 오류 응답 타입
@@ -53,9 +37,7 @@ interface ServerError {
 
 export default function ProfileSettingsPage() {
   const user = useCurrentUser();
-  const router = useRouter();
   const [isLocalProvider, setIsLocalProvider] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
@@ -65,13 +47,6 @@ export default function ProfileSettingsPage() {
       currentPassword: '',
       newPassword: '',
       confirmPassword: '',
-    },
-  });
-
-  // 계정 삭제 폼 초기화
-  const accountDeleteForm = useForm<AccountDeleteFormValues>({
-    defaultValues: {
-      password: '',
     },
   });
 
@@ -88,7 +63,7 @@ export default function ProfileSettingsPage() {
       mutationFn: (data: { currentPassword: string; newPassword: string }) => {
         return changePassword(data);
       },
-      onSuccess: response => {
+      onSuccess: () => {
         passwordChangeForm.reset();
         setServerError(null);
         toast.success('비밀번호가 성공적으로 변경되었습니다.');
@@ -106,33 +81,10 @@ export default function ProfileSettingsPage() {
       },
     });
 
-  // 계정 삭제 mutation
-  const { mutate: deleteAccountMutation, isPending: isDeletingAccount } =
-    useMutation({
-      mutationFn: (data: AccountDeleteFormValues) => {
-        return deleteAccount(data);
-      },
-      onSuccess: () => {
-        toast.success('계정이 성공적으로 삭제되었습니다.');
-        authUtils.removeTokens();
-        router.push('/');
-      },
-      onError: (error: any) => {
-        // 서버 오류 메시지 처리
-        if (error.response?.data) {
-          const errorData = error.response.data as ServerError;
-          accountDeleteForm.setError('password', {
-            type: 'server',
-            message: errorData.message || '계정 삭제 중 오류가 발생했습니다.',
-          });
-        } else {
-          accountDeleteForm.setError('password', {
-            type: 'server',
-            message: '계정 삭제 중 오류가 발생했습니다.',
-          });
-        }
-      },
-    });
+  // 계정 삭제 성공 시 핸들러
+  const handleDeleteSuccess = () => {
+    authUtils.removeTokens();
+  };
 
   // 비밀번호 변경 제출 핸들러
   const onPasswordChangeSubmit = (data: PasswordChangeFormValues) => {
@@ -155,14 +107,9 @@ export default function ProfileSettingsPage() {
     });
   };
 
-  // 계정 삭제 제출 핸들러
-  const onAccountDeleteSubmit = (data: AccountDeleteFormValues) => {
-    deleteAccountMutation(data);
-  };
-
   return (
-    <div className="w-full bg-white px-2 sm:container sm:mx-auto sm:mt-0 sm:max-w-3xl sm:p-6">
-      <h1 className="mb-2 text-xl font-bold sm:mb-8 sm:text-3xl">계정 설정</h1>
+    <div className="w-full bg-white px-4 py-6 sm:container sm:mx-auto sm:max-w-3xl sm:p-6">
+      <h1 className="mb-6 text-xl font-bold sm:mb-8 sm:text-3xl">계정 설정</h1>
 
       {/* 비밀번호 변경 섹션 */}
       {isLocalProvider && (
@@ -307,87 +254,13 @@ export default function ProfileSettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="px-4 py-4 sm:px-6 sm:py-6">
-          <ResponsiveAlertDialog
-            open={deleteDialogOpen}
-            onOpenChange={setDeleteDialogOpen}
-          >
-            <ResponsiveAlertDialogTrigger asChild>
-              <Button
-                variant="destructive"
-                className="h-11 w-full cursor-pointer rounded-lg bg-red-500 text-white hover:bg-red-600 sm:w-auto"
-              >
-                계정 삭제
-              </Button>
-            </ResponsiveAlertDialogTrigger>
-            <ResponsiveAlertDialogContent className="max-w-md border-none bg-white p-0 sm:max-w-lg">
-              <ResponsiveAlertDialogHeader className="border-b border-gray-100 px-6 py-4 sm:py-5">
-                <ResponsiveAlertDialogTitle className="text-lg font-semibold sm:text-xl">
-                  계정을 정말 삭제하시겠습니까?
-                </ResponsiveAlertDialogTitle>
-                <ResponsiveAlertDialogDescription className="mt-2 text-sm text-gray-500">
-                  이 작업은 되돌릴 수 없습니다. 계정을 삭제하면 모든 데이터가
-                  영구적으로 삭제됩니다.
-                </ResponsiveAlertDialogDescription>
-              </ResponsiveAlertDialogHeader>
-              <form
-                onSubmit={accountDeleteForm.handleSubmit(onAccountDeleteSubmit)}
-                className="px-6 py-4"
-              >
-                {isLocalProvider && (
-                  <div className="mb-6 space-y-2">
-                    <label htmlFor="password" className="text-sm font-medium">
-                      비밀번호 확인
-                    </label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="비밀번호를 입력하세요"
-                      className="h-11 rounded-lg border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-                      {...accountDeleteForm.register('password', {
-                        required: '비밀번호를 입력해주세요',
-                        minLength: {
-                          value: 8,
-                          message: '비밀번호는 최소 8자 이상이어야 합니다',
-                        },
-                      })}
-                    />
-                    {accountDeleteForm.formState.errors.password && (
-                      <p className="text-sm text-red-500">
-                        {accountDeleteForm.formState.errors.password.message}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                <ResponsiveAlertDialogFooter
-                  className="flex items-center justify-end gap-3 border-t border-gray-100 px-0 py-4"
-                  drawerClassName="flex flex-col-reverse gap-3 border-t border-gray-100 pt-4"
-                >
-                  <ResponsiveAlertDialogCancel className="h-11 cursor-pointer rounded-lg border-gray-200 bg-white text-gray-700 hover:bg-gray-50">
-                    취소
-                  </ResponsiveAlertDialogCancel>
-                  <ResponsiveAlertDialogAction
-                    type="submit"
-                    disabled={isDeletingAccount}
-                    className={cn(
-                      'h-11 cursor-pointer rounded-lg bg-red-500 text-white hover:bg-red-600',
-                      isDeletingAccount && 'opacity-70'
-                    )}
-                    drawerClassName="h-11 cursor-pointer rounded-lg bg-red-500 text-white hover:bg-red-600"
-                  >
-                    {isDeletingAccount ? (
-                      <>
-                        <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                        삭제 중...
-                      </>
-                    ) : (
-                      '삭제'
-                    )}
-                  </ResponsiveAlertDialogAction>
-                </ResponsiveAlertDialogFooter>
-              </form>
-            </ResponsiveAlertDialogContent>
-          </ResponsiveAlertDialog>
+          {user && (
+            <DeleteAccountDialog
+              isLocalProvider={isLocalProvider}
+              userId={user.id}
+              onSuccess={handleDeleteSuccess}
+            />
+          )}
         </CardContent>
       </Card>
     </div>
