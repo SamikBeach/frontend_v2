@@ -31,7 +31,7 @@ import { useAtomValue } from 'jotai';
 function MobileBookDialogContent() {
   return (
     <>
-      <div className="mx-auto w-full px-4 pt-4 pb-28">
+      <div className="mx-auto w-full px-4 pt-4">
         <div className="space-y-6">
           {/* 책 표지 및 기본 정보 */}
           <BookCoverSection />

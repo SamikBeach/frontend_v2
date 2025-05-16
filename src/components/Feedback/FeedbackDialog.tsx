@@ -89,7 +89,10 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
         </div>
 
         <div className="px-5">
-          <ResponsiveDialogDescription className="mb-8 text-sm text-gray-600 sm:mb-7 md:mb-6">
+          <ResponsiveDialogDescription
+            drawerClassName="mb-2"
+            className="mb-4 text-sm text-gray-600 sm:mb-7 md:mb-6"
+          >
             서비스 개선을 위한 의견이나 문제점을 알려주세요.
           </ResponsiveDialogDescription>
 
@@ -107,7 +110,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
 
         <ResponsiveDialogFooter
           className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
-          drawerClassName="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
+          drawerClassName="flex flex-col-reverse gap-2 border-t border-gray-100 px-5 py-4"
         >
           <Button
             type="button"

@@ -97,7 +97,10 @@ export function ProfileEditDialog({
           isSubmitting={isSubmitting}
         />
 
-        <ResponsiveDialogFooter className="mt-4 flex flex-row justify-end gap-2">
+        <ResponsiveDialogFooter
+          className="mt-4 flex flex-row justify-end gap-2"
+          drawerClassName="mt-4 flex flex-col-reverse justify-end gap-2"
+        >
           <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
             취소
           </Button>
