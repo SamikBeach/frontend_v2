@@ -424,7 +424,7 @@ export function AddBookDialog({
                             <CommandItem
                               key={bookKey}
                               className={cn(
-                                'group relative flex h-auto cursor-pointer items-start gap-3 rounded-md px-3 py-3 transition-colors hover:bg-gray-50 md:gap-4 md:py-3.5',
+                                'group relative flex h-auto cursor-pointer items-start gap-3 rounded-md px-3 py-1 transition-colors hover:bg-gray-50 md:gap-4 md:py-3.5',
                                 isSelected ? 'bg-gray-50' : ''
                               )}
                               onSelect={() => toggleBookSelection(book)}
