@@ -25,8 +25,8 @@ export function CategoryFilter({
 
   return (
     <div className={cn('w-full', className)}>
-      <div className="no-scrollbar w-full overflow-x-auto pt-0.5 pb-0.5 md:pt-1 md:pb-1">
-        <div className="flex gap-1.5 px-0.5 md:gap-2">
+      <div className="no-scrollbar w-full overflow-x-auto pb-0.5 md:pt-1 md:pb-1">
+        <div className="flex gap-1.5 md:gap-2">
           {mainCategories.map(category => (
             <button
               key={category.id}

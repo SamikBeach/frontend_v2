@@ -79,7 +79,7 @@ function CategoryFilterSkeleton() {
   return (
     <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-4rem)]">
       <div className="no-scrollbar w-full pt-0.5 pb-0.5 md:mb-2 md:pt-1 md:pb-1">
-        <div className="flex gap-1.5 px-0.5 md:gap-2">
+        <div className="flex gap-1.5 md:gap-2">
           {[...Array(6)].map((_, i) => (
             <Skeleton
               key={i}

@@ -15,10 +15,10 @@ const DEFAULT_TAG_FILTER = 'all';
 // 스켈레톤 로더 컴포넌트
 function FilterBarSkeleton() {
   return (
-    <div className="no-scrollbar flex gap-2 overflow-x-auto py-1">
-      <div className="flex gap-2 px-0.5">
+    <div className="no-scrollbar flex gap-1.5 overflow-x-auto pt-0.5 pb-0.5 md:gap-2 md:pt-1 md:pb-1">
+      <div className="flex gap-1.5 md:gap-2">
         {[...Array(6)].map((_, i) => (
-          <Skeleton key={i} className="h-9 w-20 rounded-full" />
+          <Skeleton key={i} className="h-8 w-16 rounded-full md:h-9 md:w-20" />
         ))}
       </div>
     </div>
@@ -52,8 +52,8 @@ function FilterBarContent({
   };
 
   return (
-    <div className="no-scrollbar flex gap-2 overflow-x-auto py-1">
-      <div className="flex gap-2 px-0.5">
+    <div className="no-scrollbar flex gap-1.5 overflow-x-auto pt-0.5 pb-0.5 md:gap-2 md:pt-1 md:pb-1">
+      <div className="flex gap-1.5 md:gap-2">
         {tags.map((tag: Tag) => (
           <TagButton
             key={tag.id}

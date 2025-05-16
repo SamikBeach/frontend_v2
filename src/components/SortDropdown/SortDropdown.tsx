@@ -156,7 +156,7 @@ export function SortDropdown<T = Book>({
             <Button
               variant="ghost"
               size="sm"
-              className="flex h-7 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100"
+              className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100 md:h-8"
             >
               <span className="mr-1 flex h-3 w-3 items-center justify-center">
                 {currentTimeRange.icon}
@@ -194,7 +194,7 @@ export function SortDropdown<T = Book>({
           <Button
             variant="ghost"
             size="sm"
-            className="flex h-7 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100"
+            className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100 md:h-8"
           >
             <span className="mr-1 flex h-3 w-3 items-center justify-center">
               {currentSortOption.icon}

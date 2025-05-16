@@ -78,7 +78,7 @@ export default function LibrariesPage() {
   }, [searchParams, setTagFilter, setSortOption, setTimeRange, setSearchQuery]);
 
   return (
-    <div className="min-h-screen w-full bg-white">
+    <div className="mx-auto max-w-2xl bg-white pb-8">
       {/* CSS 스타일 추가 */}
       <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
       <Libraries />
