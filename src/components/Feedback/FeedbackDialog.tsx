@@ -113,15 +113,6 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
           drawerClassName="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
         >
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isPending}
-            className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
-          >
-            취소
-          </Button>
-          <Button
             type="submit"
             onClick={handleSubmit(onSubmit)}
             disabled={isPending}
@@ -134,6 +125,15 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
                 <Send className="mr-2 h-4 w-4" /> 제출하기
               </span>
             )}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={isPending}
+            className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
+          >
+            취소
           </Button>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>

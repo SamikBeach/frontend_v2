@@ -98,15 +98,15 @@ export function ProfileEditDialog({
         />
 
         <ResponsiveDialogFooter className="mt-4 flex flex-row justify-end gap-2">
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            취소
-          </Button>
           <Button
             type="submit"
             form="profile-edit-form"
             disabled={isSubmitting}
           >
             {isSubmitting ? '저장 중...' : '저장'}
+          </Button>
+          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+            취소
           </Button>
         </ResponsiveDialogFooter>
       </ResponsiveDialogContent>

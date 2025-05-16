@@ -310,15 +310,6 @@ export function LibraryDialog({
           >
             <Button
               type="button"
-              variant="outline"
-              className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              취소
-            </Button>
-            <Button
-              type="button"
               className="rounded-xl bg-gray-900 text-white hover:bg-gray-800 disabled:bg-gray-200"
               onClick={handleSubmit}
               disabled={!name.trim() || isSubmitting}
@@ -333,6 +324,15 @@ export function LibraryDialog({
                 : mode === 'create'
                   ? '서재 만들기'
                   : '저장하기'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
+              취소
             </Button>
           </ResponsiveDialogFooter>
         </ResponsiveDialogContent>

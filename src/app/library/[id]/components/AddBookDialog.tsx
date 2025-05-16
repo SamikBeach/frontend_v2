@@ -612,17 +612,17 @@ export function AddBookDialog({
 
         <div className="mt-2 flex flex-shrink-0 justify-end gap-2 bg-white px-0 py-3">
           <Button
+            onClick={handleAddBooks}
+            disabled={selectedBooks.length === 0 || isPending}
+          >
+            {isPending ? '추가 중...' : '추가하기'}
+          </Button>
+          <Button
             variant="outline"
             onClick={handleCloseDialog}
             disabled={isPending}
           >
             취소
-          </Button>
-          <Button
-            onClick={handleAddBooks}
-            disabled={selectedBooks.length === 0 || isPending}
-          >
-            {isPending ? '추가 중...' : '추가하기'}
           </Button>
         </div>
       </ResponsiveDialogContent>
