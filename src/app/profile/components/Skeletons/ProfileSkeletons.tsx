@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function HeaderSkeleton() {
   return (
     <div className="bg-white">
-      <div className="mx-auto w-full px-4 pb-6">
+      <div className="mx-auto w-full pb-6">
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
             <Skeleton className="h-32 w-32 rounded-full" />
@@ -48,7 +48,7 @@ export function LibrariesSkeleton() {
 export function SummarySkeleton() {
   return (
     <div className="border-t border-gray-100 bg-white">
-      <div className="mx-auto w-full px-4 py-6">
+      <div className="mx-auto w-full py-6">
         <div className="grid grid-cols-2 gap-3 md:grid-cols-6">
           {Array.from({ length: 6 }).map((_, index) => (
             <Skeleton
@@ -86,7 +86,7 @@ export function PageSkeleton() {
     <div className="bg-white">
       <HeaderSkeleton />
       <SummarySkeleton />
-      <div className="mx-auto w-full px-4">
+      <div className="mx-auto w-full">
         {/* 각 섹션의 스켈레톤은 해당 페이지에서 직접 import하여 사용 */}
       </div>
     </div>

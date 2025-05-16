@@ -31,7 +31,7 @@ export default function ProfileSummary({
   const averageRating = profileData.averageRating ?? 0;
 
   return (
-    <div className="mx-auto w-full px-4 py-6">
+    <div className="mx-auto w-full py-6">
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-6">
         {/* 읽은 책 - 첫번째 위치 */}
         <button
