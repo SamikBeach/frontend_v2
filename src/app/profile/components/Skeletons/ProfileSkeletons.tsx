@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 export function HeaderSkeleton() {
   return (
     <div className="bg-white">
-      <div className="mx-auto w-full pb-6">
+      <div className="mx-auto w-full md:pb-6">
         <div className="flex flex-col items-start sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
             <Skeleton className="h-24 w-24 rounded-full sm:h-32 sm:w-32" />
