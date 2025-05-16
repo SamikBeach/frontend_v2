@@ -52,7 +52,7 @@ export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
         {!isOwner && (
           <Button
             variant={isSubscribed ? 'outline' : 'default'}
-            className="gap-1.5 rounded-full text-xs"
+            className="cursor-pointer gap-1.5 rounded-full text-sm"
             onClick={handleSubscribeClick}
           >
             <Bell className="h-3.5! w-3.5!" />
@@ -70,7 +70,7 @@ export const LibraryHeaderActions: FC<LibraryHeaderActionsProps> = ({
               <Button
                 size="icon"
                 variant="outline"
-                className="h-9 w-9 rounded-full"
+                className="h-9 w-9 cursor-pointer rounded-full"
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>

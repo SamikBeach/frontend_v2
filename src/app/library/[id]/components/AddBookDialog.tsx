@@ -24,6 +24,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import {
@@ -61,6 +62,7 @@ export function AddBookDialog({
   const [selectedBooks, setSelectedBooks] = useState<SearchResult[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const queryClient = useQueryClient();
 
@@ -255,7 +257,7 @@ export function AddBookDialog({
         {Array.from({ length: 5 }).map((_, i) => (
           <Star
             key={i}
-            className={`h-4 w-4 ${
+            className={`h-3 w-3 md:h-4 md:w-4 ${
               i < Math.floor(ratingValue)
                 ? 'fill-yellow-400 text-yellow-400'
                 : i + 0.5 <= ratingValue
@@ -298,7 +300,7 @@ export function AddBookDialog({
     <ResponsiveDialog open={isOpen} onOpenChange={handleCloseDialog}>
       <ResponsiveDialogContent
         className="flex max-h-[90vh] min-w-[800px] flex-col bg-white p-5 pb-2"
-        drawerClassName="flex flex-col bg-white p-5 pb-2 h-[80vh]"
+        drawerClassName="flex flex-col bg-white p-0 h-[90vh] overflow-hidden"
         onOpenAutoFocus={e => {
           e.preventDefault();
           setTimeout(() => {
@@ -306,324 +308,336 @@ export function AddBookDialog({
           }, 100);
         }}
       >
-        <ResponsiveDialogHeader className="mb-0.5 flex-shrink-0">
-          <ResponsiveDialogTitle>책 추가하기</ResponsiveDialogTitle>
-        </ResponsiveDialogHeader>
+        <div className="flex h-full flex-col overflow-hidden">
+          <ResponsiveDialogHeader className="mb-0.5 flex-shrink-0 px-4 pt-4 md:px-0 md:pt-0">
+            <ResponsiveDialogTitle>책 추가하기</ResponsiveDialogTitle>
+          </ResponsiveDialogHeader>
 
-        {/* 선택된 책 목록 섹션 */}
-        {selectedBooks.length > 0 && (
-          <div className="mt-2 mb-2 flex-shrink-0">
-            <h3 className="mb-1 px-2 text-xs font-medium text-gray-700">
-              선택된 책 ({selectedBooks.length})
-            </h3>
-            <ScrollArea className="max-h-20 w-full overflow-y-auto rounded-md border border-gray-100 bg-gray-50 p-2">
-              <div className="flex flex-wrap gap-2">
-                {selectedBooks.map(book => (
-                  <Badge
-                    key={`selected-${getBookIdentifier(book)}`}
-                    variant="outline"
-                    className="flex items-center gap-1 bg-white py-1 pr-1 pl-2"
-                  >
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className="max-w-[200px] truncate text-xs">
-                          {book.title}
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{book.title}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <button
-                      onClick={() => removeSelectedBook(book)}
-                      className="ml-1 rounded-full p-1 hover:bg-gray-200"
-                      aria-label="책 선택 해제"
+          {/* 선택된 책 목록 섹션 */}
+          {selectedBooks.length > 0 && (
+            <div className="mt-2 mb-2 flex-shrink-0 px-4 md:px-0">
+              <h3 className="mb-1 px-2 text-xs font-medium text-gray-700">
+                선택된 책 ({selectedBooks.length})
+              </h3>
+              <ScrollArea className="max-h-20 w-full overflow-y-auto rounded-md border border-gray-100 bg-gray-50 p-2">
+                <div className="flex flex-wrap gap-2">
+                  {selectedBooks.map(book => (
+                    <Badge
+                      key={`selected-${getBookIdentifier(book)}`}
+                      variant="outline"
+                      className="flex items-center gap-1 bg-white py-1 pr-1 pl-2"
                     >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </Badge>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
-        )}
-
-        <Command
-          className="flex h-full min-h-0 w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
-          shouldFilter={false}
-          loop={true}
-        >
-          <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-100 bg-white">
-            <CommandInput
-              ref={inputRef}
-              value={query}
-              onValueChange={setQuery}
-              className="h-12 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
-              placeholder="도서 제목, 저자, ISBN 등으로 검색"
-            />
-          </div>
-
-          <div
-            ref={scrollContainerRef}
-            className="flex-1 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
-            onScroll={handleScroll}
-          >
-            {query.length > 0 && (
-              <div className="sticky top-0 z-10 bg-white px-4 py-2 text-xs font-medium text-gray-500">
-                &ldquo;{query}&rdquo; 검색 결과
-                {totalResults ? ` (${totalResults})` : ''}
-              </div>
-            )}
-
-            <CommandList className="!max-h-none">
-              {query.length === 0 ? (
-                <div className="flex h-[300px] w-full items-center justify-center p-8 text-sm text-gray-500">
-                  검색어를 입력해주세요.
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="max-w-[150px] truncate text-xs md:max-w-[200px]">
+                            {book.title}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{book.title}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <button
+                        onClick={() => removeSelectedBook(book)}
+                        className="ml-1 rounded-full p-1 hover:bg-gray-200"
+                        aria-label="책 선택 해제"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
                 </div>
-              ) : isLoading || isDebouncing ? (
-                <div className="flex h-[300px] w-full items-center justify-center">
-                  <div className="flex flex-col items-center justify-center">
-                    <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+              </ScrollArea>
+            </div>
+          )}
+
+          <div className="min-h-0 flex-1 overflow-hidden">
+            <Command
+              className="flex h-full flex-col overflow-hidden rounded-none border-0 shadow-none"
+              shouldFilter={false}
+              loop={true}
+            >
+              <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-100 bg-white">
+                <CommandInput
+                  ref={inputRef}
+                  value={query}
+                  onValueChange={setQuery}
+                  className="h-12 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
+                  placeholder="도서 제목, 저자, ISBN 등으로 검색"
+                />
+              </div>
+
+              <div
+                ref={scrollContainerRef}
+                className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto"
+                onScroll={handleScroll}
+              >
+                {query.length > 0 && (
+                  <div className="sticky top-0 z-10 bg-white px-4 py-2 text-xs font-medium text-gray-500">
+                    &ldquo;{query}&rdquo; 검색 결과
+                    {totalResults ? ` (${totalResults})` : ''}
                   </div>
-                </div>
-              ) : searchResults.length === 0 ? (
-                <CommandEmpty className="py-6 text-center">
-                  <div className="flex h-[300px] w-full items-center justify-center">
-                    <div className="flex flex-col items-center justify-center py-6 text-center">
-                      <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-                        <span className="text-4xl">📚</span>
-                      </div>
-                      <p className="mb-3 text-xl font-medium text-gray-800">
-                        검색 결과가 없습니다
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        다른 검색어로 시도해보세요
-                      </p>
+                )}
+
+                <CommandList className="!max-h-none overflow-visible">
+                  {query.length === 0 ? (
+                    <div className="flex h-[300px] w-full items-center justify-center p-8 text-sm text-gray-500">
+                      검색어를 입력해주세요.
                     </div>
-                  </div>
-                </CommandEmpty>
-              ) : (
-                <CommandGroup className="px-1">
-                  <div className="space-y-1">
-                    {searchResults.map(book => {
-                      const bookKey = getBookIdentifier(book);
-                      const isSelected = selectedBooks.some(
-                        selectedBook =>
-                          getBookIdentifier(selectedBook) === bookKey
-                      );
-
-                      const imageUrl = normalizeImageUrl(
-                        book.coverImage || book.image
-                      );
-
-                      return (
-                        <CommandItem
-                          key={bookKey}
-                          className={cn(
-                            'group relative flex h-auto cursor-pointer items-start gap-4 rounded-md px-3 py-3.5 transition-colors hover:bg-gray-50',
-                            isSelected ? 'bg-gray-50' : ''
-                          )}
-                          onSelect={() => toggleBookSelection(book)}
-                        >
-                          <div className="relative w-[140px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white">
-                            <img
-                              src={imageUrl}
-                              alt={book.title}
-                              className="h-auto w-full object-contain"
-                              onError={e => {
-                                e.currentTarget.src = '/images/no-image.png';
-                              }}
-                              loading="lazy"
-                            />
+                  ) : isLoading || isDebouncing ? (
+                    <div className="flex h-[300px] w-full items-center justify-center">
+                      <div className="flex flex-col items-center justify-center">
+                        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                      </div>
+                    </div>
+                  ) : searchResults.length === 0 ? (
+                    <CommandEmpty className="py-6 text-center">
+                      <div className="flex h-[300px] w-full items-center justify-center">
+                        <div className="flex flex-col items-center justify-center py-6 text-center">
+                          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+                            <span className="text-4xl">📚</span>
                           </div>
+                          <p className="mb-3 text-xl font-medium text-gray-800">
+                            검색 결과가 없습니다
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            다른 검색어로 시도해보세요
+                          </p>
+                        </div>
+                      </div>
+                    </CommandEmpty>
+                  ) : (
+                    <CommandGroup className="px-0 md:px-1">
+                      <div className="space-y-1">
+                        {searchResults.map(book => {
+                          const bookKey = getBookIdentifier(book);
+                          const isSelected = selectedBooks.some(
+                            selectedBook =>
+                              getBookIdentifier(selectedBook) === bookKey
+                          );
 
-                          <div className="flex min-w-0 flex-1 flex-col justify-start pt-1">
-                            <h4 className="line-clamp-2 text-base font-medium text-gray-800 group-hover:text-gray-700">
-                              {highlightText(book.title, query)}
-                            </h4>
+                          const imageUrl = normalizeImageUrl(
+                            book.coverImage || book.image
+                          );
 
-                            {book.author && (
-                              <p className="mt-1.5 line-clamp-1 text-sm text-gray-500">
-                                {book.author}
-                              </p>
-                            )}
-
-                            <div className="mt-2.5 flex items-center gap-3">
-                              <div className="flex items-center">
-                                {renderStarRating(book.rating)}
-                                <span className="mx-1.5 text-sm font-medium text-gray-800">
-                                  {typeof book.rating === 'number'
-                                    ? book.rating.toFixed(1)
-                                    : book.rating || '0.0'}
-                                </span>
-                                <span className="text-sm text-gray-500">
-                                  ({book.totalRatings || 0})
-                                </span>
+                          return (
+                            <CommandItem
+                              key={bookKey}
+                              className={cn(
+                                'group relative flex h-auto cursor-pointer items-start gap-3 rounded-md px-3 py-1 transition-colors hover:bg-gray-50 md:gap-4 md:py-3.5',
+                                isSelected ? 'bg-gray-50' : ''
+                              )}
+                              onSelect={() => toggleBookSelection(book)}
+                            >
+                              <div className="relative w-[80px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white md:w-[140px]">
+                                <img
+                                  src={imageUrl}
+                                  alt={book.title}
+                                  className="h-auto w-full object-contain"
+                                  onError={e => {
+                                    e.currentTarget.src =
+                                      '/images/no-image.png';
+                                  }}
+                                  loading="lazy"
+                                />
                               </div>
 
-                              <div className="flex items-center border-l border-gray-200 pl-3">
-                                <MessageSquare className="h-4 w-4 text-gray-400" />
-                                <span className="ml-1.5 text-sm text-gray-500">
-                                  {book.reviews && book.reviews > 999
-                                    ? `${Math.floor(book.reviews / 1000)}k`
-                                    : book.reviews || 0}
-                                </span>
-                              </div>
-                            </div>
+                              <div className="flex min-w-0 flex-1 flex-col justify-start pt-0 md:pt-1">
+                                <h4 className="line-clamp-2 text-sm font-medium text-gray-800 group-hover:text-gray-700 md:text-base">
+                                  {highlightText(book.title, query)}
+                                </h4>
 
-                            {book.userReadingStatus && (
-                              <div className="mt-2.5">
-                                {book.userReadingStatus ===
-                                  ReadingStatusType.WANT_TO_READ && (
-                                  <div className="inline-flex items-center rounded-full bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-600">
-                                    <span className="flex items-center">
-                                      <Clock className="h-3.5 w-3.5 text-purple-500" />
-                                      <span className="ml-1">
-                                        읽고 싶어요
-                                        {(book.readingStats
-                                          ?.readingStatusCounts?.[
-                                          ReadingStatusType.WANT_TO_READ
-                                        ] ?? 0) > 0 &&
-                                          ` ${book.readingStats?.readingStatusCounts?.[ReadingStatusType.WANT_TO_READ]}`}
-                                      </span>
-                                    </span>
-                                  </div>
+                                {book.author && (
+                                  <p className="mt-1 line-clamp-1 text-xs text-gray-500 md:mt-1.5 md:text-sm">
+                                    {book.author}
+                                  </p>
                                 )}
-                                {book.userReadingStatus ===
-                                  ReadingStatusType.READING && (
-                                  <div className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600">
-                                    <span className="flex items-center">
-                                      <BookOpen className="h-3.5 w-3.5 text-blue-500" />
-                                      <span className="ml-1">
-                                        읽는 중
-                                        {(book.readingStats
-                                          ?.readingStatusCounts?.[
-                                          ReadingStatusType.READING
-                                        ] ?? 0) > 0 &&
-                                          ` ${book.readingStats?.readingStatusCounts?.[ReadingStatusType.READING]}`}
-                                      </span>
-                                    </span>
-                                  </div>
-                                )}
-                                {book.userReadingStatus ===
-                                  ReadingStatusType.READ && (
-                                  <div className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-600">
-                                    <span className="flex items-center">
-                                      <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
-                                      <span className="ml-1">
-                                        읽었어요
-                                        {(book.readingStats
-                                          ?.readingStatusCounts?.[
-                                          ReadingStatusType.READ
-                                        ] ?? 0) > 0 &&
-                                          ` ${book.readingStats?.readingStatusCounts?.[ReadingStatusType.READ]}`}
-                                      </span>
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            )}
 
-                            {/* 읽기 상태 태그 (사용자가 읽기 상태가 없는 경우에만 표시) */}
-                            {!book.userReadingStatus &&
-                              book.readingStats?.readingStatusCounts && (
-                                <div className="mt-3 flex flex-wrap gap-1.5">
-                                  {(book.readingStats?.readingStatusCounts?.[
-                                    ReadingStatusType.WANT_TO_READ
-                                  ] ?? 0) > 0 && (
-                                    <div className="inline-flex items-center rounded-full bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-600">
-                                      <span className="flex items-center">
-                                        <Clock className="h-3.5 w-3.5 text-purple-500" />
-                                        <span className="ml-1">
-                                          읽고 싶어요{' '}
-                                          {
-                                            book.readingStats
+                                <div className="mt-1.5 flex flex-wrap items-center gap-2 md:mt-2.5 md:gap-3">
+                                  <div className="flex items-center">
+                                    {renderStarRating(book.rating)}
+                                    <span className="mx-1 text-xs font-medium text-gray-800 md:mx-1.5 md:text-sm">
+                                      {typeof book.rating === 'number'
+                                        ? book.rating.toFixed(1)
+                                        : book.rating || '0.0'}
+                                    </span>
+                                    <span className="text-xs text-gray-500 md:text-sm">
+                                      ({book.totalRatings || 0})
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center border-l border-gray-200 pl-2 md:pl-3">
+                                    <MessageSquare className="h-3 w-3 text-gray-400 md:h-4 md:w-4" />
+                                    <span className="ml-1 text-xs text-gray-500 md:ml-1.5 md:text-sm">
+                                      {book.reviews && book.reviews > 999
+                                        ? `${Math.floor(book.reviews / 1000)}k`
+                                        : book.reviews || 0}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {book.userReadingStatus && (
+                                  <div className="mt-1.5 md:mt-2.5">
+                                    {book.userReadingStatus ===
+                                      ReadingStatusType.WANT_TO_READ && (
+                                      <div className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-600 md:px-2.5 md:py-1">
+                                        <span className="flex items-center">
+                                          <Clock className="h-3 w-3 text-purple-500 md:h-3.5 md:w-3.5" />
+                                          <span className="ml-1">
+                                            읽고 싶어요
+                                            {(book.readingStats
                                               ?.readingStatusCounts?.[
                                               ReadingStatusType.WANT_TO_READ
-                                            ]
-                                          }
+                                            ] ?? 0) > 0 &&
+                                              ` ${book.readingStats?.readingStatusCounts?.[ReadingStatusType.WANT_TO_READ]}`}
+                                          </span>
                                         </span>
-                                      </span>
-                                    </div>
-                                  )}
-
-                                  {(book.readingStats?.readingStatusCounts?.[
-                                    ReadingStatusType.READING
-                                  ] ?? 0) > 0 && (
-                                    <div className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-600">
-                                      <span className="flex items-center">
-                                        <BookOpen className="h-3.5 w-3.5 text-blue-500" />
-                                        <span className="ml-1">
-                                          읽는 중{' '}
-                                          {
-                                            book.readingStats
+                                      </div>
+                                    )}
+                                    {book.userReadingStatus ===
+                                      ReadingStatusType.READING && (
+                                      <div className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600 md:px-2.5 md:py-1">
+                                        <span className="flex items-center">
+                                          <BookOpen className="h-3 w-3 text-blue-500 md:h-3.5 md:w-3.5" />
+                                          <span className="ml-1">
+                                            읽는 중
+                                            {(book.readingStats
                                               ?.readingStatusCounts?.[
                                               ReadingStatusType.READING
-                                            ]
-                                          }
+                                            ] ?? 0) > 0 &&
+                                              ` ${book.readingStats?.readingStatusCounts?.[ReadingStatusType.READING]}`}
+                                          </span>
                                         </span>
-                                      </span>
-                                    </div>
-                                  )}
-
-                                  {(book.readingStats?.readingStatusCounts?.[
-                                    ReadingStatusType.READ
-                                  ] ?? 0) > 0 && (
-                                    <div className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-600">
-                                      <span className="flex items-center">
-                                        <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
-                                        <span className="ml-1">
-                                          읽었어요{' '}
-                                          {
-                                            book.readingStats
+                                      </div>
+                                    )}
+                                    {book.userReadingStatus ===
+                                      ReadingStatusType.READ && (
+                                      <div className="inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600 md:px-2.5 md:py-1">
+                                        <span className="flex items-center">
+                                          <CheckCircle2 className="h-3 w-3 text-green-500 md:h-3.5 md:w-3.5" />
+                                          <span className="ml-1">
+                                            읽었어요
+                                            {(book.readingStats
                                               ?.readingStatusCounts?.[
                                               ReadingStatusType.READ
-                                            ]
-                                          }
+                                            ] ?? 0) > 0 &&
+                                              ` ${book.readingStats?.readingStatusCounts?.[ReadingStatusType.READ]}`}
+                                          </span>
                                         </span>
-                                      </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+
+                                {/* 읽기 상태 태그 (사용자가 읽기 상태가 없는 경우에만 표시) */}
+                                {!book.userReadingStatus &&
+                                  book.readingStats?.readingStatusCounts && (
+                                    <div className="mt-1.5 flex flex-wrap gap-1 md:mt-3 md:gap-1.5">
+                                      {(book.readingStats
+                                        ?.readingStatusCounts?.[
+                                        ReadingStatusType.WANT_TO_READ
+                                      ] ?? 0) > 0 && (
+                                        <div className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-600 md:px-2.5 md:py-1">
+                                          <span className="flex items-center">
+                                            <Clock className="h-3 w-3 text-purple-500 md:h-3.5 md:w-3.5" />
+                                            <span className="ml-1">
+                                              읽고 싶어요{' '}
+                                              {
+                                                book.readingStats
+                                                  ?.readingStatusCounts?.[
+                                                  ReadingStatusType.WANT_TO_READ
+                                                ]
+                                              }
+                                            </span>
+                                          </span>
+                                        </div>
+                                      )}
+
+                                      {(book.readingStats
+                                        ?.readingStatusCounts?.[
+                                        ReadingStatusType.READING
+                                      ] ?? 0) > 0 && (
+                                        <div className="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-600 md:px-2.5 md:py-1">
+                                          <span className="flex items-center">
+                                            <BookOpen className="h-3 w-3 text-blue-500 md:h-3.5 md:w-3.5" />
+                                            <span className="ml-1">
+                                              읽는 중{' '}
+                                              {
+                                                book.readingStats
+                                                  ?.readingStatusCounts?.[
+                                                  ReadingStatusType.READING
+                                                ]
+                                              }
+                                            </span>
+                                          </span>
+                                        </div>
+                                      )}
+
+                                      {(book.readingStats
+                                        ?.readingStatusCounts?.[
+                                        ReadingStatusType.READ
+                                      ] ?? 0) > 0 && (
+                                        <div className="inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600 md:px-2.5 md:py-1">
+                                          <span className="flex items-center">
+                                            <CheckCircle2 className="h-3 w-3 text-green-500 md:h-3.5 md:w-3.5" />
+                                            <span className="ml-1">
+                                              읽었어요{' '}
+                                              {
+                                                book.readingStats
+                                                  ?.readingStatusCounts?.[
+                                                  ReadingStatusType.READ
+                                                ]
+                                              }
+                                            </span>
+                                          </span>
+                                        </div>
+                                      )}
                                     </div>
                                   )}
+                              </div>
+
+                              {/* 선택 상태 표시 배지 */}
+                              {isSelected && (
+                                <div className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-900 text-white shadow-sm md:h-6 md:w-6">
+                                  <span className="text-xs font-bold">✓</span>
                                 </div>
                               )}
+                            </CommandItem>
+                          );
+                        })}
+
+                        {isFetchingNextPage && (
+                          <div className="flex justify-center py-4">
+                            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
                           </div>
-
-                          {/* 선택 상태 표시 배지 */}
-                          {isSelected && (
-                            <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-white shadow-sm">
-                              <span className="text-xs font-bold">✓</span>
-                            </div>
-                          )}
-                        </CommandItem>
-                      );
-                    })}
-
-                    {isFetchingNextPage && (
-                      <div className="flex justify-center py-4">
-                        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+                        )}
                       </div>
-                    )}
-                  </div>
-                </CommandGroup>
-              )}
-            </CommandList>
+                    </CommandGroup>
+                  )}
+                </CommandList>
+              </div>
+            </Command>
           </div>
-        </Command>
 
-        <div className="mt-2 flex flex-shrink-0 justify-end gap-2 bg-white px-0 py-3">
-          <Button
-            variant="outline"
-            onClick={handleCloseDialog}
-            disabled={isPending}
-          >
-            취소
-          </Button>
-          <Button
-            onClick={handleAddBooks}
-            disabled={selectedBooks.length === 0 || isPending}
-          >
-            {isPending ? '추가 중...' : '추가하기'}
-          </Button>
+          <div className="mt-2 flex-shrink-0 border-t border-gray-100 bg-white px-4 py-3 md:px-0">
+            <div className="flex justify-end gap-2">
+              <Button
+                onClick={handleAddBooks}
+                disabled={selectedBooks.length === 0 || isPending}
+                className="h-9 px-3 text-sm md:h-10 md:px-4"
+              >
+                {isPending ? '추가 중...' : '추가하기'}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleCloseDialog}
+                disabled={isPending}
+                className="h-9 px-3 text-sm md:h-10 md:px-4"
+              >
+                취소
+              </Button>
+            </div>
+          </div>
         </div>
       </ResponsiveDialogContent>
     </ResponsiveDialog>

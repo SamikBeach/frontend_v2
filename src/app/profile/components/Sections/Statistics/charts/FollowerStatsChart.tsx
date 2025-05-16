@@ -13,7 +13,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { NoDataMessage, PrivateDataMessage } from '../components';
+import {
+  ChartContainer,
+  NoDataMessage,
+  PrivateDataMessage,
+} from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
@@ -190,9 +194,9 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
   ];
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
-      <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-start justify-between">
+    <ChartContainer>
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:min-w-[120px]">
           <div>
             <h3 className="text-base font-medium text-gray-700">
               {CHART_TITLE}
@@ -201,82 +205,99 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
               팔로워: {data.followersCount}명 / 팔로잉: {data.followingCount}명
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
-              {periodOptions.map(option => (
-                <button
-                  key={option.id}
-                  onClick={() => setActivePeriod(option.id)}
-                  className={cn(
-                    'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                    activePeriod === option.id
-                      ? 'border-blue-200 bg-blue-50 text-blue-600'
-                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                  )}
-                >
-                  {option.name}
-                </button>
-              ))}
-            </div>
-            {isMyProfile && (
+          {isMyProfile && (
+            <div className="sm:hidden">
               <PrivacyToggle
                 isPublic={settings?.isFollowerStatsPublic || false}
                 isLoading={showLoading}
                 onToggle={handlePrivacyToggle}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
-
-        <div className="h-[calc(100%-2rem)]">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart
-              data={chartData}
-              margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
-            >
-              <CartesianGrid
-                strokeDasharray="3 3"
-                vertical={false}
-                stroke="#f3f4f6"
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            {periodOptions.map(option => (
+              <button
+                key={option.id}
+                onClick={() => setActivePeriod(option.id)}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                  activePeriod === option.id
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                {option.name}
+              </button>
+            ))}
+          </div>
+          {isMyProfile && (
+            <div className="hidden sm:block">
+              <PrivacyToggle
+                isPublic={settings?.isFollowerStatsPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
               />
-              <XAxis
-                dataKey={dataKey}
-                tick={{ fontSize: 11 }}
-                tickLine={false}
-                axisLine={{ stroke: '#e5e7eb' }}
-                tickFormatter={formatXAxisLabel}
-                height={25}
-              />
-              <YAxis
-                tick={{ fontSize: 11 }}
-                tickLine={false}
-                axisLine={{ stroke: '#e5e7eb' }}
-                width={30}
-                allowDecimals={false}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Legend content={<CustomLegend />} />
-              <Area
-                type="monotone"
-                dataKey="followers"
-                name="팔로워"
-                stroke={PASTEL_COLORS.FOLLOWERS}
-                fill={PASTEL_COLORS.FOLLOWERS}
-                fillOpacity={0.3}
-              />
-              <Area
-                type="monotone"
-                dataKey="following"
-                name="팔로잉"
-                stroke={PASTEL_COLORS.FOLLOWING}
-                fill={PASTEL_COLORS.FOLLOWING}
-                fillOpacity={0.3}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+
+      <div className="h-[320px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <AreaChart
+            data={chartData}
+            margin={{ top: 10, right: 10, left: -15, bottom: 10 }}
+          >
+            <CartesianGrid
+              strokeDasharray="3 3"
+              vertical={false}
+              stroke="#f3f4f6"
+            />
+            <XAxis
+              dataKey={dataKey}
+              tick={{ fontSize: 11 }}
+              tickLine={false}
+              axisLine={{ stroke: '#e5e7eb' }}
+              tickFormatter={formatXAxisLabel}
+              height={25}
+            />
+            <YAxis
+              tick={{ fontSize: 11 }}
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={value => value}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Legend
+              content={<CustomLegend />}
+              wrapperStyle={{ paddingTop: '10px' }}
+            />
+            <Area
+              type="monotone"
+              dataKey="followers"
+              name="팔로워"
+              stroke={PASTEL_COLORS.FOLLOWERS}
+              fill={PASTEL_COLORS.FOLLOWERS}
+              fillOpacity={0.5}
+              strokeWidth={2}
+              activeDot={{ r: 4 }}
+            />
+            <Area
+              type="monotone"
+              dataKey="following"
+              name="팔로잉"
+              stroke={PASTEL_COLORS.FOLLOWING}
+              fill={PASTEL_COLORS.FOLLOWING}
+              fillOpacity={0.5}
+              strokeWidth={2}
+              activeDot={{ r: 4 }}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </ChartContainer>
   );
 };
 

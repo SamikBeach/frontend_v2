@@ -39,7 +39,7 @@ export function ReviewAlertDialog({
             {message}
           </ResponsiveAlertDialogDescription>
         </ResponsiveAlertDialogHeader>
-        <ResponsiveAlertDialogFooter>
+        <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
           {isDanger && (
             <ResponsiveAlertDialogCancel className="cursor-pointer rounded-xl">
               취소
@@ -47,6 +47,11 @@ export function ReviewAlertDialog({
           )}
           <ResponsiveAlertDialogAction
             className={`cursor-pointer rounded-xl ${
+              isDanger
+                ? 'bg-red-500 hover:bg-red-600'
+                : 'bg-gray-900 hover:bg-gray-800'
+            }`}
+            drawerClassName={`${
               isDanger
                 ? 'bg-red-500 hover:bg-red-600'
                 : 'bg-gray-900 hover:bg-gray-800'

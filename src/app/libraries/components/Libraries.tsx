@@ -95,7 +95,7 @@ export function Libraries({ setSearchQuery }: LibrariesProps) {
   };
 
   return (
-    <>
+    <div className="w-full">
       {/* Header 컴포넌트로 필터 영역 분리 */}
       <Header
         sortOption={sortOption}
@@ -108,7 +108,7 @@ export function Libraries({ setSearchQuery }: LibrariesProps) {
       />
 
       {/* 메인 콘텐츠 */}
-      <div className="p-4">
+      <div className="px-2 pt-2 pb-4 md:px-4 md:pt-4">
         {/* 서재 목록 */}
         {isLoading ? (
           <LibraryListSkeleton />
@@ -149,6 +149,6 @@ export function Libraries({ setSearchQuery }: LibrariesProps) {
           </TooltipContent>
         </Tooltip>
       )}
-    </>
+    </div>
   );
 }

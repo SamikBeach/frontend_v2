@@ -81,8 +81,8 @@ export function ProfileEditForm({
   };
 
   return (
-    <form id="profile-edit-form" onSubmit={handleSubmit} className="space-y-4">
-      <div className="mb-6 flex justify-center">
+    <form id="profile-edit-form" onSubmit={handleSubmit} className="space-y-6">
+      <div className="flex justify-center py-2">
         <AvatarUpload
           initialImage={user.profileImage || ''}
           onChange={handleAvatarChange}
@@ -90,9 +90,14 @@ export function ProfileEditForm({
         />
       </div>
 
-      <div className="grid gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="username">닉네임</Label>
+      <div className="space-y-5">
+        <div className="space-y-2.5">
+          <Label
+            htmlFor="username"
+            className="text-sm font-medium text-gray-700"
+          >
+            닉네임
+          </Label>
           <Input
             id="username"
             name="username"
@@ -100,11 +105,14 @@ export function ProfileEditForm({
             onChange={handleChange}
             disabled={isSubmitting}
             placeholder="변경할 닉네임을 입력하세요"
+            className="h-12 rounded-lg border-gray-200 px-3 py-2 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           />
         </div>
 
-        <div className="grid gap-2">
-          <Label htmlFor="bio">자기소개</Label>
+        <div className="space-y-2.5">
+          <Label htmlFor="bio" className="text-sm font-medium text-gray-700">
+            자기소개
+          </Label>
           <Textarea
             id="bio"
             name="bio"
@@ -112,10 +120,15 @@ export function ProfileEditForm({
             value={formData.bio}
             onChange={handleChange}
             disabled={isSubmitting}
-            className="resize-none"
+            className="min-h-[120px] resize-none rounded-lg border-gray-200 px-3 py-2.5 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             placeholder="자기소개를 입력하세요 (최대 200자)"
             maxLength={200}
           />
+          <div className="flex justify-end">
+            <span className="text-xs text-gray-500">
+              {formData.bio.length}/200
+            </span>
+          </div>
         </div>
       </div>
     </form>

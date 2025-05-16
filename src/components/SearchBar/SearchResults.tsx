@@ -1,11 +1,10 @@
 import { SearchResult } from '@/apis/search/types';
 import { CommandEmpty, CommandGroup } from '@/components/ui/command';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { cn } from '@/lib/utils';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Clock, Loader2 } from 'lucide-react';
 import { Suspense, useEffect, useRef } from 'react';
-import { PopularSearchList } from './PopularSearchList';
-import { RecentSearchList } from './RecentSearchList';
-import { SearchItem } from './SearchItem';
 import {
   useDeleteAllRecentSearches,
   useDeleteRecentSearch,
@@ -13,6 +12,9 @@ import {
   usePopularSearches,
   useRecentSearches,
 } from './hooks';
+import { PopularSearchList } from './PopularSearchList';
+import { RecentSearchList } from './RecentSearchList';
+import { SearchItem } from './SearchItem';
 
 interface SearchResultsProps {
   query: string;
@@ -36,11 +38,18 @@ function RecentSearches({
   const { data: recentSearchData } = useRecentSearches();
   const { mutate: deleteAllRecentSearches } = useDeleteAllRecentSearches();
   const { mutate: deleteRecentSearch } = useDeleteRecentSearch();
+  const isMobile = useIsMobile();
 
   const recentSearches = recentSearchData?.books || [];
 
   return (
-    <CommandPrimitive.List className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent">
+    <CommandPrimitive.List
+      className={cn(
+        'h-full !max-h-none overflow-y-auto pr-0',
+        !isMobile &&
+          '[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent'
+      )}
+    >
       {/* 최근 검색 목록 */}
       <div>
         <div className="mb-2 flex items-center justify-between px-4 pt-2">
@@ -134,6 +143,7 @@ export function SearchResults({
 }: SearchResultsProps) {
   const { mutate: logSelection } = useLogBookSelection();
   const listRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   // 검색 아이템 클릭 시 검색어 저장
   const handleItemClick = (item: any) => {
@@ -198,9 +208,13 @@ export function SearchResults({
     return (
       <CommandPrimitive.List
         ref={listRef}
-        className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+        className={cn(
+          'h-full !max-h-none overflow-y-auto',
+          !isMobile &&
+            '[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent'
+        )}
       >
-        <div className="flex h-[540px] w-full items-center justify-center">
+        <div className="flex h-full min-h-[400px] w-full items-center justify-center">
           <div className="flex flex-col items-center justify-center">
             <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
           </div>
@@ -215,26 +229,19 @@ export function SearchResults({
   // 검색 결과 없음
   if (hasNoResults) {
     return (
-      <CommandPrimitive.List
-        ref={listRef}
-        className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
-      >
-        <CommandEmpty className="py-6 text-center">
-          <div className="flex h-[540px] w-full items-center justify-center">
-            <div className="flex flex-col items-center justify-center py-6 text-center">
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-                <span className="text-4xl">📚</span>
-              </div>
-              <p className="mb-3 text-xl font-medium text-gray-800">
-                검색 결과가 없습니다
-              </p>
-              <p className="text-sm text-gray-500">
-                다른 검색어로 시도해보세요
-              </p>
+      <CommandEmpty className="py-6 text-center">
+        <div className="flex h-full min-h-[400px] w-full items-center justify-center">
+          <div className="flex flex-col items-center justify-center py-6 text-center">
+            <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
+              <span className="text-4xl">📚</span>
             </div>
+            <p className="mb-3 text-xl font-medium text-gray-800">
+              검색 결과가 없습니다
+            </p>
+            <p className="text-sm text-gray-500">다른 검색어로 시도해보세요</p>
           </div>
-        </CommandEmpty>
-      </CommandPrimitive.List>
+        </div>
+      </CommandEmpty>
     );
   }
 
@@ -242,7 +249,10 @@ export function SearchResults({
   return (
     <CommandPrimitive.List
       ref={listRef}
-      className="h-full !max-h-none overflow-y-auto pr-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
+      className={cn(
+        'h-full !max-h-none overflow-y-auto',
+        'md:[&::-webkit-scrollbar]:w-2 md:[&::-webkit-scrollbar-thumb]:rounded-full md:[&::-webkit-scrollbar-thumb]:bg-gray-200 md:[&::-webkit-scrollbar-track]:bg-transparent'
+      )}
     >
       {/* 검색 결과 헤더 */}
       <div className="sticky top-0 z-10 bg-white px-4 py-2 text-xs font-medium text-gray-500">
@@ -250,69 +260,63 @@ export function SearchResults({
         {totalResults ? ` (${totalResults})` : ''}
       </div>
 
-      <CommandGroup className="px-2">
-        <div className="space-y-1">
-          {searchResults.map((book, index) => {
-            // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
-            const bookKey =
-              (book?.isbn13 ?? '') + (book?.isbn ?? '') + book.title;
+      <CommandGroup>
+        {searchResults.map((book, index) => {
+          // ISBN13 또는 ISBN을 우선 사용하고, 둘 다 없는 경우 인덱스를 포함한 고유 키 생성
+          const bookKey =
+            (book?.isbn13 ?? '') + (book?.isbn ?? '') + book.title;
 
-            return (
-              <SearchItem
-                key={bookKey}
-                item={{
+          return (
+            <SearchItem
+              key={bookKey}
+              item={{
+                id: book.id,
+                bookId: book.bookId,
+                type: 'book',
+                title: book.title,
+                author: book.author,
+                image: book.coverImage
+                  ? book.coverImage.replace(/^https?:\/\//, '//')
+                  : undefined,
+                coverImage: book.coverImage
+                  ? book.coverImage.replace(/^https?:\/\//, '//')
+                  : undefined,
+                highlight: query,
+                rating: book.rating,
+                reviews: book.reviews,
+                totalRatings: book.totalRatings,
+                isbn: book.isbn || '',
+                isbn13: book.isbn13 || '',
+                readingStats: book.readingStats,
+                userReadingStatus: book.userReadingStatus,
+                userRating: book.userRating,
+              }}
+              onClick={() =>
+                handleItemClick({
                   id: book.id,
                   bookId: book.bookId,
-                  type: 'book',
                   title: book.title,
                   author: book.author,
-                  image: book.coverImage
-                    ? book.coverImage.replace(/^https?:\/\//, '//')
-                    : undefined,
-                  coverImage: book.coverImage
-                    ? book.coverImage.replace(/^https?:\/\//, '//')
-                    : undefined,
-                  highlight: query,
+                  image: book.coverImage,
+                  coverImage: book.coverImage,
+                  isbn: book.isbn,
+                  isbn13: book.isbn13,
                   rating: book.rating,
                   reviews: book.reviews,
                   totalRatings: book.totalRatings,
-                  isbn: book.isbn || '',
-                  isbn13: book.isbn13 || '',
                   readingStats: book.readingStats,
                   userReadingStatus: book.userReadingStatus,
-                  userRating: book.userRating,
-                }}
-                onClick={() =>
-                  handleItemClick({
-                    id: book.id,
-                    bookId: book.bookId,
-                    title: book.title,
-                    author: book.author,
-                    image: book.coverImage,
-                    coverImage: book.coverImage,
-                    isbn: book.isbn,
-                    isbn13: book.isbn13,
-                    rating: book.rating,
-                    reviews: book.reviews,
-                    totalRatings: book.totalRatings,
-                    readingStats: book.readingStats,
-                    userReadingStatus: book.userReadingStatus,
-                  })
-                }
-              />
-            );
-          })}
-        </div>
+                })
+              }
+            />
+          );
+        })}
+        {isLoading && (
+          <div className="flex justify-center py-4">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          </div>
+        )}
       </CommandGroup>
-
-      {/* 로딩 인디케이터 */}
-      {isLoading && searchResults.length > 0 && (
-        <div className="py-4 text-center">
-          <Loader2 className="mx-auto h-5 w-5 animate-spin text-gray-400" />
-        </div>
-      )}
-
-      {/* 모바일 뷰에서는 더이상 추가 패딩이 필요없음 */}
     </CommandPrimitive.List>
   );
 }

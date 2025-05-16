@@ -1,5 +1,4 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Hash, Tag } from 'lucide-react';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import {
@@ -15,7 +14,11 @@ import { LibraryCompositionResponse } from '@/apis/user/types';
 import { getLibraryComposition } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
-import { NoDataMessage, PrivateDataMessage } from '../components';
+import {
+  ChartContainer,
+  NoDataMessage,
+  PrivateDataMessage,
+} from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
@@ -197,161 +200,147 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
     }));
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-2.5">
-      <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-start justify-between">
+    <ChartContainer>
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:min-w-[120px]">
           <h3 className="text-base font-medium text-gray-700">서재 구성</h3>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
-              <button
-                onClick={() => setActiveTab('libraries')}
-                className={cn(
-                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                  activeTab === 'libraries'
-                    ? 'border-blue-200 bg-blue-50 text-blue-600'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                )}
-              >
-                서재별 도서 수
-              </button>
-              <button
-                onClick={() => setActiveTab('tags')}
-                className={cn(
-                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                  activeTab === 'tags'
-                    ? 'border-blue-200 bg-blue-50 text-blue-600'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                )}
-              >
-                태그 분포
-              </button>
-            </div>
-            {isMyProfile && (
+          {isMyProfile && (
+            <div className="sm:hidden">
               <PrivacyToggle
                 isPublic={settings?.isLibraryCompositionPublic || false}
                 isLoading={showLoading}
                 onToggle={handlePrivacyToggle}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        <div className="flex-1">
-          {activeTab === 'libraries' ? (
-            <div className="h-full pt-2">
-              {libraryData.length > 0 ? (
-                <div className="h-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={libraryData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={renderCustomizedLabel}
-                        outerRadius={90}
-                        innerRadius={35}
-                        fill="#8884d8"
-                        dataKey="value"
-                        nameKey="name"
-                        onClick={data => setSelectedLibrary(data.name)}
-                        paddingAngle={2}
-                      >
-                        {libraryData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={entry.color}
-                            stroke={
-                              selectedLibrary === entry.name ? '#000' : 'none'
-                            }
-                            strokeWidth={selectedLibrary === entry.name ? 2 : 0}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend
-                        content={<CustomLegend />}
-                        verticalAlign="middle"
-                        align="right"
-                        layout="vertical"
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : (
-                <NoDataMessage
-                  title="서재 구성"
-                  message="서재 구성 데이터가 없습니다."
-                />
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setActiveTab('libraries')}
+              className={cn(
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                activeTab === 'libraries'
+                  ? 'border-blue-200 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
               )}
-            </div>
-          ) : (
-            <div className="h-full">
-              {sortedTagData.length > 0 ? (
-                <div className="h-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={sortedTagData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={renderCustomizedLabel}
-                        outerRadius={90}
-                        innerRadius={35}
-                        fill="#8884d8"
-                        dataKey="value"
-                        nameKey="name"
-                        paddingAngle={2}
-                      >
-                        {sortedTagData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend
-                        content={<CustomLegend />}
-                        verticalAlign="middle"
-                        align="right"
-                        layout="vertical"
-                      />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              ) : selectedLibrary ? (
-                <div className="flex h-full flex-col items-center justify-center">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
-                      <Hash className="h-10 w-10 text-gray-300" />
-                    </div>
-                    <p className="text-sm font-medium text-gray-500">
-                      &quot;{selectedLibrary}&quot; 서재에 태그가 없습니다
-                    </p>
-                    <button
-                      className="mt-3 text-xs text-blue-500 hover:underline"
-                      onClick={() => setSelectedLibrary(null)}
-                    >
-                      모든 서재 보기
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center">
-                  <div className="flex flex-col items-center text-center">
-                    <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
-                      <Tag className="h-10 w-10 text-gray-300" />
-                    </div>
-                    <p className="text-sm font-medium text-gray-500">
-                      태그 데이터가 없습니다
-                    </p>
-                  </div>
-                </div>
+            >
+              서재별 도서 수
+            </button>
+            <button
+              onClick={() => setActiveTab('tags')}
+              className={cn(
+                'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
+                activeTab === 'tags'
+                  ? 'border-blue-200 bg-blue-50 text-blue-600'
+                  : 'border-gray-200 text-gray-700 hover:bg-gray-50'
               )}
+            >
+              태그 분포
+            </button>
+          </div>
+          {isMyProfile && (
+            <div className="hidden sm:block">
+              <PrivacyToggle
+                isPublic={settings?.isLibraryCompositionPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
             </div>
           )}
         </div>
       </div>
-    </div>
+
+      <div className="h-[320px]">
+        {activeTab === 'libraries' ? (
+          <div className="h-full pt-2">
+            {libraryData.length > 0 ? (
+              <div className="h-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart margin={{ left: -20 }}>
+                    <Pie
+                      data={libraryData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      nameKey="name"
+                    >
+                      {libraryData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={entry.color}
+                          stroke="#fff"
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend
+                      layout="vertical"
+                      align="right"
+                      verticalAlign="middle"
+                      content={<CustomLegend />}
+                      wrapperStyle={{ right: 30 }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <p className="text-sm text-gray-500">
+                  서재별 도서 데이터가 없습니다
+                </p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="h-full pt-2">
+            {sortedTagData.length > 0 ? (
+              <div className="h-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={sortedTagData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={renderCustomizedLabel}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                      nameKey="name"
+                    >
+                      {sortedTagData.map((entry, index) => (
+                        <Cell
+                          key={`cell-${index}`}
+                          fill={entry.color}
+                          stroke="#fff"
+                        />
+                      ))}
+                    </Pie>
+                    <Tooltip content={<CustomTooltip />} />
+                    <Legend
+                      layout="vertical"
+                      align="right"
+                      verticalAlign="middle"
+                      content={<CustomLegend />}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <p className="text-sm text-gray-500">태그 데이터가 없습니다</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </ChartContainer>
   );
 };
 

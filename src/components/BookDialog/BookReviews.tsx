@@ -196,7 +196,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
             />
             <Button
               onClick={handleCommentSubmitWithAuth}
-              className="h-9 rounded-lg bg-gray-900 px-3 text-white hover:bg-gray-800"
+              className="h-9 cursor-pointer rounded-lg bg-gray-900 px-3 text-white hover:bg-gray-800"
               disabled={!commentText.trim() || isSubmitting}
             >
               {isSubmitting ? '등록 중...' : '등록'}
@@ -257,14 +257,14 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-7 rounded-md border-gray-200 px-2 text-xs"
+                        className="h-7 cursor-pointer rounded-md border-gray-200 px-2 text-xs"
                         onClick={handleCancelEditComment}
                       >
                         취소
                       </Button>
                       <Button
                         size="sm"
-                        className="h-7 rounded-md bg-gray-900 px-2 text-xs text-white hover:bg-gray-800"
+                        className="h-7 cursor-pointer rounded-md bg-gray-900 px-2 text-xs text-white hover:bg-gray-800"
                         onClick={() => handleUpdateComment(comment.id)}
                         disabled={updateCommentMutation.isPending}
                       >
@@ -328,18 +328,19 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                                     되돌릴 수 없습니다.
                                   </ResponsiveAlertDialogDescription>
                                 </ResponsiveAlertDialogHeader>
-                                <ResponsiveAlertDialogFooter>
+                                <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
+                                  <ResponsiveAlertDialogCancel className="cursor-pointer">
+                                    취소
+                                  </ResponsiveAlertDialogCancel>
                                   <ResponsiveAlertDialogAction
                                     onClick={() =>
                                       handleDeleteComment(comment.id)
                                     }
                                     className="bg-red-500 text-white hover:bg-red-600"
+                                    drawerClassName="bg-red-500 text-white hover:bg-red-600"
                                   >
                                     {isDeleting ? '삭제 중...' : '삭제'}
                                   </ResponsiveAlertDialogAction>
-                                  <ResponsiveAlertDialogCancel className="cursor-pointer">
-                                    취소
-                                  </ResponsiveAlertDialogCancel>
                                 </ResponsiveAlertDialogFooter>
                               </ResponsiveAlertDialogContent>
                             </ResponsiveAlertDialog>
@@ -407,7 +408,7 @@ function ErrorFallback({
       <Button
         variant="outline"
         size="sm"
-        className="mt-2 border-red-200 text-red-600 hover:bg-red-100"
+        className="mt-2 cursor-pointer border-red-200 text-red-600 hover:bg-red-100"
         onClick={resetErrorBoundary}
       >
         다시 시도
@@ -554,7 +555,7 @@ function ReviewsList({
         <p className="text-sm text-gray-500">아직 리뷰가 없습니다</p>
         <Button
           variant="outline"
-          className="mt-3 rounded-full text-sm font-medium"
+          className="mt-3 cursor-pointer rounded-full text-sm font-medium"
           onClick={handleReviewDialogWithAuth}
         >
           첫 리뷰를 작성해보세요
@@ -643,7 +644,7 @@ function ReviewsList({
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-7 w-7 p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
+                            className="h-7 w-7 cursor-pointer p-0 text-gray-400 hover:bg-gray-50 hover:text-gray-600"
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
@@ -679,21 +680,22 @@ function ReviewsList({
                                   되돌릴 수 없습니다.
                                 </ResponsiveAlertDialogDescription>
                               </ResponsiveAlertDialogHeader>
-                              <ResponsiveAlertDialogFooter>
+                              <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
+                                <ResponsiveAlertDialogCancel className="cursor-pointer">
+                                  취소
+                                </ResponsiveAlertDialogCancel>
                                 <ResponsiveAlertDialogAction
                                   onClick={() =>
                                     handleDeleteReviewClick(review.id)
                                   }
-                                  className="bg-red-500 text-white hover:bg-red-600"
+                                  className="cursor-pointer bg-red-500 text-white hover:bg-red-600"
+                                  drawerClassName="cursor-pointer bg-red-500 text-white hover:bg-red-600"
                                 >
                                   {deleteReviewMutation.isPending &&
                                   deleteReviewMutation.variables === review.id
                                     ? '삭제 중...'
                                     : '삭제'}
                                 </ResponsiveAlertDialogAction>
-                                <ResponsiveAlertDialogCancel className="cursor-pointer">
-                                  취소
-                                </ResponsiveAlertDialogCancel>
                               </ResponsiveAlertDialogFooter>
                             </ResponsiveAlertDialogContent>
                           </ResponsiveAlertDialog>
@@ -727,7 +729,7 @@ function ReviewsList({
                   <div className="mt-2.5 flex items-center gap-2 pt-1">
                     <Button
                       variant="outline"
-                      className={`flex h-7 items-center gap-1 rounded-full border px-2.5 ${
+                      className={`flex h-7 cursor-pointer items-center gap-1 rounded-full border px-2.5 ${
                         review.isLiked
                           ? 'border-pink-200 bg-pink-50 text-pink-500 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-600'
                           : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-700'
@@ -750,7 +752,7 @@ function ReviewsList({
                     </Button>
                     <Button
                       variant="outline"
-                      className="flex h-7 items-center gap-1 rounded-full border border-gray-200 px-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-700"
+                      className="flex h-7 cursor-pointer items-center gap-1 rounded-full border border-gray-200 px-2.5 text-gray-600 hover:bg-gray-50 hover:text-gray-700"
                       onClick={() => handleCommentsToggleWithAuth(review.id)}
                     >
                       <MessageSquare className="h-3.5 w-3.5" />

@@ -35,7 +35,7 @@ function LibrariesError({ resetErrorBoundary }: any) {
       <p className="mb-4 text-sm text-gray-600">
         서재 정보를 불러오는 중 오류가 발생했습니다.
       </p>
-      <Button size="sm" onClick={resetErrorBoundary}>
+      <Button size="sm" onClick={resetErrorBoundary} className="cursor-pointer">
         다시 시도
       </Button>
     </div>
@@ -122,7 +122,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
           <ResponsiveDropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="mt-3 w-44 max-w-xs rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
+              className="mt-3 w-44 max-w-xs cursor-pointer rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
             >
               <ListPlus className="mr-1.5 h-4 w-4" />
               <span className="text-sm">내 서재에 담기</span>
@@ -192,7 +192,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
         <div className="mt-6 flex justify-center">
           <Button
             variant="outline"
-            className="rounded-full text-sm font-medium"
+            className="cursor-pointer rounded-full text-sm font-medium"
             onClick={handleLoadMore}
             disabled={isFetchingNextPage}
           >

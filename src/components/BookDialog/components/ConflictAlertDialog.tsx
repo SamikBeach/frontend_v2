@@ -29,8 +29,11 @@ export function ConflictAlertDialog({
             이 책은 이미 &quot;{libraryName}&quot; 서재에 담겨 있습니다.
           </ResponsiveAlertDialogTitle>
         </ResponsiveAlertDialogHeader>
-        <ResponsiveAlertDialogFooter>
-          <ResponsiveAlertDialogAction className="cursor-pointer">
+        <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
+          <ResponsiveAlertDialogAction
+            className="cursor-pointer"
+            drawerClassName="cursor-pointer"
+          >
             확인
           </ResponsiveAlertDialogAction>
         </ResponsiveAlertDialogFooter>

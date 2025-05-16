@@ -84,7 +84,7 @@ const SubscriberItem: FC<SubscriberItemProps> = ({
         <Button
           variant={isFollowing ? 'outline' : 'ghost'}
           size="sm"
-          className="h-7 rounded-full text-xs"
+          className="h-7 cursor-pointer rounded-full text-xs"
           onClick={handleFollowClick}
           disabled={isLoading}
         >

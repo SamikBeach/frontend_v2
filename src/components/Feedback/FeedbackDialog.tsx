@@ -89,15 +89,15 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
         </div>
 
         <div className="px-5">
-          <ResponsiveDialogDescription className="mb-6 text-sm text-gray-600">
+          <ResponsiveDialogDescription
+            drawerClassName="mb-2"
+            className="mb-4 text-sm text-gray-600 sm:mb-7 md:mb-6"
+          >
             서비스 개선을 위한 의견이나 문제점을 알려주세요.
           </ResponsiveDialogDescription>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div className="space-y-3">
-              <label htmlFor="content" className="text-sm font-medium">
-                내용
-              </label>
               <Textarea
                 id="content"
                 placeholder="피드백 내용을 자세히 입력해주세요"
@@ -110,14 +110,14 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
 
         <ResponsiveDialogFooter
           className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
-          drawerClassName="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
+          drawerClassName="flex flex-col-reverse gap-2 border-t border-gray-100 px-5 py-4"
         >
           <Button
             type="button"
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isPending}
-            className="rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
+            className="cursor-pointer rounded-xl border-gray-200 text-gray-700 hover:bg-gray-50"
           >
             취소
           </Button>
@@ -125,7 +125,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
             type="submit"
             onClick={handleSubmit(onSubmit)}
             disabled={isPending}
-            className="rounded-xl bg-gray-900 text-white hover:bg-gray-800"
+            className="cursor-pointer rounded-xl bg-gray-900 text-white hover:bg-gray-800"
           >
             {isPending ? (
               <span className="flex items-center">제출 중...</span>

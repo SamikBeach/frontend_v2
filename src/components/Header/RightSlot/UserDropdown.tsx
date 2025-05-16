@@ -16,7 +16,8 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 interface UserDropdownProps {
   user: User;
@@ -24,6 +25,8 @@ interface UserDropdownProps {
 
 export function UserDropdown({ user }: UserDropdownProps) {
   const setUser = useSetAtom(userAtom);
+  const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   /**
    * 로그아웃 요청을 처리하는 mutation
@@ -50,6 +53,19 @@ export function UserDropdown({ user }: UserDropdownProps) {
    */
   const handleLogout = () => {
     logout();
+    setIsOpen(false);
+  };
+
+  // 프로필 페이지로 이동 핸들러
+  const handleProfileClick = () => {
+    setIsOpen(false);
+    router.push(`/profile/${user.id}`);
+  };
+
+  // 설정 페이지로 이동 핸들러
+  const handleSettingsClick = () => {
+    setIsOpen(false);
+    router.push('/profile/settings');
   };
 
   // 사용자 표시 정보 설정
@@ -58,7 +74,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
   const avatarUrl = user.profileImage || null;
 
   return (
-    <ResponsiveDropdownMenu>
+    <ResponsiveDropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <ResponsiveDropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="rounded-full">
           <Avatar className="h-8 w-8 cursor-pointer">
@@ -87,22 +103,20 @@ export function UserDropdown({ user }: UserDropdownProps) {
           </div>
         </div>
         <ResponsiveDropdownMenuSeparator />
-        <Link href={`/profile/${user.id}`} passHref legacyBehavior>
-          <ResponsiveDropdownMenuItem className="cursor-pointer" asChild>
-            <a className="flex w-full items-center">
-              <UserIcon className="mr-2 h-4 w-4" />
-              <span>내 프로필</span>
-            </a>
-          </ResponsiveDropdownMenuItem>
-        </Link>
-        <Link href="/profile/settings" passHref legacyBehavior>
-          <ResponsiveDropdownMenuItem className="cursor-pointer" asChild>
-            <a className="flex w-full items-center">
-              <Settings className="mr-2 h-4 w-4" />
-              <span>설정</span>
-            </a>
-          </ResponsiveDropdownMenuItem>
-        </Link>
+        <ResponsiveDropdownMenuItem
+          className="cursor-pointer"
+          onSelect={handleProfileClick}
+        >
+          <UserIcon className="mr-2 h-4 w-4" />
+          <span>내 프로필</span>
+        </ResponsiveDropdownMenuItem>
+        <ResponsiveDropdownMenuItem
+          className="cursor-pointer"
+          onSelect={handleSettingsClick}
+        >
+          <Settings className="mr-2 h-4 w-4" />
+          <span>설정</span>
+        </ResponsiveDropdownMenuItem>
         <ResponsiveDropdownMenuSeparator />
         <ResponsiveDropdownMenuItem
           onSelect={handleLogout}

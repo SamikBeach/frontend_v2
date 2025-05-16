@@ -3,7 +3,7 @@ import { CommandGroup, CommandItem } from '@/components/ui/command';
 import { TrendingUp } from 'lucide-react';
 
 interface PopularSearchListProps {
-  popularSearches: PopularSearch[];
+  popularSearches?: PopularSearch[];
   onSearchClick: (term: string) => void;
 }
 
@@ -11,6 +11,22 @@ export function PopularSearchList({
   popularSearches,
   onSearchClick,
 }: PopularSearchListProps) {
+  // 데이터가 없거나 로딩 중일 때
+  if (!popularSearches || popularSearches.length === 0) {
+    return (
+      <CommandGroup>
+        <div className="mb-2 px-4">
+          <h3 className="flex items-center text-sm font-medium text-gray-700">
+            인기 검색어
+          </h3>
+        </div>
+        <div className="flex min-h-[200px] items-center justify-center">
+          <p className="text-sm text-gray-500">인기 검색어가 없습니다.</p>
+        </div>
+      </CommandGroup>
+    );
+  }
+
   return (
     <CommandGroup>
       <div className="mb-2 px-2">

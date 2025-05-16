@@ -44,7 +44,7 @@ export function FilterMenu({
   };
 
   return (
-    <div className="mb-6 flex flex-wrap gap-3">
+    <div className="mb-3 flex flex-wrap gap-3 sm:mb-6">
       {readingStatusFilters.map(filter => (
         <button
           key={filter.id}

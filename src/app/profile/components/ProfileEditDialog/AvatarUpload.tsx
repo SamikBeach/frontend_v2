@@ -75,14 +75,14 @@ export function AvatarUpload({
         className="hidden"
       />
 
-      <div className="relative mb-2">
-        <Avatar className="h-24 w-24 border-4 border-white ring-2 ring-gray-100">
+      <div className="relative mb-3">
+        <Avatar className="h-28 w-28 border-4 border-white ring-2 ring-gray-100 transition duration-200 sm:h-32 sm:w-32">
           <AvatarImage
             src={avatarPreview || undefined}
             alt={username}
             className="object-cover"
           />
-          <AvatarFallback className="bg-gray-200 text-3xl font-medium text-gray-700">
+          <AvatarFallback className="bg-gray-200 text-4xl font-medium text-gray-700">
             {initial}
           </AvatarFallback>
         </Avatar>
@@ -91,7 +91,8 @@ export function AvatarUpload({
           <button
             type="button"
             onClick={handleRemoveAvatar}
-            className="absolute -top-2 -right-2 rounded-full bg-gray-200 p-1 text-gray-700 hover:bg-gray-300"
+            aria-label="프로필 이미지 삭제"
+            className="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300 active:bg-gray-400"
           >
             <X className="h-4 w-4" />
           </button>
@@ -103,11 +104,15 @@ export function AvatarUpload({
         onClick={handleUploadClick}
         variant="outline"
         size="sm"
-        className="h-8 rounded-full text-xs"
+        className="h-10 min-w-[140px] cursor-pointer rounded-full border-gray-200 px-4 text-sm font-medium transition-colors active:bg-gray-100"
       >
-        <Camera className="mr-1.5 h-3.5 w-3.5" />
-        {avatarPreview ? '새 사진 업로드' : '사진 업로드'}
+        <Camera className="mr-2 h-4 w-4" />
+        {avatarPreview ? '사진 변경' : '사진 업로드'}
       </Button>
+
+      <p className="mt-2 text-center text-xs text-gray-500">
+        5MB 이하의 이미지 파일만 업로드 가능합니다
+      </p>
     </div>
   );
 }

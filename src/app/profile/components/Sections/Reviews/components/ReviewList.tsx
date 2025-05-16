@@ -29,7 +29,7 @@ export function ReviewList() {
         )
       }
       scrollThreshold={0.9}
-      className="mt-8"
+      className="md:mt-8"
       style={{ overflow: 'visible' }} // 스크롤바 숨기기
     >
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

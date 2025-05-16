@@ -17,9 +17,12 @@ import { ReadingStatusType } from '@/apis/reading-status/types';
 import { getReadingStatusByPeriod } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
-import { NoDataMessage } from '../components/NoDataMessage';
-import { PrivacyToggle } from '../components/PrivacyToggle';
-import { PrivateDataMessage } from '../components/PrivateDataMessage';
+import {
+  ChartContainer,
+  NoDataMessage,
+  PrivacyToggle,
+  PrivateDataMessage,
+} from '../components';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
 interface ReadingStatusByPeriodChartProps {
@@ -245,43 +248,61 @@ const ReadingStatusByPeriodChart = ({
   };
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
-      <div className="mb-2 flex items-start justify-between">
-        <div className="min-w-[120px]">
-          <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1">
-            {periodOptions.map(option => (
-              <button
-                key={option.id}
-                onClick={() => setActivePeriod(option.id as PeriodType)}
-                className={cn(
-                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                  activePeriod === option.id
-                    ? 'border-blue-200 bg-blue-50 text-blue-600'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                )}
-              >
-                {option.name}
-              </button>
-            ))}
+    <ChartContainer className="h-[340px]">
+      <div className="mb-2 sm:px-0 sm:pt-0">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between sm:min-w-[120px]">
+            <h3 className="text-base font-medium text-gray-700">
+              {CHART_TITLE}
+            </h3>
+            {isMyProfile && (
+              <div className="sm:hidden">
+                <PrivacyToggle
+                  isPublic={settings?.isReadingStatusByPeriodPublic || false}
+                  isLoading={showLoading}
+                  onToggle={handlePrivacyToggle}
+                />
+              </div>
+            )}
           </div>
-          {isMyProfile && (
-            <PrivacyToggle
-              isPublic={settings?.isReadingStatusByPeriodPublic || false}
-              isLoading={showLoading}
-              onToggle={handlePrivacyToggle}
-            />
-          )}
+
+          {/* 기간 선택 버튼들 */}
+          <div className="flex items-center justify-start gap-2 sm:justify-end">
+            <div className="flex flex-nowrap overflow-x-auto pb-1">
+              {periodOptions.map(option => (
+                <button
+                  key={option.id}
+                  onClick={() => setActivePeriod(option.id as PeriodType)}
+                  className={cn(
+                    'flex h-8 cursor-pointer items-center justify-center rounded-full border px-3 text-xs font-medium whitespace-nowrap transition-colors',
+                    'mr-1.5 last:mr-0',
+                    activePeriod === option.id
+                      ? 'border-blue-200 bg-blue-50 text-blue-600'
+                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                  )}
+                >
+                  {option.name}
+                </button>
+              ))}
+            </div>
+            {isMyProfile && (
+              <div className="hidden sm:block">
+                <PrivacyToggle
+                  isPublic={settings?.isReadingStatusByPeriodPublic || false}
+                  isLoading={showLoading}
+                  onToggle={handlePrivacyToggle}
+                />
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      <div className="h-[calc(100%-2.5rem)]">
+      <div className="h-[320px] px-2 sm:px-0">
         {periodData && periodData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={periodData}
-              margin={{ top: 5, right: 5, bottom: 5, left: 5 }}
+              margin={{ top: 5, right: 5, bottom: 5, left: -20 }}
             >
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -354,7 +375,7 @@ const ReadingStatusByPeriodChart = ({
           </div>
         )}
       </div>
-    </div>
+    </ChartContainer>
   );
 };
 

@@ -73,7 +73,7 @@ export function LibraryHeader() {
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-white pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-white md:pt-3">
         <div className="flex-1">
           <LibraryHeaderTitle
             library={library}

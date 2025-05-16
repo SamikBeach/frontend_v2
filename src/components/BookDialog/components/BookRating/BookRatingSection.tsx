@@ -66,7 +66,7 @@ export function BookRatingSection() {
 
             {/* 리뷰 작성하기 버튼 - 별점 옆으로 이동 */}
             <Button
-              className="h-8 rounded-full bg-gray-100 px-3 text-xs text-gray-700 hover:bg-gray-200"
+              className="h-8 cursor-pointer rounded-full bg-gray-100 px-3 text-xs text-gray-700 hover:bg-gray-200"
               onClick={handleReviewButtonClick}
             >
               <PenLine className="mr-1 h-3 w-3" />

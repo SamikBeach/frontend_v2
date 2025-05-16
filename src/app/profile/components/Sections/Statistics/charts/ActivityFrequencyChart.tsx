@@ -3,7 +3,11 @@ import { Activity, Calendar, Clock } from 'lucide-react';
 
 import { getActivityFrequency } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { NoDataMessage, PrivateDataMessage } from '../components';
+import {
+  ChartContainer,
+  NoDataMessage,
+  PrivateDataMessage,
+} from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
@@ -96,23 +100,36 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
     dayMapping[data.mostActiveDay.toLowerCase()] || data.mostActiveDay;
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+    <ChartContainer className="h-[340px]">
       <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-medium text-gray-700">활동 빈도</h3>
-            <p className="text-xs text-gray-500">
-              {data.mostActiveDay && data.mostActiveHour
-                ? `가장 활발한 시간대: ${translatedDay} ${formatHour(data.mostActiveHour)}`
-                : '아직 충분한 활동 데이터가 없습니다.'}
-            </p>
+        <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between sm:min-w-[120px]">
+            <div>
+              <h3 className="text-base font-medium text-gray-700">활동 빈도</h3>
+              <p className="text-xs text-gray-500">
+                {data.mostActiveDay && data.mostActiveHour
+                  ? `가장 활발한 시간대: ${translatedDay} ${formatHour(data.mostActiveHour)}`
+                  : '아직 충분한 활동 데이터가 없습니다.'}
+              </p>
+            </div>
+            {isMyProfile && (
+              <div className="sm:hidden">
+                <PrivacyToggle
+                  isPublic={settings?.isActivityFrequencyPublic || false}
+                  isLoading={showLoading}
+                  onToggle={handlePrivacyToggle}
+                />
+              </div>
+            )}
           </div>
           {isMyProfile && (
-            <PrivacyToggle
-              isPublic={settings?.isActivityFrequencyPublic || false}
-              isLoading={showLoading}
-              onToggle={handlePrivacyToggle}
-            />
+            <div className="hidden sm:block">
+              <PrivacyToggle
+                isPublic={settings?.isActivityFrequencyPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            </div>
           )}
         </div>
 
@@ -158,7 +175,7 @@ const ActivityFrequencyChart = ({ userId }: ActivityFrequencyChartProps) => {
           </div>
         </div>
       </div>
-    </div>
+    </ChartContainer>
   );
 };
 

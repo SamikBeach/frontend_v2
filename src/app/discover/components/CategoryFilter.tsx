@@ -24,7 +24,7 @@ export function CategoryFilterSkeleton() {
   return (
     <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-4rem)]">
       <div className="no-scrollbar w-full pt-0.5 pb-0.5 md:mb-2 md:pt-1 md:pb-1">
-        <div className="flex gap-1.5 px-0.5 md:gap-2">
+        <div className="flex gap-1.5 md:gap-2">
           {[...Array(6)].map((_, i) => (
             <Skeleton
               key={i}
@@ -116,11 +116,11 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   return (
     <div className={className}>
       {/* 카테고리 목록 */}
-      <div className="no-scrollbar w-full overflow-x-auto pt-0.5 pb-1 md:pt-1 md:pb-1">
+      <div className="no-scrollbar mr-2 w-full overflow-x-auto pt-0.5 pb-1 md:pt-1 md:pb-1">
         {/* 모바일에서는 항상 모든 카테고리 표시, 데스크탑에서는 visibleCategories 기반으로 표시 */}
         <div className="flex gap-1.5 md:flex-wrap md:gap-2">
           {/* 모바일에서는 모든 카테고리 표시 */}
-          <div className="flex gap-2 md:hidden">
+          <div className="flex gap-2 px-2 md:hidden">
             <button
               key="all-mobile"
               onClick={() => handleCategoryClick('all')}
@@ -231,7 +231,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
       {/* 선택한 카테고리의 서브카테고리 목록 */}
       {subcategories.length > 0 && (
         <div className="no-scrollbar w-full overflow-x-auto py-1 md:py-1">
-          <div className="flex gap-2 px-0.5 md:gap-2">
+          <div className="flex gap-2 px-2 md:gap-2 md:px-0">
             <button
               onClick={() => handleSubcategoryClick('all')}
               className={cn(

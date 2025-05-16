@@ -72,14 +72,7 @@ export function DeleteLibraryDialog({
             태그 정보가 함께 삭제되며, 이 작업은 되돌릴 수 없습니다.
           </ResponsiveAlertDialogDescription>
         </ResponsiveAlertDialogHeader>
-        <ResponsiveAlertDialogFooter>
-          <ResponsiveAlertDialogAction
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="cursor-pointer bg-red-500 hover:bg-red-600"
-          >
-            {isDeleting ? '삭제 중...' : '삭제하기'}
-          </ResponsiveAlertDialogAction>
+        <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
           <ResponsiveAlertDialogCancel
             disabled={isDeleting}
             className="cursor-pointer"
@@ -87,6 +80,14 @@ export function DeleteLibraryDialog({
           >
             취소
           </ResponsiveAlertDialogCancel>
+          <ResponsiveAlertDialogAction
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="cursor-pointer bg-red-500 hover:bg-red-600"
+            drawerClassName="cursor-pointer bg-red-500 hover:bg-red-600"
+          >
+            {isDeleting ? '삭제 중...' : '삭제하기'}
+          </ResponsiveAlertDialogAction>
         </ResponsiveAlertDialogFooter>
       </ResponsiveAlertDialogContent>
     </ResponsiveAlertDialog>

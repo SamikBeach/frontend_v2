@@ -61,7 +61,7 @@ export function MobileSideSheet({ trigger }: MobileSideSheetProps) {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent side="left" className="p-0 sm:max-w-xs">
+      <SheetContent side="left" className="gap-1 p-0 pt-0.5 sm:max-w-xs">
         <SheetTitle>
           <VisuallyHidden>메인 메뉴</VisuallyHidden>
         </SheetTitle>

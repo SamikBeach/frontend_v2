@@ -23,7 +23,7 @@ export function Notification({ className }: NotificationDropdownProps) {
         <Button
           variant="ghost"
           size="icon"
-          className={`relative text-gray-500 hover:text-gray-900 ${className || ''}`}
+          className={`relative cursor-pointer text-gray-500 hover:text-gray-900 ${className || ''}`}
         >
           <Suspense fallback={<span className="h-5 w-5" />}>
             <NotificationBadge />

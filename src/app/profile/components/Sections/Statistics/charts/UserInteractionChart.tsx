@@ -3,7 +3,7 @@ import { getUserInteraction } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BarChart3, MessageSquare, ThumbsUp } from 'lucide-react';
+import { MessageSquare, ThumbsUp } from 'lucide-react';
 import { useState } from 'react';
 import {
   Area,
@@ -19,6 +19,7 @@ import {
   YAxis,
 } from 'recharts';
 import { NoDataMessage, PrivateDataMessage } from '../components';
+import { ChartContainer } from '../components/ChartContainer';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
@@ -307,22 +308,20 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
     return label;
   };
 
-  // 데이터 타입 옵션
-  const dataTypeOptions = [
-    {
-      id: 'likes',
-      name: '좋아요',
-      icon: <ThumbsUp className="mr-1 h-3 w-3" />,
-    },
-    {
-      id: 'comments',
-      name: '댓글',
-      icon: <MessageSquare className="mr-1 h-3 w-3" />,
-    },
+  // 기간 옵션
+  const periodOptions = [
+    { id: 'all' as PeriodType, name: '전체' },
+    { id: 'daily' as PeriodType, name: '일별' },
+    { id: 'weekly' as PeriodType, name: '주별' },
+    { id: 'monthly' as PeriodType, name: '월별' },
+    { id: 'yearly' as PeriodType, name: '연도별' },
   ];
 
-  // 차트 데이터
-  const chartData = getChartData();
+  // 데이터 타입 옵션
+  const dataTypeOptions = [
+    { id: 'likes' as DataType, name: '좋아요', icon: ThumbsUp },
+    { id: 'comments' as DataType, name: '댓글', icon: MessageSquare },
+  ];
 
   // 라벨 가져오기
   const getReceivedLabel = () => {
@@ -355,33 +354,47 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
   };
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
-      <div className="flex h-full flex-col">
-        <div className="mb-2 flex items-center justify-between">
-          <div>
-            <h3 className="text-base font-medium text-gray-700">
-              {CHART_TITLE}
-            </h3>
-            <p className="flex flex-wrap gap-2 text-xs text-gray-500">
-              <span className="inline-flex items-center gap-1">
-                <ThumbsUp className="h-3 w-3" /> 받은 좋아요:{' '}
-                {data.totalLikesReceived}개
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <MessageSquare className="h-3 w-3" /> 받은 댓글:{' '}
-                {data.totalCommentsReceived}개
-              </span>
-            </p>
+    <ChartContainer>
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:min-w-[120px]">
+          <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
+          {isMyProfile && (
+            <div className="sm:hidden">
+              <PrivacyToggle
+                isPublic={settings?.isUserInteractionPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex gap-1">
+            {dataTypeOptions.map(option => (
+              <button
+                key={option.id}
+                onClick={() => setActiveDataType(option.id)}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center gap-1 rounded-full border px-2 text-xs font-medium transition-colors',
+                  activeDataType === option.id
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                <option.icon className="h-3 w-3" />
+                {option.name}
+              </button>
+            ))}
           </div>
           <div className="flex items-center gap-2">
             <div className="flex gap-1">
-              {dataTypeOptions.map(option => (
+              {periodOptions.map(option => (
                 <button
                   key={option.id}
-                  onClick={() => setActiveDataType(option.id as DataType)}
+                  onClick={() => setActivePeriod(option.id)}
                   className={cn(
                     'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                    activeDataType === option.id
+                    activePeriod === option.id
                       ? 'border-blue-200 bg-blue-50 text-blue-600'
                       : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                   )}
@@ -391,200 +404,125 @@ const UserInteractionChart = ({ userId }: UserInteractionChartProps) => {
               ))}
             </div>
             {isMyProfile && (
-              <PrivacyToggle
-                isPublic={settings?.isUserInteractionPublic || false}
-                isLoading={showLoading}
-                onToggle={handlePrivacyToggle}
-              />
+              <div className="hidden sm:block">
+                <PrivacyToggle
+                  isPublic={settings?.isUserInteractionPublic || false}
+                  isLoading={showLoading}
+                  onToggle={handlePrivacyToggle}
+                />
+              </div>
             )}
           </div>
         </div>
-
-        <div className="h-[calc(100%-3.5rem)]">
-          {chartData && chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              {activePeriod === 'all' ? (
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 5, right: 0, left: 0, bottom: 30 }}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    horizontal={true}
-                    vertical={false}
-                    stroke="#f3f4f6"
-                  />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fontSize: 11 }}
-                    tickLine={false}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11 }}
-                    tickLine={false}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                    allowDecimals={false}
-                  />
-                  <Tooltip content={<AllModeTooltip />} />
-                  <Bar dataKey="value" barSize={40} radius={[4, 4, 0, 0]}>
-                    {chartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Bar>
-                </BarChart>
-              ) : (
-                <AreaChart
-                  data={chartData}
-                  margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
-                >
-                  <defs>
-                    <linearGradient
-                      id="receivedGradient"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor={
-                          activeDataType === 'likes'
-                            ? PASTEL_COLORS.LIKES_RECEIVED
-                            : PASTEL_COLORS.COMMENTS_RECEIVED
-                        }
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor={
-                          activeDataType === 'likes'
-                            ? PASTEL_COLORS.LIKES_RECEIVED
-                            : PASTEL_COLORS.COMMENTS_RECEIVED
-                        }
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
-                    <linearGradient
-                      id="createdGradient"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor={
-                          activeDataType === 'likes'
-                            ? PASTEL_COLORS.LIKES_GIVEN
-                            : PASTEL_COLORS.COMMENTS_CREATED
-                        }
-                        stopOpacity={0.8}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor={
-                          activeDataType === 'likes'
-                            ? PASTEL_COLORS.LIKES_GIVEN
-                            : PASTEL_COLORS.COMMENTS_CREATED
-                        }
-                        stopOpacity={0.1}
-                      />
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="#f3f4f6"
-                  />
-                  <XAxis
-                    dataKey={getDataKey()}
-                    tick={{ fontSize: 11 }}
-                    tickLine={false}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                    tickFormatter={formatXAxisLabel}
-                    height={30}
-                    angle={0}
-                    textAnchor="middle"
-                  />
-                  <YAxis
-                    tick={{ fontSize: 11 }}
-                    tickLine={false}
-                    axisLine={{ stroke: '#e5e7eb' }}
-                    allowDecimals={false}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Legend
-                    content={<CustomLegend />}
-                    verticalAlign="bottom"
-                    height={20}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey={getReceivedLabel()}
-                    name={getReceivedLabel()}
-                    stroke={
-                      activeDataType === 'likes'
-                        ? PASTEL_COLORS.LIKES_RECEIVED
-                        : PASTEL_COLORS.COMMENTS_RECEIVED
-                    }
-                    fillOpacity={1}
-                    fill="url(#receivedGradient)"
-                    dot={{
-                      fill:
-                        activeDataType === 'likes'
-                          ? PASTEL_COLORS.LIKES_RECEIVED
-                          : PASTEL_COLORS.COMMENTS_RECEIVED,
-                      r: 3,
-                    }}
-                    activeDot={{ r: 5 }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey={getCreatedLabel()}
-                    name={getCreatedLabel()}
-                    stroke={
-                      activeDataType === 'likes'
-                        ? PASTEL_COLORS.LIKES_GIVEN
-                        : PASTEL_COLORS.COMMENTS_CREATED
-                    }
-                    fillOpacity={1}
-                    fill="url(#createdGradient)"
-                    dot={{
-                      fill:
-                        activeDataType === 'likes'
-                          ? PASTEL_COLORS.LIKES_GIVEN
-                          : PASTEL_COLORS.COMMENTS_CREATED,
-                      r: 3,
-                    }}
-                    activeDot={{ r: 5 }}
-                  />
-                </AreaChart>
-              )}
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex h-full flex-col items-center justify-center">
-              <div className="flex flex-col items-center text-center">
-                <div className="mb-2 flex h-20 w-20 items-center justify-center rounded-full bg-gray-50">
-                  <BarChart3 className="h-10 w-10 text-gray-300" />
-                </div>
-                <p className="text-sm font-medium text-gray-500">
-                  {activePeriod === 'all'
-                    ? `${activeDataType === 'likes' ? '좋아요' : '댓글'} 데이터가 없습니다`
-                    : activePeriod === 'daily'
-                      ? `일별 ${activeDataType === 'likes' ? '좋아요' : '댓글'} 데이터가 없습니다`
-                      : activePeriod === 'weekly'
-                        ? `주별 ${activeDataType === 'likes' ? '좋아요' : '댓글'} 데이터가 없습니다`
-                        : activePeriod === 'monthly'
-                          ? `월별 ${activeDataType === 'likes' ? '좋아요' : '댓글'} 데이터가 없습니다`
-                          : `연도별 ${activeDataType === 'likes' ? '좋아요' : '댓글'} 데이터가 없습니다`}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
       </div>
-    </div>
+
+      <div className="h-[320px]">
+        {activePeriod === 'all' ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={getChartData()}
+              margin={{ top: 10, right: 10, left: -15, bottom: 10 }}
+              layout="vertical"
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                horizontal={true}
+                vertical={false}
+                stroke="#f3f4f6"
+              />
+              <XAxis
+                type="number"
+                tick={{ fontSize: 11 }}
+                tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }}
+              />
+              <YAxis
+                dataKey="name"
+                type="category"
+                tick={{ fontSize: 12 }}
+                tickLine={false}
+                axisLine={false}
+                width={80}
+              />
+              <Tooltip content={<AllModeTooltip />} />
+              <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                {getChartData().map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={getChartData()}
+              margin={{ top: 10, right: 10, left: -15, bottom: 10 }}
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#f3f4f6"
+              />
+              <XAxis
+                dataKey={getDataKey()}
+                tick={{ fontSize: 11 }}
+                tickLine={false}
+                axisLine={{ stroke: '#e5e7eb' }}
+                tickFormatter={formatXAxisLabel}
+                height={25}
+              />
+              <YAxis
+                tick={{ fontSize: 11 }}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={value => value}
+              />
+              <Tooltip content={<CustomTooltip />} />
+              <Legend
+                content={<CustomLegend />}
+                wrapperStyle={{ paddingTop: '10px' }}
+              />
+              <Area
+                type="monotone"
+                dataKey={getReceivedLabel()}
+                name={activeDataType === 'likes' ? '받은 좋아요' : '받은 댓글'}
+                stroke={
+                  activeDataType === 'likes'
+                    ? PASTEL_COLORS.LIKES_RECEIVED
+                    : PASTEL_COLORS.COMMENTS_RECEIVED
+                }
+                fill={
+                  activeDataType === 'likes'
+                    ? PASTEL_COLORS.LIKES_RECEIVED
+                    : PASTEL_COLORS.COMMENTS_RECEIVED
+                }
+                fillOpacity={0.5}
+                strokeWidth={2}
+                activeDot={{ r: 4 }}
+              />
+              <Area
+                type="monotone"
+                dataKey={getCreatedLabel()}
+                name={activeDataType === 'likes' ? '남긴 좋아요' : '남긴 댓글'}
+                stroke={
+                  activeDataType === 'likes'
+                    ? PASTEL_COLORS.LIKES_GIVEN
+                    : PASTEL_COLORS.COMMENTS_CREATED
+                }
+                fill={
+                  activeDataType === 'likes'
+                    ? PASTEL_COLORS.LIKES_GIVEN
+                    : PASTEL_COLORS.COMMENTS_CREATED
+                }
+                fillOpacity={0.5}
+                strokeWidth={2}
+                activeDot={{ r: 4 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        )}
+      </div>
+    </ChartContainer>
   );
 };
 

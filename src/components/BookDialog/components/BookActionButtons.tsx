@@ -127,7 +127,7 @@ export function BookActionButtons() {
             <Button
               variant="outline"
               className={cn(
-                'w-full rounded-full border-gray-300 hover:bg-gray-100 hover:text-gray-900',
+                'w-full cursor-pointer rounded-full border-gray-300 hover:bg-gray-100 hover:text-gray-900',
                 readingStatus
                   ? getReadingStatusStyle(readingStatus)
                   : 'bg-gray-50 text-gray-700'
@@ -194,7 +194,7 @@ export function BookActionButtons() {
           <ResponsiveDropdownMenuTrigger asChild>
             <Button
               variant="outline"
-              className="w-full rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
+              className="w-full cursor-pointer rounded-full border-gray-300 bg-white text-gray-900 hover:bg-gray-100"
             >
               <ListPlus className="mr-1.5 h-4 w-4" />
               <span className="text-sm">서재에 담기</span>

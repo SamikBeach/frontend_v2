@@ -139,7 +139,7 @@ export default function ProfilePage() {
         </Suspense>
 
         {/* 섹션 컨텐츠 */}
-        <div className="mx-auto w-full px-4">
+        <div className="mx-auto w-full">
           {/* 현재 선택된 섹션 컨텐츠 렌더링 */}
           {renderSectionContent()}
         </div>

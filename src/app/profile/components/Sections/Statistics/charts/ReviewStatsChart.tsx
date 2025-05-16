@@ -20,7 +20,11 @@ import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { NoDataMessage, PrivateDataMessage } from '../components';
+import {
+  ChartContainer,
+  NoDataMessage,
+  PrivateDataMessage,
+} from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
@@ -252,18 +256,31 @@ const ReviewStatsChart = ({ userId }: ReviewStatsChartProps) => {
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
-      <div className="mb-2 flex items-start justify-between">
-        <div className="min-w-[120px]">
-          <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
-          <p className="text-xs text-gray-500">
-            총 {data.totalReviews}개
-            {data.averageReviewLength > 0 &&
-              ` | 평균 ${data.averageReviewLength.toFixed(0)}자`}
-          </p>
+    <ChartContainer className="h-[340px]">
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:min-w-[120px]">
+          <div>
+            <h3 className="text-base font-medium text-gray-700">
+              {CHART_TITLE}
+            </h3>
+            <p className="text-xs text-gray-500">
+              총 {data.totalReviews}개
+              {data.averageReviewLength > 0 &&
+                ` | 평균 ${data.averageReviewLength.toFixed(0)}자`}
+            </p>
+          </div>
+          {isMyProfile && (
+            <div className="sm:hidden">
+              <PrivacyToggle
+                isPublic={settings?.isReviewStatsPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            </div>
+          )}
         </div>
-        <div className="flex flex-col gap-1">
-          <div className="flex justify-end gap-1">
+        <div className="flex flex-col gap-2">
+          <div className="flex justify-start gap-1 sm:justify-end">
             {chartTypeOptions.map(option => (
               <button
                 key={option.id}
@@ -279,16 +296,18 @@ const ReviewStatsChart = ({ userId }: ReviewStatsChartProps) => {
               </button>
             ))}
             {isMyProfile && (
-              <PrivacyToggle
-                isPublic={settings?.isReviewStatsPublic || false}
-                isLoading={showLoading}
-                onToggle={handlePrivacyToggle}
-              />
+              <div className="hidden sm:block">
+                <PrivacyToggle
+                  isPublic={settings?.isReviewStatsPublic || false}
+                  isLoading={showLoading}
+                  onToggle={handlePrivacyToggle}
+                />
+              </div>
             )}
           </div>
 
           {/* Fixed height container for the submenu */}
-          <div className="flex h-7 justify-end">
+          <div className="flex h-7 justify-start sm:justify-end">
             {activeType === 'timeline' && (
               <div className="flex gap-1">
                 {periodOptions.map(option => (
@@ -311,7 +330,7 @@ const ReviewStatsChart = ({ userId }: ReviewStatsChartProps) => {
         </div>
       </div>
 
-      <div className="h-[calc(100%-3.5rem)]">
+      <div className="h-[300px]">
         {activeType === 'timeline' ? (
           timelineData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -419,7 +438,7 @@ const ReviewStatsChart = ({ userId }: ReviewStatsChartProps) => {
           </div>
         )}
       </div>
-    </div>
+    </ChartContainer>
   );
 };
 

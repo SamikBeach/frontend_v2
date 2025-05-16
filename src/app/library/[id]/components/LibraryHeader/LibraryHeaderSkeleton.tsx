@@ -1,6 +1,6 @@
 export function LibraryHeaderSkeleton() {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-4 bg-white pt-3">
+    <div className="flex flex-wrap items-center justify-between gap-4 bg-white md:pt-3">
       <div className="flex-1">
         <div className="mb-2 flex flex-wrap items-center gap-3">
           <div className="h-8 w-48 animate-pulse rounded-lg bg-gray-200"></div>

@@ -32,12 +32,12 @@ export function FilterArea({
       <CategoryFilter
         selectedCategory={selectedCategory}
         onCategoryClick={handleCategoryClick}
-        className="w-full max-w-[100vw] overflow-x-auto pl-2"
+        className="w-full max-w-[100vw] overflow-x-auto"
       />
       <SortFilter
         selectedSort={selectedSort}
         onSortClick={handleSortClick}
-        className="ml-2 md:ml-0"
+        className="md:ml-0"
       />
     </div>
   );

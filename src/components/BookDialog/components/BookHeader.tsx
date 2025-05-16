@@ -22,7 +22,11 @@ export function BookHeaderSkeleton() {
       <div className="pl-2">
         <Skeleton className="h-7 w-56 rounded-md" />
       </div>
-      <Button variant="ghost" size="icon" className="rounded-full">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="cursor-pointer rounded-full"
+      >
         <X className="h-4 w-4" />
       </Button>
     </div>
@@ -53,7 +57,7 @@ export function BookHeader() {
         variant="ghost"
         size={isMobile ? 'sm' : 'icon'}
         className={cn(
-          'transition-colors',
+          'cursor-pointer transition-colors',
           isMobile ? 'h-8 w-8 rounded-full p-0' : 'rounded-full'
         )}
         onClick={() => close()}

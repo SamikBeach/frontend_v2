@@ -79,7 +79,7 @@ function CategoryFilterSkeleton() {
   return (
     <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-4rem)]">
       <div className="no-scrollbar w-full pt-0.5 pb-0.5 md:mb-2 md:pt-1 md:pb-1">
-        <div className="flex gap-1.5 px-0.5 md:gap-2">
+        <div className="flex gap-1.5 md:gap-2">
           {[...Array(6)].map((_, i) => (
             <Skeleton
               key={i}
@@ -163,7 +163,7 @@ export default function PopularPage() {
             <div className="flex w-full items-start justify-between">
               {/* 카테고리 필터 - 로딩 상태일 때 스켈레톤 표시 */}
               <Suspense fallback={<CategoryFilterSkeleton />}>
-                <CategoryFilter className="w-full max-w-[100vw] pl-2" />
+                <CategoryFilter className="w-full max-w-[100vw]" />
               </Suspense>
               <div className="ml-4 hidden flex-shrink-0 xl:block">
                 <PopularSortDropdown />

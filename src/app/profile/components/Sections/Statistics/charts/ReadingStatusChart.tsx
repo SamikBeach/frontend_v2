@@ -5,6 +5,7 @@ import { ReadingStatusType } from '@/apis/reading-status/types';
 import { getReadingStatusStats } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import {
+  ChartContainer,
   NoDataMessage,
   PrivacyToggle,
   PrivateDataMessage,
@@ -163,17 +164,30 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   return (
-    <div className="min-h-[400px] w-full rounded-lg bg-white p-3">
-      <div className="mb-2 flex items-start justify-between">
-        <h3 className="text-base font-medium text-gray-700">
-          독서 상태별 도서 수
-        </h3>
+    <ChartContainer>
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:min-w-[120px]">
+          <h3 className="text-base font-medium text-gray-700">
+            독서 상태별 도서 수
+          </h3>
+          {isMyProfile && (
+            <div className="sm:hidden">
+              <PrivacyToggle
+                isPublic={settings?.isReadingStatusPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            </div>
+          )}
+        </div>
         {isMyProfile && (
-          <PrivacyToggle
-            isPublic={settings?.isReadingStatusPublic || false}
-            isLoading={showLoading}
-            onToggle={handlePrivacyToggle}
-          />
+          <div className="hidden sm:block">
+            <PrivacyToggle
+              isPublic={settings?.isReadingStatusPublic || false}
+              isLoading={showLoading}
+              onToggle={handlePrivacyToggle}
+            />
+          </div>
         )}
       </div>
       <div className="flex h-[320px] flex-col items-center sm:flex-row">
@@ -233,7 +247,7 @@ const ReadingStatusChart = ({ userId }: ReadingStatusChartProps) => {
           )}
         </div>
       </div>
-    </div>
+    </ChartContainer>
   );
 };
 

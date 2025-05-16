@@ -32,10 +32,14 @@ export function EmptyState({ type }: EmptyStateProps) {
   }
 
   return (
-    <div className="mt-8 flex items-center justify-center rounded-lg bg-gray-50 py-16">
-      <div className="text-center">
-        <h3 className="text-lg font-medium text-gray-900">{title}</h3>
-        <p className="mt-2 text-sm text-gray-500">{description}</p>
+    <div className="mt-4 flex items-center justify-center rounded-lg bg-gray-50 py-8 sm:mt-8 sm:py-16">
+      <div className="px-4 text-center sm:px-6">
+        <h3 className="text-base font-medium text-gray-900 sm:text-lg">
+          {title}
+        </h3>
+        <p className="mt-1 text-xs text-gray-500 sm:mt-2 sm:text-sm">
+          {description}
+        </p>
       </div>
     </div>
   );
