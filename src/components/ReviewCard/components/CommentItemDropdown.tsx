@@ -72,13 +72,14 @@ export function CommentItemDropdown({
                 이 댓글을 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
               </ResponsiveAlertDialogDescription>
             </ResponsiveAlertDialogHeader>
-            <ResponsiveAlertDialogFooter>
+            <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
               <ResponsiveAlertDialogCancel className="cursor-pointer">
                 취소
               </ResponsiveAlertDialogCancel>
               <ResponsiveAlertDialogAction
                 onClick={onDeleteComment}
                 className="bg-red-500 text-white hover:bg-red-600"
+                drawerClassName="bg-red-500 text-white hover:bg-red-600"
               >
                 {isDeleting ? '삭제 중...' : '삭제'}
               </ResponsiveAlertDialogAction>

@@ -328,7 +328,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                                     되돌릴 수 없습니다.
                                   </ResponsiveAlertDialogDescription>
                                 </ResponsiveAlertDialogHeader>
-                                <ResponsiveAlertDialogFooter>
+                                <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
                                   <ResponsiveAlertDialogCancel className="cursor-pointer">
                                     취소
                                   </ResponsiveAlertDialogCancel>
@@ -337,6 +337,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                                       handleDeleteComment(comment.id)
                                     }
                                     className="bg-red-500 text-white hover:bg-red-600"
+                                    drawerClassName="bg-red-500 text-white hover:bg-red-600"
                                   >
                                     {isDeleting ? '삭제 중...' : '삭제'}
                                   </ResponsiveAlertDialogAction>
@@ -679,7 +680,7 @@ function ReviewsList({
                                   되돌릴 수 없습니다.
                                 </ResponsiveAlertDialogDescription>
                               </ResponsiveAlertDialogHeader>
-                              <ResponsiveAlertDialogFooter>
+                              <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
                                 <ResponsiveAlertDialogCancel className="cursor-pointer">
                                   취소
                                 </ResponsiveAlertDialogCancel>
@@ -688,6 +689,7 @@ function ReviewsList({
                                     handleDeleteReviewClick(review.id)
                                   }
                                   className="cursor-pointer bg-red-500 text-white hover:bg-red-600"
+                                  drawerClassName="cursor-pointer bg-red-500 text-white hover:bg-red-600"
                                 >
                                   {deleteReviewMutation.isPending &&
                                   deleteReviewMutation.variables === review.id

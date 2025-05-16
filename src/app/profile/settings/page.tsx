@@ -333,13 +333,14 @@ export default function ProfileSettingsPage() {
                   </div>
                 )}
 
-                <ResponsiveAlertDialogFooter>
+                <ResponsiveAlertDialogFooter drawerClassName="flex flex-col-reverse gap-2">
                   <ResponsiveAlertDialogCancel>
                     취소
                   </ResponsiveAlertDialogCancel>
                   <ResponsiveAlertDialogAction
                     type="submit"
                     disabled={isDeletingAccount}
+                    drawerClassName="cursor-pointer bg-gray-900 hover:bg-gray-800"
                   >
                     {isDeletingAccount ? '삭제 중...' : '삭제'}
                   </ResponsiveAlertDialogAction>
