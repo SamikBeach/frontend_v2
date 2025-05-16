@@ -19,17 +19,15 @@ export function ProfileTabs({
   onSelectSection,
 }: ProfileTabsProps) {
   return (
-    <div className="pb-4 md:mb-4">
-      <div className="flex flex-wrap gap-3">
-        {profileSections.map(section => (
-          <MenuItem
-            key={section.id}
-            filter={section}
-            selectedSection={selectedSection}
-            onSelectSection={onSelectSection}
-          />
-        ))}
-      </div>
+    <div className="flex flex-wrap gap-3">
+      {profileSections.map(section => (
+        <MenuItem
+          key={section.id}
+          filter={section}
+          selectedSection={selectedSection}
+          onSelectSection={onSelectSection}
+        />
+      ))}
     </div>
   );
 }

@@ -265,7 +265,9 @@ const ReadingStatusByPeriodChart = ({
               </div>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+
+          {/* 기간 선택 버튼들 */}
+          <div className="flex items-center justify-start gap-2 sm:justify-end">
             <div className="flex flex-nowrap overflow-x-auto pb-1">
               {periodOptions.map(option => (
                 <button

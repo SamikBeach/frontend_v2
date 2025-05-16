@@ -18,7 +18,11 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { NoDataMessage, PrivateDataMessage } from '../components';
+import {
+  ChartContainer,
+  NoDataMessage,
+  PrivateDataMessage,
+} from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
 
@@ -190,8 +194,8 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
   ];
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white md:p-3">
-      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+    <ChartContainer className="h-[340px]">
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center justify-between sm:min-w-[120px]">
           <div>
             <h3 className="text-base font-medium text-gray-700">
@@ -212,7 +216,7 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
             </div>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-start gap-2 sm:justify-end">
           <div className="flex gap-1">
             {tabOptions.map(option => (
               <button
@@ -241,7 +245,7 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
         </div>
       </div>
 
-      <div className="h-[calc(100%-3.5rem)]">
+      <div className="h-[320px]">
         {activeTab === 'distribution' ? (
           fullRatingDistribution.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -418,7 +422,7 @@ const RatingStatsChart = ({ userId }: RatingStatsChartProps) => {
           </div>
         )}
       </div>
-    </div>
+    </ChartContainer>
   );
 };
 
