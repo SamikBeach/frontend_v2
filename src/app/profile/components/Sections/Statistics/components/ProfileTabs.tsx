@@ -19,7 +19,7 @@ export function ProfileTabs({
   onSelectSection,
 }: ProfileTabsProps) {
   return (
-    <div className="mb-4 border-b border-gray-100 pb-4">
+    <div className="pb-4 md:mb-4">
       <div className="flex flex-wrap gap-3">
         {profileSections.map(section => (
           <MenuItem

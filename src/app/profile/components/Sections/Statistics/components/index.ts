@@ -1,3 +1,4 @@
+export * from './ChartContainer';
 export * from './MenuItem';
 export * from './NoDataMessage';
 export * from './PrivacyToggle';

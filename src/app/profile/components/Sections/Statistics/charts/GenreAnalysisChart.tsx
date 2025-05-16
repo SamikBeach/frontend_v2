@@ -14,7 +14,7 @@ import { getGenreAnalysis } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 
-import { PrivateDataMessage } from '../components';
+import { ChartContainer, PrivateDataMessage } from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { PASTEL_COLORS } from '../constants';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
@@ -301,170 +301,177 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
   };
 
   return (
-    <div className="w-full">
-      {/* 차트 컨테이너 */}
-      <div className="w-full rounded-lg bg-white p-3">
-        <div className="mb-2 flex items-start justify-between">
-          <div className="flex min-w-[120px] items-center">
-            <h3 className="text-base font-medium text-gray-700">
-              {CHART_TITLE}
-            </h3>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="flex gap-1">
-              {getAllPeriodOptions().map(option => (
-                <button
-                  key={option.id}
-                  onClick={() => setActivePeriod(option.id)}
-                  className={cn(
-                    'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium transition-colors',
-                    activePeriod === option.id
-                      ? 'border-blue-200 bg-blue-50 text-blue-600'
-                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                  )}
-                >
-                  {option.name}
-                </button>
-              ))}
-            </div>
-            {isMyProfile && (
+    <ChartContainer>
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:min-w-[120px]">
+          <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
+          {isMyProfile && (
+            <div className="sm:hidden">
               <PrivacyToggle
                 isPublic={settings?.isGenreAnalysisPublic || false}
                 isLoading={showLoading}
                 onToggle={handlePrivacyToggle}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
-
-        {/* 차트 영역 */}
-        <div className="flex h-[260px] flex-col items-center md:flex-row">
-          <div className="flex h-full w-full flex-col gap-4 md:flex-row">
-            {/* 카테고리 차트 */}
-            <div className="relative h-full w-full md:w-1/2 md:pr-4">
-              {/* 카테고리 차트 타이틀 */}
-              <div className="absolute top-2 right-0 left-0 z-10 text-center">
-                <span className="text-sm text-gray-600">카테고리</span>
-              </div>
-
-              {totalCategoryCount === 0 && (
-                <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
-                  <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
-                    데이터가 없습니다
-                  </p>
-                </div>
-              )}
-              <div className="flex h-[140px] items-center justify-center pt-8 md:h-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={topCategories}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                      outerRadius={42}
-                      innerRadius={18}
-                      fill="#8884d8"
-                      dataKey="count"
-                      nameKey="category"
-                      paddingAngle={2}
-                    >
-                      {topCategories.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.color}
-                          stroke="#fff"
-                          strokeWidth={1}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      content={<CustomTooltip />}
-                      wrapperStyle={{ zIndex: 20 }}
-                    />
-                    <Legend
-                      content={<CustomLegend />}
-                      verticalAlign="middle"
-                      align="right"
-                      layout="vertical"
-                      wrapperStyle={{ right: -5 }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* 세부 장르 차트 */}
-            <div className="relative h-full w-full md:w-1/2 md:pl-4">
-              {/* 세부 장르 차트 타이틀 */}
-              <div className="absolute top-2 right-0 left-0 z-10 text-center">
-                <span className="text-sm text-gray-600">세부 장르</span>
-              </div>
-
-              {totalSubCategoryCount === 0 && (
-                <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
-                  <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
-                    데이터가 없습니다
-                  </p>
-                </div>
-              )}
-              <div className="flex h-[140px] items-center justify-center pt-8 md:h-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={topSubCategories}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={renderCustomizedLabel}
-                      outerRadius={42}
-                      innerRadius={18}
-                      fill="#8884d8"
-                      dataKey="count"
-                      nameKey="subCategory"
-                      paddingAngle={2}
-                    >
-                      {topSubCategories.map((entry, index) => (
-                        <Cell
-                          key={`cell-${index}`}
-                          fill={entry.color}
-                          stroke="#fff"
-                          strokeWidth={1}
-                        />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      content={<CustomTooltip />}
-                      wrapperStyle={{ zIndex: 20 }}
-                    />
-                    <Legend
-                      content={<CustomLegend />}
-                      verticalAlign="middle"
-                      align="right"
-                      layout="vertical"
-                      wrapperStyle={{ right: -5 }}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+        <div className="flex items-center gap-2">
+          <div className="flex flex-nowrap overflow-x-auto pb-1">
+            {getAllPeriodOptions().map(option => (
+              <button
+                key={option.id}
+                onClick={() => setActivePeriod(option.id)}
+                className={cn(
+                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium whitespace-nowrap transition-colors',
+                  'mr-1.5 last:mr-0',
+                  activePeriod === option.id
+                    ? 'border-blue-200 bg-blue-50 text-blue-600'
+                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                )}
+              >
+                {option.name}
+              </button>
+            ))}
           </div>
+          {isMyProfile && (
+            <div className="hidden sm:block">
+              <PrivacyToggle
+                isPublic={settings?.isGenreAnalysisPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            </div>
+          )}
         </div>
-
-        {/* 주요 카테고리 정보 - 독서 상태별 도서수 차트의 완독률과 같은 스타일로 하단에 배치 */}
-        {data.mostReadCategory && (
-          <div className="mt-4">
-            <div className="mx-auto max-w-[200px] rounded-md bg-gray-50 px-3 py-1.5">
-              <p className="text-center text-sm font-medium text-gray-600">
-                주요 카테고리:{' '}
-                <span className="text-blue-600">{data.mostReadCategory}</span>
-              </p>
-            </div>
-          </div>
-        )}
       </div>
-    </div>
+
+      {/* 차트 영역 */}
+      <div className="flex h-[260px] flex-col items-center md:flex-row">
+        <div className="flex h-full w-full flex-col gap-4 md:flex-row">
+          {/* 카테고리 차트 */}
+          <div className="relative h-full w-full md:w-1/2 md:pr-4">
+            {/* 카테고리 차트 타이틀 */}
+            <div className="absolute top-2 right-0 left-0 z-10 text-center">
+              <span className="text-sm text-gray-600">카테고리</span>
+            </div>
+
+            {totalCategoryCount === 0 && (
+              <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
+                <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
+                  데이터가 없습니다
+                </p>
+              </div>
+            )}
+            <div className="flex h-[140px] items-center justify-center pt-8 md:h-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={topCategories}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={renderCustomizedLabel}
+                    outerRadius={42}
+                    innerRadius={18}
+                    fill="#8884d8"
+                    dataKey="count"
+                    nameKey="category"
+                    paddingAngle={2}
+                  >
+                    {topCategories.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                        stroke="#fff"
+                        strokeWidth={1}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    content={<CustomTooltip />}
+                    wrapperStyle={{ zIndex: 20 }}
+                  />
+                  <Legend
+                    content={<CustomLegend />}
+                    verticalAlign="middle"
+                    align="right"
+                    layout="vertical"
+                    wrapperStyle={{ right: -5 }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* 세부 장르 차트 */}
+          <div className="relative h-full w-full md:w-1/2 md:pl-4">
+            {/* 세부 장르 차트 타이틀 */}
+            <div className="absolute top-2 right-0 left-0 z-10 text-center">
+              <span className="text-sm text-gray-600">세부 장르</span>
+            </div>
+
+            {totalSubCategoryCount === 0 && (
+              <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
+                <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
+                  데이터가 없습니다
+                </p>
+              </div>
+            )}
+            <div className="flex h-[140px] items-center justify-center pt-8 md:h-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={topSubCategories}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={renderCustomizedLabel}
+                    outerRadius={42}
+                    innerRadius={18}
+                    fill="#8884d8"
+                    dataKey="count"
+                    nameKey="subCategory"
+                    paddingAngle={2}
+                  >
+                    {topSubCategories.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                        stroke="#fff"
+                        strokeWidth={1}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    content={<CustomTooltip />}
+                    wrapperStyle={{ zIndex: 20 }}
+                  />
+                  <Legend
+                    content={<CustomLegend />}
+                    verticalAlign="middle"
+                    align="right"
+                    layout="vertical"
+                    wrapperStyle={{ right: -5 }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 주요 카테고리 정보 - 독서 상태별 도서수 차트의 완독률과 같은 스타일로 하단에 배치 */}
+      {data.mostReadCategory && (
+        <div className="mt-14 md:mt-0">
+          <div className="mx-auto max-w-[200px] rounded-md bg-gray-50 px-3 py-1.5">
+            <p className="text-center text-sm font-medium text-gray-600">
+              주요 카테고리:{' '}
+              <span className="text-blue-600">{data.mostReadCategory}</span>
+            </p>
+          </div>
+        </div>
+      )}
+    </ChartContainer>
   );
 };
 

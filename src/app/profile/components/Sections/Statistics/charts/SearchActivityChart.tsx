@@ -188,7 +188,7 @@ const SearchActivityChart = ({ userId }: SearchActivityChartProps) => {
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white md:p-3">
       <div className="flex h-full flex-col">
         <div className="mb-2 flex items-start justify-between">
           <div className="flex items-center gap-2">

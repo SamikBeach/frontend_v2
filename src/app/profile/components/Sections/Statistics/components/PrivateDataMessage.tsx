@@ -10,7 +10,7 @@ export function PrivateDataMessage({
   message,
 }: PrivateDataMessageProps) {
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white md:p-3">
       <div className="flex h-full flex-col">
         <div className="mb-2">
           <h3 className="text-base font-medium text-gray-600">{title}</h3>

@@ -190,7 +190,7 @@ const FollowerStatsChart = ({ userId }: FollowerStatsChartProps) => {
   ];
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white md:p-3">
       <div className="flex h-full flex-col">
         <div className="mb-2 flex items-start justify-between">
           <div>

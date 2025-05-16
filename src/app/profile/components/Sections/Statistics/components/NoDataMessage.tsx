@@ -10,7 +10,7 @@ export function NoDataMessage({
   message = '데이터가 없습니다',
 }: NoDataMessageProps) {
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white md:p-3">
       <div className="flex h-full flex-col">
         <div className="mb-2">
           <h3 className="text-sm font-medium text-gray-700">{title}</h3>

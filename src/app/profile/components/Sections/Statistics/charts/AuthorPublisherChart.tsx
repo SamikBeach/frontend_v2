@@ -201,10 +201,19 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
-      <div className="mb-2 flex items-center justify-between">
-        <div className="min-w-[120px]">
+    <div className="h-[340px] w-full rounded-lg bg-white md:p-3">
+      <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center justify-between sm:min-w-[120px]">
           <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
+          {isMyProfile && (
+            <div className="sm:hidden">
+              <PrivacyToggle
+                isPublic={settings?.isAuthorPublisherStatsPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <div className="flex space-x-1">
@@ -224,11 +233,13 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
             ))}
           </div>
           {isMyProfile && (
-            <PrivacyToggle
-              isPublic={settings?.isAuthorPublisherStatsPublic || false}
-              isLoading={showLoading}
-              onToggle={handlePrivacyToggle}
-            />
+            <div className="hidden sm:block">
+              <PrivacyToggle
+                isPublic={settings?.isAuthorPublisherStatsPublic || false}
+                isLoading={showLoading}
+                onToggle={handlePrivacyToggle}
+              />
+            </div>
           )}
         </div>
       </div>
@@ -302,7 +313,7 @@ const AuthorPublisherChart = ({ userId }: AuthorPublisherChartProps) => {
 
         {/* 가장 많이 읽은 항목 정보 표시 */}
         {mostReadItem && (
-          <div className="absolute right-0 bottom-0 left-0 flex justify-center">
+          <div className="absolute right-0 bottom-0 left-0 mb-3 flex justify-center">
             <div className="rounded-md bg-gray-50 px-3 py-1.5">
               <p className="text-center text-sm text-gray-600">
                 주요{' '}

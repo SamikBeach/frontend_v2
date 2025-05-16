@@ -252,7 +252,7 @@ const ReviewStatsChart = ({ userId }: ReviewStatsChartProps) => {
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   return (
-    <div className="h-[340px] w-full rounded-lg bg-white p-3">
+    <div className="h-[340px] w-full rounded-lg bg-white md:p-3">
       <div className="mb-2 flex items-start justify-between">
         <div className="min-w-[120px]">
           <h3 className="text-base font-medium text-gray-700">{CHART_TITLE}</h3>
