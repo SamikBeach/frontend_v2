@@ -19,8 +19,8 @@ export function ProfileTabs({
   onSelectSection,
 }: ProfileTabsProps) {
   return (
-    <div className="mb-4 overflow-x-auto border-b border-gray-100 pb-4">
-      <div className="flex min-w-max flex-wrap gap-2 sm:gap-3">
+    <div className="mb-4 border-b border-gray-100 pb-4">
+      <div className="flex flex-wrap gap-3">
         {profileSections.map(section => (
           <MenuItem
             key={section.id}
