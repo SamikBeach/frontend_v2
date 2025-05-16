@@ -278,7 +278,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     if (value === 0 || percent < 0.08) return null;
 
     const RADIAN = Math.PI / 180;
-    const radius = outerRadius * 0.7;
+    const radius = outerRadius * 0.75;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
@@ -346,12 +346,12 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
       </div>
 
       {/* 차트 영역 */}
-      <div className="flex h-[260px] flex-col items-center md:flex-row">
+      <div className="flex h-[280px] flex-col items-center md:flex-row">
         <div className="flex h-full w-full flex-col gap-4 md:flex-row">
           {/* 카테고리 차트 */}
           <div className="relative h-full w-full md:w-1/2 md:pr-4">
             {/* 카테고리 차트 타이틀 */}
-            <div className="absolute top-2 right-0 left-0 z-10 text-center">
+            <div className="absolute top-0 right-0 left-0 z-10 text-center md:top-12">
               <span className="text-sm text-gray-600">카테고리</span>
             </div>
 
@@ -362,17 +362,17 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
                 </p>
               </div>
             )}
-            <div className="flex h-[140px] items-center justify-center pt-8 md:h-full">
+            <div className="flex h-[160px] items-center justify-center md:h-full">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+                <PieChart margin={{ left: -40 }}>
                   <Pie
                     data={topCategories}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
                     label={renderCustomizedLabel}
-                    outerRadius={42}
-                    innerRadius={18}
+                    outerRadius={55}
+                    innerRadius={25}
                     fill="#8884d8"
                     dataKey="count"
                     nameKey="category"
@@ -396,7 +396,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
                     verticalAlign="middle"
                     align="right"
                     layout="vertical"
-                    wrapperStyle={{ right: -5 }}
+                    wrapperStyle={{ right: 30 }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -406,7 +406,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
           {/* 세부 장르 차트 */}
           <div className="relative h-full w-full md:w-1/2 md:pl-4">
             {/* 세부 장르 차트 타이틀 */}
-            <div className="absolute top-2 right-0 left-0 z-10 text-center">
+            <div className="absolute top-0 right-0 left-0 z-10 text-center md:top-12">
               <span className="text-sm text-gray-600">세부 장르</span>
             </div>
 
@@ -417,17 +417,17 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
                 </p>
               </div>
             )}
-            <div className="flex h-[140px] items-center justify-center pt-8 md:h-full">
+            <div className="flex h-[160px] items-center justify-center md:h-full">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
+                <PieChart margin={{ left: -40 }}>
                   <Pie
                     data={topSubCategories}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
                     label={renderCustomizedLabel}
-                    outerRadius={42}
-                    innerRadius={18}
+                    outerRadius={55}
+                    innerRadius={25}
                     fill="#8884d8"
                     dataKey="count"
                     nameKey="subCategory"
@@ -451,7 +451,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
                     verticalAlign="middle"
                     align="right"
                     layout="vertical"
-                    wrapperStyle={{ right: -5 }}
+                    wrapperStyle={{ right: 30 }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -462,7 +462,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
 
       {/* 주요 카테고리 정보 - 독서 상태별 도서수 차트의 완독률과 같은 스타일로 하단에 배치 */}
       {data.mostReadCategory && (
-        <div className="mt-14 md:mt-0">
+        <div className="mt-16 md:mt-[-50px]">
           <div className="mx-auto max-w-[200px] rounded-md bg-gray-50 px-3 py-1.5">
             <p className="text-center text-sm font-medium text-gray-600">
               주요 카테고리:{' '}
