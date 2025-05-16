@@ -50,7 +50,6 @@ export function RecentSearchList({
           <SearchItem
             key={`${search.term}-${index}`}
             item={searchItem}
-            size="sm"
             onClick={() => {
               onItemClick(searchItem);
               onOpenChange(false);

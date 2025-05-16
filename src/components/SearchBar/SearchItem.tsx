@@ -52,8 +52,6 @@ export function SearchItem({
 }: SearchItemProps) {
   const [imageError, setImageError] = useState(false);
 
-  const isSmall = size === 'sm';
-
   // 하이라이트 텍스트 처리
   const highlightText = (text: string, highlight?: string) => {
     if (!highlight) return text;
@@ -99,7 +97,7 @@ export function SearchItem({
         {Array.from({ length: 5 }).map((_, i) => (
           <Star
             key={i}
-            className={`${isSmall ? 'h-3.5 w-3.5' : 'h-4 w-4'} ${
+            className={`h-3.5 w-3.5 md:h-4 md:w-4 ${
               i < Math.floor(ratingValue)
                 ? 'fill-yellow-400 text-yellow-400'
                 : i + 0.5 <= ratingValue
@@ -119,9 +117,7 @@ export function SearchItem({
     const statusConfig = {
       [ReadingStatusType.WANT_TO_READ]: {
         icon: (
-          <Clock
-            className={`${isSmall ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5'} text-purple-500`}
-          />
+          <Clock className="h-2.5 w-2.5 text-purple-500 md:h-3.5 md:w-3.5" />
         ),
         text: '읽고 싶어요',
         bgColor: 'bg-purple-50',
@@ -129,9 +125,7 @@ export function SearchItem({
       },
       [ReadingStatusType.READING]: {
         icon: (
-          <BookOpen
-            className={`${isSmall ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5'} text-blue-500`}
-          />
+          <BookOpen className="h-2.5 w-2.5 text-blue-500 md:h-3.5 md:w-3.5" />
         ),
         text: '읽는 중',
         bgColor: 'bg-blue-50',
@@ -139,9 +133,7 @@ export function SearchItem({
       },
       [ReadingStatusType.READ]: {
         icon: (
-          <CheckCircle2
-            className={`${isSmall ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5'} text-green-500`}
-          />
+          <CheckCircle2 className="h-2.5 w-2.5 text-green-500 md:h-3.5 md:w-3.5" />
         ),
         text: '읽었어요',
         bgColor: 'bg-green-50',
@@ -154,13 +146,9 @@ export function SearchItem({
       item.readingStats?.readingStatusCounts?.[item.userReadingStatus] || 0;
 
     return (
-      <div className={`${isSmall ? 'mt-1.5' : 'mt-2.5'}`}>
+      <div className="mt-1.5 md:mt-2.5">
         <div
-          className={`inline-flex items-center rounded-full ${status.bgColor} ${
-            isSmall
-              ? 'px-1.5 py-0.5 text-[10px] leading-none'
-              : 'px-2.5 py-1 text-xs'
-          } font-medium ${status.textColor}`}
+          className={`inline-flex items-center rounded-full ${status.bgColor} px-1.5 py-0.5 text-[10px] leading-none font-medium md:px-2.5 md:py-1 md:text-xs md:leading-normal ${status.textColor}`}
         >
           <span className="flex items-center">
             {status.icon}
@@ -192,16 +180,10 @@ export function SearchItem({
       statuses.push(
         <div
           key="want"
-          className={`inline-flex items-center rounded-full bg-purple-50 ${
-            isSmall
-              ? 'px-1.5 py-0.5 text-[10px] leading-none'
-              : 'px-2.5 py-1 text-xs'
-          } font-medium text-purple-600`}
+          className="inline-flex items-center rounded-full bg-purple-50 px-1.5 py-0.5 text-[10px] leading-none font-medium text-purple-600 md:px-2.5 md:py-1 md:text-xs md:leading-normal"
         >
           <span className="flex items-center">
-            <Clock
-              className={`${isSmall ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5'} text-purple-500`}
-            />
+            <Clock className="h-2.5 w-2.5 text-purple-500 md:h-3.5 md:w-3.5" />
             <span className="ml-1">
               읽고 싶어요 {statusCounts[ReadingStatusType.WANT_TO_READ]}
             </span>
@@ -217,16 +199,10 @@ export function SearchItem({
       statuses.push(
         <div
           key="reading"
-          className={`inline-flex items-center rounded-full bg-blue-50 ${
-            isSmall
-              ? 'px-1.5 py-0.5 text-[10px] leading-none'
-              : 'px-2.5 py-1 text-xs'
-          } font-medium text-blue-600`}
+          className="inline-flex items-center rounded-full bg-blue-50 px-1.5 py-0.5 text-[10px] leading-none font-medium text-blue-600 md:px-2.5 md:py-1 md:text-xs md:leading-normal"
         >
           <span className="flex items-center">
-            <BookOpen
-              className={`${isSmall ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5'} text-blue-500`}
-            />
+            <BookOpen className="h-2.5 w-2.5 text-blue-500 md:h-3.5 md:w-3.5" />
             <span className="ml-1">
               읽는 중 {statusCounts[ReadingStatusType.READING]}
             </span>
@@ -242,16 +218,10 @@ export function SearchItem({
       statuses.push(
         <div
           key="read"
-          className={`inline-flex items-center rounded-full bg-green-50 ${
-            isSmall
-              ? 'px-1.5 py-0.5 text-[10px] leading-none'
-              : 'px-2.5 py-1 text-xs'
-          } font-medium text-green-600`}
+          className="inline-flex items-center rounded-full bg-green-50 px-1.5 py-0.5 text-[10px] leading-none font-medium text-green-600 md:px-2.5 md:py-1 md:text-xs md:leading-normal"
         >
           <span className="flex items-center">
-            <CheckCircle2
-              className={`${isSmall ? 'h-2.5 w-2.5' : 'h-3.5 w-3.5'} text-green-500`}
-            />
+            <CheckCircle2 className="h-2.5 w-2.5 text-green-500 md:h-3.5 md:w-3.5" />
             <span className="ml-1">
               읽었어요 {statusCounts[ReadingStatusType.READ]}
             </span>
@@ -261,9 +231,7 @@ export function SearchItem({
     }
 
     return statuses.length > 0 ? (
-      <div className={`${isSmall ? 'mt-1.5' : 'mt-3'} flex flex-wrap gap-1.5`}>
-        {statuses}
-      </div>
+      <div className="mt-1.5 flex flex-wrap gap-1.5 md:mt-3">{statuses}</div>
     ) : null;
   };
 
@@ -279,22 +247,16 @@ export function SearchItem({
     if (!hasRating && !hasReviews) return null;
 
     return (
-      <div
-        className={`${isSmall ? 'mt-1.5' : 'mt-2.5'} flex items-center gap-3`}
-      >
+      <div className="mt-1.5 flex items-center gap-3 md:mt-2.5">
         {/* 별점 */}
         {hasRating && (
           <div className="flex items-center">
             {renderStarRating(item.rating || 0)}
-            <span
-              className={`${isSmall ? 'text-xs' : 'text-sm'} mx-1.5 font-medium text-gray-800`}
-            >
+            <span className="mx-1.5 text-xs font-medium text-gray-800 md:text-sm">
               {formatRating(item.rating || 0)}
             </span>
             {hasTotalRatings && (
-              <span
-                className={`${isSmall ? 'text-xs' : 'text-sm'} text-gray-500`}
-              >
+              <span className="text-xs text-gray-500 md:text-sm">
                 ({item.totalRatings || 0})
               </span>
             )}
@@ -304,12 +266,8 @@ export function SearchItem({
         {/* 리뷰 수 */}
         {hasReviews && (
           <div className="flex items-center border-l border-gray-200 pl-3">
-            <MessageSquare
-              className={`${isSmall ? 'h-3 w-3' : 'h-4 w-4'} text-gray-400`}
-            />
-            <span
-              className={`${isSmall ? 'text-xs' : 'text-md'} ml-1.5 text-gray-500`}
-            >
+            <MessageSquare className="h-3 w-3 text-gray-400 md:h-4 md:w-4" />
+            <span className="ml-1.5 text-xs text-gray-500 md:text-sm">
               {item.reviews !== undefined && item.reviews > 999
                 ? `${Math.floor(item.reviews / 1000)}k`
                 : item.reviews || 0}
@@ -323,13 +281,11 @@ export function SearchItem({
   return (
     <CommandItem
       value={`${item.type}-${item.id}-${item.title}`}
-      className={`group relative flex cursor-pointer items-start gap-4 px-3 ${isSmall ? 'py-2' : 'py-3.5'} transition-colors hover:bg-gray-50`}
+      className="group relative flex cursor-pointer items-start gap-3 px-2 py-1 transition-colors hover:bg-gray-50 md:gap-4 md:py-2"
       onSelect={onClick}
     >
       {/* 이미지 섬네일 */}
-      <div
-        className={`relative flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white ${isSmall ? 'w-[70px]' : 'w-[140px]'}`}
-      >
+      <div className="relative w-[85px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white md:w-[160px]">
         {!imageError ? (
           <img
             src={imageUrl}
@@ -339,25 +295,19 @@ export function SearchItem({
             loading="lazy"
           />
         ) : (
-          <div
-            className={`flex w-full items-center justify-center bg-gray-50 ${isSmall ? 'h-[100px]' : 'h-[190px]'}`}
-          >
-            <span className={`${isSmall ? 'text-2xl' : 'text-3xl'}`}>📚</span>
+          <div className="flex h-[100px] w-full items-center justify-center bg-gray-50 md:h-[190px]">
+            <span className="text-2xl md:text-3xl">📚</span>
           </div>
         )}
       </div>
 
       {/* 도서 정보 */}
       <div className="flex min-w-0 flex-1 flex-col justify-start pt-1">
-        <h4
-          className={`line-clamp-2 ${isSmall ? 'text-sm' : 'text-base'} font-medium text-gray-800 group-hover:text-gray-700`}
-        >
+        <h4 className="line-clamp-2 text-sm font-medium text-gray-800 group-hover:text-gray-700 md:text-base">
           {highlightText(item.title, item.highlight)}
         </h4>
         {item.author && (
-          <p
-            className={`${isSmall ? 'mt-0.5 text-xs' : 'mt-1.5 text-sm'} line-clamp-1 text-gray-500`}
-          >
+          <p className="mt-0.5 line-clamp-1 text-xs text-gray-500 md:mt-1.5 md:text-sm">
             {item.author}
           </p>
         )}
@@ -375,7 +325,7 @@ export function SearchItem({
       {/* 삭제 버튼 (최근 검색어에만 표시) */}
       {onDelete && (
         <button
-          className={`absolute top-1/2 right-4 flex-shrink-0 -translate-y-1/2 transform cursor-pointer rounded-full text-gray-400 opacity-0 transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-gray-300 hover:text-gray-700 focus:ring-2 focus:ring-gray-300 focus:outline-none ${isSmall ? 'p-1' : 'p-1.5'}`}
+          className="absolute top-1/2 right-4 flex-shrink-0 -translate-y-1/2 transform cursor-pointer rounded-full p-1 text-gray-400 opacity-0 transition-all duration-200 group-hover:opacity-100 hover:scale-110 hover:bg-gray-300 hover:text-gray-700 focus:ring-2 focus:ring-gray-300 focus:outline-none md:p-1.5"
           onClick={e => {
             e.stopPropagation();
             onDelete();
@@ -383,7 +333,7 @@ export function SearchItem({
           title="검색어 삭제"
           aria-label="검색어 삭제"
         >
-          <X className={`${isSmall ? 'h-3 w-3' : 'h-4 w-4'}`} />
+          <X className="h-3 w-3 md:h-4 md:w-4" />
         </button>
       )}
     </CommandItem>

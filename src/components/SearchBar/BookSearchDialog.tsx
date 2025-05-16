@@ -9,6 +9,7 @@ import {
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 import { useDialogQuery } from '@/hooks';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
@@ -20,7 +21,7 @@ import { useSearchQuery } from './hooks';
 interface BookSearchDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  searchBarRef: MutableRefObject<HTMLDivElement | null>;
+  searchBarRef?: MutableRefObject<HTMLDivElement | null>;
   overlayClassName?: string;
 }
 
@@ -81,6 +82,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
   const queryClient = useQueryClient();
+  const isMobile = useIsMobile();
 
   // 다이얼로그 닫기 핸들러
   const handleClose = () => {
@@ -125,7 +127,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
             'animate-expandDown fixed top-[6px] left-1/2 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
             query ? 'h-[calc(100vh-32px)]' : 'auto'
           )}
-          drawerClassName="animate-expandUp gap-1 p-0 shadow-none outline-none z-[100]"
+          drawerClassName="animate-expandUp gap-1 p-0 shadow-none outline-none z-[100] h-[90vh] overflow-hidden"
           hideCloseButton
           dialogOverlayClassName="bg-black/5"
           drawerOverlayClassName="bg-black/5"
@@ -147,43 +149,47 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
                 : view === 'recent'
                   ? 'h-auto max-h-[640px]'
                   : 'auto',
-              'max-md:h-screen max-md:rounded-none max-md:px-2 max-md:pt-0 max-md:pb-0 max-md:ring-0'
+              'max-md:h-full max-md:rounded-none max-md:px-2 max-md:pt-2 max-md:pb-0 max-md:ring-0'
             )}
           >
-            <Command
-              className="flex h-full w-full flex-col overflow-hidden rounded-none border-0 shadow-none"
-              shouldFilter={false}
-              loop={true}
-            >
-              <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-100 bg-white">
-                <CommandInput
-                  ref={inputRef}
-                  value={query}
-                  onValueChange={setQuery}
-                  className="h-16 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
-                  placeholder="도서 제목을 검색해보세요"
-                />
-              </div>
-              <div className="flex-1 overflow-y-auto">
-                <Suspense
-                  fallback={
-                    <div className="flex h-full w-full items-center justify-center">
-                      <div className="flex flex-col items-center justify-center">
-                        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-                      </div>
-                    </div>
-                  }
-                >
-                  <SearchResultsLoader
-                    query={query}
-                    view={view}
-                    onItemClick={handleItemClick}
-                    onOpenChange={handleOpenChange}
-                    setQuery={setQuery}
+            <div className="flex h-full flex-col overflow-hidden">
+              <Command
+                className="flex h-full flex-col overflow-hidden rounded-none border-0 shadow-none"
+                shouldFilter={false}
+                loop={true}
+              >
+                <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-100 bg-white">
+                  <CommandInput
+                    ref={inputRef}
+                    value={query}
+                    onValueChange={setQuery}
+                    className="h-12 rounded-none border-0 py-3 text-base shadow-none focus:ring-0 md:h-16 md:py-4"
+                    placeholder="도서 제목을 검색해보세요"
                   />
-                </Suspense>
-              </div>
-            </Command>
+                </div>
+                <div className="min-h-0 flex-1 overflow-hidden">
+                  <Suspense
+                    fallback={
+                      <div className="flex h-full w-full items-center justify-center">
+                        <div className="flex min-h-[400px] w-full flex-col items-center justify-center">
+                          <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+                        </div>
+                      </div>
+                    }
+                  >
+                    <div className="h-full overflow-y-auto">
+                      <SearchResultsLoader
+                        query={query}
+                        view={view}
+                        onItemClick={handleItemClick}
+                        onOpenChange={handleOpenChange}
+                        setQuery={setQuery}
+                      />
+                    </div>
+                  </Suspense>
+                </div>
+              </Command>
+            </div>
           </div>
           <ResponsiveDialogClose
             className="absolute top-6 right-6 flex h-8 w-8 cursor-pointer items-center justify-center rounded-sm text-gray-400 transition-colors hover:text-gray-600 focus:outline-none"
