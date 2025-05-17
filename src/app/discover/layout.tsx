@@ -3,10 +3,10 @@ import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   title: '발견하기',
-  description: '새로운 고전 도서를 발견하고 다양한 작품을 탐색해보세요',
+  description: '다양한 책들을 발견하고 자유롭게 탐색해보세요',
   openGraph: {
-    title: '발견하기 | 고전산책',
-    description: '새로운 고전 도서를 발견하고 다양한 작품을 탐색해보세요',
+    title: '발견하기 | 미역서점',
+    description: '다양한 책들을 발견하고 자유롭게 탐색해보세요',
   },
 };
 

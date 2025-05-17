@@ -2,13 +2,11 @@ import { Metadata } from 'next';
 import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: '서재 둘러보기',
-  description:
-    '다양한 서재를 둘러보고 관심 있는 서재를 구독하여 독서 취향을 공유해보세요',
+  title: '서재 둘러보기 | 미역서점',
+  description: '다양한 서재를 자유롭게 둘러보고 독서 취향을 나눠보세요',
   openGraph: {
-    title: '서재 둘러보기 | 고전산책',
-    description:
-      '다양한 서재를 둘러보고 관심 있는 서재를 구독하여 독서 취향을 공유해보세요',
+    title: '서재 둘러보기 | 미역서점',
+    description: '다양한 서재를 자유롭게 둘러보고 독서 취향을 나눠보세요',
   },
 };
 

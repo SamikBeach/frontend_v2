@@ -106,7 +106,7 @@ export function UserInfoForm({ email, onSuccess }: UserInfoFormProps) {
           회원 정보 입력
         </h2>
         <p className="text-xs text-gray-500">
-          고전산책에서 사용할 정보를 입력해주세요
+          미역서점에서 사용할 정보를 입력해주세요
         </p>
       </div>
 

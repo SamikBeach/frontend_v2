@@ -13,20 +13,20 @@ import { ReactNode } from 'react';
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: {
-      default: '고전산책',
-      template: '%s | 고전산책',
+      default: '미역서점',
+      template: '%s',
     },
-    description: '고전산책 - 당신의 고전 여행을 위한 최고의 플랫폼',
+    description: '미역서점 - 책과 함께 유유자적',
     keywords: ['고전', '독서', '도서', '서재', '문학', '독서 커뮤니티'],
-    authors: [{ name: '고전산책' }],
-    creator: '고전산책',
-    publisher: '고전산책',
+    authors: [{ name: '미역서점' }],
+    creator: '미역서점',
+    publisher: '미역서점',
     formatDetection: {
       email: false,
       address: false,
       telephone: false,
     },
-    metadataBase: new URL('https://gocheonsan.com'),
+    metadataBase: new URL('https://miyukbooks.com'),
     alternates: {
       canonical: '/',
     },
@@ -35,10 +35,10 @@ export async function generateMetadata(): Promise<Metadata> {
       follow: true,
     },
     openGraph: {
-      title: '고전산책',
-      description: '고전산책 - 당신의 고전 여행을 위한 최고의 플랫폼',
-      url: 'https://gocheonsan.com',
-      siteName: '고전산책',
+      title: '미역서점',
+      description: '미역서점 - 책과 함께 유유자적',
+      url: 'https://miyukbooks.com',
+      siteName: '미역서점',
       locale: 'ko_KR',
       type: 'website',
     },

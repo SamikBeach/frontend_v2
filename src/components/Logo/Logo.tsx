@@ -10,7 +10,7 @@ export default function Logo({ className, size = 'md' }: LogoProps) {
     <div className={className}>
       <h1 className="flex items-center font-bold">
         <LogoImage size={size} />
-        <span className="text-black">고전산책</span>
+        <span className="text-black">미역서점</span>
       </h1>
     </div>
   );

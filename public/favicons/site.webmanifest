@@ -1,7 +1,7 @@
 {
-  "name": "고전산책",
-  "short_name": "고전산책",
-  "description": "시간이 검증한 고전과 함께하는 특별한 독서 경험. 서로의 생각을 나누며 독서의 깊이를 더해보세요.",
+  "name": "미역서점",
+  "short_name": "미역서점",
+  "description": "책과 함께 유유자적하게 책을 탐색하세요.",
   "icons": [
     {
       "src": "/favicons/web-app-manifest-192x192.png",
