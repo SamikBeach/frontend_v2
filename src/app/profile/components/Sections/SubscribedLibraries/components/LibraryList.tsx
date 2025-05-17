@@ -8,6 +8,7 @@ interface LibraryListProps {
   tags: Tag[];
   fetchNextPage: () => void;
   hasNextPage: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 export function LibraryList({
@@ -15,6 +16,7 @@ export function LibraryList({
   tags,
   fetchNextPage,
   hasNextPage,
+  isFetchingNextPage,
 }: LibraryListProps) {
   return (
     <InfiniteScroll
