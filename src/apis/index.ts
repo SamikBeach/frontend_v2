@@ -44,7 +44,10 @@ export {
   updateCategory,
 };
 
-export * from './library';
+// Import and re-export library module explicitly to resolve TimeRangeOptions naming conflict
+import * as libraryModule from './library';
+export { libraryModule };
+
 export * from './notification';
 
 // Import and re-export rating module explicitly to resolve naming conflicts
