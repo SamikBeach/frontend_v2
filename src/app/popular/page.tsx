@@ -165,14 +165,14 @@ export default function PopularPage() {
               <Suspense fallback={<CategoryFilterSkeleton />}>
                 <CategoryFilter className="w-full max-w-[100vw]" />
               </Suspense>
-              <div className="ml-4 hidden flex-shrink-0 xl:block">
+              <div className="ml-4 hidden flex-shrink-0 items-center xl:flex">
                 <PopularSortDropdown />
               </div>
             </div>
 
             {/* xl 미만 화면에서 보이는 정렬 버튼 */}
             <div className="w-full xl:hidden">
-              <PopularSortDropdown className="w-full" />
+              <PopularSortDropdown className="w-full justify-start" />
             </div>
           </div>
         </div>
