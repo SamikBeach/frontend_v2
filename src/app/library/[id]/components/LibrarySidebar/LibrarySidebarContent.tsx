@@ -24,8 +24,7 @@ export const LibrarySidebarContent: FC<LibrarySidebarContentProps> = ({
   const { renderActivityMessage } = useActivityMessage(library);
 
   // 구독자 관련 훅
-  const { previewSubscribers, isCurrentUserSubscriber } =
-    useSubscribers(library);
+  const { previewSubscribers } = useSubscribers(library);
 
   // 책 개수 계산
   const booksCount = library.books?.length || 0;
@@ -49,10 +48,7 @@ export const LibrarySidebarContent: FC<LibrarySidebarContentProps> = ({
 
       {/* 구독자 미리보기 */}
       {library.subscribers && library.subscribers.length > 0 && (
-        <LibrarySidebarSubscribers
-          subscribers={previewSubscribers}
-          isCurrentUserSubscriber={isCurrentUserSubscriber}
-        />
+        <LibrarySidebarSubscribers subscribers={previewSubscribers} />
       )}
 
       {/* 업데이트 알림 섹션 */}
