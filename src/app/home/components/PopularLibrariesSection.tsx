@@ -28,7 +28,7 @@ export function PopularLibrariesSection() {
     <section className="h-auto p-2 sm:p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <BookOpen className="h-4 w-4 text-[#3B82F6] sm:h-5 sm:w-5" />
+          <BookOpen className="h-4 w-4 text-rose-500 sm:h-5 sm:w-5" />
           <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
             인기 서재
           </h2>

@@ -55,7 +55,7 @@ export function PopularReviewsSection() {
     <section className="h-auto p-2 sm:p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <Users className="h-4 w-4 text-blue-500 sm:h-5 sm:w-5" />
+          <Users className="h-4 w-4 text-amber-500 sm:h-5 sm:w-5" />
           <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
             커뮤니티 인기글
           </h2>

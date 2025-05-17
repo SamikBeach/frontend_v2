@@ -52,7 +52,7 @@ export function PopularBooksSection() {
     <section className="h-auto p-2 sm:p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <Lightbulb className="h-4 w-4 text-[#3182F6] sm:h-5 sm:w-5" />
+          <Lightbulb className="h-4 w-4 text-purple-600 sm:h-5 sm:w-5" />
           <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
             지금 인기 있는 책
           </h2>
