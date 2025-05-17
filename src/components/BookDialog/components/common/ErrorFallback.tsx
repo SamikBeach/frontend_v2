@@ -25,7 +25,7 @@ export function ErrorFallback({
 
 // 작은 사이즈의 오류 컴포넌트
 export function SimpleErrorFallback({
-  error,
+  error: _,
   resetErrorBoundary,
 }: ErrorFallbackProps) {
   return (

@@ -1,4 +1,3 @@
-import { ReviewType } from '@/apis/review/types';
 import { ReviewCard } from '@/components/ReviewCard/ReviewCard';
 import { ExtendedReviewResponseDto } from '@/components/ReviewCard/types';
 import { Button } from '@/components/ui/button';
@@ -84,40 +83,4 @@ export function PopularReviewsSection() {
       )}
     </section>
   );
-}
-
-// 리뷰 타입에 따른 색상
-function getReviewTypeColor(type: ReviewType): string {
-  switch (type) {
-    case 'general':
-      return '#E2E8F0'; // 파스텔 그레이
-    case 'discussion':
-      return '#FFF8E2'; // 파스텔 옐로우
-    case 'review':
-      return '#F2E2FF'; // 파스텔 퍼플
-    case 'question':
-      return '#FFE2EC'; // 파스텔 코럴
-    case 'meetup':
-      return '#E2FFFC'; // 파스텔 민트
-    default:
-      return '#E2E8F0';
-  }
-}
-
-// 리뷰 타입에 따른 이름
-function getReviewTypeName(type: ReviewType): string {
-  switch (type) {
-    case 'general':
-      return '일반';
-    case 'discussion':
-      return '토론';
-    case 'review':
-      return '리뷰';
-    case 'question':
-      return '질문';
-    case 'meetup':
-      return '모임';
-    default:
-      return '일반';
-  }
 }

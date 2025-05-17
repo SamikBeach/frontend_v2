@@ -6,7 +6,6 @@ import {
   ResponsiveDropdownMenuContent,
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Suspense, useState } from 'react';
 import { NotificationLoading } from './components/LoadingStates';
 import { NotificationBadge } from './components/NotificationBadge';
@@ -15,7 +14,6 @@ import { NotificationDropdownProps } from './types';
 
 export function Notification({ className }: NotificationDropdownProps) {
   const [open, setOpen] = useState(false);
-  const isMobile = useIsMobile();
 
   return (
     <ResponsiveDropdownMenu open={open} onOpenChange={setOpen}>

@@ -67,7 +67,7 @@ export const formatTooltipDate = (
       const [year, month] = label.split('-');
       const monthNum = parseInt(month);
       return `${year}년 ${monthNum}월`;
-    } catch (e) {
+    } catch {
       return label;
     }
   } else if (periodType === 'weekly') {
@@ -77,7 +77,7 @@ export const formatTooltipDate = (
     try {
       const date = new Date(label);
       return format(date, 'yyyy년 MM월 dd일', { locale: ko });
-    } catch (e) {
+    } catch {
       return label;
     }
   }
@@ -92,13 +92,13 @@ export const formatXAxisLabel = (
   if (periodType === 'yearly') {
     return label;
   } else if (periodType === 'monthly') {
-    const [year, month] = label.split('-');
+    const [_, month] = label.split('-');
     return `${parseInt(month)}월`;
   } else if (periodType === 'weekly') {
     // 주별 데이터는 그대로 표시 (이미 '5월 1째주' 형식)
     return label;
   } else if (periodType === 'daily') {
-    const [year, month, day] = label.split('-');
+    const [_, month, day] = label.split('-');
     return `${parseInt(month)}/${parseInt(day)}`;
   }
   return label;

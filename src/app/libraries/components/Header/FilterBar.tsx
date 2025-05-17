@@ -9,9 +9,6 @@ import { Suspense } from 'react';
 import { useAllLibraryTags } from '../../hooks/useAllLibraryTags';
 import { TagButton } from './TagButton';
 
-// 기본값 상수 정의
-const DEFAULT_TAG_FILTER = 'all';
-
 // 스켈레톤 로더 컴포넌트
 function FilterBarSkeleton() {
   return (

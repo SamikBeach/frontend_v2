@@ -45,7 +45,7 @@ export const useStatisticsSettings = (userId: number) => {
 
       return { previousSettings };
     },
-    onError: (error, variables, context) => {
+    onError: (_, __, context) => {
       // 에러 발생 시 이전 설정으로 롤백
       if (context?.previousSettings) {
         queryClient.setQueryData(

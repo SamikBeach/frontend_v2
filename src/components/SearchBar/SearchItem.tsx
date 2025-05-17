@@ -1,5 +1,3 @@
-'use client';
-
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { UserRating } from '@/apis/search/types';
 import { CommandItem } from '@/components/ui/command';
@@ -44,12 +42,7 @@ interface SearchItemProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function SearchItem({
-  item,
-  onClick,
-  onDelete,
-  size = 'md',
-}: SearchItemProps) {
+export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
   const [imageError, setImageError] = useState(false);
 
   // 하이라이트 텍스트 처리

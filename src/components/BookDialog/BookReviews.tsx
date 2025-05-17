@@ -394,7 +394,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
 
 // 에러 폴백 컴포넌트
 function ErrorFallback({
-  error,
+  error: _,
   resetErrorBoundary,
 }: {
   error: Error;

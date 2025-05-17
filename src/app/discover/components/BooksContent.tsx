@@ -1,17 +1,11 @@
 import { Book } from '@/apis/book/types';
 import { selectedBookIdAtom } from '@/atoms/book';
-import {
-  discoverCategoryFilterAtom,
-  discoverSortOptionAtom,
-  discoverSubcategoryFilterAtom,
-  discoverTimeRangeAtom,
-} from '@/atoms/discover';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useDialogQuery, useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useDiscoverBooksQuery } from '../hooks';
@@ -20,12 +14,7 @@ export function BooksContent() {
   const isMobile = useIsMobile();
   const { clearQueryParams } = useQueryParams();
 
-  // Atom values
-  const categoryFilter = useAtomValue(discoverCategoryFilterAtom);
-  const subcategoryFilter = useAtomValue(discoverSubcategoryFilterAtom);
-  const sortOption = useAtomValue(discoverSortOptionAtom);
-  const timeRange = useAtomValue(discoverTimeRangeAtom);
-  const [selectedBookId, setSelectedBookId] = useAtom(selectedBookIdAtom);
+  const [_, setSelectedBookId] = useAtom(selectedBookIdAtom);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
 
   // 무한 스크롤로 도서 데이터 가져오기

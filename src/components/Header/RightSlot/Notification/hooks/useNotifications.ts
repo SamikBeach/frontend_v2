@@ -59,7 +59,7 @@ export function useNotifications(initialLimit = 10, isDropdownOpen = false) {
       );
       return totalFetched < lastPage.total ? allPages.length + 1 : undefined;
     },
-    getPreviousPageParam: (firstPage, allPages) => {
+    getPreviousPageParam: (_, allPages) => {
       return allPages.length > 1 ? allPages.length - 1 : undefined;
     },
     // 드롭다운이 열려있을 때만 실행

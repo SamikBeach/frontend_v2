@@ -60,7 +60,6 @@ function FollowListContent({
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useUserFollowList(userId, type);
   const currentUser = useCurrentUser();
-  const queryClient = useQueryClient();
   const loadMoreRef = useRef<HTMLDivElement>(null);
 
   // 모든 페이지의 사용자 데이터를 하나의 배열로 병합

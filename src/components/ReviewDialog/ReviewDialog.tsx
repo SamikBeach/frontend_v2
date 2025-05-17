@@ -258,7 +258,7 @@ export function ReviewDialog({
                           status === ReadingStatusType.READ &&
                             'hover:bg-green-50'
                         )}
-                        onSelect={e => handleReadingStatusChange(status)}
+                        onSelect={() => handleReadingStatusChange(status)}
                         disabled={isSubmitting}
                       >
                         <span className="text-base">{statusIcons[status]}</span>
@@ -285,7 +285,7 @@ export function ReviewDialog({
                         readingStatus === null ? 'bg-gray-100' : '',
                         'hover:bg-red-50'
                       )}
-                      onSelect={e => handleReadingStatusChange(null)}
+                      onSelect={() => handleReadingStatusChange(null)}
                       disabled={isSubmitting}
                     >
                       <span className="text-base">{statusIcons['NONE']}</span>

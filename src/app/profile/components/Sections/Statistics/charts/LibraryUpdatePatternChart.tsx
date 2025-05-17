@@ -365,7 +365,7 @@ const LibraryUpdatePatternChart = ({
                     fill="#93c5fd"
                     radius={[4, 4, 0, 0]}
                   >
-                    {weekdayData.map((entry, index) => (
+                    {weekdayData.map((_, index) => (
                       <Cell
                         key={`cell-${index}`}
                         fill={CHART_COLORS[index % CHART_COLORS.length]}

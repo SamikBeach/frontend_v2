@@ -121,7 +121,7 @@ const LibraryCompositionChart = ({ userId }: LibraryCompositionChartProps) => {
   const params = useParams<{ id: string }>();
   const id = userId || Number(params?.id || 0);
   const [activeTab, setActiveTab] = useState('libraries');
-  const [selectedLibrary, setSelectedLibrary] = useState<string | null>(null);
+  const [selectedLibrary] = useState<string | null>(null);
 
   const currentUser = useCurrentUser();
   const isMyProfile = currentUser?.id === id;

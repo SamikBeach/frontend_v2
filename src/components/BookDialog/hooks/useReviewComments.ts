@@ -162,7 +162,7 @@ export function useReviewComments(reviewId: number) {
         queryKey: ['review-comments', reviewId],
       });
     },
-    onError: (_, commentId, context) => {
+    onError: (_, __, context) => {
       // 오류 발생 시 이전 상태로 복원
       if (context?.previousComments) {
         queryClient.setQueryData(
@@ -212,7 +212,7 @@ export function useReviewComments(reviewId: number) {
         queryKey: ['review-comments', reviewId],
       });
     },
-    onError: (_, commentId, context) => {
+    onError: (_, __, context) => {
       // 오류 발생 시 이전 상태로 복원
       if (context?.previousComments) {
         queryClient.setQueryData(

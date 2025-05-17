@@ -1,20 +1,13 @@
 import { cn } from '@/lib/utils';
 
 interface MenuItemProps {
-  id: string;
   name: string;
   count: number;
   isSelected: boolean;
   onClick: () => void;
 }
 
-export function MenuItem({
-  id,
-  name,
-  count,
-  isSelected,
-  onClick,
-}: MenuItemProps) {
+export function MenuItem({ name, count, isSelected, onClick }: MenuItemProps) {
   return (
     <button
       className={cn(

@@ -48,11 +48,7 @@ export function useCreateLibrary(
       throw new Error('로그인이 필요합니다.');
     }
 
-    try {
-      await mutateAsync(data);
-    } catch (error) {
-      throw error;
-    }
+    await mutateAsync(data);
   };
 
   return {

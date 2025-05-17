@@ -49,11 +49,7 @@ export function useCreateLibrary(
 
   // 서재 생성 함수
   const createLibraryMutation = async (data: CreateLibraryDto) => {
-    try {
-      await mutateAsync(data);
-    } catch (error) {
-      throw error;
-    }
+    await mutateAsync(data);
   };
 
   return {

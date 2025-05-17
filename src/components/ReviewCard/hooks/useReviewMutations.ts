@@ -37,7 +37,6 @@ export function useReviewMutations({
       bookId,
       rating,
       isbn,
-      skipInvalidate,
     }: {
       bookId: number;
       rating: number;
@@ -79,7 +78,6 @@ export function useReviewMutations({
       type,
       bookId,
       isbn,
-      skipInvalidate,
     }: {
       content: string;
       type: ReviewType;
@@ -134,7 +132,6 @@ export function useReviewMutations({
       type,
       bookId,
       isbn,
-      skipInvalidate,
     }: {
       id: number;
       content: string;

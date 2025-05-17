@@ -1,11 +1,13 @@
-import { Notification } from '../types';
 import { ReactNode } from 'react';
+import { Notification } from '../types';
 
 /**
  * 알림 내용 커스텀 렌더링 함수
  * 알림 타입에 따라 적절한 메시지를 생성합니다.
  */
-export function renderNotificationContent(notification: Notification): ReactNode {
+export function renderNotificationContent(
+  notification: Notification
+): ReactNode {
   // 액터 이름 (알림 주체)
   const actorName = notification.actor?.username || '누군가';
 
@@ -263,4 +265,4 @@ export function renderNotificationContent(notification: Notification): ReactNode
     default:
       return (notification.content || '새로운 알림이 도착했습니다.') + '.';
   }
-} 
+}
