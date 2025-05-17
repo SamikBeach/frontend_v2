@@ -1,5 +1,5 @@
-import { getAllPopularBooks } from '@/apis/book/book';
-import { Book } from '@/apis/book/types';
+import { getPopularBooks } from '@/apis/book/book';
+import { Book, BookSearchResponse } from '@/apis/book/types';
 import { selectedBookIdAtom } from '@/atoms/book';
 import {
   categoryFilterAtom,
@@ -25,7 +25,7 @@ export function BookList({ className }: BookListProps) {
   const setSelectedBookId = useSetAtom(selectedBookIdAtom);
 
   // 도서 데이터 가져오기
-  const { data: books } = useSuspenseQuery({
+  const { data } = useSuspenseQuery<BookSearchResponse>({
     queryKey: [
       'popular-books',
       categoryParam,
@@ -53,17 +53,19 @@ export function BookList({ className }: BookListProps) {
         params.subcategory = subcategoryParam;
       }
 
-      return getAllPopularBooks(params as any);
+      return getPopularBooks(params as any);
     },
     staleTime: 1000 * 60 * 2, // 2분 동안 캐시 유지
   });
+
+  const books = data?.books || [];
 
   const handleBookSelect = (book: Book) => {
     setSelectedBookId(book.id.toString());
     updateQueryParams({ book: book.id.toString() });
   };
 
-  if (!books || books.length === 0) {
+  if (books.length === 0) {
     return null;
   }
 
