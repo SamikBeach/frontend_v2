@@ -1,4 +1,4 @@
-import { Book } from '@/apis/book/types';
+import { Book, TimeRangeOptions } from '@/apis/book/types';
 import { BookCard } from '@/components/BookCard';
 import { TimeRange, useSortedBooks } from '@/components/SortDropdown';
 
@@ -13,13 +13,13 @@ export function BookGrid({
   books,
   onSelectBook,
   selectedSort,
-  selectedTimeRange = 'all',
+  selectedTimeRange = TimeRangeOptions.ALL,
 }: BookGridProps) {
   // 정렬된 책 목록
   const sortedBooks = useSortedBooks(
     books,
     selectedSort ?? 'reviews-desc',
-    undefined,
+    undefined as any,
     selectedTimeRange
   );
 
