@@ -3,7 +3,7 @@ import { statsSections } from './StatsTabs';
 
 export function StatsTabsSkeleton() {
   // 각 섹션의 이름에 대략적인 너비 매핑 (글자 길이에 비례)
-  const widths = {
+  const widths: Record<string, string> = {
     '읽기 상태': 'w-[90px]',
     '리뷰와 평점': 'w-[110px]',
     '커뮤니티 활동': 'w-[120px]',

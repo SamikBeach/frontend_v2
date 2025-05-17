@@ -16,7 +16,6 @@ export function LibraryList({
   tags,
   fetchNextPage,
   hasNextPage,
-  isFetchingNextPage,
 }: LibraryListProps) {
   return (
     <InfiniteScroll
