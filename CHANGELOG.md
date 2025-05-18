@@ -1,5 +1,18 @@
 # 🚦 CHANGELOG
 
+# [1.2.0](https://github.com/SamikBeach/frontend_v2/compare/1.1.0...1.2.0) (2025-05-18)
+
+
+### Bug Fixes
+
+* update package.json ([6cb3478](https://github.com/SamikBeach/frontend_v2/commit/6cb3478867520f2dc48fc15919a86e5228441171))
+
+
+### Features
+
+* next-intl 적용 ([2c48c7d](https://github.com/SamikBeach/frontend_v2/commit/2c48c7db4fb16704c05bf4581c8a782eddba807b))
+* 센트리 설치 ([88884c0](https://github.com/SamikBeach/frontend_v2/commit/88884c031d5c1fb0bc360941fd85870e1347f5de))
+
 # [1.1.0](https://github.com/SamikBeach/frontend_v2/compare/1.0.0...1.1.0) (2025-05-18)
 
 
