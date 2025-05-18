@@ -74,7 +74,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <SidebarProvider>
                 <Header />
                 <AppSidebar />
-                <div className="w-full">{children}</div>
+                <main className="w-full">{children}</main>
               </SidebarProvider>
               <Toaster />
             </DialogProvider>
