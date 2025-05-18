@@ -56,7 +56,7 @@ export default function SocialCallback() {
           throw new Error('사용자 정보를 가져올 수 없습니다.');
         }
 
-        // 부모 창으로 성공 메시지 전달
+        // 부모 창으로 성공 메시지 전달!
         window.opener.postMessage(
           {
             type: 'social-login-success',
