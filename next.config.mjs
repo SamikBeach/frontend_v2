@@ -1,5 +1,5 @@
 import { withSentryConfig } from '@sentry/nextjs';
-import { createNextIntlPlugin } from 'next-intl';
+import createNextIntlPlugin from 'next-intl/plugin';
 
 const withNextIntl = createNextIntlPlugin();
 
