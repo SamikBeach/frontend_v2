@@ -56,6 +56,30 @@ export default function SocialCallback() {
           throw new Error('사용자 정보를 가져올 수 없습니다.');
         }
 
+        // 안전한 origin 확인 및 추출
+        let targetOrigin = '*'; // 기본값
+        try {
+          // opener의 origin 확인 시도
+          if (
+            window.opener &&
+            window.opener.location &&
+            window.opener.location.origin
+          ) {
+            targetOrigin = window.opener.location.origin;
+          } else {
+            // referrer에서 origin 추출 시도
+            const referrer = document.referrer;
+            if (referrer) {
+              const url = new URL(referrer);
+              targetOrigin = url.origin;
+            }
+          }
+        } catch (originError) {
+          console.error('Origin 추출 오류:', originError);
+          // 실패 시 현재 창의 origin 사용
+          targetOrigin = window.location.origin;
+        }
+
         // 부모 창으로 성공 메시지 전달
         window.opener.postMessage(
           {
@@ -66,12 +90,12 @@ export default function SocialCallback() {
               user,
             },
           },
-          window.location.origin
+          targetOrigin
         );
 
         setStatus('success');
 
-        // 3초 후 창 닫기
+        // 1초 후 창 닫기
         setTimeout(() => {
           window.close();
         }, 1000);
@@ -80,6 +104,26 @@ export default function SocialCallback() {
 
         // 부모 창으로 오류 메시지 전달
         if (window.opener) {
+          // 안전한 origin 확인 및 추출
+          let targetOrigin = '*'; // 기본값
+          try {
+            // opener의 origin 확인 시도
+            if (window.opener.location && window.opener.location.origin) {
+              targetOrigin = window.opener.location.origin;
+            } else {
+              // referrer에서 origin 추출 시도
+              const referrer = document.referrer;
+              if (referrer) {
+                const url = new URL(referrer);
+                targetOrigin = url.origin;
+              }
+            }
+          } catch (originError) {
+            console.error('Origin 추출 오류:', originError);
+            // 실패 시 현재 창의 origin 사용
+            targetOrigin = window.location.origin;
+          }
+
           window.opener.postMessage(
             {
               type: 'social-login-error',
@@ -90,7 +134,7 @@ export default function SocialCallback() {
                     : '알 수 없는 오류가 발생했습니다.',
               },
             },
-            window.location.origin
+            targetOrigin
           );
         }
 
