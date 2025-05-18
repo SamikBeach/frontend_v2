@@ -1,0 +1,15 @@
+{
+  "Common": {
+    "sign_up": "Sign Up",
+    "login": "Login",
+    "login_description": "Login is required to use the service.",
+    "sign_up_description": "Sign up to access more features.",
+    "email": "Email",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "no_account": "Don't have an account?",
+    "already_have_account": "Already have an account?",
+    "go_to_sign_up": "Sign up",
+    "go_to_login": "Login"
+  }
+}

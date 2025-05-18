@@ -1,0 +1,15 @@
+{
+  "Common": {
+    "sign_up": "회원가입",
+    "login": "로그인",
+    "login_description": "서비스를 이용하기 위해 로그인이 필요합니다.",
+    "sign_up_description": "회원가입을 통해 더 많은 기능을 이용해보세요.",
+    "email": "이메일",
+    "password": "비밀번호",
+    "confirm_password": "비밀번호 확인",
+    "no_account": "계정이 없으신가요?",
+    "already_have_account": "이미 계정이 있으신가요?",
+    "go_to_sign_up": "회원가입 하기",
+    "go_to_login": "로그인 하기"
+  }
+}
