@@ -139,3 +139,5 @@ dist
 
 # Cursor Rules
 *.mdc
+# Sentry Config File
+.env.sentry-build-plugin
