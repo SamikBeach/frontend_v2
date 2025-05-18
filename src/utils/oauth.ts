@@ -10,27 +10,6 @@ export const calculatePopupPosition = (width: number, height: number) => {
 };
 
 /**
- * 현재 환경에 맞는 서버 URL을 반환
- */
-export const getServerUrl = (): string => {
-  // 브라우저 환경인 경우
-  if (typeof window !== 'undefined') {
-    // 현재 hostname 확인
-    const { hostname } = window.location;
-
-    // 개발 환경이 아닌 경우 현재 도메인 기반 API URL 반환
-    if (!hostname.includes('localhost') && !hostname.includes('127.0.0.1')) {
-      // 프로덕션/스테이징 환경에서는 동일한 도메인 사용
-      const protocol = window.location.protocol;
-      return `${protocol}//${hostname}/api/v2`;
-    }
-  }
-
-  // 개발 환경이거나 SSR인 경우 환경 변수 사용
-  return process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3001/api/v2';
-};
-
-/**
  * 소셜 로그인 팝업을 열고 결과를 Promise로 반환
  */
 export const openSocialLoginPopup = (
@@ -43,8 +22,7 @@ export const openSocialLoginPopup = (
   return new Promise((resolve, reject) => {
     // 로그인 방식에 따른 URL 설정
     const providerPath = provider === AuthProvider.GOOGLE ? 'google' : 'apple';
-    const serverUrl = getServerUrl();
-    const authUrl = `${serverUrl}/auth/${providerPath}`;
+    const authUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/auth/${providerPath}`;
 
     // 팝업 설정
     const width = 600;
