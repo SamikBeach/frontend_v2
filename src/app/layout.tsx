@@ -8,6 +8,8 @@ import { DialogProvider } from '@/providers/DialogProvider';
 import ReactQueryProvider from '@/providers/ReactQueryProvider';
 import '@/styles/globals.css';
 import { Metadata } from 'next';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 import { ReactNode } from 'react';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -63,21 +65,29 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const messages = await getMessages();
+
   return (
     <html lang="ko">
       <body className="overflow-x-hidden">
         <ReactQueryProvider>
           <AtomsProvider>
-            <DialogProvider>
-              <Initializer />
-              <SidebarProvider>
-                <Header />
-                <AppSidebar />
-                <main className="w-full">{children}</main>
-              </SidebarProvider>
-              <Toaster />
-            </DialogProvider>
+            <NextIntlClientProvider messages={messages}>
+              <DialogProvider>
+                <Initializer />
+                <SidebarProvider>
+                  <Header />
+                  <AppSidebar />
+                  <main className="w-full">{children}</main>
+                </SidebarProvider>
+                <Toaster />
+              </DialogProvider>
+            </NextIntlClientProvider>
           </AtomsProvider>
         </ReactQueryProvider>
       </body>

@@ -1,5 +1,3 @@
-'use client';
-
 import { submitFeedback } from '@/apis/feedback';
 import { FeedbackDto } from '@/apis/feedback/types';
 import { useMutation } from '@tanstack/react-query';
