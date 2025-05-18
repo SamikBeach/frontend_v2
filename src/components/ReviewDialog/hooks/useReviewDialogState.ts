@@ -1,11 +1,6 @@
-import {
-  ReadingStatusType,
-  deleteReadingStatusByBookId,
-} from '@/apis/reading-status';
+import { ReadingStatusType } from '@/apis/reading-status';
 import { useBookDetails } from '@/components/BookDialog/hooks';
-import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
 
 interface UseReviewDialogStateProps {
   initialRating?: number;
@@ -24,23 +19,12 @@ export function useReviewDialogState({
   const [content, setContent] = useState(initialContent);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const { book, userReadingStatus } = useBookDetails();
+  const { userReadingStatus } = useBookDetails();
 
   // atom 대신 로컬 상태 사용
   const [readingStatus, setReadingStatus] = useState<ReadingStatusType | null>(
     null
   );
-
-  // 읽기 상태 삭제 mutation
-  const deleteReadingStatusMutation = useMutation({
-    mutationFn: (bookId: number) => deleteReadingStatusByBookId(bookId),
-    onSuccess: () => {
-      toast.success('읽기 상태가 초기화되었습니다.');
-    },
-    onError: () => {
-      toast.error('읽기 상태 초기화에 실패했습니다.');
-    },
-  });
 
   // 읽기 상태 변경 핸들러
   const handleReadingStatusChange = (status: ReadingStatusType | null) => {

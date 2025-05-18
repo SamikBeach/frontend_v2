@@ -2,10 +2,6 @@ import { TimeRangeOptions } from '@/apis/library/types';
 import { SortDropdown as CommonSortDropdown } from '@/components/SortDropdown';
 import { SortDropdownProps } from '../../types';
 
-// 기본값 상수 정의
-const DEFAULT_SORT_OPTION = 'popular';
-const DEFAULT_TIME_RANGE = TimeRangeOptions.ALL;
-
 export function SortDropdown({
   selectedSort,
   onSortChange,

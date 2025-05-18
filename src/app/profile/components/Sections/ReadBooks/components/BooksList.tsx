@@ -14,12 +14,7 @@ interface BooksListProps {
 }
 
 export function BooksList({ status }: BooksListProps) {
-  const {
-    books = [],
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useUserBooks(status);
+  const { books = [], fetchNextPage, hasNextPage } = useUserBooks(status);
   const [, setSelectedBookId] = useAtom(selectedBookIdAtom);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
 

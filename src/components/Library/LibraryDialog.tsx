@@ -1,5 +1,3 @@
-'use client';
-
 import { getPopularLibraryTags } from '@/apis/library/library-tag';
 import {
   CreateLibraryDto,
@@ -31,7 +29,6 @@ interface LibraryDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   mode: 'create' | 'edit';
-  className?: string;
   // 생성 모드일 때 필요한 props
   onCreateLibrary?: (library: CreateLibraryDto) => Promise<void>;
   // 편집 모드일 때 필요한 props
@@ -43,7 +40,6 @@ export function LibraryDialog({
   open,
   onOpenChange,
   mode,
-  className,
   onCreateLibrary,
   library,
   onUpdateLibrary,
@@ -67,7 +63,7 @@ export function LibraryDialog({
   );
 
   // 태그 이름을 저장하기 위한 맵 (UI 표시용)
-  const [selectedTagNames, setSelectedTagNames] = useState<Map<number, string>>(
+  const [_, setSelectedTagNames] = useState<Map<number, string>>(
     new Map(
       mode === 'edit' && library?.tags
         ? library.tags.map(tag => [tag.tagId, tag.tagName])

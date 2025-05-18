@@ -28,13 +28,11 @@ interface AccountDeleteFormValues {
 
 interface DeleteAccountDialogProps {
   isLocalProvider: boolean;
-  userId: number;
   onSuccess?: () => void;
 }
 
 export function DeleteAccountDialog({
   isLocalProvider,
-  userId,
   onSuccess,
 }: DeleteAccountDialogProps) {
   const router = useRouter();

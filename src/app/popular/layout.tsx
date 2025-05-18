@@ -2,12 +2,11 @@ import { Metadata } from 'next';
 import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: '분야별 인기',
-  description: '다양한 분야별 인기 도서를 확인하고 독자들의 평가를 살펴보세요',
+  title: '분야별 인기 | 미역서점',
+  description: '다양한 분야의 인기 도서를 둘러보세요',
   openGraph: {
-    title: '분야별 인기 | 고전산책',
-    description:
-      '다양한 분야별 인기 도서를 확인하고 독자들의 평가를 살펴보세요',
+    title: '분야별 인기 | 미역서점',
+    description: '다양한 분야의 인기 도서를 둘러보세요',
   },
 };
 

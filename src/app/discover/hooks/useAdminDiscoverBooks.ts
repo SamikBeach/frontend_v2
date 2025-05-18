@@ -1,26 +1,8 @@
 import { getDiscoverBooks } from '@/apis/book/book';
-import {
-  Book,
-  BookSearchResponse,
-  DiscoverBooksParams,
-} from '@/apis/book/types';
+import { BookSearchResponse, DiscoverBooksParams } from '@/apis/book/types';
 import { searchBooks } from '@/apis/search/search';
-import { SearchResult } from '@/apis/search/types';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-
-/**
- * Book을 SearchResult 타입으로 변환하는 헬퍼 함수
- */
-const convertBookToSearchResult = (book: Book): SearchResult => {
-  return {
-    ...book,
-    type: 'book',
-    bookId: book.id,
-    image: book.coverImage,
-    publishDate: book.publishDate ? book.publishDate.toString() : undefined,
-  } as unknown as SearchResult;
-};
 
 /**
  * 발견하기 카테고리에 추가할 수 있는 도서 목록을 검색하는 훅

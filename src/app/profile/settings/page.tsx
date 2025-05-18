@@ -13,7 +13,6 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useCurrentUser } from '@/hooks';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
@@ -39,7 +38,6 @@ export default function ProfileSettingsPage() {
   const user = useCurrentUser();
   const [isLocalProvider, setIsLocalProvider] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
-  const isMobile = useIsMobile();
 
   // 비밀번호 변경 폼 초기화
   const passwordChangeForm = useForm<PasswordChangeFormValues>({
@@ -254,13 +252,10 @@ export default function ProfileSettingsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="px-4 py-4 sm:px-6 sm:py-6">
-          {user && (
-            <DeleteAccountDialog
-              isLocalProvider={isLocalProvider}
-              userId={user.id}
-              onSuccess={handleDeleteSuccess}
-            />
-          )}
+          <DeleteAccountDialog
+            isLocalProvider={isLocalProvider}
+            onSuccess={handleDeleteSuccess}
+          />
         </CardContent>
       </Card>
     </div>

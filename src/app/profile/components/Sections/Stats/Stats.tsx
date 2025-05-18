@@ -1,15 +1,5 @@
 import { AreaChart, Book, BookOpen, Users } from 'lucide-react';
 
-// 기본 통계 카드 컴포넌트
-interface StatsCardProps {
-  children: React.ReactNode;
-  className?: string;
-}
-
-const StatsCard = ({ children, className = '' }: StatsCardProps) => (
-  <div className={`rounded-xl bg-gray-50 p-5 ${className}`}>{children}</div>
-);
-
 // 통계 섹션에서 사용할 독서 통계 데이터
 const readingStats = {
   // 독서량 통계

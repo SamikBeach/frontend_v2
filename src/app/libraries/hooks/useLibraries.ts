@@ -11,7 +11,6 @@ import {
   libraryTimeRangeAtom,
 } from '@/atoms/library';
 import { useQueryParams } from '@/hooks';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { keepPreviousData, useInfiniteQuery } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -38,8 +37,7 @@ interface UseLibrariesResult {
 }
 
 export function useLibraries(): UseLibrariesResult {
-  const user = useCurrentUser();
-  const [tagFilter, setTagFilter] = useAtom(libraryTagFilterAtom);
+  const [tagFilter] = useAtom(libraryTagFilterAtom);
   const [sortOption, setSortOption] = useAtom(librarySortOptionAtom);
   const [timeRange, setTimeRange] = useAtom(libraryTimeRangeAtom);
   const [searchQuery, setSearchQuery] = useAtom(librarySearchQueryAtom);
@@ -177,34 +175,4 @@ export function useLibraries(): UseLibrariesResult {
     handleSearchChange,
     refetch,
   };
-}
-
-// 기간별 필터링을 위한 날짜 계산 함수
-function getDateFromTimeRange(timeRange: TimeRangeOptions): Date | null {
-  const now = new Date();
-
-  switch (timeRange) {
-    case TimeRangeOptions.TODAY:
-      // 오늘 00:00:00 시간으로 설정
-      now.setHours(0, 0, 0, 0);
-      return now;
-    case TimeRangeOptions.WEEK:
-      // 이번 주 일요일로 설정 (0: 일요일, 1: 월요일, ..., 6: 토요일)
-      now.setDate(now.getDate() - now.getDay());
-      now.setHours(0, 0, 0, 0);
-      return now;
-    case TimeRangeOptions.MONTH:
-      // 이번 달 1일로 설정
-      now.setDate(1);
-      now.setHours(0, 0, 0, 0);
-      return now;
-    case TimeRangeOptions.YEAR:
-      // 올해 1월 1일로 설정
-      now.setMonth(0, 1);
-      now.setHours(0, 0, 0, 0);
-      return now;
-    default:
-      // 'all'인 경우 null 반환
-      return null;
-  }
 }

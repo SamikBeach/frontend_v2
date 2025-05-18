@@ -3,10 +3,10 @@ import { ReactNode } from 'react';
 
 export const metadata: Metadata = {
   title: '리뷰',
-  description: '독자들의 다양한 서평과 독후감을 읽고 내 생각을 공유해보세요',
+  description: '다양한 서평을 읽고 자유롭게 내 생각을 나눠보세요',
   openGraph: {
-    title: '리뷰 | 고전산책',
-    description: '독자들의 다양한 서평과 독후감을 읽고 내 생각을 공유해보세요',
+    title: '리뷰 | 미역서점',
+    description: '다양한 서평을 읽고 자유롭게 내 생각을 나눠보세요',
   },
 };
 

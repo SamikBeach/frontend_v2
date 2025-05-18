@@ -276,13 +276,13 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
     if (activePeriod === 'yearly') {
       return label;
     } else if (activePeriod === 'monthly') {
-      const [year, month] = label.split('-');
+      const [_, month] = label.split('-');
       return `${parseInt(month)}월`;
     } else if (activePeriod === 'weekly') {
-      const [year, week] = label.split('-W');
+      const [_, week] = label.split('-W');
       return `${week}주`;
     } else if (activePeriod === 'daily') {
-      const [year, month, day] = label.split('-');
+      const [_, month, day] = label.split('-');
       return `${parseInt(month)}/${parseInt(day)}`;
     }
     return label;
@@ -295,18 +295,6 @@ const LibraryPopularityChart = ({ userId }: LibraryPopularityChartProps) => {
 
   // 설정 로딩 중 또는 설정 업데이트 중인지 확인
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
-
-  // 0값 툴팁 컴포넌트
-  const ZeroValueTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="rounded-md border border-gray-100 bg-white px-3 py-2 shadow-md">
-          <p className="text-xs text-gray-500">데이터가 없습니다</p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   // 기간 옵션
   const periodOptions = [

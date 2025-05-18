@@ -105,18 +105,6 @@ function ResponsiveAlertDialogTrigger({
   );
 }
 
-// Portal component
-function ResponsiveAlertDialogPortal({
-  ...props
-}: React.ComponentProps<typeof AlertDialogPrimitive.Portal>) {
-  const { isMobile } = useResponsiveAlertDialog();
-  return isMobile ? (
-    <DrawerPrimitive.Portal data-slot="drawer-portal" {...props} />
-  ) : (
-    <AlertDialogPrimitive.Portal data-slot="alert-dialog-portal" {...props} />
-  );
-}
-
 // Content component
 function ResponsiveAlertDialogContent({
   className,

@@ -23,7 +23,6 @@ import {
   ResponsiveSelectValue,
 } from '@/components/ui/responsive-select';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
   useInfiniteQuery,
@@ -52,7 +51,6 @@ export function ManageDiscoverBooksDialog({
   open,
   onOpenChange,
 }: ManageDiscoverBooksDialogProps) {
-  const isMobile = useIsMobile();
   const queryClient = useQueryClient();
 
   // 상태 관리
@@ -67,15 +65,11 @@ export function ManageDiscoverBooksDialog({
   const searchScrollContainerRef = useRef<HTMLDivElement>(null);
 
   // 카테고리 데이터 가져오기 - 다이얼로그가 열렸을 때만 호출
-  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
+  const { data: categories = [] } = useQuery({
     queryKey: ['discover-categories-management'],
     queryFn: getAllDiscoverCategories,
     enabled: open, // 다이얼로그가 열렸을 때만 API 호출
   });
-
-  // 카테고리 통계 대신 기본 상태 제공
-  const [categoryStats, setcategoryStats] = useState(null);
-  const isStatsLoading = false;
 
   // 선택이 완료되었는지 확인하는 함수
   const isSelectionComplete = useCallback(() => {
@@ -191,41 +185,9 @@ export function ManageDiscoverBooksDialog({
     },
   });
 
-  // 도서 추가 뮤테이션
-  const { mutate: addBookMutation, isPending: isAdding } = useMutation({
-    mutationFn: ({
-      bookId,
-      categoryId,
-      subcategoryId,
-      isbn,
-    }: {
-      bookId: number;
-      categoryId: number;
-      subcategoryId?: number;
-      isbn?: string;
-    }) => addBookToDiscoverCategory(bookId, categoryId, subcategoryId, isbn),
-    onSuccess: () => {
-      toast.success('도서가 발견하기 카테고리에 추가되었습니다.');
-      queryClient.invalidateQueries({
-        queryKey: ['discover-books-management'],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ['admin-discover-category-books'],
-      });
-    },
-    onError: () => {
-      toast.error('도서 추가 중 오류가 발생했습니다.');
-    },
-  });
-
   // 현재 선택된 카테고리
   const selectedCategory = categories.find(
     c => c.id.toString() === selectedCategoryId
-  );
-
-  // 현재 선택된 서브카테고리
-  const selectedSubcategory = selectedCategory?.subCategories.find(
-    s => s.id.toString() === selectedSubcategoryId
   );
 
   // 무한 스크롤을 위한 이벤트 리스너
@@ -411,18 +373,6 @@ export function ManageDiscoverBooksDialog({
   // Book 또는 SearchResult 타입의 객체에서 이미지 URL을 안전하게 추출하는 함수
   const getImageUrl = (book: SearchResult): string => {
     return book.coverImage || book.image || '/images/no-image.png';
-  };
-
-  // SearchResult의 ID를 안전하게 추출하는 함수
-  const getBookId = (book: SearchResult): number => {
-    const bookId = book.bookId;
-    const id = book.id;
-
-    return bookId !== undefined && bookId !== null
-      ? bookId
-      : id !== undefined && id !== null
-        ? id
-        : -1;
   };
 
   // 책 식별자 생성 헬퍼 함수
@@ -681,7 +631,6 @@ export function ManageDiscoverBooksDialog({
                       <div className="divide-y divide-gray-100">
                         {searchResults.map(book => {
                           const imageUrl = normalizeImageUrl(getImageUrl(book));
-                          const bookId = getBookId(book);
 
                           return (
                             <div

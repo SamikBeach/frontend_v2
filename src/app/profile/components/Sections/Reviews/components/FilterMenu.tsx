@@ -25,21 +25,18 @@ export function FilterMenu({ selectedTab, setSelectedTab }: FilterMenuProps) {
   return (
     <div className="mb-3 flex flex-wrap gap-3 sm:mb-6">
       <MenuItem
-        id="all"
         name="전체"
         count={totalCount}
         isSelected={selectedTab === 'all'}
         onClick={() => setSelectedTab('all')}
       />
       <MenuItem
-        id="reviews"
         name="리뷰"
         count={reviewCount}
         isSelected={selectedTab === 'reviews'}
         onClick={() => setSelectedTab('reviews')}
       />
       <MenuItem
-        id="ratings"
         name="별점만"
         count={ratingCount}
         isSelected={selectedTab === 'ratings'}

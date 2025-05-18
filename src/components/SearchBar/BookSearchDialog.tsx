@@ -1,5 +1,3 @@
-'use client';
-
 import { Command, CommandInput } from '@/components/ui/command';
 import {
   ResponsiveDialog,
@@ -9,7 +7,6 @@ import {
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 import { useDialogQuery } from '@/hooks';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
@@ -82,13 +79,6 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { open: openBookDialog } = useDialogQuery({ type: 'book' });
   const queryClient = useQueryClient();
-  const isMobile = useIsMobile();
-
-  // 다이얼로그 닫기 핸들러
-  const handleClose = () => {
-    setIsOpen(false);
-    setQuery(''); // 검색어 초기화
-  };
 
   // Dialog가 닫힐 때 검색어 초기화
   const handleOpenChange = (isOpen: boolean) => {

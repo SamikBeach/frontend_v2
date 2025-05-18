@@ -13,12 +13,10 @@ interface Subscriber {
 
 interface LibrarySidebarSubscribersProps {
   subscribers: Subscriber[];
-  isCurrentUserSubscriber: (id: number) => boolean;
 }
 
 export const LibrarySidebarSubscribers: FC<LibrarySidebarSubscribersProps> = ({
   subscribers,
-  isCurrentUserSubscriber,
 }) => {
   const currentUser = useCurrentUser();
 

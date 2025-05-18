@@ -148,7 +148,7 @@ export function SortDropdown<T = Book>({
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-2 px-2 pt-1.5 pb-1.5 ${className}`}
+      className={`flex flex-wrap items-center gap-2 px-2 pt-1.5 pb-1.5 md:flex-nowrap ${className}`}
     >
       {showTimeRangeFilter && (
         <ResponsiveDropdownMenu>

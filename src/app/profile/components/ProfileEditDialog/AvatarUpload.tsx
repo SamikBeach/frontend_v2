@@ -1,5 +1,3 @@
-'use client';
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Camera, X } from 'lucide-react';
@@ -19,7 +17,6 @@ export function AvatarUpload({
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     initialImage && initialImage.length > 0 ? initialImage : null
   );
-  const [isInitialImage, setIsInitialImage] = useState(!!initialImage);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const initial = username.charAt(0).toUpperCase();
 
@@ -43,7 +40,6 @@ export function AvatarUpload({
     const reader = new FileReader();
     reader.onload = () => {
       setAvatarPreview(reader.result as string);
-      setIsInitialImage(false);
     };
     reader.readAsDataURL(file);
 
@@ -53,7 +49,6 @@ export function AvatarUpload({
 
   const handleRemoveAvatar = () => {
     setAvatarPreview(null);
-    setIsInitialImage(false);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }

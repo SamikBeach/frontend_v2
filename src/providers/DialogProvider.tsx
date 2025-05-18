@@ -4,9 +4,9 @@ import { dialogAtom } from '@/atoms/dialog';
 import { BookDialog } from '@/components/BookDialog';
 import { useQueryParams } from '@/hooks/useQueryParams';
 import { useAtom } from 'jotai';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
-export function DialogProvider({ children }: { children: React.ReactNode }) {
+function DialogProviderInner({ children }: { children: React.ReactNode }) {
   const [, setDialogState] = useAtom(dialogAtom);
   const { searchParams } = useQueryParams();
 
@@ -32,5 +32,13 @@ export function DialogProvider({ children }: { children: React.ReactNode }) {
       {children}
       <BookDialog />
     </>
+  );
+}
+
+export function DialogProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={null}>
+      <DialogProviderInner>{children}</DialogProviderInner>
+    </Suspense>
   );
 }

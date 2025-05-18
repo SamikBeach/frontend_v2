@@ -81,7 +81,7 @@ export function MobileSideSheet({ trigger }: MobileSideSheetProps) {
                     <SheetClose asChild>
                       <Link
                         href={item.href}
-                        className={`flex h-11 items-center gap-3 rounded-xl px-4 text-[15px] font-medium transition-colors hover:bg-gray-100/80 ${
+                        className={`flex h-11 cursor-pointer items-center gap-3 rounded-xl px-4 text-[15px] font-medium transition-colors hover:bg-gray-100/80 ${
                           isActive(item.href)
                             ? 'bg-gray-100 font-semibold text-gray-900'
                             : 'text-gray-600'

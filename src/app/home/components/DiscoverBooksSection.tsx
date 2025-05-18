@@ -65,7 +65,7 @@ export function DiscoverBooksSection() {
         <Button
           variant="ghost"
           size="sm"
-          className="text-xs font-medium text-gray-500 hover:text-gray-900 sm:text-sm"
+          className="cursor-pointer text-xs font-medium text-gray-500 hover:text-gray-900 sm:text-sm"
           onClick={() => router.push('/discover')}
         >
           더보기

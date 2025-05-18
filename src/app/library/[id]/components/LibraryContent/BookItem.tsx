@@ -1,6 +1,8 @@
 import { Book } from '@/apis/book/types';
-import { LibraryListItem } from '@/apis/library/types';
+import { createLibrary } from '@/apis/library/library';
+import { CreateLibraryDto, LibraryListItem } from '@/apis/library/types';
 import { BookCard } from '@/components/BookCard';
+import { LibraryDialog } from '@/components/Library';
 import { Button } from '@/components/ui/button';
 import {
   ResponsiveDropdownMenu,
@@ -11,8 +13,11 @@ import {
   ResponsiveDropdownMenuSubTrigger,
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
+import { useQueryClient } from '@tanstack/react-query';
 import { ExternalLink, MoreHorizontal, Trash2 } from 'lucide-react';
-import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useCallback, useState } from 'react';
+import { toast } from 'sonner';
 
 interface BookItemProps {
   book: Book;
@@ -39,12 +44,50 @@ export function BookItem({
   userLibraries,
   isLoadingLibraries,
 }: BookItemProps) {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [showLibraryDialog, setShowLibraryDialog] = useState(false);
+
   // Create a memoized handler for moving books
   const handleMoveBook = useCallback(
     (targetLibraryId: number) => {
       onMoveBook(targetLibraryId);
     },
     [onMoveBook]
+  );
+
+  // 서재 생성 다이얼로그 핸들러
+  const handleCreateLibrary = useCallback(() => {
+    setShowLibraryDialog(true);
+    // 드롭다운 메뉴 닫기
+    onDropdownOpenChange(false);
+  }, [onDropdownOpenChange]);
+
+  // 서재 생성 API 호출 함수
+  const handleCreateLibrarySubmit = useCallback(
+    async (libraryData: CreateLibraryDto) => {
+      try {
+        // API 직접 호출
+        await createLibrary(libraryData);
+
+        // 성공 메시지 표시
+        toast.success('새 서재가 생성되었습니다');
+
+        // 서재 목록 쿼리 무효화
+        queryClient.invalidateQueries({ queryKey: ['user-libraries'] });
+
+        // 서재 목록이 갱신되도록 페이지를 새로고침
+        router.refresh();
+
+        // 다이얼로그 닫기
+        setShowLibraryDialog(false);
+      } catch (error) {
+        console.error('서재 생성 중 오류 발생:', error);
+        // 오류 메시지는 LibraryDialog 내부에서 처리됨
+        throw error; // 오류를 상위로 전파하여 LibraryDialog에서 처리되게 함
+      }
+    },
+    [router, queryClient]
   );
 
   return (
@@ -83,11 +126,36 @@ export function BookItem({
                       </span>
                     </ResponsiveDropdownMenuItem>
                   ) : userLibraries.length === 0 ? (
-                    <ResponsiveDropdownMenuItem disabled>
-                      <span className="w-full text-left">
-                        이동할 서재가 없습니다
-                      </span>
-                    </ResponsiveDropdownMenuItem>
+                    <div>
+                      <ResponsiveDropdownMenuItem disabled>
+                        <span className="w-full text-left">
+                          서재가 없습니다
+                        </span>
+                      </ResponsiveDropdownMenuItem>
+                      <ResponsiveDropdownMenuItem
+                        onSelect={handleCreateLibrary}
+                      >
+                        <span className="w-full text-left font-medium text-gray-900">
+                          + 새 서재 만들기
+                        </span>
+                      </ResponsiveDropdownMenuItem>
+                    </div>
+                  ) : userLibraries.filter(lib => lib.id !== libraryId)
+                      .length === 0 ? (
+                    <div>
+                      <ResponsiveDropdownMenuItem disabled>
+                        <span className="w-full text-left">
+                          서재가 없습니다
+                        </span>
+                      </ResponsiveDropdownMenuItem>
+                      <ResponsiveDropdownMenuItem
+                        onSelect={handleCreateLibrary}
+                      >
+                        <span className="w-full text-left font-medium text-gray-900">
+                          + 새 서재 만들기
+                        </span>
+                      </ResponsiveDropdownMenuItem>
+                    </div>
                   ) : (
                     userLibraries
                       .filter(lib => lib.id !== libraryId) // 현재 서재 제외
@@ -113,6 +181,14 @@ export function BookItem({
           </ResponsiveDropdownMenu>
         </div>
       )}
+
+      {/* 서재 생성 다이얼로그 */}
+      <LibraryDialog
+        open={showLibraryDialog}
+        onOpenChange={setShowLibraryDialog}
+        mode="create"
+        onCreateLibrary={handleCreateLibrarySubmit}
+      />
     </div>
   );
 }

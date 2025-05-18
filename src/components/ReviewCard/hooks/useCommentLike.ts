@@ -2,7 +2,6 @@ import {
   likeComment as apiLikeComment,
   unlikeComment as apiUnlikeComment,
 } from '@/apis/review/review';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface UseCommentLikeResult {
@@ -21,7 +20,6 @@ interface Comment {
 
 export function useCommentLike(): UseCommentLikeResult {
   const queryClient = useQueryClient();
-  const currentUser = useCurrentUser();
 
   // 좋아요 추가 mutation
   const { mutateAsync: addLike, isPending: isAddLikeLoading } = useMutation({
