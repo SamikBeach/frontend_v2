@@ -2,7 +2,6 @@
 
 import { FeedbackButton } from '@/components/Feedback';
 import { SearchBar } from '@/components/SearchBar';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Settings } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { LeftSlot } from './LeftSlot';
@@ -10,11 +9,11 @@ import { Notification } from './RightSlot/Notification';
 import { UserDropdown } from './RightSlot/UserDropdown';
 
 export function Header() {
-  const isMobile = useIsMobile();
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
+    const isMobile = window.matchMedia('(max-width: 639px)').matches;
     if (!isMobile) return;
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
@@ -29,13 +28,13 @@ export function Header() {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isMobile]);
+  }, []);
 
   return (
     <header
-      className={`fixed top-0 right-0 left-0 z-40 flex min-h-[56px] items-center justify-between border-b border-gray-200/50 bg-white transition-transform duration-300 ${
-        isMobile ? 'px-2' : 'px-4'
-      } ${isMobile ? (showHeader ? 'translate-y-0' : '-translate-y-full') : ''}`}
+      className={`fixed top-0 right-0 left-0 z-40 flex min-h-[56px] items-center justify-between border-b border-gray-200/50 bg-white px-2 transition-transform duration-300 sm:translate-y-0 md:px-4 ${
+        showHeader ? 'translate-y-0' : '-translate-y-full'
+      }`}
     >
       <div className="flex items-center gap-1">
         <LeftSlot />
@@ -44,12 +43,12 @@ export function Header() {
         <SearchBar />
       </div>
       <div className="flex items-center gap-2">
-        <div className="hidden max-sm:block">
+        <div className="sm:hidden">
           <SearchBar />
         </div>
         <FeedbackButton />
         <Notification />
-        {isMobile ? (
+        <div className="sm:hidden">
           <UserDropdown
             trigger={
               <button
@@ -61,9 +60,10 @@ export function Header() {
               </button>
             }
           />
-        ) : (
+        </div>
+        <div className="hidden sm:block">
           <UserDropdown />
-        )}
+        </div>
       </div>
     </header>
   );
