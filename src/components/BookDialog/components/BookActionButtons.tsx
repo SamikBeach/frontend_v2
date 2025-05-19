@@ -1,3 +1,5 @@
+'use client';
+
 import { CreateLibraryDto } from '@/apis/library/types';
 import { ReadingStatusType } from '@/apis/reading-status';
 import {

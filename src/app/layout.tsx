@@ -1,3 +1,4 @@
+import { BottomNav } from '@/components';
 import { Header } from '@/components/Header';
 import { Initializer } from '@/components/Initializer';
 import { AppSidebar } from '@/components/Sidebar';
@@ -84,6 +85,7 @@ export default async function RootLayout({
                   <Header />
                   <AppSidebar />
                   <main className="w-full">{children}</main>
+                  <BottomNav />
                 </SidebarProvider>
                 <Toaster />
               </DialogProvider>

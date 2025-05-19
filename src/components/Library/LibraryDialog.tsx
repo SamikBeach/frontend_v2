@@ -1,3 +1,5 @@
+'use client';
+
 import { getPopularLibraryTags } from '@/apis/library/library-tag';
 import {
   CreateLibraryDto,
