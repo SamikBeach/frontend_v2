@@ -6,6 +6,8 @@ import {
   ResponsiveDropdownMenuContent,
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
+import { useCurrentUser } from '@/hooks';
+import { Bell } from 'lucide-react';
 import { Suspense, useState } from 'react';
 import { NotificationLoading } from './components/LoadingStates';
 import { NotificationBadge } from './components/NotificationBadge';
@@ -13,7 +15,12 @@ import { NotificationContent } from './components/NotificationContent';
 import { NotificationDropdownProps } from './types';
 
 export function Notification({ className }: NotificationDropdownProps) {
+  const user = useCurrentUser();
   const [open, setOpen] = useState(false);
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <ResponsiveDropdownMenu open={open} onOpenChange={setOpen}>
@@ -23,7 +30,7 @@ export function Notification({ className }: NotificationDropdownProps) {
           size="icon"
           className={`relative cursor-pointer text-gray-500 hover:text-gray-900 ${className || ''}`}
         >
-          <Suspense fallback={<span className="h-5 w-5" />}>
+          <Suspense fallback={<Bell className="h-5 w-5" />}>
             <NotificationBadge />
           </Suspense>
         </Button>

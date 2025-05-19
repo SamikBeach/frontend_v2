@@ -2,7 +2,6 @@
 
 import { logout as logoutApi } from '@/apis/auth';
 import { authUtils } from '@/apis/axios';
-import { User } from '@/apis/user/types';
 import { userAtom } from '@/atoms/user';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -14,17 +13,14 @@ import {
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
 import { useMutation } from '@tanstack/react-query';
-import { useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { LoginButton } from './LoginButton';
 
-interface UserDropdownProps {
-  user: User;
-}
-
-export function UserDropdown({ user }: UserDropdownProps) {
-  const setUser = useSetAtom(userAtom);
+export function UserDropdown() {
+  const [user, setUser] = useAtom(userAtom);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
@@ -59,7 +55,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
   // 프로필 페이지로 이동 핸들러
   const handleProfileClick = () => {
     setIsOpen(false);
-    router.push(`/profile/${user.id}`);
+    router.push(`/profile/${user?.id}`);
   };
 
   // 설정 페이지로 이동 핸들러
@@ -69,9 +65,13 @@ export function UserDropdown({ user }: UserDropdownProps) {
   };
 
   // 사용자 표시 정보 설정
-  const displayName = user.username || user.email.split('@')[0];
-  const initial = displayName.charAt(0).toUpperCase();
-  const avatarUrl = user.profileImage || null;
+  const displayName = user?.username || user?.email.split('@')[0];
+  const initial = displayName?.charAt(0).toUpperCase();
+  const avatarUrl = user?.profileImage || null;
+
+  if (!user) {
+    return <LoginButton />;
+  }
 
   return (
     <ResponsiveDropdownMenu open={isOpen} onOpenChange={setIsOpen}>
