@@ -8,6 +8,7 @@ import {
   ThumbsUp,
   Trash,
 } from 'lucide-react';
+import Link from 'next/link';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 
 import { deleteReview, updateComment } from '@/apis/review';
@@ -165,10 +166,19 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
     <div className="space-y-4">
       {/* 댓글 입력 */}
       <div className="flex items-start pl-3">
-        <Avatar className="mt-1 h-7 w-7 flex-shrink-0 border-0">
-          <AvatarFallback className="bg-gray-200 text-gray-700">
-            {currentUser?.username?.[0]?.toUpperCase() || 'U'}
-          </AvatarFallback>
+        <Avatar
+          className="mt-1 h-7 w-7 flex-shrink-0 cursor-pointer border-0"
+          asChild
+        >
+          <Link href={`/profile/${currentUser?.id}`}>
+            <AvatarImage
+              src={currentUser?.profileImage || undefined}
+              alt={currentUser?.username || 'User'}
+            />
+            <AvatarFallback className="bg-gray-200 text-gray-700">
+              {currentUser?.username?.[0]?.toUpperCase() || 'U'}
+            </AvatarFallback>
+          </Link>
         </Avatar>
         <div className="ml-2 flex-1">
           <div className="flex gap-2">
@@ -210,14 +220,19 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
         {comments && comments.length > 0 ? (
           comments.map(comment => (
             <div key={comment.id} className="flex gap-2 pb-1">
-              <Avatar className="mt-1 h-7 w-7 flex-shrink-0 border-0">
-                <AvatarImage
-                  src={comment.author.profileImage || undefined}
-                  alt={comment.author.username}
-                />
-                <AvatarFallback className="bg-gray-200 text-gray-700">
-                  {comment.author.username.charAt(0).toUpperCase()}
-                </AvatarFallback>
+              <Avatar
+                className="mt-1 h-7 w-7 flex-shrink-0 cursor-pointer border-0"
+                asChild
+              >
+                <Link href={`/profile/${comment.author.id}`}>
+                  <AvatarImage
+                    src={comment.author.profileImage || undefined}
+                    alt={comment.author.username}
+                  />
+                  <AvatarFallback className="bg-gray-200 text-gray-700">
+                    {comment.author.username.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Link>
               </Avatar>
               <div className="flex-1 rounded-xl bg-gray-50 p-2.5">
                 {editingCommentId === comment.id ? (
@@ -279,9 +294,12 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                   <>
                     <div className="mb-0.5 flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-gray-900">
+                        <Link
+                          href={`/profile/${comment.author.id}`}
+                          className="cursor-pointer text-sm font-medium text-gray-900 hover:underline"
+                        >
                           {comment.author.username}
-                        </p>
+                        </Link>
                         <span className="text-xs text-gray-500">
                           {formatDate(comment.createdAt)}
                         </span>
@@ -594,22 +612,30 @@ function ReviewsList({
               }`}
             >
               <div className="flex items-start gap-3.5">
-                <Avatar className="mt-0.5 h-9 w-9 flex-shrink-0">
-                  <AvatarImage
-                    src={review.author.profileImage || undefined}
-                    alt={review.author.username}
-                  />
-                  <AvatarFallback className="bg-gray-100">
-                    {review.author.username.charAt(0)}
-                  </AvatarFallback>
+                <Avatar
+                  className="mt-0.5 h-9 w-9 flex-shrink-0 cursor-pointer"
+                  asChild
+                >
+                  <Link href={`/profile/${review.author.id}`}>
+                    <AvatarImage
+                      src={review.author.profileImage || undefined}
+                      alt={review.author.username}
+                    />
+                    <AvatarFallback className="bg-gray-100">
+                      {review.author.username.charAt(0)}
+                    </AvatarFallback>
+                  </Link>
                 </Avatar>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-medium text-gray-800">
+                        <Link
+                          href={`/profile/${review.author.id}`}
+                          className="cursor-pointer text-sm font-medium text-gray-800 hover:underline"
+                        >
                           {review.author.username}
-                        </h3>
+                        </Link>
                         <span className="text-xs text-gray-500">
                           {formatDate(review.createdAt)}
                         </span>
