@@ -411,7 +411,7 @@ export function AddBookDialog({
                       </div>
                     </CommandEmpty>
                   ) : (
-                    <CommandGroup className="px-0 md:px-1">
+                    <CommandGroup className="px-1">
                       <div className="space-y-1">
                         {searchResults.map(book => {
                           const bookKey = getBookIdentifier(book);
@@ -428,7 +428,7 @@ export function AddBookDialog({
                             <CommandItem
                               key={bookKey}
                               className={cn(
-                                'group relative flex h-auto cursor-pointer items-start gap-3 rounded-md px-3 py-1 transition-colors hover:bg-gray-50 md:gap-4 md:py-3.5',
+                                'group relative flex h-auto cursor-pointer items-start gap-3 rounded-md p-2 transition-colors hover:bg-gray-50 md:gap-4',
                                 isSelected ? 'bg-gray-50' : ''
                               )}
                               onSelect={() => toggleBookSelection(book)}
