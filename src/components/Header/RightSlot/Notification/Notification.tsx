@@ -38,7 +38,7 @@ export function Notification({ className }: NotificationDropdownProps) {
       <ResponsiveDropdownMenuContent
         align="end"
         className="h-auto max-h-[75vh] w-[480px] overflow-y-auto rounded-xl border border-gray-100 p-0"
-        drawerClassName="w-full p-0 pt-6 items-start justify-start"
+        drawerClassName="w-full p-0 pt-6 items-start justify-start h-[100dvh]"
         id="notification-scroll-container"
       >
         <Suspense fallback={<NotificationLoading />}>
