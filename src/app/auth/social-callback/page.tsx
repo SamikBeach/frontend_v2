@@ -71,7 +71,6 @@ export default function SocialCallback() {
 
         setStatus('success');
 
-        // 3초 후 창 닫기
         setTimeout(() => {
           window.close();
         }, 1000);
@@ -101,10 +100,9 @@ export default function SocialCallback() {
         );
         setStatus('error');
 
-        // 3초 후 창 닫기
         setTimeout(() => {
           window.close();
-        }, 3000);
+        }, 1000);
       }
     };
 
