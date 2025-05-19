@@ -141,8 +141,7 @@ export default function DiscoverPage() {
               <div className="flex-1">
                 <DiscoverBreadcrumb />
               </div>
-              {/* 관리자 버튼 */}
-              <AdminBookManageButton />
+              {/* 관리자 버튼 삭제 (아래에 고정 배치로 이동) */}
             </div>
           </Suspense>
         </div>
@@ -174,6 +173,11 @@ export default function DiscoverPage() {
         <Suspense fallback={<BooksLoading />}>
           <BooksContent />
         </Suspense>
+      </div>
+
+      {/* 발견하기 도서관리 버튼을 우하단에 고정 */}
+      <div className="fixed right-6 bottom-6 z-50">
+        <AdminBookManageButton />
       </div>
     </div>
   );
