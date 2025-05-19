@@ -62,6 +62,10 @@ export function useReviewMutations({
         queryKey: ['communityReviews'],
         exact: false,
       });
+      // 홈 인기글 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['home', 'popularReviews'],
+      });
     },
     onError: (error: any) => {
       console.error('별점 업데이트 실패:', error);
@@ -102,6 +106,10 @@ export function useReviewMutations({
       queryClient.invalidateQueries({
         queryKey: ['communityReviews'],
         exact: false,
+      });
+      // 홈 인기글 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['home', 'popularReviews'],
       });
 
       // 프로필 페이지 관련 쿼리 선택적 무효화
@@ -159,6 +167,10 @@ export function useReviewMutations({
         queryKey: ['communityReviews'],
         exact: false,
       });
+      // 홈 인기글 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['home', 'popularReviews'],
+      });
 
       // 원본 타입과 수정된 타입이 다른 경우 두 타입 모두 무효화
       if (review.type !== variables.type) {
@@ -175,6 +187,10 @@ export function useReviewMutations({
       // 단일 리뷰 데이터도 무효화
       queryClient.invalidateQueries({
         queryKey: ['review', review.id],
+      });
+      // 홈 인기글 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['home', 'popularReviews'],
       });
 
       // 책 관련 데이터가 변경된 경우 책 데이터도 무효화
@@ -213,6 +229,10 @@ export function useReviewMutations({
         queryKey: ['communityReviews'],
         exact: false,
       });
+      // 홈 인기글 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['home', 'popularReviews'],
+      });
 
       // 프로필 페이지에서 필요한 쿼리 무효화
       if (isCurrentUserProfilePage(pathname, currentUserId)) {
@@ -239,6 +259,10 @@ export function useReviewMutations({
       queryClient.invalidateQueries({
         queryKey: ['communityReviews'],
         exact: false,
+      });
+      // 홈 인기글 쿼리 무효화
+      queryClient.invalidateQueries({
+        queryKey: ['home', 'popularReviews'],
       });
 
       // 프로필 페이지에서 필요한 쿼리 무효화
@@ -309,7 +333,10 @@ export function useReviewMutations({
               queryKey: ['communityReviews'],
               exact: false,
             });
-
+            // 홈 인기글 쿼리 무효화
+            queryClient.invalidateQueries({
+              queryKey: ['home', 'popularReviews'],
+            });
             // 유저 프로필 관련 쿼리 일괄 무효화
             invalidateReviewAndRatingQueries(
               queryClient,
@@ -418,6 +445,10 @@ export function useReviewMutations({
 
         // 한 번에 무효화 처리
         invalidateReviewAndRatingQueries(queryClient, pathname, currentUserId);
+        // 홈 인기글 쿼리 무효화
+        queryClient.invalidateQueries({
+          queryKey: ['home', 'popularReviews'],
+        });
 
         // 책 상세 정보 쿼리 무효화 (필요한 경우)
         if (bookIsbn || selectedBook?.isbn || selectedBook?.isbn13) {

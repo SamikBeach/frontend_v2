@@ -1,6 +1,4 @@
 import { Badge } from '@/components/ui/badge';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { useCallback } from 'react';
@@ -8,7 +6,6 @@ import { useBookDetails } from '../hooks';
 
 export function BookCoverSection() {
   const { book, isbn } = useBookDetails();
-  const isMobile = useIsMobile();
 
   // 알라딘으로 이동하는 함수
   const handleOpenAladin = useCallback(() => {
@@ -33,15 +30,10 @@ export function BookCoverSection() {
     : '';
 
   return (
-    <div className={cn('flex', isMobile ? 'flex-col gap-4' : 'flex-col gap-3')}>
+    <div className="flex flex-col gap-4 md:gap-6">
       {/* 책 표지 이미지 */}
       <div
-        className={cn(
-          'relative overflow-hidden rounded-2xl bg-gray-50',
-          isMobile
-            ? 'mx-auto w-44 cursor-pointer' // 약간 넓게 조정
-            : 'flex w-full cursor-pointer items-center justify-center'
-        )}
+        className="relative mx-auto w-44 cursor-pointer overflow-hidden rounded-2xl bg-gray-50 md:w-56 lg:w-64"
         onClick={handleOpenAladin}
       >
         <img
@@ -53,13 +45,10 @@ export function BookCoverSection() {
       </div>
 
       {/* 책 정보(제목, 저자, 출판사, 출간일)는 이미지 아래에 배치 */}
-      <div className={cn('space-y-2', isMobile ? 'px-1' : '')}>
-        <div className={cn(isMobile ? 'text-center' : '')}>
+      <div className="space-y-2 px-1 md:px-0">
+        <div className="text-center md:text-left">
           <h2
-            className={cn(
-              'inline cursor-pointer font-bold text-gray-900',
-              isMobile ? 'text-lg' : 'text-xl'
-            )}
+            className="inline cursor-pointer text-lg font-bold text-gray-900 md:text-xl"
             onClick={handleOpenAladin}
           >
             {book.title}
@@ -77,15 +66,15 @@ export function BookCoverSection() {
           )}
         </div>
 
-        <p className={cn('text-gray-700', isMobile ? 'text-sm' : '')}>
-          {book.author}
-        </p>
+        <p className="text-sm text-gray-700 md:text-base">{book.author}</p>
 
         {book.publisher && (
-          <p className="text-sm text-gray-500">{book.publisher}</p>
+          <p className="text-sm text-gray-500 md:text-base">{book.publisher}</p>
         )}
         {book.publishDate && (
-          <p className="text-sm text-gray-500">출간일: {formattedDate}</p>
+          <p className="text-sm text-gray-500 md:text-base">
+            출간일: {formattedDate}
+          </p>
         )}
       </div>
     </div>

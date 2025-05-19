@@ -1,33 +1,21 @@
 {
   "name": "미역서점",
   "short_name": "미역서점",
-  "description": "책과 함께 유유자적하게 책을 탐색하세요.",
   "icons": [
     {
-      "src": "/favicons/web-app-manifest-192x192.png",
+      "src": "/web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable"
     },
     {
-      "src": "/favicons/web-app-manifest-512x512.png",
+      "src": "/web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "/favicons/favicon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
+      "purpose": "maskable"
     }
   ],
   "theme_color": "#ffffff",
   "background_color": "#ffffff",
-  "display": "standalone",
-  "start_url": "/",
-  "orientation": "portrait",
-  "scope": "/",
-  "lang": "ko",
-  "dir": "ltr"
+  "display": "standalone"
 }

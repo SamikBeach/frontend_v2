@@ -141,7 +141,6 @@ function ResponsiveDropdownMenuContent({
             'bg-popover text-popover-foreground fixed z-52 flex flex-col items-start',
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[10px] data-[vaul-drawer-direction=bottom]:border-t-0',
             'space-y-3 p-4',
-            'max-h-[94%]', // Limit height to adapt to content
             drawerClassName
           )}
           {...props}
@@ -407,7 +406,6 @@ function ResponsiveDropdownMenuSubContent({
         <DrawerPrimitive.Content
           className={cn(
             'bg-popover text-popover-foreground fixed inset-x-0 bottom-0 z-50 mt-24 flex flex-col space-y-3 rounded-t-[10px] border p-4 shadow-lg',
-            'max-h-[94%]', // Limit height to adapt to content
             'w-full', // Ensure full width
             drawerClassName || className
           )}

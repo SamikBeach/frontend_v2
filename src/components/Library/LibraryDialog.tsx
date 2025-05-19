@@ -1,3 +1,5 @@
+'use client';
+
 import { getPopularLibraryTags } from '@/apis/library/library-tag';
 import {
   CreateLibraryDto,
@@ -200,7 +202,7 @@ export function LibraryDialog({
                   placeholder="서재 이름을 입력하세요"
                   value={name}
                   onChange={e => setName(e.target.value)}
-                  className="rounded-xl border-gray-200 focus:border-blue-200 focus:ring-2 focus:ring-blue-100"
+                  className="rounded-xl border-gray-200 text-base focus:border-blue-200 focus:ring-2 focus:ring-blue-100 md:text-sm"
                   autoFocus
                 />
               </div>
@@ -215,7 +217,7 @@ export function LibraryDialog({
                 <Textarea
                   id="libraryDesc"
                   placeholder="서재에 대한 간단한 설명을 입력하세요"
-                  className="min-h-[120px] resize-none rounded-xl border-gray-200 bg-gray-50 p-4 text-sm placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                  className="min-h-[120px] resize-none rounded-xl border-gray-200 bg-gray-50 p-4 text-base placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100 md:text-sm"
                   value={description}
                   onChange={e => setDescription(e.target.value)}
                 />

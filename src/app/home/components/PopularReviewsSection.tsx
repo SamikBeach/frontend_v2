@@ -71,6 +71,10 @@ export function PopularReviewsSection() {
 
       {isLoading ? (
         <PopularReviewsSkeleton />
+      ) : reviews.length === 0 ? (
+        <div className="flex h-[200px] items-center justify-center">
+          <p className="text-sm text-gray-500">인기 커뮤니티 글이 없습니다.</p>
+        </div>
       ) : (
         <div className="space-y-3 sm:space-y-4">
           {reviews.slice(0, 2).map(review => (

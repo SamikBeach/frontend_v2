@@ -209,7 +209,6 @@ function ResponsiveSelectContent({
             'bg-popover text-popover-foreground fixed z-52 flex flex-col items-start',
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[10px] data-[vaul-drawer-direction=bottom]:border-t-0',
             'space-y-3 p-4',
-            'max-h-[94%]', // Limit height to adapt to content
             drawerClassName
           )}
           {...props}

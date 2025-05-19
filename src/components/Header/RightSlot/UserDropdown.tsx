@@ -2,7 +2,6 @@
 
 import { logout as logoutApi } from '@/apis/auth';
 import { authUtils } from '@/apis/axios';
-import { User } from '@/apis/user/types';
 import { userAtom } from '@/atoms/user';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -13,20 +12,28 @@ import {
   ResponsiveDropdownMenuSeparator,
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useMutation } from '@tanstack/react-query';
-import { useSetAtom } from 'jotai';
+import { useAtom } from 'jotai';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { LoginButton } from './LoginButton';
 
 interface UserDropdownProps {
-  user: User;
+  trigger?: ReactNode;
 }
 
-export function UserDropdown({ user }: UserDropdownProps) {
-  const setUser = useSetAtom(userAtom);
+export function UserDropdown({ trigger }: UserDropdownProps) {
+  const isMobile = useIsMobile();
+  const [user, setUser] = useAtom(userAtom);
+  const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   /**
    * 로그아웃 요청을 처리하는 mutation
@@ -59,7 +66,7 @@ export function UserDropdown({ user }: UserDropdownProps) {
   // 프로필 페이지로 이동 핸들러
   const handleProfileClick = () => {
     setIsOpen(false);
-    router.push(`/profile/${user.id}`);
+    router.push(`/profile/${user?.id}`);
   };
 
   // 설정 페이지로 이동 핸들러
@@ -69,21 +76,30 @@ export function UserDropdown({ user }: UserDropdownProps) {
   };
 
   // 사용자 표시 정보 설정
-  const displayName = user.username || user.email.split('@')[0];
-  const initial = displayName.charAt(0).toUpperCase();
-  const avatarUrl = user.profileImage || null;
+  const displayName = user?.username || user?.email.split('@')[0];
+  const initial = displayName?.charAt(0).toUpperCase();
+  const avatarUrl = user?.profileImage || null;
+
+  if (!user) {
+    if (isMobile || !isMounted) return null;
+    return <LoginButton />;
+  }
 
   return (
     <ResponsiveDropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <ResponsiveDropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Avatar className="h-8 w-8 cursor-pointer">
-            <AvatarImage src={avatarUrl || undefined} alt={displayName} />
-            <AvatarFallback className="bg-gray-200 text-gray-700">
-              {initial}
-            </AvatarFallback>
-          </Avatar>
-        </Button>
+        {trigger ? (
+          trigger
+        ) : (
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <Avatar className="h-8 w-8 cursor-pointer">
+              <AvatarImage src={avatarUrl || undefined} alt={displayName} />
+              <AvatarFallback className="bg-gray-200 text-gray-700">
+                {initial}
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        )}
       </ResponsiveDropdownMenuTrigger>
       <ResponsiveDropdownMenuContent
         align="end"

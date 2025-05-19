@@ -70,7 +70,7 @@ export function ReviewEditForm({
     <div className="flex-1">
       <Textarea
         placeholder="어떤 책에 대해 이야기하고 싶으신가요?"
-        className="min-h-[100px] resize-none rounded-xl border-gray-200 bg-[#F9FAFB] text-[15px]"
+        className="min-h-[100px] resize-none rounded-xl border-gray-200 bg-[#F9FAFB] text-base md:text-[15px]"
         value={content}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
           setContent(e.target.value)

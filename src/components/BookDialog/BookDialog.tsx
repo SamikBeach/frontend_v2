@@ -1,3 +1,5 @@
+'use client';
+
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import { Suspense } from 'react';
@@ -172,7 +174,7 @@ export function BookDialog() {
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <Suspense fallback={<BookFullSkeleton />}>
                   <div className="sticky top-0 z-10">
-                    <BookHeader />
+                    <BookHeader isDialog />
                   </div>
                   <div className="pb-safe h-full overflow-y-auto">
                     <MobileBookDialogContent />
@@ -213,7 +215,7 @@ export function BookDialog() {
               </DialogPrimitive.Title>
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <Suspense fallback={<BookFullSkeleton />}>
-                  <BookHeader />
+                  <BookHeader isDialog />
                   <DesktopBookDialogContent />
                 </Suspense>
               </ErrorBoundary>

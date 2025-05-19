@@ -148,7 +148,7 @@ export function SortDropdown<T = Book>({
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-2 px-2 pt-1.5 pb-1.5 md:flex-nowrap ${className}`}
+      className={`flex flex-wrap items-center gap-2 px-2 pt-1.5 pb-1.5 md:flex-nowrap md:px-0 ${className}`}
     >
       {showTimeRangeFilter && (
         <ResponsiveDropdownMenu>
@@ -156,7 +156,7 @@ export function SortDropdown<T = Book>({
             <Button
               variant="ghost"
               size="sm"
-              className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100 md:h-8"
+              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-4 text-sm text-gray-600 hover:bg-gray-100 md:h-8 md:px-3 md:text-xs"
             >
               <span className="mr-1 flex h-3 w-3 items-center justify-center">
                 {currentTimeRange.icon}
@@ -194,7 +194,7 @@ export function SortDropdown<T = Book>({
           <Button
             variant="ghost"
             size="sm"
-            className="flex h-8 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100 md:h-8"
+            className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-4 text-sm text-gray-600 hover:bg-gray-100 md:h-8 md:px-3 md:text-xs"
           >
             <span className="mr-1 flex h-3 w-3 items-center justify-center">
               {currentSortOption.icon}

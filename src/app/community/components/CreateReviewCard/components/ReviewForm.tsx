@@ -69,7 +69,7 @@ export function ReviewForm({
     <>
       <Textarea
         placeholder="어떤 책에 대해 이야기하고 싶으신가요?"
-        className="min-h-[80px] resize-none rounded-lg border-gray-200 bg-[#F9FAFB] text-[14px] sm:min-h-[100px] sm:rounded-xl sm:text-[15px]"
+        className="min-h-[80px] resize-none rounded-lg border-gray-200 bg-[#F9FAFB] text-base sm:min-h-[100px] sm:rounded-xl md:text-[15px]"
         value={content}
         onChange={e => setContent(e.target.value)}
       />

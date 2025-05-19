@@ -3,8 +3,9 @@ import { selectedBookIdAtom } from '@/atoms/book';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useDialogQuery, useQueryParams } from '@/hooks';
+import { useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useAtom } from 'jotai';
 import { useCallback } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -15,7 +16,7 @@ export function BooksContent() {
   const { clearQueryParams } = useQueryParams();
 
   const [_, setSelectedBookId] = useAtom(selectedBookIdAtom);
-  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
+  const openBookDetail = useBookDetailOpen();
 
   // 무한 스크롤로 도서 데이터 가져오기
   const { books, fetchNextPage, hasNextPage, isLoading } =
@@ -27,9 +28,9 @@ export function BooksContent() {
       setSelectedBookId(book.id.toString());
       // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
       const bookIsbn = book.isbn13 || book.isbn;
-      openBookDialog(bookIsbn);
+      openBookDetail(bookIsbn);
     },
-    [setSelectedBookId, openBookDialog]
+    [setSelectedBookId, openBookDetail]
   );
 
   // 필터 초기화 핸들러

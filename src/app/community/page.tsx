@@ -7,6 +7,7 @@ import {
 } from '@/atoms/community';
 import { ReviewCard } from '@/components/ReviewCard';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
@@ -99,6 +100,8 @@ function CommunityContent() {
   const user = useCurrentUser();
   const currentUser = user;
 
+  const isMobile = useIsMobile();
+
   // 필터 변경 핸들러
   const handleTypeFilterChange = (type: ReviewType | 'all') => {
     setTypeFilter(type);
@@ -111,7 +114,9 @@ function CommunityContent() {
   return (
     <div className="pb-3">
       {/* 필터 바 - 스크롤 시 상단에 고정 */}
-      <div className="sticky top-[56px] z-30 bg-white pt-2 pb-1 md:pt-4 md:pb-2">
+      <div
+        className={`${!isMobile ? 'sticky top-[56px] z-30' : ''} bg-white pt-2 pb-1 md:pt-4 md:pb-2`}
+      >
         <FilterArea
           selectedCategory={typeFilter}
           selectedSort={sortOption}

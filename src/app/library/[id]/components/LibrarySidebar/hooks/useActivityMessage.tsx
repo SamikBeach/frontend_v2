@@ -3,15 +3,12 @@ import {
   LibraryActivityType,
   UpdateHistoryItem,
 } from '@/apis/library/types';
-import { useDialogQuery } from '@/hooks';
+import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { getTagColor } from '@/utils/tags';
 import { ReactNode } from 'react';
 
 export function useActivityMessage(library: Library) {
-  const { open: openBookDialog } = useDialogQuery({
-    type: 'book',
-    idType: 'id',
-  });
+  const openBookDetail = useBookDetailOpen();
 
   // 활동 타입별 아이콘 매핑
   const getActivityIcon = (activityType: LibraryActivityType): string => {
@@ -124,7 +121,7 @@ export function useActivityMessage(library: Library) {
               className="cursor-pointer font-medium text-gray-800 hover:underline"
               onClick={() => {
                 if (update.bookId) {
-                  openBookDialog(update.bookId.toString());
+                  openBookDetail(update.bookId.toString());
                 }
               }}
             >
@@ -148,7 +145,7 @@ export function useActivityMessage(library: Library) {
               className="cursor-pointer font-medium text-gray-800 hover:underline"
               onClick={() => {
                 if (update.bookId) {
-                  openBookDialog(update.bookId.toString());
+                  openBookDetail(update.bookId.toString());
                 }
               }}
             >

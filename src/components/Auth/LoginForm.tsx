@@ -46,7 +46,7 @@ export function LoginForm({
       email: '',
       password: '',
     },
-    mode: 'onTouched', // 필드가 한 번 터치된 후에는 onChange처럼 동작
+    mode: 'onSubmit', // 폼이 제출될 때만 유효성 검사 실행
   });
 
   // 이메일 필드 컨트롤러

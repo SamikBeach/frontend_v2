@@ -1,3 +1,5 @@
+'use client';
+
 import { CreateLibraryDto } from '@/apis/library/types';
 import { ReadingStatusType } from '@/apis/reading-status';
 import {
@@ -135,9 +137,15 @@ export function BookActionButtons() {
               disabled={isPending}
             >
               {displayStatusIcon && (
-                <span className="mr-1.5">{displayStatusIcon}</span>
+                <span className="mr-1.5" suppressHydrationWarning>
+                  {typeof displayStatusIcon === 'string'
+                    ? displayStatusIcon
+                    : ''}
+                </span>
               )}
-              <span>{displayStatusText}</span>
+              <span suppressHydrationWarning>
+                {typeof displayStatusText === 'string' ? displayStatusText : ''}
+              </span>
               <ChevronDown className="ml-auto h-4 w-4" />
             </Button>
           </ResponsiveDropdownMenuTrigger>

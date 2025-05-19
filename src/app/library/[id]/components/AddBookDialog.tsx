@@ -297,8 +297,8 @@ export function AddBookDialog({
   return (
     <ResponsiveDialog open={isOpen} onOpenChange={handleCloseDialog}>
       <ResponsiveDialogContent
-        className="flex max-h-[90vh] min-w-[800px] flex-col bg-white p-5 pb-2"
-        drawerClassName="flex flex-col bg-white p-0 h-[90vh] overflow-hidden"
+        className="flex min-w-[800px] flex-col bg-white p-5 pb-2"
+        drawerClassName="flex flex-col bg-white p-0 h-full overflow-hidden"
         onOpenAutoFocus={e => {
           e.preventDefault();
           setTimeout(() => {
@@ -377,13 +377,17 @@ export function AddBookDialog({
                   </div>
                 )}
 
-                <CommandList className="!max-h-none overflow-visible">
+                <CommandList className="h-full !max-h-none overflow-visible [&>div]:h-full">
                   {query.length === 0 ? (
-                    <div className="flex h-[300px] w-full items-center justify-center p-8 text-sm text-gray-500">
+                    <div
+                      className={`flex h-full w-full grow flex-col items-center justify-center p-8 text-sm text-gray-500`}
+                    >
                       검색어를 입력해주세요.
                     </div>
                   ) : isLoading || isDebouncing ? (
-                    <div className="flex h-[300px] w-full items-center justify-center">
+                    <div
+                      className={`flex h-full w-full grow flex-col items-center justify-center`}
+                    >
                       <div className="flex flex-col items-center justify-center">
                         <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
                       </div>
@@ -405,7 +409,7 @@ export function AddBookDialog({
                       </div>
                     </CommandEmpty>
                   ) : (
-                    <CommandGroup className="px-0 md:px-1">
+                    <CommandGroup className="px-1">
                       <div className="space-y-1">
                         {searchResults.map(book => {
                           const bookKey = getBookIdentifier(book);
@@ -422,7 +426,7 @@ export function AddBookDialog({
                             <CommandItem
                               key={bookKey}
                               className={cn(
-                                'group relative flex h-auto cursor-pointer items-start gap-3 rounded-md px-3 py-1 transition-colors hover:bg-gray-50 md:gap-4 md:py-3.5',
+                                'group relative flex h-auto cursor-pointer items-start gap-3 rounded-md p-2 transition-colors hover:bg-gray-50 md:gap-4',
                                 isSelected ? 'bg-gray-50' : ''
                               )}
                               onSelect={() => toggleBookSelection(book)}

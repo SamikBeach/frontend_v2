@@ -62,10 +62,6 @@ export const LibrarySidebarUpdates: FC<LibrarySidebarUpdatesProps> = ({
         <h3 className="text-sm font-medium text-gray-900">최근 활동</h3>
       </div>
       <div className="space-y-2">{renderRecentUpdates()}</div>
-
-      <div className="mt-3 flex items-center justify-center rounded-lg bg-gray-100 p-2 text-xs text-gray-600">
-        구독하면 이 서재의 모든 활동 소식을 볼 수 있습니다
-      </div>
     </div>
   );
 };

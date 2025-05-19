@@ -7,8 +7,9 @@ import { sortOptionAtom, timeRangeAtom } from '@/atoms/popular';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useDialogQuery, useQueryParams } from '@/hooks';
+import { useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useAtom } from 'jotai';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { usePopularBooksQuery } from '../hooks';
@@ -18,7 +19,7 @@ export function BooksContent() {
   const { updateQueryParams } = useQueryParams();
   const [, setSortOption] = useAtom(sortOptionAtom);
   const [, setTimeRange] = useAtom(timeRangeAtom);
-  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
+  const openBookDetail = useBookDetailOpen();
 
   // Get books with infinite query
   const { books, hasNextPage, fetchNextPage, isLoading } =
@@ -27,7 +28,7 @@ export function BooksContent() {
   const handleBookSelect = (book: Book) => {
     // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
     const bookIsbn = book.isbn13 || book.isbn;
-    openBookDialog(bookIsbn);
+    openBookDetail(bookIsbn);
   };
 
   const handleClearFilters = () => {

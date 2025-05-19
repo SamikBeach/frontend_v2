@@ -1,6 +1,6 @@
 'use client';
 
-import { BookOpen, Compass, Home, Lightbulb, Users } from 'lucide-react';
+import { Compass, Home, Library, Lightbulb, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -41,7 +41,7 @@ const mainMenuItems = [
   },
   {
     title: '서재 둘러보기',
-    icon: BookOpen,
+    icon: Library,
     href: '/libraries',
   },
 ];
