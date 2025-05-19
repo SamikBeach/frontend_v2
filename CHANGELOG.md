@@ -1,5 +1,49 @@
 # 🚦 CHANGELOG
 
+# [1.3.0](https://github.com/SamikBeach/frontend_v2/compare/1.2.0...1.3.0) (2025-05-19)
+
+
+### Bug Fixes
+
+* AddBookDialog 안내/로딩 컨테이너 컨텐츠 영역 수직 중앙 정렬로 개선 ([adb6dfa](https://github.com/SamikBeach/frontend_v2/commit/adb6dfaebfc6d0dd2b1d2a7aec9c9da0c4720e71))
+* BookActionButtons의 읽기 상태 아이콘/텍스트 hydration mismatch 완전 방지(string 타입 강제) ([3b3b9a4](https://github.com/SamikBeach/frontend_v2/commit/3b3b9a4e8a1c04eddcda8f102d1f878f7e627c7f))
+* BottomNav에서 아바타 이미지 없을 때 이니셜만 보이도록 Avatar 렌더링 방식 수정 ([43b604d](https://github.com/SamikBeach/frontend_v2/commit/43b604dd512ff3a4ba7eb060cc631357b4ab8d52))
+* fix lint ([06d89f5](https://github.com/SamikBeach/frontend_v2/commit/06d89f5150eba09ef542724695219fb1b364e869))
+* 데스크톱 도서 상세 페이지 좌우 여백 축소 ([9deccb9](https://github.com/SamikBeach/frontend_v2/commit/9deccb91c17d3af987c73520817109248316a6ee))
+* 로고 컬러 변경 ([4d9b73c](https://github.com/SamikBeach/frontend_v2/commit/4d9b73c9c2e042f1b172c8c238930e306fa51f41))
+* 모바일 및 SSR(클라이언트 마운트 전)에서 Header에 "로그인" 글자가 보이지 않도록 UserDropdown 조건부 렌더링 강화 ([08b57ba](https://github.com/SamikBeach/frontend_v2/commit/08b57ba804a69ad075b7875c4df473af20cdd44a))
+* 모바일에서 Input, Textarea, CommandInput 등 입력 필드에 text-base 적용(md 이상은 text-sm)하여 브라우저 자동 줌 방지 ([776fa66](https://github.com/SamikBeach/frontend_v2/commit/776fa66c9583e12237c40cc09d5d804014aa0edf))
+* 모바일에서 발견하기/분야별 인기 상단 필터·정렬·브레드크럼 고정 해제 ([eb3d870](https://github.com/SamikBeach/frontend_v2/commit/eb3d8708e87f07fe1e538b65f863ff1b0d067c30))
+* 서재 상세 페이지에서 구독 안내문구 영역 제거 ([64b27cf](https://github.com/SamikBeach/frontend_v2/commit/64b27cf02c35ae9230fce3d182b14cf866c559f3))
+* 서재 추가(플러스) 버튼 컬러를 green-800/green-900으로 변경 ([882954a](https://github.com/SamikBeach/frontend_v2/commit/882954aacfc7dd30582a35306f0c2e4045fd8361))
+* 스타일 수정 ([92511e6](https://github.com/SamikBeach/frontend_v2/commit/92511e677d6c9783f02e19f289b7475efbf6d09a))
+* 스타일 수정 ([2d627bc](https://github.com/SamikBeach/frontend_v2/commit/2d627bc146bd70cdb4a7e7584b1870098fb3314a))
+* 스타일 수정 ([0279d73](https://github.com/SamikBeach/frontend_v2/commit/0279d73d0c4c9655788f50e1afe38560e7b04ff7))
+* 스타일 수정 ([ed9d92c](https://github.com/SamikBeach/frontend_v2/commit/ed9d92cbc86753ea80fc792f052fd8d0b30d7ed1))
+* 스타일 수정 ([ee88191](https://github.com/SamikBeach/frontend_v2/commit/ee881913f3f80eda96b75b28a3ad93a1c51dc22a))
+* 스타일 수정 ([355de29](https://github.com/SamikBeach/frontend_v2/commit/355de29205fe63384f6b00aa8bb71b0748ef8144))
+* 홈 인기글 쿼리 invalidate queryKey를 ['home', 'popularReviews']로 통일 ([1fced46](https://github.com/SamikBeach/frontend_v2/commit/1fced4620490c2c5d076f537ea36ca89a07c4c9a))
+* 홈 커뮤니티 인기글 fallback 타이틀 및 레이아웃 실제와 일치하도록 수정 ([2272be7](https://github.com/SamikBeach/frontend_v2/commit/2272be73db9714b84981e7d3bc4d78b766f8b676))
+
+
+### Features
+
+* AppSidebar의 서재 메뉴 아이콘을 BookOpen에서 Library로 교체 ([c8368c4](https://github.com/SamikBeach/frontend_v2/commit/c8368c414bd71d1a0c1ee37d939f21a19f0425e2))
+* BookDialog/상세페이지 리뷰·댓글 아바타/이름 클릭 시 유저 프로필로 이동 및 cursor-pointer 적용 ([6220cbd](https://github.com/SamikBeach/frontend_v2/commit/6220cbd368cb3d990a39e7fd2bb200715aedef42))
+* BookSearchDialog와 Notification drawer가 모바일에서 전체화면 높이를 차지하도록 drawerClassName에 h-[100dvh] 적용 ([b2ccd1d](https://github.com/SamikBeach/frontend_v2/commit/b2ccd1db3d6aa775ef119322f3cee8630bb6af13))
+* BottomNav 추가 ([0d3a609](https://github.com/SamikBeach/frontend_v2/commit/0d3a6093dfcb8117b34036fc432d4955c75276d9))
+* favicon 업데이트 ([7c7537f](https://github.com/SamikBeach/frontend_v2/commit/7c7537f0e47dff9993e29980e8870d7ee7eede22))
+* favicon 업데이트 ([d665d66](https://github.com/SamikBeach/frontend_v2/commit/d665d662eb394ffd0bb30a769509d5bbbd3e8b4c))
+* 도서 상세페이지 페이지 추가 ([8a9f050](https://github.com/SamikBeach/frontend_v2/commit/8a9f050e0af9cf0cc6502ea57471437d97335cda))
+* 로고 이미지 교체 ([07a6cc3](https://github.com/SamikBeach/frontend_v2/commit/07a6cc3281dc778df8d5c05ba29506cc72313f70))
+* 모바일에서 BottomNav 높이만큼 컨텐츠 하단 여백(padding-bottom) 적용 ([b15312a](https://github.com/SamikBeach/frontend_v2/commit/b15312a0e6791244658c60197fd0c0fd7de38962))
+* 모바일에서 서브카테고리(서브메뉴) 버튼 크기 상향 ([5feff2b](https://github.com/SamikBeach/frontend_v2/commit/5feff2b8b38260db2b055ac693249447f5835d30))
+* 모바일에서 스크롤 방향에 따라 헤더가 사라졌다가 나타나는 기능 추가 ([c7b3046](https://github.com/SamikBeach/frontend_v2/commit/c7b304621508e0d1966e330b1d8001d005671f7c))
+* 모바일에서 스크롤 방향에 따라 헤더가 사라졌다가 나타나는 기능 추가 ([39de48b](https://github.com/SamikBeach/frontend_v2/commit/39de48b1be61fdd78eaf3bf05d5e9927d18aeb35))
+* 발견하기 도서관리 버튼을 화면 우하단에 고정 배치하도록 수정 ([ce98156](https://github.com/SamikBeach/frontend_v2/commit/ce98156c98d40ca22a3bde258c4dfa383a301875))
+* 커뮤니티 페이지 모바일에서 상단 메뉴 고정 해제 ([c5c8ce3](https://github.com/SamikBeach/frontend_v2/commit/c5c8ce308595ebb6bb896d8042ae0c2eaab762e6))
+* 홈 커뮤니티 인기글 섹션에 empty(비어있음) 안내 문구 추가 ([d374b55](https://github.com/SamikBeach/frontend_v2/commit/d374b55472b255e34d2dd90f298f124b49d299a0))
+
 # [1.2.0](https://github.com/SamikBeach/frontend_v2/compare/1.1.0...1.2.0) (2025-05-18)
 
 
