@@ -138,7 +138,7 @@ export function Libraries({ setSearchQuery }: LibrariesProps) {
           <TooltipTrigger asChild>
             <Button
               onClick={handleCreateLibrary}
-              className="fixed right-6 bottom-6 flex h-12 w-12 items-center justify-center rounded-full bg-gray-900 p-0 shadow-lg transition-all duration-200 ease-in-out hover:translate-y-[-2px] hover:bg-gray-800 hover:shadow-xl"
+              className="fixed right-6 bottom-[72px] flex h-12 w-12 items-center justify-center rounded-full bg-green-800 p-0 shadow-lg transition-all duration-200 ease-in-out hover:translate-y-[-2px] hover:bg-green-900 hover:shadow-xl md:bottom-6"
               size="icon"
             >
               <Plus className="h-5 w-5 text-white" />
