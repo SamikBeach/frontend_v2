@@ -2,9 +2,9 @@
 
 import { SearchBar } from '@/components/SearchBar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useEffect, useRef, useState } from 'react';
 import { LeftSlot } from './LeftSlot';
 import { RightSlot } from './RightSlot';
-import { useEffect, useRef, useState } from 'react';
 
 export function Header() {
   const isMobile = useIsMobile();
