@@ -4,7 +4,7 @@ import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
-import { BookOpen, Compass, Flame, Home, User, Users } from 'lucide-react';
+import { Compass, Flame, Home, Library, User, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -33,7 +33,7 @@ const NAV_ITEMS = [
   {
     label: '서재',
     href: '/libraries',
-    icon: BookOpen,
+    icon: Library,
   },
 ];
 
