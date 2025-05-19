@@ -132,8 +132,8 @@ export default function DiscoverPage() {
       {/* CSS 스타일 추가 */}
       <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
 
-      {/* 필터 영역 및 브레드크럼 - 스크롤 시 상단에 고정 */}
-      <div className={`sticky top-[56px] z-30 w-full bg-white`}>
+      {/* 필터 영역 및 브레드크럼 - 모바일에선 상단 고정 해제, 데스크탑만 sticky */}
+      <div className="w-full bg-white md:sticky md:top-[56px] md:z-30">
         {/* 브레드크럼 */}
         <div className="mx-auto w-full px-3 py-2 sm:px-4 sm:py-2 sm:pt-4">
           <Suspense fallback={<div className="h-5 md:h-6" />}>
