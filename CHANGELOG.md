@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.3.1](https://github.com/SamikBeach/frontend_v2/compare/1.3.0...1.3.1) (2025-05-19)
+
+
+### Bug Fixes
+
+* 모바일에서 input/textarea/combobox/commandinput의 placeholder 텍스트 크기를 md:text-sm(데스크톱 기준)으로 고정 ([d1c3c9c](https://github.com/SamikBeach/frontend_v2/commit/d1c3c9cb211d9ad52160613da228572a615276eb))
+
 # [1.3.0](https://github.com/SamikBeach/frontend_v2/compare/1.2.0...1.3.0) (2025-05-19)
 
 
