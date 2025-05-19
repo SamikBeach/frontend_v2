@@ -24,7 +24,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import {
@@ -64,7 +63,6 @@ export function AddBookDialog({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const queryClient = useQueryClient();
-  const isMobile = useIsMobile();
 
   // 다이얼로그가 열릴 때 검색 입력창에 포커스
   useEffect(() => {
