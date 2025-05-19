@@ -49,9 +49,24 @@ export default function HomePage() {
         <Suspense
           fallback={
             <section className="h-auto p-2 sm:p-4">
-              <h2 className="mb-2 text-lg font-semibold text-gray-900 sm:text-xl">
-                인기 리뷰
-              </h2>
+              <div className="mb-2 flex items-center gap-1.5 sm:gap-2">
+                <svg
+                  className="h-4 w-4 text-amber-500 sm:h-5 sm:w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17 20h5v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2h5m6 0v-2a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v2m6 0h-6"
+                  />
+                </svg>
+                <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
+                  커뮤니티 인기글
+                </h2>
+              </div>
               <PopularReviewsSkeleton />
             </section>
           }
