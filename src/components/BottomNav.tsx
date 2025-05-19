@@ -1,10 +1,13 @@
 'use client';
 
+import { AuthDialog } from '@/components/Auth/AuthDialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { BookOpen, Compass, Flame, Home, User, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const NAV_ITEMS = [
   {
@@ -38,6 +41,7 @@ export function BottomNav() {
   const pathname = usePathname();
   const router = useRouter();
   const currentUser = useCurrentUser();
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   // activeColor는 green-800, inactiveColor는 gray-500으로 조금 더 진하게
   const activeColor = 'text-green-800';
@@ -99,18 +103,44 @@ export function BottomNav() {
           if (currentUser?.id) {
             router.push(`/profile/${currentUser.id}`);
           } else {
-            router.push('/profile');
+            setAuthDialogOpen(true);
           }
         }}
       >
-        <User
-          className={cn(
-            'mb-0.5 transition-colors duration-150',
-            pathname.startsWith('/profile') ? activeColor : inactiveColor
-          )}
-          size={iconSize}
-          strokeWidth={iconStroke}
-        />
+        {/* 로그인 상태: Avatar, 로그아웃 상태: User 아이콘 */}
+        {currentUser ? (
+          <Avatar
+            className={cn(
+              'mb-0.5 h-6 w-6',
+              pathname.startsWith('/profile')
+                ? 'ring-2 ring-green-800'
+                : 'ring-1 ring-gray-300'
+            )}
+          >
+            {currentUser.profileImage ? (
+              <AvatarImage
+                src={currentUser.profileImage}
+                alt={currentUser.username || currentUser.email || '아바타'}
+              />
+            ) : null}
+            <AvatarFallback className="bg-gray-200 text-xs text-gray-700">
+              {(
+                currentUser.username?.[0] ||
+                currentUser.email?.[0] ||
+                '?'
+              ).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        ) : (
+          <User
+            className={cn(
+              'mb-0.5 transition-colors duration-150',
+              pathname.startsWith('/profile') ? activeColor : inactiveColor
+            )}
+            size={iconSize}
+            strokeWidth={iconStroke}
+          />
+        )}
         <span
           className={cn(
             fontClass,
@@ -121,6 +151,7 @@ export function BottomNav() {
           My
         </span>
       </button>
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </nav>
   );
 }

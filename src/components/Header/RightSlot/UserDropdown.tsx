@@ -16,10 +16,14 @@ import { useMutation } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { LoginButton } from './LoginButton';
 
-export function UserDropdown() {
+interface UserDropdownProps {
+  trigger?: ReactNode;
+}
+
+export function UserDropdown({ trigger }: UserDropdownProps) {
   const [user, setUser] = useAtom(userAtom);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
@@ -76,14 +80,18 @@ export function UserDropdown() {
   return (
     <ResponsiveDropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <ResponsiveDropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full">
-          <Avatar className="h-8 w-8 cursor-pointer">
-            <AvatarImage src={avatarUrl || undefined} alt={displayName} />
-            <AvatarFallback className="bg-gray-200 text-gray-700">
-              {initial}
-            </AvatarFallback>
-          </Avatar>
-        </Button>
+        {trigger ? (
+          trigger
+        ) : (
+          <Button variant="ghost" size="icon" className="rounded-full">
+            <Avatar className="h-8 w-8 cursor-pointer">
+              <AvatarImage src={avatarUrl || undefined} alt={displayName} />
+              <AvatarFallback className="bg-gray-200 text-gray-700">
+                {initial}
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        )}
       </ResponsiveDropdownMenuTrigger>
       <ResponsiveDropdownMenuContent
         align="end"

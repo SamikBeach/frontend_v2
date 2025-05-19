@@ -22,11 +22,11 @@ export function FeedbackButton() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 cursor-pointer rounded-full hover:bg-gray-100"
+              className="h-9 w-9 cursor-pointer rounded-full hover:bg-gray-100"
               onClick={() => setIsOpen(true)}
               aria-label="피드백 남기기"
             >
-              <HelpCircle className="h-5 w-5 text-gray-600" />
+              <HelpCircle className="h-5 w-5 text-gray-500" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">

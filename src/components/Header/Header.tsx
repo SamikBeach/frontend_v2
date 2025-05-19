@@ -1,10 +1,13 @@
 'use client';
 
+import { FeedbackButton } from '@/components/Feedback';
 import { SearchBar } from '@/components/SearchBar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Settings } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { LeftSlot } from './LeftSlot';
-import { RightSlot } from './RightSlot';
+import { Notification } from './RightSlot/Notification';
+import { UserDropdown } from './RightSlot/UserDropdown';
 
 export function Header() {
   const isMobile = useIsMobile();
@@ -44,7 +47,23 @@ export function Header() {
         <div className="hidden max-sm:block">
           <SearchBar />
         </div>
-        <RightSlot />
+        <FeedbackButton />
+        <Notification />
+        {isMobile ? (
+          <UserDropdown
+            trigger={
+              <button
+                type="button"
+                className="flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-gray-100"
+                aria-label="설정"
+              >
+                <Settings className="h-4 w-4 text-gray-500" />
+              </button>
+            }
+          />
+        ) : (
+          <UserDropdown />
+        )}
       </div>
     </header>
   );
