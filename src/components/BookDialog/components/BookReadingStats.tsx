@@ -49,7 +49,9 @@ export function BookReadingStats() {
       </div>
       <div>
         <p className="text-xs text-gray-500">{label}</p>
-        <p className="text-sm font-medium">{value}</p>
+        <p className="text-sm font-medium" suppressHydrationWarning>
+          {value}
+        </p>
       </div>
     </div>
   );
