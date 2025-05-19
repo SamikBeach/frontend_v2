@@ -10,6 +10,8 @@ export function BookCoverSection() {
   const { book, isbn } = useBookDetails();
   const isMobile = useIsMobile();
 
+  console.log({ book });
+
   // 알라딘으로 이동하는 함수
   const handleOpenAladin = useCallback(() => {
     if (!isbn) return;

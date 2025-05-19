@@ -6,7 +6,7 @@ import {
   ResponsiveDialogPortal,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
-import { useDialogQuery } from '@/hooks';
+import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
@@ -77,8 +77,8 @@ function SearchResultsLoader({
 export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
   const queryClient = useQueryClient();
+  const openBookDetail = useBookDetailOpen();
 
   // Dialog가 닫힐 때 검색어 초기화
   const handleOpenChange = (isOpen: boolean) => {
@@ -91,9 +91,8 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
 
   // 검색 아이템 클릭 핸들러
   const handleItemClick = (item: any) => {
-    // isbn13을 우선적으로 사용하고, 없으면 isbn 사용
     const bookIsbn = item.isbn13 || item.isbn || '';
-    openBookDialog(bookIsbn);
+    openBookDetail(bookIsbn);
   };
 
   // 검색 결과 또는 최근 검색 표시 여부

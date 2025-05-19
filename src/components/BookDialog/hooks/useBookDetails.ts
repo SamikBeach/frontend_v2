@@ -3,6 +3,8 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { getBookByIsbn } from '@/apis/book';
 import { ReadingStatusType } from '@/apis/reading-status';
 import { useDialogQuery } from '@/hooks/useDialogQuery';
+import { useQueryParams } from '@/hooks/useQueryParams';
+import { useParams } from 'next/navigation';
 
 import { Book } from '@/apis/book/types';
 import { BookDetails } from '../types';
@@ -22,8 +24,23 @@ function enrichBookDetails(book: Book): BookDetails {
 }
 
 export function useBookDetails() {
-  const { id } = useDialogQuery({ type: 'book' });
+  const params = useParams();
+  const { searchParams } = useQueryParams();
+  const { id: dialogId } = useDialogQuery({ type: 'book' });
   const { libraries } = useUserLibraries();
+
+  // dialog 쿼리가 있으면 dialogId, 없으면 page param/searchParams 기반
+  let id: string | null = null;
+  if (dialogId) {
+    id = dialogId;
+  } else {
+    id =
+      (params as Record<string, string | undefined>).id ||
+      (params as Record<string, string | undefined>).isbn ||
+      searchParams.get('id') ||
+      searchParams.get('isbn') ||
+      null;
+  }
 
   // 책 상세 정보 가져오기 (ISBN 또는 ID로 API 호출)
   const { data: book } = useSuspenseQuery({

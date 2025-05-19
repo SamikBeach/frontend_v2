@@ -3,7 +3,7 @@ import { selectedBookIdAtom } from '@/atoms/book';
 import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useDialogQuery } from '@/hooks';
+import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useAtom } from 'jotai';
 import { Lightbulb } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -37,7 +37,7 @@ export function PopularBooksSkeleton() {
 export function PopularBooksSection() {
   const router = useRouter();
   const { books, isLoading } = useHomePopularBooksQuery();
-  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
+  const openBookDetail = useBookDetailOpen();
   const [, setSelectedBookId] = useAtom(selectedBookIdAtom);
 
   // 책 선택 핸들러
@@ -45,7 +45,7 @@ export function PopularBooksSection() {
     setSelectedBookId(book.id.toString());
     // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
     const bookIsbn = book.isbn13 || book.isbn;
-    openBookDialog(bookIsbn);
+    openBookDetail(bookIsbn);
   };
 
   return (

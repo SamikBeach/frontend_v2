@@ -1,7 +1,7 @@
 import { Book } from '@/apis/book/types';
 import { LibraryListItem } from '@/apis/library/types';
 import { Separator } from '@/components/ui/separator';
-import { useDialogQuery } from '@/hooks';
+import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -27,10 +27,7 @@ export function LibraryContent() {
   const libraryId = parseInt(params.id as string, 10);
   const { library, isLoading } = useLibraryDetail(libraryId);
   const currentUser = useCurrentUser();
-  const { open: openBookDialog } = useDialogQuery({
-    type: 'book',
-    idType: 'id',
-  });
+  const openBookDetail = useBookDetailOpen();
 
   // 사용자 서재 목록 불러오기
   const { userLibraries, isLoading: isLoadingLibraries } = useUserLibraries(
@@ -66,7 +63,9 @@ export function LibraryContent() {
 
   // 책 클릭 핸들러
   const handleBookClick = (book: LibraryBookItem) => {
-    openBookDialog(book.id.toString());
+    const bookIsbn = book.isbn13 || book.isbn;
+    if (!bookIsbn) return;
+    openBookDetail(bookIsbn);
   };
 
   // 책 삭제 핸들러

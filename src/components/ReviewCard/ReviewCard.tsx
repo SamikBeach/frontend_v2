@@ -8,8 +8,8 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { useDialogQuery } from '@/hooks/useDialogQuery';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -48,7 +48,7 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
   // Book 다이얼로그 쿼리 사용
-  const { open: openBookDialog } = useDialogQuery({ type: 'book' });
+  const openBookDetail = useBookDetailOpen();
 
   // 현재 사용자가 리뷰 작성자인지 확인
   const isAuthor = currentUser?.id === review.author.id;
@@ -382,9 +382,8 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
   const handleBookClick = () => {
     if (review.books && review.books.length > 0) {
       const book = review.books[0];
-      // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
       const bookIsbn = (book as any).isbn13 || (book as any).isbn || '';
-      openBookDialog(bookIsbn);
+      openBookDetail(bookIsbn);
     }
   };
 
