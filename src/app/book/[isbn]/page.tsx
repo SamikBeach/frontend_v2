@@ -22,7 +22,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 // 모바일용 BookPageContent
 function MobileBookPageContent() {
   return (
-    <div className="mx-auto w-full px-4 pt-4">
+    <div className="mx-auto w-full p-3">
       <div className="space-y-6">
         <BookCoverSection />
         <ErrorBoundary FallbackComponent={ErrorFallback}>
@@ -61,7 +61,7 @@ function MobileBookPageContent() {
 // 데스크톱용 BookPageContent
 function DesktopBookPageContent() {
   return (
-    <div className="mx-auto w-full p-2 md:p-8">
+    <div className="mx-auto w-full p-3 md:p-8">
       <div className="grid gap-10 md:grid-cols-[380px_1fr]">
         <div className="space-y-6">
           <BookCoverSection />
