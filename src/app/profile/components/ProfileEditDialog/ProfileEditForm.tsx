@@ -105,7 +105,7 @@ export function ProfileEditForm({
             onChange={handleChange}
             disabled={isSubmitting}
             placeholder="변경할 닉네임을 입력하세요"
-            className="h-12 rounded-lg border-gray-200 px-3 py-2 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="h-12 rounded-lg border-gray-200 px-3 py-2 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:text-sm"
           />
         </div>
 
@@ -120,7 +120,7 @@ export function ProfileEditForm({
             value={formData.bio}
             onChange={handleChange}
             disabled={isSubmitting}
-            className="min-h-[120px] resize-none rounded-lg border-gray-200 px-3 py-2.5 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="min-h-[120px] resize-none rounded-lg border-gray-200 px-3 py-2.5 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-100 md:text-sm"
             placeholder="자기소개를 입력하세요 (최대 200자)"
             maxLength={200}
           />

@@ -226,7 +226,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                     <Textarea
                       value={editCommentText}
                       onChange={e => setEditCommentText(e.target.value)}
-                      className="max-h-[150px] min-h-[36px] w-full resize-none rounded-lg border-gray-200 bg-white py-2 text-sm shadow-none"
+                      className="max-h-[150px] min-h-[36px] w-full resize-none rounded-lg border-gray-200 bg-white py-2 text-base shadow-none md:text-sm"
                       placeholder="댓글을 수정하세요..."
                       rows={1}
                       style={{ overflow: 'hidden', height: 'auto' }}

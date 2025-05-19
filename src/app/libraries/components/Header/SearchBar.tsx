@@ -41,7 +41,7 @@ export function SearchBar({ value, onSearchChange }: SearchBarProps) {
         placeholder="서재 검색..."
         value={inputValue}
         onChange={handleInputChange}
-        className="h-8 rounded-lg border-gray-200 bg-[#F9FAFB] pl-9 focus-visible:ring-gray-300 md:h-10 md:rounded-xl"
+        className="h-8 rounded-lg border-gray-200 bg-[#F9FAFB] pl-9 text-base focus-visible:ring-gray-300 md:h-10 md:rounded-xl md:text-sm"
       />
     </div>
   );

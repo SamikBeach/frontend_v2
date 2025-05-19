@@ -73,7 +73,7 @@ export function Combobox({
           <input
             value={value}
             onChange={e => onChange(e.target.value)}
-            className="placeholder:text-muted-foreground w-full border-0 bg-transparent outline-none"
+            className="placeholder:text-muted-foreground w-full border-0 bg-transparent text-base outline-none md:text-sm"
             placeholder={placeholder}
             disabled={disabled}
           />
