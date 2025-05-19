@@ -142,7 +142,7 @@ export function NotificationContent({
           className="h-full divide-y divide-gray-50 overflow-auto"
           height={isMobile ? '72vh' : undefined}
           endMessage={
-            <p className="py-4 pb-8 text-center text-xs text-gray-400">
+            <p className="py-4 text-center text-xs text-gray-400">
               모든 알림을 불러왔습니다
             </p>
           }
