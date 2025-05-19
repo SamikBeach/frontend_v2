@@ -3,32 +3,13 @@
 import { FeedbackButton } from '@/components/Feedback';
 import { SearchBar } from '@/components/SearchBar';
 import { Settings } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useHeaderScrollVisibility } from './hooks/useHeaderScrollVisibility';
 import { LeftSlot } from './LeftSlot';
 import { Notification } from './RightSlot/Notification';
 import { UserDropdown } from './RightSlot/UserDropdown';
 
 export function Header() {
-  const [showHeader, setShowHeader] = useState(true);
-  const lastScrollY = useRef(0);
-
-  useEffect(() => {
-    const isMobile = window.matchMedia('(max-width: 639px)').matches;
-    if (!isMobile) return;
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY < 50) {
-        setShowHeader(true);
-      } else if (currentScrollY > lastScrollY.current) {
-        setShowHeader(false);
-      } else {
-        setShowHeader(true);
-      }
-      lastScrollY.current = currentScrollY;
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const [showHeader] = useHeaderScrollVisibility();
 
   return (
     <header
