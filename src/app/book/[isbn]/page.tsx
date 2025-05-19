@@ -61,7 +61,7 @@ function MobileBookPageContent() {
 // 데스크톱용 BookPageContent
 function DesktopBookPageContent() {
   return (
-    <div className="mx-auto w-full max-w-screen-xl px-10 pt-4 pb-10">
+    <div className="mx-auto w-full p-2 md:p-8">
       <div className="grid gap-10 md:grid-cols-[380px_1fr]">
         <div className="space-y-6">
           <BookCoverSection />

@@ -1,11 +1,13 @@
 import { Skeleton } from '@/components/ui/skeleton';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // 전체 북 다이얼로그 스켈레톤
 export function BookFullSkeleton() {
+  const isMobile = useIsMobile();
   return (
     <div className="overflow-hidden rounded-lg">
-      <BookHeaderSkeleton />
-      <BookSkeleton />
+      {/* 헤더는 페이지에선 없음, 다이얼로그에선 별도 처리 */}
+      {isMobile ? <BookMobileSkeleton /> : <BookSkeleton />}
     </div>
   );
 }
@@ -170,6 +172,46 @@ export function LibrariesSkeleton() {
             <Skeleton className="h-8 w-8 rounded-full" />
           </div>
         ))}
+    </div>
+  );
+}
+
+// 모바일 전용 책 상세 스켈레톤
+export function BookMobileSkeleton() {
+  return (
+    <div className="mx-auto w-full px-4 pt-4">
+      <div className="space-y-6">
+        {/* 책 표지 이미지 */}
+        <div className="flex flex-col gap-4">
+          <div className="relative mx-auto w-44 overflow-hidden rounded-2xl bg-gray-100">
+            <Skeleton className="h-[264px] w-full" />
+          </div>
+          <div className="flex flex-col gap-2 px-1 text-center">
+            <Skeleton className="mx-auto h-6 w-3/4 rounded" />
+            <div className="flex justify-center gap-2">
+              <Skeleton className="h-5 w-12 rounded-full" />
+              <Skeleton className="h-5 w-12 rounded-full" />
+            </div>
+            <Skeleton className="mx-auto h-5 w-1/2 rounded" />
+            <Skeleton className="mx-auto h-5 w-1/3 rounded" />
+            <Skeleton className="mx-auto h-5 w-1/3 rounded" />
+          </div>
+        </div>
+        {/* 별점 정보 스켈레톤 */}
+        <div className="h-24 animate-pulse rounded-xl bg-gray-50 p-4"></div>
+        {/* 읽기 통계 스켈레톤 */}
+        <Skeleton className="h-20 w-full rounded-xl" />
+        {/* 기능 버튼 스켈레톤 */}
+        <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-2 gap-2">
+            <Skeleton className="h-10 w-full rounded-full" />
+            <Skeleton className="h-10 w-full rounded-full" />
+          </div>
+        </div>
+        {/* 책 설명 스켈레톤 */}
+        <BookInfoSkeleton />
+        {/* 탭/리뷰/서재 등은 BookRightPanel에서 별도 Suspense로 처리됨 */}
+      </div>
     </div>
   );
 }

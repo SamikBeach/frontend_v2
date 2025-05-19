@@ -116,7 +116,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
             'animate-expandDown fixed top-[6px] left-1/2 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
             query ? 'h-[calc(100vh-32px)]' : 'auto'
           )}
-          drawerClassName="animate-expandUp gap-1 p-0 shadow-none outline-none z-[100] h-[90vh] overflow-hidden"
+          drawerClassName="animate-expandUp gap-1 p-0 shadow-none outline-none z-[100] overflow-hidden"
           hideCloseButton
           dialogOverlayClassName="bg-black/5"
           drawerOverlayClassName="bg-black/5"
