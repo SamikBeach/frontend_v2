@@ -316,7 +316,7 @@ export function LibraryDialog({
             </Button>
             <Button
               type="button"
-              className="rounded-xl bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-200"
+              className="rounded-xl bg-green-600 text-white hover:bg-green-700 disabled:bg-green-200"
               onClick={handleSubmit}
               disabled={!name.trim() || isSubmitting}
             >

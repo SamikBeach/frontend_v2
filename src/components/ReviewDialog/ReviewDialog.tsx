@@ -346,7 +346,7 @@ export function ReviewDialog({
                   : isCreateMode
                     ? 'bg-green-600 hover:bg-green-700'
                     : 'bg-green-600 hover:bg-green-700'
-              } disabled:bg-gray-200`}
+              } disabled:bg-green-200`}
             >
               {isDeleteMode ? (
                 <Trash2 className="mr-1.5 h-4 w-4" />

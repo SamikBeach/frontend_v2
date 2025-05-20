@@ -123,7 +123,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
             type="submit"
             onClick={handleSubmit(onSubmit)}
             disabled={isPending}
-            className="cursor-pointer rounded-xl bg-green-600 text-white hover:bg-green-700"
+            className="cursor-pointer rounded-xl bg-green-600 text-white hover:bg-green-700 disabled:bg-green-200"
           >
             {isPending ? (
               <span className="flex items-center">제출 중...</span>
