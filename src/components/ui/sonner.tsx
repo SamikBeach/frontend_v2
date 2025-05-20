@@ -23,7 +23,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       />
       <Sonner
         theme={theme as ToasterProps['theme']}
-        position="bottom-center"
+        position="bottom-right"
         className="toaster group hidden sm:block"
         style={
           {
