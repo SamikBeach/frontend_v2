@@ -144,7 +144,7 @@ export function ReviewDialog({
       >
         <ResponsiveDialogContent
           className="max-w-md rounded-2xl border-none p-0"
-          drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0 z-52"
+          drawerClassName="h-full min-h-0 max-h-full w-full max-w-none rounded-t-[16px] border-none p-0 z-52"
           drawerOverlayClassName="z-51"
         >
           <div className="sticky top-0 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
@@ -156,7 +156,7 @@ export function ReviewDialog({
             </ResponsiveDialogTitle>
           </div>
 
-          <div className="px-5">
+          <div className="flex-1 overflow-y-auto px-5">
             <ResponsiveDialogDescription
               className="mb-6 text-sm text-gray-600"
               drawerClassName="mb-6 text-sm text-gray-600"
@@ -346,7 +346,7 @@ export function ReviewDialog({
                   : isCreateMode
                     ? 'bg-green-600 hover:bg-green-700'
                     : 'bg-green-600 hover:bg-green-700'
-              } disabled:bg-gray-200`}
+              } disabled:bg-green-200`}
             >
               {isDeleteMode ? (
                 <Trash2 className="mr-1.5 h-4 w-4" />

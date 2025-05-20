@@ -99,7 +99,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
               <Textarea
                 id="content"
                 placeholder="피드백 내용을 자세히 입력해주세요"
-                className="min-h-[180px] resize-none rounded-xl border-gray-200 p-4 text-sm placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                className="min-h-[180px] resize-none rounded-xl border-gray-200 p-4 text-sm text-[16px] placeholder:text-gray-400 focus:border-blue-200 focus:bg-white focus:ring-2 focus:ring-blue-100"
                 {...register('content')}
               />
             </div>
@@ -123,7 +123,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
             type="submit"
             onClick={handleSubmit(onSubmit)}
             disabled={isPending}
-            className="cursor-pointer rounded-xl bg-green-600 text-white hover:bg-green-700"
+            className="cursor-pointer rounded-xl bg-green-600 text-white hover:bg-green-700 disabled:bg-green-200"
           >
             {isPending ? (
               <span className="flex items-center">제출 중...</span>

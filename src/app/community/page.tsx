@@ -8,7 +8,6 @@ import {
 import { ReviewCard } from '@/components/ReviewCard';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
@@ -93,8 +92,6 @@ function CommunityContent() {
   const [sortOption, setSortOption] = useAtom(communitySortOptionAtom);
 
   // 현재 사용자 가져오기 (CreateReviewCard 위해 필요)
-  const user = useCurrentUser();
-  const currentUser = user;
 
   const isMobile = useIsMobile();
 
