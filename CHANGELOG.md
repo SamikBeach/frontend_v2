@@ -1,5 +1,16 @@
 # 🚦 CHANGELOG
 
+## [1.4.1](https://github.com/SamikBeach/frontend_v2/compare/1.4.0...1.4.1) (2025-05-20)
+
+
+### Bug Fixes
+
+* fix lint ([789eb91](https://github.com/SamikBeach/frontend_v2/commit/789eb91dbb77b7d1a4f22cd439b85d95bbe863d4))
+* green-600 버튼의 disabled 상태에서 bg-green-200 컬러 적용 ([d19a931](https://github.com/SamikBeach/frontend_v2/commit/d19a931b32ebeb1c90ab50429b12160780998501))
+* 모바일 Safari에서 ReviewDialog TextArea 포커스 시 흰 화면 문제 해결 ([ebe2ec8](https://github.com/SamikBeach/frontend_v2/commit/ebe2ec8ad1104aa119e06fc4b6197a311172f1ff))
+* 모바일 브라우저 Drawer 높이 문제 및 autoFocus 제거 ([2261018](https://github.com/SamikBeach/frontend_v2/commit/22610183364abbba75b49030d1366dbdd972deb6))
+* 서재 SearchBar 입력 텍스트 16px, placeholder는 작게 보이도록 수정 ([15e2c42](https://github.com/SamikBeach/frontend_v2/commit/15e2c42e9c3620e741b96084addfafcc08b31877))
+
 # [1.4.0](https://github.com/SamikBeach/frontend_v2/compare/1.3.1...1.4.0) (2025-05-20)
 
 
