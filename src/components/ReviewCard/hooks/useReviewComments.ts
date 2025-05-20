@@ -165,7 +165,7 @@ export function useReviewComments(
   });
 
   // 댓글 좋아요 취소 뮤테이션
-  const { mutate: unlikeComment, isPending: isUnliking } = useMutation({
+  const { mutate: unlikeComment } = useMutation({
     mutationFn: (commentId: number) => apiUnlikeComment(commentId),
     onSuccess: () => {
       // 댓글 목록 새로고침
