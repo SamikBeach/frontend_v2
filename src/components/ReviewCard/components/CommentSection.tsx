@@ -78,7 +78,7 @@ export function CommentSection({
             </div>
             <Button
               size="icon"
-              className="h-8 w-8 cursor-pointer rounded-lg bg-gray-900 text-white hover:bg-gray-800 sm:h-9 sm:w-9 sm:rounded-xl"
+              className="h-8 w-8 cursor-pointer rounded-lg bg-green-600 text-white hover:bg-green-700 sm:h-9 sm:w-9 sm:rounded-xl"
               onClick={handleSubmitComment}
               disabled={!commentText.trim() || isCommentLoading}
             >
