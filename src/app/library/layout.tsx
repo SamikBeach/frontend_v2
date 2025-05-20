@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 };
 
 export default function LibraryLayout({ children }: { children: ReactNode }) {
-  return <div className="mt-[56px] w-full px-3 py-4 sm:px-8">{children}</div>;
+  return <div className="mt-[56px] w-full py-4 sm:px-8">{children}</div>;
 }
