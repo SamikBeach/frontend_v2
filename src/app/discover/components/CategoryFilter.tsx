@@ -238,7 +238,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
                 'flex shrink-0 cursor-pointer items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors md:px-3 md:text-sm',
                 'h-8 md:h-8',
                 selectedSubcategory === 'all'
-                  ? 'border-blue-200 bg-blue-50 text-blue-700'
+                  ? 'border-green-200 bg-green-50 text-green-800'
                   : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
               )}
             >
@@ -254,7 +254,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
                   'flex shrink-0 cursor-pointer items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors md:px-3 md:text-sm',
                   'h-8 md:h-8',
                   subcategory.id.toString() === selectedSubcategory
-                    ? 'border-blue-200 bg-blue-50 text-blue-700'
+                    ? 'border-green-200 bg-green-50 text-green-800'
                     : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
                 )}
               >
