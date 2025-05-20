@@ -6,6 +6,7 @@ import {
   ResponsiveDialogPortal,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
@@ -79,6 +80,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
   const openBookDetail = useBookDetailOpen();
+  const isMobile = useIsMobile();
 
   // Dialog가 닫힐 때 검색어 초기화
   const handleOpenChange = (isOpen: boolean) => {
@@ -93,6 +95,9 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
   const handleItemClick = (item: any) => {
     const bookIsbn = item.isbn13 || item.isbn || '';
     openBookDetail(bookIsbn);
+    if (isMobile) {
+      setIsOpen(false);
+    }
   };
 
   // 검색 결과 또는 최근 검색 표시 여부
