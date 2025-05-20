@@ -118,8 +118,6 @@ export function useReviewMutations({
         invalidateUserProfileQueries(queryClient, pathname, currentUserId);
       }
 
-      toast.success('리뷰가 등록되었습니다.');
-
       if (onCreateSuccess) {
         onCreateSuccess();
       }
@@ -205,8 +203,6 @@ export function useReviewMutations({
         // 유저 프로필 관련 쿼리 일괄 무효화
         invalidateUserProfileQueries(queryClient, pathname, currentUserId);
       }
-
-      toast.success('리뷰가 수정되었습니다.');
 
       if (onUpdateSuccess) {
         onUpdateSuccess();
