@@ -178,12 +178,7 @@ export function useReviewComments(
 
   return {
     comments,
-    isLoading:
-      isLoading ||
-      isAddingComment ||
-      isDeletingComment ||
-      isLiking ||
-      isUnliking,
+    isLoading,
     error: error as Error | null,
     commentText,
     setCommentText,
