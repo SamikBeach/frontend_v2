@@ -182,7 +182,7 @@ export function ReviewForm({
         </Button>
 
         <Button
-          className="ml-auto h-8 rounded-lg bg-gray-900 px-2.5 text-xs font-medium text-white hover:bg-gray-800 sm:h-9 sm:rounded-xl sm:px-4 sm:text-sm"
+          className="ml-auto h-8 rounded-lg bg-green-600 px-2.5 text-xs font-medium text-white hover:bg-green-700 sm:h-9 sm:rounded-xl sm:px-4 sm:text-sm"
           onClick={handleSubmitReview}
           disabled={!content.trim() || isLoading}
         >

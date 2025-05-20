@@ -41,7 +41,7 @@ export function Header({
             />
           </div>
 
-          <div className="flex flex-col gap-1 md:gap-4">
+          <div className="flex flex-col md:gap-4">
             <FilterBar />
             {/* xl 미만 화면에서 보이는 검색바와 정렬 버튼 */}
             <div className="flex items-center gap-2 px-2 xl:hidden">

@@ -146,9 +146,13 @@ export function SortDropdown<T = Book>({
   // 버튼에 표시할 정렬 텍스트
   const sortButtonText = SORT_LABELS[selectedSort] || currentSortOption.label;
 
+  // active 스타일 조건
+  const isTimeRangeActive = selectedTimeRange !== TimeRangeOptions.ALL;
+  const isSortActive = selectedSort !== (sortOptions[0]?.id ?? '');
+
   return (
     <div
-      className={`flex flex-wrap items-center gap-2 pt-1.5 pb-1.5 md:flex-nowrap md:px-0 ${className}`}
+      className={`flex flex-wrap items-center gap-2 px-2 pt-1.5 pb-1.5 md:flex-nowrap md:px-0 ${className}`}
     >
       {showTimeRangeFilter && (
         <ResponsiveDropdownMenu>
@@ -156,9 +160,16 @@ export function SortDropdown<T = Book>({
             <Button
               variant="ghost"
               size="sm"
-              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-4 text-sm text-gray-600 hover:bg-gray-100 md:h-8 md:px-3 md:text-xs"
+              className={
+                `flex h-9 cursor-pointer items-center gap-1.5 rounded-full px-4 text-sm md:h-8 md:px-3 md:text-xs ` +
+                (isTimeRangeActive
+                  ? 'border border-blue-200 bg-blue-50 text-blue-700'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100')
+              }
             >
-              <span className="mr-1 flex h-3 w-3 items-center justify-center">
+              <span
+                className={`mr-1 flex h-3 w-3 items-center justify-center ${isTimeRangeActive ? 'text-blue-700' : 'text-gray-500'}`}
+              >
                 {currentTimeRange.icon}
               </span>
               {currentTimeRange.label}
@@ -194,9 +205,16 @@ export function SortDropdown<T = Book>({
           <Button
             variant="ghost"
             size="sm"
-            className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-4 text-sm text-gray-600 hover:bg-gray-100 md:h-8 md:px-3 md:text-xs"
+            className={
+              `flex h-9 cursor-pointer items-center gap-1.5 rounded-full px-4 text-sm md:h-8 md:px-3 md:text-xs ` +
+              (isSortActive
+                ? 'border border-blue-200 bg-blue-50 text-blue-700'
+                : 'bg-gray-50 text-gray-600 hover:bg-gray-100')
+            }
           >
-            <span className="mr-1 flex h-3 w-3 items-center justify-center">
+            <span
+              className={`mr-1 flex h-3 w-3 items-center justify-center ${isSortActive ? 'text-blue-700' : 'text-gray-500'}`}
+            >
               {currentSortOption.icon}
             </span>
             {sortButtonText}

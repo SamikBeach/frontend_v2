@@ -345,7 +345,7 @@ export function ReviewDialog({
                   ? 'bg-red-500 hover:bg-red-600'
                   : isCreateMode
                     ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-gray-900 hover:bg-gray-800'
+                    : 'bg-green-600 hover:bg-green-700'
               } disabled:bg-gray-200`}
             >
               {isDeleteMode ? (
