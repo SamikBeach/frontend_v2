@@ -10,7 +10,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BookOpen, SendHorizontal } from 'lucide-react';
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useEffect, useMemo, useRef } from 'react';
 
 interface ReviewFormProps {
   content: string;
@@ -34,6 +34,15 @@ export function ReviewForm({
   children,
 }: ReviewFormProps) {
   const isMobile = useIsMobile();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // 제출 후 content가 비워지면 textarea 높이 초기화
+  useEffect(() => {
+    if (content === '' && textareaRef.current) {
+      textareaRef.current.style.height = '';
+    }
+  }, [content]);
+
   // 태그 변경 핸들러
   const handleTypeChange = (newType: string) => {
     setType(newType as ReviewType);
@@ -68,10 +77,16 @@ export function ReviewForm({
   return (
     <>
       <Textarea
+        ref={textareaRef}
         placeholder="어떤 책에 대해 이야기하고 싶으신가요?"
-        className="min-h-[80px] resize-none rounded-lg border-gray-200 bg-[#F9FAFB] text-base sm:min-h-[100px] sm:rounded-xl md:text-[15px]"
+        className="min-h-[80px] rounded-lg border-gray-200 bg-[#F9FAFB] text-base sm:min-h-[100px] sm:rounded-xl md:text-[15px]"
         value={content}
         onChange={e => setContent(e.target.value)}
+        onInput={e => {
+          const target = e.target as HTMLTextAreaElement;
+          target.style.height = 'auto';
+          target.style.height = `${target.scrollHeight}px`;
+        }}
       />
 
       {/* 선택된 책 정보 및 별점/읽기 상태 표시 (children으로 받음) */}
