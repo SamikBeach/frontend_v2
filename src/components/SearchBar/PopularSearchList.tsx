@@ -45,7 +45,7 @@ export function PopularSearchList({
           >
             <div className="flex items-center gap-2">
               <div
-                className={`flex h-5 w-5 items-center justify-center rounded-full ${index < 3 ? 'bg-gray-800 text-white' : 'bg-gray-200 text-gray-700'} `}
+                className={`flex h-5 w-5 items-center justify-center rounded-full ${index < 3 ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700'} `}
               >
                 <span className="text-xs font-medium">{index + 1}</span>
               </div>
