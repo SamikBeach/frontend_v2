@@ -127,12 +127,12 @@ export function useReviewState(
     return newShowComments;
   };
 
-  // 텍스트가 길면 접어두기
-  const isLongContent = review.content.length > 300;
-  const displayContent =
-    isLongContent && !expanded
-      ? review.content.substring(0, 300) + '...'
-      : review.content;
+  // 텍스트가 길면 접어두기 (7줄 기준)
+  // 1. 줄바꿈 6개 이상이거나
+  // 2. 7줄이 안되더라도 500자 이상이면 강제 더보기
+  const lineCount = review.content.split('\n').length;
+  const isLongContent = lineCount > 7 || review.content.length > 500;
+  const displayContent = review.content;
 
   return {
     // UI 상태

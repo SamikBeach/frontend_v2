@@ -50,7 +50,6 @@ export default function ProfilePage() {
   const handleSectionChange = (sectionId: string) => {
     setSelectedSection(sectionId);
     updateQueryParams({ section: sectionId });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // 다시 시도 핸들러

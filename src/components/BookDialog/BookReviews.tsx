@@ -757,7 +757,7 @@ function ReviewsList({
                       variant="outline"
                       className={`flex h-7 cursor-pointer items-center gap-1 rounded-full border px-2.5 ${
                         review.isLiked
-                          ? 'border-pink-200 bg-pink-50 text-pink-500 hover:border-pink-300 hover:bg-pink-100 hover:text-pink-600'
+                          ? 'border-green-200 bg-green-50 text-green-600 hover:border-green-300 hover:bg-green-100 hover:text-green-700'
                           : 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-700'
                       }`}
                       onClick={() =>
@@ -766,12 +766,12 @@ function ReviewsList({
                       disabled={likingReviewId === review.id && isLikeLoading}
                     >
                       {review.isLiked ? (
-                        <ThumbsUp className="h-3.5 w-3.5 fill-pink-500 text-pink-500" />
+                        <ThumbsUp className="h-3.5 w-3.5 fill-green-600 text-green-600" />
                       ) : (
                         <ThumbsUp className="h-3.5 w-3.5" />
                       )}
                       <span
-                        className={`text-xs font-medium ${review.isLiked ? 'text-pink-500' : ''}`}
+                        className={`text-xs font-medium ${review.isLiked ? 'text-green-600' : ''}`}
                       >
                         {review.likesCount || 0}
                       </span>

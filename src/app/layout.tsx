@@ -44,6 +44,14 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: '미역서점',
       locale: 'ko_KR',
       type: 'website',
+      images: [
+        {
+          url: '/images/og-image.png',
+          width: 1024,
+          height: 1024,
+          alt: '미역서점',
+        },
+      ],
     },
     icons: {
       icon: [

@@ -26,7 +26,7 @@ export function LibraryCardSkeleton() {
         </div>
       </CardHeader>
       <CardContent className="flex flex-1 flex-col px-5 pt-0 pb-3">
-        <Skeleton className="mb-4 h-5 w-3/4" />
+        <Skeleton className="mb-4 h-6 w-3/4" />
         <div className="grid min-h-[160px] w-full grid-cols-3 gap-2">
           {[1, 2, 3].map(i => (
             <Skeleton key={i} className="aspect-[5/7] w-full rounded-lg" />

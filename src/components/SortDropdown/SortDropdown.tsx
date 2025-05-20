@@ -29,30 +29,48 @@ export type TimeRange = ApiTimeRange;
 export type SortOption<T = Book> = {
   id: string;
   label: string;
-  icon: React.ReactNode;
+  icon: ((isActive: boolean) => React.ReactNode) | React.ReactNode;
   sortFn: (a: T, b: T) => number;
   supportsTimeRange?: boolean;
+};
+
+export type TimeRangeOption = {
+  id: TimeRangeOptions;
+  label: string;
+  icon: (isActive: boolean) => React.ReactNode;
 };
 
 export const defaultSortOptions: SortOption<Book>[] = [
   {
     id: 'rating-desc',
     label: '평점 높은순',
-    icon: <Star className="h-3.5 w-3.5 text-[#FFAB00]" />,
+    icon: (isActive: boolean) => (
+      <Star
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-[#FFAB00]'}`}
+      />
+    ),
     sortFn: (a, b) => b.rating - a.rating,
     supportsTimeRange: true,
   },
   {
     id: 'reviews-desc',
     label: '리뷰 많은순',
-    icon: <Users className="h-3.5 w-3.5 text-gray-500" />,
+    icon: (isActive: boolean) => (
+      <Users
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`}
+      />
+    ),
     sortFn: (a, b) => b.reviews - a.reviews,
     supportsTimeRange: true,
   },
   {
     id: 'library-desc',
     label: '서재에 많이 담긴 순',
-    icon: <Bookmark className="h-3.5 w-3.5 text-gray-500" />,
+    icon: (isActive: boolean) => (
+      <Bookmark
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`}
+      />
+    ),
     sortFn: (a, b) =>
       ((b as any).libraryAdds || 0) - ((a as any).libraryAdds || 0),
     supportsTimeRange: true,
@@ -60,44 +78,72 @@ export const defaultSortOptions: SortOption<Book>[] = [
   {
     id: 'publishDate-desc',
     label: '출간일 최신순',
-    icon: <Calendar className="h-3.5 w-3.5 text-gray-500" />,
+    icon: (isActive: boolean) => (
+      <Calendar
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`}
+      />
+    ),
     sortFn: (a, b) =>
       new Date(b.publishDate).getTime() - new Date(a.publishDate).getTime(),
   },
   {
     id: 'title-asc',
     label: '제목 가나다순',
-    icon: <ArrowDownAZ className="h-3.5 w-3.5 text-gray-500" />,
+    icon: (isActive: boolean) => (
+      <ArrowDownAZ
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`}
+      />
+    ),
     sortFn: (a, b) => a.title.localeCompare(b.title, 'ko'),
   },
 ];
 
 // 기간 필터 옵션
-export const timeRangeOptions = [
+export const timeRangeOptions: TimeRangeOption[] = [
   {
     id: TimeRangeOptions.ALL,
     label: '전체 기간',
-    icon: <CalendarDays className="h-3.5 w-3.5 text-gray-500" />,
+    icon: (isActive: boolean) => (
+      <CalendarDays
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`}
+      />
+    ),
   },
   {
     id: TimeRangeOptions.TODAY,
     label: '오늘',
-    icon: <Clock className="h-3.5 w-3.5 text-gray-500" />,
+    icon: (isActive: boolean) => (
+      <Clock
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`}
+      />
+    ),
   },
   {
     id: TimeRangeOptions.WEEK,
     label: '이번 주',
-    icon: <Clock3 className="h-3.5 w-3.5 text-gray-500" />,
+    icon: (isActive: boolean) => (
+      <Clock3
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`}
+      />
+    ),
   },
   {
     id: TimeRangeOptions.MONTH,
     label: '이번 달',
-    icon: <Calendar className="h-3.5 w-3.5 text-gray-500" />,
+    icon: (isActive: boolean) => (
+      <Calendar
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`}
+      />
+    ),
   },
   {
     id: TimeRangeOptions.YEAR,
     label: '올해',
-    icon: <CalendarClock className="h-3.5 w-3.5 text-gray-500" />,
+    icon: (isActive: boolean) => (
+      <CalendarClock
+        className={`h-3.5 w-3.5 ${isActive ? 'text-blue-700' : 'text-gray-500'}`}
+      />
+    ),
   },
 ];
 
@@ -146,6 +192,10 @@ export function SortDropdown<T = Book>({
   // 버튼에 표시할 정렬 텍스트
   const sortButtonText = SORT_LABELS[selectedSort] || currentSortOption.label;
 
+  // active 스타일 조건
+  const isTimeRangeActive = selectedTimeRange !== TimeRangeOptions.ALL;
+  const isSortActive = selectedSort !== (sortOptions[0]?.id ?? '');
+
   return (
     <div
       className={`flex flex-wrap items-center gap-2 px-2 pt-1.5 pb-1.5 md:flex-nowrap md:px-0 ${className}`}
@@ -156,10 +206,17 @@ export function SortDropdown<T = Book>({
             <Button
               variant="ghost"
               size="sm"
-              className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-4 text-sm text-gray-600 hover:bg-gray-100 md:h-8 md:px-3 md:text-xs"
+              className={
+                `flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs ` +
+                (isTimeRangeActive
+                  ? 'border border-blue-200 bg-blue-50 text-blue-700'
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100')
+              }
             >
               <span className="mr-1 flex h-3 w-3 items-center justify-center">
-                {currentTimeRange.icon}
+                {typeof currentTimeRange.icon === 'function'
+                  ? currentTimeRange.icon(isTimeRangeActive)
+                  : currentTimeRange.icon}
               </span>
               {currentTimeRange.label}
             </Button>
@@ -169,22 +226,21 @@ export function SortDropdown<T = Book>({
             className="w-[140px]"
             sideOffset={8}
           >
-            {timeRangeOptions.map(option => (
-              <ResponsiveDropdownMenuItem
-                key={option.id}
-                className={`cursor-pointer text-sm ${
-                  option.id === selectedTimeRange
-                    ? 'text-primary font-medium'
-                    : ''
-                }`}
-                onSelect={() => onTimeRangeChange?.(option.id as TimeRange)}
-              >
-                <span className="mr-2 inline-flex h-3.5 w-3.5 items-center justify-center">
-                  {option.icon}
-                </span>
-                {option.label}
-              </ResponsiveDropdownMenuItem>
-            ))}
+            {timeRangeOptions.map(option => {
+              const isActive = option.id === selectedTimeRange;
+              return (
+                <ResponsiveDropdownMenuItem
+                  key={option.id}
+                  className={`flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors ${isActive ? 'text-primary bg-blue-50 font-medium' : 'text-gray-700'} `}
+                  onSelect={() => onTimeRangeChange?.(option.id as TimeRange)}
+                >
+                  <span className="mr-2 inline-flex h-3.5 w-3.5 items-center justify-center">
+                    {option.icon(false)}
+                  </span>
+                  {option.label}
+                </ResponsiveDropdownMenuItem>
+              );
+            })}
           </ResponsiveDropdownMenuContent>
         </ResponsiveDropdownMenu>
       )}
@@ -194,10 +250,17 @@ export function SortDropdown<T = Book>({
           <Button
             variant="ghost"
             size="sm"
-            className="flex h-9 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-4 text-sm text-gray-600 hover:bg-gray-100 md:h-8 md:px-3 md:text-xs"
+            className={
+              `flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs ` +
+              (isSortActive
+                ? 'border border-blue-200 bg-blue-50 text-blue-700'
+                : 'bg-gray-50 text-gray-600 hover:bg-gray-100')
+            }
           >
             <span className="mr-1 flex h-3 w-3 items-center justify-center">
-              {currentSortOption.icon}
+              {typeof currentSortOption.icon === 'function'
+                ? currentSortOption.icon(isSortActive)
+                : currentSortOption.icon}
             </span>
             {sortButtonText}
           </Button>
@@ -207,20 +270,23 @@ export function SortDropdown<T = Book>({
           className="w-[180px]"
           sideOffset={8}
         >
-          {sortOptions.map(option => (
-            <ResponsiveDropdownMenuItem
-              key={option.id}
-              className={`cursor-pointer text-sm ${
-                option.id === selectedSort ? 'text-primary font-medium' : ''
-              }`}
-              onSelect={() => onSortChange(option.id)}
-            >
-              <span className="mr-2 inline-flex h-3.5 w-3.5 items-center justify-center">
-                {option.icon}
-              </span>
-              {option.label}
-            </ResponsiveDropdownMenuItem>
-          ))}
+          {sortOptions.map(option => {
+            const isActive = option.id === selectedSort;
+            return (
+              <ResponsiveDropdownMenuItem
+                key={option.id}
+                className={`flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors ${isActive ? 'text-primary bg-blue-50 font-medium' : 'text-gray-700'} `}
+                onSelect={() => onSortChange(option.id)}
+              >
+                <span className="mr-2 inline-flex h-3.5 w-3.5 items-center justify-center">
+                  {typeof option.icon === 'function'
+                    ? option.icon(false)
+                    : option.icon}
+                </span>
+                {option.label}
+              </ResponsiveDropdownMenuItem>
+            );
+          })}
         </ResponsiveDropdownMenuContent>
       </ResponsiveDropdownMenu>
     </div>

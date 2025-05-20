@@ -2,7 +2,7 @@ import { LibraryCard } from '@/components/LibraryCard/LibraryCard';
 import { LibraryCardSkeleton } from '@/components/LibraryCard/LibraryCardSkeleton';
 import { Button } from '@/components/ui/button';
 import { Tag } from '@/utils/tags';
-import { BookOpen } from 'lucide-react';
+import { Library } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useHomePopularLibrariesQuery } from '../hooks';
 
@@ -28,7 +28,7 @@ export function PopularLibrariesSection() {
     <section className="h-auto p-2 sm:p-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <BookOpen className="h-4 w-4 text-rose-500 sm:h-5 sm:w-5" />
+          <Library className="h-4 w-4 text-rose-500 sm:h-5 sm:w-5" />
           <h2 className="text-lg font-semibold text-gray-900 sm:text-xl">
             인기 서재
           </h2>

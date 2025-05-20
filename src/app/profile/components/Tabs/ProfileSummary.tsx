@@ -32,12 +32,12 @@ export default function ProfileSummary({
 
   return (
     <div className="mx-auto w-full py-6">
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-6">
+      <div className="grid grid-cols-3 gap-1 sm:grid-cols-3 sm:gap-3 md:grid-cols-6">
         {/* 읽은 책 - 첫번째 위치 */}
         <button
           onClick={() => onSectionChange('read')}
           className={cn(
-            `flex cursor-pointer flex-col items-center rounded-lg p-3 transition-colors sm:p-4`,
+            `flex cursor-pointer flex-col items-center rounded-lg p-2 transition-colors sm:p-4`,
             selectedSection === 'read'
               ? 'bg-violet-200'
               : 'bg-violet-50 hover:bg-violet-200/70'
@@ -45,7 +45,7 @@ export default function ProfileSummary({
         >
           <div
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-full sm:h-10 sm:w-10',
+              'flex h-7 w-7 items-center justify-center rounded-full sm:h-10 sm:w-10',
               selectedSection === 'read' ? 'bg-violet-300' : 'bg-violet-200'
             )}
           >
@@ -58,10 +58,10 @@ export default function ProfileSummary({
               )}
             />
           </div>
-          <div className="mt-2 text-center">
+          <div className="mt-1 text-center sm:mt-2">
             <span
               className={cn(
-                'block text-lg font-bold sm:text-xl',
+                'block text-base font-bold sm:text-xl',
                 selectedSection === 'read' ? 'text-gray-900' : 'text-gray-800'
               )}
             >
@@ -69,7 +69,7 @@ export default function ProfileSummary({
             </span>
             <span
               className={cn(
-                'text-[10px] sm:text-xs',
+                'text-xs sm:text-xs',
                 selectedSection === 'read' ? 'text-gray-900' : 'text-gray-700'
               )}
             >
@@ -78,36 +78,36 @@ export default function ProfileSummary({
           </div>
         </button>
 
-        {/* 리뷰 - 두번째 위치로 이동 */}
+        {/* 리뷰 - 두번째 위치 */}
         <button
           onClick={() => onSectionChange('reviews')}
           className={cn(
-            `flex cursor-pointer flex-col items-center rounded-lg p-3 transition-colors sm:p-4`,
+            `flex cursor-pointer flex-col items-center rounded-lg p-2 transition-colors sm:p-4`,
             selectedSection === 'reviews'
-              ? 'bg-purple-200'
-              : 'bg-purple-50 hover:bg-purple-200/70'
+              ? 'bg-rose-200'
+              : 'bg-rose-50 hover:bg-rose-200/70'
           )}
         >
           <div
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-full sm:h-10 sm:w-10',
-              selectedSection === 'reviews' ? 'bg-purple-300' : 'bg-purple-200'
+              'flex h-7 w-7 items-center justify-center rounded-full sm:h-10 sm:w-10',
+              selectedSection === 'reviews' ? 'bg-rose-300' : 'bg-rose-200'
             )}
           >
             <MessageSquare
               className={cn(
                 'h-4 w-4 sm:h-5 sm:w-5',
                 selectedSection === 'reviews'
-                  ? 'text-purple-800'
-                  : 'text-purple-700'
+                  ? 'text-rose-800'
+                  : 'text-rose-700'
               )}
             />
           </div>
-          <div className="mt-2 text-center">
+          <div className="mt-1 text-center sm:mt-2">
             <div className="flex items-center justify-center">
               <span
                 className={cn(
-                  'text-lg font-bold sm:text-xl',
+                  'text-base font-bold sm:text-xl',
                   selectedSection === 'reviews'
                     ? 'text-gray-900'
                     : 'text-gray-800'
@@ -129,7 +129,7 @@ export default function ProfileSummary({
             </div>
             <span
               className={cn(
-                'text-[10px] sm:text-xs',
+                'text-xs sm:text-xs',
                 selectedSection === 'reviews'
                   ? 'text-gray-900'
                   : 'text-gray-700'
@@ -140,35 +140,35 @@ export default function ProfileSummary({
           </div>
         </button>
 
-        {/* 내 서재 - 세번째 위치로 이동 */}
+        {/* 내 서재 - 세번째 위치 */}
         <button
           onClick={() => onSectionChange('libraries')}
           className={cn(
-            `flex cursor-pointer flex-col items-center rounded-lg p-3 transition-colors sm:p-4`,
+            `flex cursor-pointer flex-col items-center rounded-lg p-2 transition-colors sm:p-4`,
             selectedSection === 'libraries'
-              ? 'bg-blue-200'
-              : 'bg-blue-50 hover:bg-blue-200/70'
+              ? 'bg-sky-200'
+              : 'bg-sky-50 hover:bg-sky-200/70'
           )}
         >
           <div
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-full sm:h-10 sm:w-10',
-              selectedSection === 'libraries' ? 'bg-blue-300' : 'bg-blue-200'
+              'flex h-7 w-7 items-center justify-center rounded-full sm:h-10 sm:w-10',
+              selectedSection === 'libraries' ? 'bg-sky-300' : 'bg-sky-200'
             )}
           >
             <BookOpen
               className={cn(
                 'h-4 w-4 sm:h-5 sm:w-5',
                 selectedSection === 'libraries'
-                  ? 'text-blue-800'
-                  : 'text-blue-700'
+                  ? 'text-sky-800'
+                  : 'text-sky-700'
               )}
             />
           </div>
-          <div className="mt-2 text-center">
+          <div className="mt-1 text-center sm:mt-2">
             <span
               className={cn(
-                'block text-lg font-bold sm:text-xl',
+                'block text-base font-bold sm:text-xl',
                 selectedSection === 'libraries'
                   ? 'text-gray-900'
                   : 'text-gray-800'
@@ -178,7 +178,7 @@ export default function ProfileSummary({
             </span>
             <span
               className={cn(
-                'text-[10px] sm:text-xs',
+                'text-xs sm:text-xs',
                 selectedSection === 'libraries'
                   ? 'text-gray-900'
                   : 'text-gray-700'
@@ -193,7 +193,7 @@ export default function ProfileSummary({
         <button
           onClick={() => onSectionChange('community')}
           className={cn(
-            `flex cursor-pointer flex-col items-center rounded-lg p-3 transition-colors sm:p-4`,
+            `flex cursor-pointer flex-col items-center rounded-lg p-2 transition-colors sm:p-4`,
             selectedSection === 'community'
               ? 'bg-amber-200'
               : 'bg-amber-50 hover:bg-amber-200/70'
@@ -201,7 +201,7 @@ export default function ProfileSummary({
         >
           <div
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-full sm:h-10 sm:w-10',
+              'flex h-7 w-7 items-center justify-center rounded-full sm:h-10 sm:w-10',
               selectedSection === 'community' ? 'bg-amber-300' : 'bg-amber-200'
             )}
           >
@@ -214,10 +214,10 @@ export default function ProfileSummary({
               )}
             />
           </div>
-          <div className="mt-2 text-center">
+          <div className="mt-1 text-center sm:mt-2">
             <span
               className={cn(
-                'block text-lg font-bold sm:text-xl',
+                'block text-base font-bold sm:text-xl',
                 selectedSection === 'community'
                   ? 'text-gray-900'
                   : 'text-gray-800'
@@ -231,7 +231,7 @@ export default function ProfileSummary({
             </span>
             <span
               className={cn(
-                'text-[10px] sm:text-xs',
+                'text-xs sm:text-xs',
                 selectedSection === 'community'
                   ? 'text-gray-900'
                   : 'text-gray-700'
@@ -246,33 +246,33 @@ export default function ProfileSummary({
         <button
           onClick={() => onSectionChange('subscriptions')}
           className={cn(
-            `flex cursor-pointer flex-col items-center rounded-lg p-3 transition-colors sm:p-4`,
+            `flex cursor-pointer flex-col items-center rounded-lg p-2 transition-colors sm:p-4`,
             selectedSection === 'subscriptions'
-              ? 'bg-green-200'
-              : 'border border-green-200 bg-white hover:bg-green-100'
+              ? 'bg-emerald-200'
+              : 'bg-emerald-50 hover:bg-emerald-200/70'
           )}
         >
           <div
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-full sm:h-10 sm:w-10',
+              'flex h-7 w-7 items-center justify-center rounded-full sm:h-10 sm:w-10',
               selectedSection === 'subscriptions'
-                ? 'bg-green-300'
-                : 'bg-green-200'
+                ? 'bg-emerald-300'
+                : 'bg-emerald-200'
             )}
           >
             <Bell
               className={cn(
                 'h-4 w-4 sm:h-5 sm:w-5',
                 selectedSection === 'subscriptions'
-                  ? 'text-green-800'
-                  : 'text-green-700'
+                  ? 'text-emerald-800'
+                  : 'text-emerald-700'
               )}
             />
           </div>
-          <div className="mt-2 text-center">
+          <div className="mt-1 text-center sm:mt-2">
             <span
               className={cn(
-                'block text-lg font-bold sm:text-xl',
+                'block text-base font-bold sm:text-xl',
                 selectedSection === 'subscriptions'
                   ? 'text-gray-900'
                   : 'text-gray-800'
@@ -282,7 +282,7 @@ export default function ProfileSummary({
             </span>
             <span
               className={cn(
-                'text-[10px] sm:text-xs',
+                'text-xs sm:text-xs',
                 selectedSection === 'subscriptions'
                   ? 'text-gray-900'
                   : 'text-gray-700'
@@ -297,29 +297,31 @@ export default function ProfileSummary({
         <button
           onClick={() => onSectionChange('stats')}
           className={cn(
-            `flex cursor-pointer flex-col items-center rounded-lg p-3 transition-colors sm:p-4`,
+            `flex cursor-pointer flex-col items-center rounded-lg p-2 transition-colors sm:p-4`,
             selectedSection === 'stats'
-              ? 'bg-blue-200'
-              : 'border border-blue-200 bg-white hover:bg-blue-100'
+              ? 'bg-indigo-200'
+              : 'bg-indigo-50 hover:bg-indigo-200/70'
           )}
         >
           <div
             className={cn(
-              'flex h-8 w-8 items-center justify-center rounded-full sm:h-10 sm:w-10',
-              selectedSection === 'stats' ? 'bg-blue-300' : 'bg-blue-200'
+              'flex h-7 w-7 items-center justify-center rounded-full sm:h-10 sm:w-10',
+              selectedSection === 'stats' ? 'bg-indigo-300' : 'bg-indigo-200'
             )}
           >
             <AreaChart
               className={cn(
                 'h-4 w-4 sm:h-5 sm:w-5',
-                selectedSection === 'stats' ? 'text-blue-800' : 'text-blue-700'
+                selectedSection === 'stats'
+                  ? 'text-indigo-800'
+                  : 'text-indigo-700'
               )}
             />
           </div>
-          <div className="mt-2 text-center">
+          <div className="mt-1 text-center sm:mt-2">
             <span
               className={cn(
-                'block text-lg font-bold sm:text-xl',
+                'block text-base font-bold sm:text-xl',
                 selectedSection === 'stats' ? 'text-gray-900' : 'text-gray-800'
               )}
             >
@@ -327,7 +329,7 @@ export default function ProfileSummary({
             </span>
             <span
               className={cn(
-                'text-[10px] sm:text-xs',
+                'text-xs sm:text-xs',
                 selectedSection === 'stats' ? 'text-gray-900' : 'text-gray-700'
               )}
             >

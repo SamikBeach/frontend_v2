@@ -55,7 +55,7 @@ export default function ProfileHeader() {
       return;
     }
 
-    await toggleFollow(user.id);
+    await toggleFollow(user.id, user.username);
   };
 
   // 프로필 편집 다이얼로그 열기

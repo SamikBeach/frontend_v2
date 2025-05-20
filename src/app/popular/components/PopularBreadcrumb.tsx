@@ -33,7 +33,7 @@ export function PopularBreadcrumb() {
   };
 
   return (
-    <div className="flex items-center text-[12px] text-gray-500 md:text-[14px]">
+    <div className="flex items-center text-[14px] text-gray-500 md:text-[14px]">
       <Link
         href="/popular"
         onClick={e => {

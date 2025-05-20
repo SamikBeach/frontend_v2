@@ -55,7 +55,7 @@ export function ReviewHeader({
             alt={review.author.username}
             className="object-cover"
           />
-          <AvatarFallback>
+          <AvatarFallback className="text-xs">
             {getNameInitial(review.author.username)}
           </AvatarFallback>
         </Avatar>

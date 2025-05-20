@@ -52,44 +52,44 @@ export function SummarySkeleton() {
   return (
     <div className="border-t border-gray-100 bg-white">
       <div className="mx-auto w-full py-6">
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 md:grid-cols-6">
+        <div className="grid grid-cols-3 gap-1 sm:grid-cols-3 sm:gap-3 md:grid-cols-6">
           {Array.from({ length: 6 }).map((_, index) => (
             <Skeleton
               key={index}
-              className={`flex h-[110px] w-full flex-col items-center rounded-lg p-3 sm:h-[130px] sm:p-4 ${
+              className={`flex h-[90px] w-full flex-col items-center rounded-lg p-2 sm:h-[130px] sm:p-4 ${
                 index === 0
                   ? 'bg-violet-50'
                   : index === 1
-                    ? 'bg-purple-50'
+                    ? 'bg-rose-50'
                     : index === 2
-                      ? 'bg-blue-50'
+                      ? 'bg-sky-50'
                       : index === 3
                         ? 'bg-amber-50'
                         : index === 4
-                          ? 'bg-green-50'
-                          : 'bg-teal-50'
+                          ? 'bg-emerald-50'
+                          : 'bg-indigo-50'
               }`}
             >
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-full sm:h-10 sm:w-10 ${
+                className={`flex h-7 w-7 items-center justify-center rounded-full sm:h-10 sm:w-10 ${
                   index === 0
                     ? 'bg-violet-200'
                     : index === 1
-                      ? 'bg-purple-200'
+                      ? 'bg-rose-200'
                       : index === 2
-                        ? 'bg-blue-200'
+                        ? 'bg-sky-200'
                         : index === 3
                           ? 'bg-amber-200'
                           : index === 4
-                            ? 'bg-green-200'
-                            : 'bg-teal-200'
+                            ? 'bg-emerald-200'
+                            : 'bg-indigo-200'
                 }`}
               >
                 <Skeleton className="h-4 w-4 sm:h-5 sm:w-5" />
               </div>
-              <div className="mt-2 w-full text-center">
-                <Skeleton className="mx-auto mb-1 h-6 w-12 sm:h-7" />
-                <Skeleton className="mx-auto h-3 w-14 sm:h-3.5" />
+              <div className="mt-1 w-full text-center sm:mt-2">
+                <Skeleton className="mx-auto mb-1 h-5 w-10 sm:h-7 sm:w-12" />
+                <Skeleton className="mx-auto h-3 w-12 sm:h-3.5 sm:w-14" />
               </div>
             </Skeleton>
           ))}

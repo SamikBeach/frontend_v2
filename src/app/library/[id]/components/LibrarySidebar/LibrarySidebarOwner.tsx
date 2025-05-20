@@ -36,7 +36,7 @@ export const LibrarySidebarOwner: FC<LibrarySidebarOwnerProps> = ({
       return;
     }
 
-    await toggleFollow(owner.id);
+    await toggleFollow(owner.id, owner.username);
   };
 
   // 비로그인 사용자에게도 항상 팔로우 버튼 표시 (자기 자신이 아닌 경우)

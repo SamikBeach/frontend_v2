@@ -180,7 +180,7 @@ function UserListItem({
       e.stopPropagation();
       e.preventDefault();
 
-      await toggleFollow(user.id);
+      await toggleFollow(user.id, user.username);
 
       // 팔로우/언팔로우 후 관련 쿼리 무효화
       queryClient.invalidateQueries({
@@ -192,7 +192,7 @@ function UserListItem({
         queryKey: ['profile', parentUserId],
       });
     },
-    [toggleFollow, user.id, queryClient, parentUserId, listType]
+    [toggleFollow, user.id, user.username, queryClient, parentUserId, listType]
   );
 
   const displayName = user.username || `사용자 ${user.id}`;

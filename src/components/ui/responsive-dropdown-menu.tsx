@@ -405,7 +405,7 @@ function ResponsiveDropdownMenuSubContent({
         <DrawerPrimitive.Overlay className="fixed inset-0 z-50 bg-black/40" />
         <DrawerPrimitive.Content
           className={cn(
-            'bg-popover text-popover-foreground fixed inset-x-0 bottom-0 z-50 mt-24 flex flex-col space-y-3 rounded-t-[10px] border p-4 shadow-lg',
+            'bg-popover text-popover-foreground fixed inset-x-0 bottom-0 z-52 mt-24 flex flex-col space-y-3 rounded-t-[10px] border p-4 shadow-lg',
             'w-full', // Ensure full width
             drawerClassName || className
           )}

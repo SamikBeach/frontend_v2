@@ -232,7 +232,7 @@ export function LoginForm({
 
         <Button
           type="submit"
-          className="w-full rounded-xl bg-gray-900 font-medium text-white hover:bg-gray-800 focus:ring-offset-0"
+          className="w-full rounded-xl bg-green-600 font-medium text-white hover:bg-green-700 focus:ring-offset-0"
           disabled={loginMutation.isPending}
         >
           {loginMutation.isPending ? (

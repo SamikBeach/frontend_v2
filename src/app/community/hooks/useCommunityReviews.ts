@@ -4,7 +4,7 @@ import {
   communitySortOptionAtom,
   communityTypeFilterAtom,
 } from '@/atoms/community';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 
 /**
@@ -19,22 +19,15 @@ export const useCommunityReviews = (limit: number = 10) => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-    isLoading,
     isError,
     error,
-  } = useInfiniteQuery({
+  } = useSuspenseInfiniteQuery({
     queryKey: ['communityReviews', sortOption, typeFilter, limit],
     queryFn: async ({ pageParam = 1 }) => {
-      // 타입이 'all'이면 백엔드에 전달하지 않음
       const type =
         typeFilter !== 'all' ? (typeFilter as ReviewType) : undefined;
-
-      // filter 값을 백엔드에 전달 (recent, popular, following)
       const filter = sortOption === 'latest' ? 'recent' : sortOption;
-
-      // getReviews 함수 사용
       const result = await getReviews(pageParam, limit, filter, type);
-
       return {
         ...result,
         page: pageParam,
@@ -59,7 +52,6 @@ export const useCommunityReviews = (limit: number = 10) => {
 
   return {
     reviews,
-    isLoading,
     isError,
     error,
     totalReviews,

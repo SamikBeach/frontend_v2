@@ -138,7 +138,7 @@ export function CommentItem({
               className="object-cover"
             />
           )}
-          <AvatarFallback className="bg-gray-200 text-gray-700">
+          <AvatarFallback className="bg-gray-200 text-xs text-gray-700">
             {comment.author.username.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
@@ -209,12 +209,12 @@ export function CommentItem({
                   onClick={handleLikeToggle}
                   className={`flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-colors ${
                     isLiked
-                      ? 'bg-pink-50 text-pink-500'
+                      ? 'bg-green-50 text-green-600'
                       : 'text-gray-500 hover:bg-gray-100'
                   }`}
                 >
                   <ThumbsUp
-                    className={`h-2.5 w-2.5 sm:h-3 sm:w-3 ${isLiked ? 'fill-pink-500' : ''}`}
+                    className={`h-2.5 w-2.5 sm:h-3 sm:w-3 ${isLiked ? 'fill-green-600' : ''}`}
                   />
                   <span>{likeCount}</span>
                 </button>

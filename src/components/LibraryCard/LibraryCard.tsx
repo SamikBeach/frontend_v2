@@ -144,7 +144,7 @@ export function LibraryCard({
         </CardHeader>
         <CardContent className="flex flex-1 flex-col px-3 pt-0 pb-2 sm:px-5 sm:pb-3">
           {library.description && (
-            <p className="mb-3 line-clamp-1 text-xs text-gray-600 sm:mb-4 sm:text-sm">
+            <p className="mb-3 line-clamp-1 text-sm text-gray-600 sm:mb-4 sm:text-sm">
               {library.description}
             </p>
           )}

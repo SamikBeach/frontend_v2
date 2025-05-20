@@ -29,43 +29,6 @@ import {
   DiscoverSortDropdown,
 } from './components';
 
-// 스크롤바 숨기는 CSS 추가
-const noScrollbarStyles = `
-  /* 스크롤바 숨김 */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none !important;
-    scrollbar-width: none !important;
-  }
-
-  /* 모바일 환경에서 스크롤바 추가 숨김 처리 */
-  * {
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* 모바일 환경에서 추가 스크롤바 숨김 처리 */
-  @media (max-width: 768px) {
-    .overflow-x-auto::-webkit-scrollbar,
-    div::-webkit-scrollbar {
-      display: none !important;
-      width: 0 !important;
-      height: 0 !important;
-    }
-    
-    .overflow-x-auto,
-    div.overflow-x-auto {
-      -ms-overflow-style: none !important;
-      scrollbar-width: none !important;
-      -webkit-overflow-scrolling: touch;
-    }
-  }
-`;
-
 // 책 컨텐츠 로딩 스켈레톤
 function BooksLoading() {
   return (
@@ -129,9 +92,6 @@ export default function DiscoverPage() {
 
   return (
     <div className="w-full bg-white pb-1">
-      {/* CSS 스타일 추가 */}
-      <style dangerouslySetInnerHTML={{ __html: noScrollbarStyles }} />
-
       {/* 필터 영역 및 브레드크럼 - 모바일에선 상단 고정 해제, 데스크탑만 sticky */}
       <div className="w-full bg-white md:sticky md:top-[56px] md:z-30">
         {/* 브레드크럼 */}

@@ -84,7 +84,7 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
         {/* 모바일에서는 항상 모든 카테고리 표시, 데스크탑에서는 visibleCategories 기반으로 표시 */}
         <div className="flex gap-1.5 md:flex-wrap md:gap-2">
           {/* 모바일에서는 모든 카테고리 표시 */}
-          <div className="flex gap-2 px-2 md:hidden">
+          <div className="flex gap-2 pl-2 after:block after:w-1 after:flex-shrink-0 after:content-[''] md:hidden">
             {categories.map(category => (
               <button
                 key={category.id}

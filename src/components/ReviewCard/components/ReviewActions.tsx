@@ -26,12 +26,12 @@ export function ReviewActions({
         disabled={isLikeLoading}
         className={`flex h-8 cursor-pointer items-center gap-1 rounded-full px-3 text-sm font-medium transition-colors ${
           isLiked
-            ? 'bg-pink-50 text-pink-500'
+            ? 'bg-green-50 text-green-600'
             : 'text-gray-600 hover:bg-gray-100'
         }`}
       >
         <ThumbsUp
-          className={`mr-0.5 h-4 w-4 ${isLiked ? 'fill-pink-500' : ''}`}
+          className={`mr-0.5 h-4 w-4 ${isLiked ? 'fill-green-600' : ''}`}
         />
         <span>{likesCount}</span>
       </button>

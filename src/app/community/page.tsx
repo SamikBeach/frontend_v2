@@ -11,6 +11,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
+import { Suspense } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CreateReviewCard, FilterArea } from './components';
 import { useCommunityReviews } from './hooks';
@@ -48,16 +49,11 @@ function ReviewsList() {
   // 무한 스크롤 훅 사용
   const {
     reviews,
-    isLoading,
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
     sortOption,
   } = useCommunityReviews(10);
-
-  if (isLoading) {
-    return <ReviewsLoading />;
-  }
 
   if (reviews.length === 0) {
     return <EmptyState selectedSort={sortOption} />;
@@ -126,12 +122,14 @@ function CommunityContent() {
       </div>
 
       {/* 메인 콘텐츠 */}
-      <div className="pt-2">
+      <div className="px-2 pt-1 sm:px-0">
         {/* 포스트 작성 */}
-        {currentUser && <CreateReviewCard user={currentUser} />}
+        <CreateReviewCard />
 
-        {/* 포스트 목록 - 바로 사용 */}
-        <ReviewsList />
+        {/* 포스트 목록 - Suspense로 감싸기 */}
+        <Suspense fallback={<ReviewsLoading />}>
+          <ReviewsList />
+        </Suspense>
       </div>
     </div>
   );

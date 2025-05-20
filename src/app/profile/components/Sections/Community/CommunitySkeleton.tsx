@@ -3,10 +3,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 // 필터 메뉴 스켈레톤 컴포넌트
 export function FilterMenuSkeleton() {
   return (
-    <div className="mb-3 flex flex-wrap gap-3 sm:mb-6">
-      {Array.from({ length: 5 }).map((_, index) => (
-        <Skeleton key={index} className="h-8 w-24 rounded-full" />
-      ))}
+    <div className="w-full">
+      <div className="no-scrollbar w-full overflow-x-auto pt-0.5 pb-1 md:pt-1 md:pb-1">
+        <div className="flex gap-2 pr-2 pl-2 after:block after:w-1 after:flex-shrink-0 after:content-[''] md:hidden">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <Skeleton
+              key={index}
+              className="h-9 w-16 rounded-full px-4 text-sm font-medium"
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

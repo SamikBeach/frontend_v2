@@ -8,11 +8,11 @@ interface LogoImageProps {
 }
 
 const SIZES = {
-  xs: 16,
-  sm: 24,
-  md: 32,
-  lg: 48,
-  xl: 64,
+  xs: 96,
+  sm: 96,
+  md: 96,
+  lg: 96,
+  xl: 96,
 } as const;
 
 export default function LogoImage({
@@ -31,6 +31,8 @@ export default function LogoImage({
       height={pixelSize}
       className={className}
       priority={priority}
+      quality={100}
+      style={{ width: 32, height: 32 }}
     />
   );
 }
