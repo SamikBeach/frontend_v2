@@ -1,3 +1,5 @@
+import { useIsMobile } from '@/hooks/use-mobile';
+
 interface ReviewTextProps {
   content: string;
   isLongContent: boolean;
@@ -11,18 +13,40 @@ export function ReviewText({
   expanded,
   setExpanded,
 }: ReviewTextProps) {
+  const isMobile = useIsMobile();
+
+  const handleExpand = () => {
+    if (!expanded) setExpanded(true);
+  };
+
+  const shouldEnableExpand = isLongContent && !expanded;
+
   return (
     <div className="mt-2">
-      <p className="text-[15px] leading-relaxed whitespace-pre-line text-gray-800">
-        {expanded ? content : content.slice(0, 200)}
+      <p
+        className={`text-[15px] leading-relaxed whitespace-pre-line text-gray-800 ${!expanded ? 'line-clamp-7' : ''}`}
+        {...(isMobile && shouldEnableExpand
+          ? {
+              onClick: handleExpand,
+              role: 'button',
+              tabIndex: 0,
+              'aria-expanded': expanded,
+              style: { cursor: 'pointer' },
+            }
+          : {})}
+      >
+        {content}
       </p>
-      {isLongContent && (
-        <button
-          onClick={() => setExpanded(!expanded)}
-          className="mt-2 cursor-pointer text-sm text-gray-500 hover:text-gray-700"
+      {shouldEnableExpand && (
+        <span
+          className="mt-2 inline-block cursor-pointer text-sm text-[#A0AEC0] hover:underline"
+          onClick={handleExpand}
+          tabIndex={0}
+          role="button"
+          aria-expanded={expanded}
         >
-          {expanded ? '접기' : '더보기'}
-        </button>
+          더 보기
+        </span>
       )}
     </div>
   );
