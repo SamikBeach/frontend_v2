@@ -48,13 +48,13 @@ export const BookCard = React.memo(
       >
         <div
           className={cn(
-            'group w-full transition-all hover:bg-gray-50',
+            'group w-full transition-all',
             horizontal ? 'flex h-auto items-start' : 'h-full bg-white'
           )}
         >
           <div
             className={cn(
-              'relative flex items-center justify-center overflow-hidden rounded-sm bg-gray-100',
+              'relative flex flex-col items-center justify-end overflow-hidden rounded-md bg-white',
               horizontal ? 'h-auto w-24 flex-shrink-0' : 'aspect-[3/4.5] w-full'
             )}
           >
@@ -62,7 +62,7 @@ export const BookCard = React.memo(
               src={coverImage}
               alt={book.title}
               className={cn(
-                'h-auto w-full object-contain transition-transform group-hover:scale-[1.02]'
+                'h-auto max-h-full w-auto max-w-full rounded-md object-contain object-bottom transition-transform group-hover:scale-[1.02]'
               )}
               loading="lazy"
             />
@@ -71,7 +71,7 @@ export const BookCard = React.memo(
             className={cn(
               horizontal
                 ? 'flex h-full flex-1 flex-col justify-between px-2 py-0.5'
-                : 'p-2.5'
+                : 'px-2.5 pt-2.5 pb-2.5'
             )}
           >
             <div>
