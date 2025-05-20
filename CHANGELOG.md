@@ -1,5 +1,49 @@
 # 🚦 CHANGELOG
 
+# [1.4.0](https://github.com/SamikBeach/frontend_v2/compare/1.3.1...1.4.0) (2025-05-20)
+
+
+### Bug Fixes
+
+* BookCard 이미지에 rounded-md 적용, 이미지 자체에도 라운드가 보이도록 개선 ([4355df4](https://github.com/SamikBeach/frontend_v2/commit/4355df4b4108de2c7fdc994d8b27db4aba38b21e))
+* BookSearchDialog에서 책 선택 시 닫히면서 검색어도 초기화되도록 처리 ([69f6d23](https://github.com/SamikBeach/frontend_v2/commit/69f6d23139ebca75ee61cd68ae650f991a2f97c4))
+* ReviewCard 댓글 좋아요(ThumbsUp) 버튼 색상을 green 계열로 변경 ([a04e9c5](https://github.com/SamikBeach/frontend_v2/commit/a04e9c5235b760df447ba4ccb5c1c59e350a7d89))
+* ReviewDialog textarea 폰트사이즈 16px, placeholder는 기존 크기 유지 ([6f72d8e](https://github.com/SamikBeach/frontend_v2/commit/6f72d8ed272730f62332b03b6fa7b0c67e2e573c))
+* SortDropdown 드롭다운 내부 active 항목 스타일 단순화 ([128603f](https://github.com/SamikBeach/frontend_v2/commit/128603febf4662078ac523714db8973a826d95d9))
+* 댓글 수 업데이트가 모든 communityReviews 쿼리 인스턴스에 반영되도록 개선 ([43b4740](https://github.com/SamikBeach/frontend_v2/commit/43b47407eed78e732eac7d6a84cf023543a543f9))
+* 댓글 입력창 및 ReviewCard 아바타 폴백 이니셜 폰트 크기 축소(text-xs) ([e280b56](https://github.com/SamikBeach/frontend_v2/commit/e280b562b60fc992efaae89a1f4d8dd73780e3e4))
+* 댓글 입력창 제출 버튼을 green-600 계열로 변경 ([5e88aca](https://github.com/SamikBeach/frontend_v2/commit/5e88aca61ef05b6ee0f84a04307507769c215ec0))
+* 로그인하지 않은 상태에서도 커뮤니티 글쓰기 입력창(CreateReviewCard) 항상 노출 ([40a1b31](https://github.com/SamikBeach/frontend_v2/commit/40a1b311792c8f080a41696a7ef625dc887b2c67))
+* 리뷰 수정 시 토스트가 두 번 뜨는 문제 수정 ([19ef611](https://github.com/SamikBeach/frontend_v2/commit/19ef61134f1c99f875a0a7ad2babbf3603897e9b))
+* 모바일 기간/정렬 버튼 크기를 데스크톱과 동일하게 통일(h-8, px-3, text-xs) ([2267e0d](https://github.com/SamikBeach/frontend_v2/commit/2267e0d45b5521a2f0e2fd125ac64900ba406b0d))
+* 모바일 서재 목록 태그 필터 영역을 분야별 인기 카테고리 필터와 동일한 스타일로 통일 ([be70334](https://github.com/SamikBeach/frontend_v2/commit/be703344d934941c1053a5b7e4b2e2aa88e5c03f))
+* 모바일 서재 태그 메뉴 버튼 크기를 발견하기 카테고리 필터와 통일 ([8c33dd3](https://github.com/SamikBeach/frontend_v2/commit/8c33dd352038e5e2ebcd3f7730e940359bea4743))
+* 모바일 카테고리 필터 flex 컨테이너에 after 가상요소로 오른쪽 여백 보장 ([3d819d2](https://github.com/SamikBeach/frontend_v2/commit/3d819d2e91381f0100f5c7fa9265020f7aa4f268))
+* 모바일에서도 더 보기 버튼 항상 노출 및 클릭/터치 동작 일관성 개선 ([70c0dee](https://github.com/SamikBeach/frontend_v2/commit/70c0dee46ecc447aca85954c727880030117030d))
+* 발견하기/분야별 인기/커뮤니티 메뉴 active 스타일을 초록색 계열로 변경 ([7f44fd4](https://github.com/SamikBeach/frontend_v2/commit/7f44fd4b99c84bf7745782f68f32258c66b2ad24))
+* 브레드크럼 글자 크기를 14px로 통일 (모바일/데스크톱) ([c7a95c4](https://github.com/SamikBeach/frontend_v2/commit/c7a95c4852b5c9eec989a27330650527c180b759))
+* 새 서재 만들기 Drawer 모바일에서 세로 길이 100%로 보이도록 수정 ([71c8cc4](https://github.com/SamikBeach/frontend_v2/commit/71c8cc4ae1b10d7476ced874815f0f9d183f65cb))
+* 서브 메뉴 active 컬러를 파란색 계열(border-blue-200 bg-blue-50 text-blue-700)로 되돌림 ([a470faf](https://github.com/SamikBeach/frontend_v2/commit/a470faf4b1daefe95490746eae42d5ed5ddbcf63))
+* 서재 검색 placeholder 텍스트 크기 축소 ([3d8fa62](https://github.com/SamikBeach/frontend_v2/commit/3d8fa621c0688b2044d3b7e9882d1509aec6f646))
+* 서재 목록 필터 메뉴(태그 필터) flex 컨테이너에 after 가상요소로 오른쪽 여백 보장 ([1bca990](https://github.com/SamikBeach/frontend_v2/commit/1bca99049162f9e7e31c8068bf7a846271f5adf5))
+* 서재 상세페이지 Empty 메시지 모바일 폰트 크기 축소 및 중복 제거 ([c9a353d](https://github.com/SamikBeach/frontend_v2/commit/c9a353d88b15774bdf00817a18f67a6e31e2d218))
+* 스크롤바 숨김 스타일을 globals.css로 이동, 인라인 스타일 제거 및 전역 적용 ([b1eb0bc](https://github.com/SamikBeach/frontend_v2/commit/b1eb0bcf00f314d1acf64bd9c7e2052b5896a482))
+* 스타일 수정 ([20ed2f3](https://github.com/SamikBeach/frontend_v2/commit/20ed2f31f57688bca0442a01bff0cc9ed7b2d770))
+* 스타일 수정 ([05a2235](https://github.com/SamikBeach/frontend_v2/commit/05a22355dca95e1056a00fcc71939ecea0acff83))
+* 커뮤니티 인기/팔로잉/최신 메뉴 버튼 스타일을 발견하기 서브메뉴와 동일하게 통일 ([a84e17e](https://github.com/SamikBeach/frontend_v2/commit/a84e17e22ff22a980359df9697aa45a157820bf3))
+* 토스트 위치 수정 ([7d8f93c](https://github.com/SamikBeach/frontend_v2/commit/7d8f93c2be24cdb286dc4c670f1f8807ad0fa310))
+* 팔로우 성공 메시지에 사용자 이름이 노출되도록 개선 ([2687f0d](https://github.com/SamikBeach/frontend_v2/commit/2687f0dbf6c2c103677c0242390973237e0b941b))
+* 프로필 메뉴 변경 시 스크롤 이동 제거 ([d2ef2f1](https://github.com/SamikBeach/frontend_v2/commit/d2ef2f1c2d421a2dee51fc33b98d82cfaac6a108))
+* 프로필 편집 드로어가 모바일에서 전체화면 높이를 차지하도록 수정 ([4c08366](https://github.com/SamikBeach/frontend_v2/commit/4c08366b15aaefaf8efc16e1aff5dbad0b64c134))
+
+
+### Features
+
+* BookSearchDialog 인기 검색어 숫자(1~3위) 배경색을 green-600으로 변경 ([8a96806](https://github.com/SamikBeach/frontend_v2/commit/8a968062ee25bd640369e68a8a8db19d55b4cc5c))
+* 모바일에서 LibraryCard description 글자 크기 개선 및 Skeleton 높이 조정 ([7fe22ca](https://github.com/SamikBeach/frontend_v2/commit/7fe22cab7da942702bd520e3862c0227f878561d))
+* 프로필 페이지 스켈레톤 UI 크기 및 레이아웃 모바일 최적화 ([5b6ee3c](https://github.com/SamikBeach/frontend_v2/commit/5b6ee3c6326c590582a78838d0ac6d8ece13ba83))
+* 홈 인기서재(BookOpen) 아이콘을 Library 아이콘으로 교체 ([588b851](https://github.com/SamikBeach/frontend_v2/commit/588b8513e4b34042adddf729f1260f5003ae78be))
+
 ## [1.3.1](https://github.com/SamikBeach/frontend_v2/compare/1.3.0...1.3.1) (2025-05-19)
 
 
