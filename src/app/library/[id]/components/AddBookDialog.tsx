@@ -298,7 +298,8 @@ export function AddBookDialog({
     <ResponsiveDialog open={isOpen} onOpenChange={handleCloseDialog}>
       <ResponsiveDialogContent
         className="flex min-w-[800px] flex-col bg-white p-5 pb-2"
-        drawerClassName="flex flex-col bg-white p-0 h-full overflow-hidden"
+        drawerClassName="flex flex-col bg-white p-0 h-full overflow-hidden z-53"
+        drawerOverlayClassName="z-52"
         onOpenAutoFocus={e => {
           e.preventDefault();
           setTimeout(() => {
