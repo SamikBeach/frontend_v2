@@ -307,7 +307,7 @@ export function ReviewDialog({
                     ? '내용을 비워두면 리뷰가 삭제됩니다'
                     : '이 책에 대한 리뷰를 남겨주세요'
                 }
-                className={`min-h-[150px] w-full resize-none rounded-2xl border-gray-200 p-4 text-sm placeholder:text-gray-400 focus:border-pink-200 focus:bg-white focus:ring-2 focus:ring-pink-100 ${
+                className={`min-h-[150px] w-full resize-none rounded-2xl border-gray-200 p-4 text-[16px] placeholder:text-sm placeholder:text-gray-400 focus:border-pink-200 focus:bg-white focus:ring-2 focus:ring-pink-100 ${
                   isDeleteMode
                     ? 'bg-red-50'
                     : isCreateMode
