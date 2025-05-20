@@ -159,17 +159,17 @@ export function ResetPasswordForm({
       <div className="flex items-center space-x-2">
         <div
           className={`h-2.5 w-2.5 rounded-full ${
-            step === 'request' ? 'bg-gray-900' : 'bg-gray-300'
+            step === 'request' ? 'bg-green-600' : 'bg-gray-300'
           }`}
         />
         <div
           className={`h-2.5 w-2.5 rounded-full ${
-            step === 'verify' ? 'bg-gray-900' : 'bg-gray-300'
+            step === 'verify' ? 'bg-green-600' : 'bg-gray-300'
           }`}
         />
         <div
           className={`h-2.5 w-2.5 rounded-full ${
-            step === 'reset' ? 'bg-gray-900' : 'bg-gray-300'
+            step === 'reset' ? 'bg-green-600' : 'bg-gray-300'
           }`}
         />
       </div>
