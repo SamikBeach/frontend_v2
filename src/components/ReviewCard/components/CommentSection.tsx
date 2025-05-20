@@ -52,7 +52,7 @@ export function CommentSection({
               className="object-cover"
             />
           )}
-          <AvatarFallback className="bg-gray-200 text-gray-700">
+          <AvatarFallback className="bg-gray-200 text-xs text-gray-700">
             {getNameInitial(currentUser.username)}
           </AvatarFallback>
         </Avatar>
