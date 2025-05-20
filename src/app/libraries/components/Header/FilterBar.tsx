@@ -50,7 +50,7 @@ function FilterBarContent({
 
   return (
     <div className="no-scrollbar flex gap-1.5 overflow-x-auto pt-0.5 pb-0.5 md:gap-2 md:pt-1 md:pb-1">
-      <div className="flex gap-1.5 md:gap-2">
+      <div className="flex gap-1.5 after:block after:w-1 after:flex-shrink-0 after:content-[''] md:gap-2">
         {tags.map((tag: Tag) => (
           <TagButton
             key={tag.id}
