@@ -49,8 +49,8 @@ function FilterBarContent({
   };
 
   return (
-    <div className="no-scrollbar flex gap-1.5 overflow-x-auto pt-0.5 pb-0.5 md:gap-2 md:pt-1 md:pb-1">
-      <div className="flex gap-1.5 after:block after:w-1 after:flex-shrink-0 after:content-[''] md:gap-2">
+    <div className="no-scrollbar w-full overflow-x-auto pt-0.5 pb-1 md:pt-1 md:pb-1">
+      <div className="flex gap-2 pl-2 after:block after:w-1 after:flex-shrink-0 after:content-[''] md:gap-2 md:pl-0 md:after:content-none">
         {tags.map((tag: Tag) => (
           <TagButton
             key={tag.id}
