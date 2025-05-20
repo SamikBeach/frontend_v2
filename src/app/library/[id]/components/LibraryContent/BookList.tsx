@@ -31,8 +31,10 @@ export function BookList({
 
   if (books.length === 0) {
     return (
-      <div className="col-span-full py-8 text-center">
-        <p className="text-gray-500">아직 추가된 책이 없습니다.</p>
+      <div className="col-span-full py-4 text-center sm:py-8">
+        <p className="text-sm text-gray-500 sm:text-sm">
+          아직 추가된 책이 없습니다.
+        </p>
       </div>
     );
   }
