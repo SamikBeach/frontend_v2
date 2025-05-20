@@ -21,6 +21,7 @@ interface ReviewFormProps {
   handleSubmitReview: () => Promise<void>;
   isLoading: boolean;
   children?: ReactNode;
+  onTextareaFocus?: () => void;
 }
 
 export function ReviewForm({
@@ -32,6 +33,7 @@ export function ReviewForm({
   handleSubmitReview,
   isLoading,
   children,
+  onTextareaFocus,
 }: ReviewFormProps) {
   const isMobile = useIsMobile();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -87,6 +89,7 @@ export function ReviewForm({
           target.style.height = 'auto';
           target.style.height = `${target.scrollHeight}px`;
         }}
+        onFocus={onTextareaFocus}
       />
 
       {/* 선택된 책 정보 및 별점/읽기 상태 표시 (children으로 받음) */}

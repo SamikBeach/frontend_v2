@@ -1,6 +1,7 @@
 import { SearchResult } from '@/apis/search/types';
 import { AddBookDialog } from '@/app/library/[id]/components';
 import { communityTypeFilterAtom } from '@/atoms/community';
+import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   ResponsiveAlertDialog,
@@ -11,6 +12,7 @@ import {
   ResponsiveAlertDialogHeader,
   ResponsiveAlertDialogTitle,
 } from '@/components/ui/responsive-alert-dialog';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useCreateReview } from '../../hooks';
@@ -18,17 +20,20 @@ import { ReviewForm } from './components/ReviewForm';
 import { SelectedBook } from './components/SelectedBook';
 import { UserAvatar } from './components/UserAvatar';
 
+interface CreateReviewCardProps {
+  user?: UserProfile;
+}
+
 export interface UserProfile {
   id: number;
   username?: string;
   profileImage?: string;
 }
 
-interface CreateReviewCardProps {
-  user: UserProfile;
-}
-
-export function CreateReviewCard({ user }: CreateReviewCardProps) {
+export function CreateReviewCard({ user: userProp }: CreateReviewCardProps) {
+  const currentUser = useCurrentUser();
+  const user = userProp ||
+    currentUser || { id: 0, username: '게스트', profileImage: undefined };
   const [bookDialogOpen, setBookDialogOpen] = useState(false);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -114,6 +119,8 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
     }
   };
 
+  const [authDialogOpen, setAuthDialogOpen] = useState(false);
+
   return (
     <>
       <Card className="mb-3 overflow-hidden border-gray-200 bg-white sm:mb-4">
@@ -129,6 +136,9 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
                 handleBookDialogOpen={handleBookDialogOpen}
                 handleSubmitReview={handleSubmitReview}
                 isLoading={isLoading}
+                onTextareaFocus={() => {
+                  if (!currentUser) setAuthDialogOpen(true);
+                }}
               >
                 {/* 선택된 책 정보 및 별점 표시 (리뷰 태그인 경우) */}
                 {type === 'review' && selectedBook && (
@@ -179,6 +189,9 @@ export function CreateReviewCard({ user }: CreateReviewCardProps) {
           </ResponsiveAlertDialogFooter>
         </ResponsiveAlertDialogContent>
       </ResponsiveAlertDialog>
+
+      {/* 인증 다이얼로그 */}
+      <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
     </>
   );
 }
