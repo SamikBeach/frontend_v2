@@ -21,17 +21,22 @@ export function SortFilter({
   ];
 
   return (
-    <div className={cn('flex gap-1.5 md:gap-2', className)}>
+    <div
+      className={cn(
+        "no-scrollbar flex gap-2 overflow-x-auto pr-2 pl-2 after:block after:w-1 after:flex-shrink-0 after:content-[''] md:gap-2 md:pr-0 md:pl-0 md:after:content-none",
+        className
+      )}
+    >
       {sortOptions.map(option => (
         <button
           key={option.id}
           onClick={() => onSortClick(option.id as SortOption)}
           className={cn(
-            'flex min-w-[50px] cursor-pointer items-center justify-center rounded-full border text-xs font-medium transition-all md:min-w-[60px] md:text-sm',
+            'flex shrink-0 cursor-pointer items-center justify-center rounded-full border px-3 text-sm font-medium transition-colors md:px-3 md:text-sm',
             'h-8 md:h-8',
             selectedSort === option.id
-              ? 'border-blue-200 bg-blue-50 text-blue-600'
-              : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+              ? 'border-blue-200 bg-blue-50 text-blue-700'
+              : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
           )}
         >
           {option.name}

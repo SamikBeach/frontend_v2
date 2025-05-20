@@ -25,15 +25,15 @@ export function CategoryFilter({
 
   return (
     <div className={cn('w-full', className)}>
-      <div className="no-scrollbar w-full overflow-x-auto pb-0.5 md:pt-1 md:pb-1">
-        <div className="flex gap-1.5 md:gap-2">
+      <div className="no-scrollbar w-full overflow-x-auto pt-0.5 pb-1 md:pt-1 md:pb-1">
+        <div className="flex gap-2 pr-2 pl-2 after:block after:w-1 after:flex-shrink-0 after:content-[''] md:hidden">
           {mainCategories.map(category => (
             <button
               key={category.id}
               onClick={() => onCategoryClick(category.id as ReviewType | 'all')}
               className={cn(
-                'flex shrink-0 cursor-pointer items-center justify-center rounded-full px-3 text-xs font-medium transition-colors md:px-4 md:text-sm',
-                'h-8 md:h-9',
+                'flex shrink-0 cursor-pointer items-center justify-center rounded-full px-4 text-sm font-medium transition-colors md:px-4 md:text-sm',
+                'h-9 md:h-9',
                 selectedCategory === category.id
                   ? 'bg-gray-900 text-white'
                   : 'text-gray-700 hover:opacity-90'
@@ -51,6 +51,7 @@ export function CategoryFilter({
             </button>
           ))}
         </div>
+        {/* 데스크탑용: md:flex md:flex-wrap ... 필요시 추가 */}
       </div>
     </div>
   );

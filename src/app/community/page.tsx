@@ -126,7 +126,7 @@ function CommunityContent() {
       </div>
 
       {/* 메인 콘텐츠 */}
-      <div className="pt-2">
+      <div className="px-2 pt-1 sm:px-4">
         {/* 포스트 작성 */}
         {currentUser && <CreateReviewCard user={currentUser} />}
 
