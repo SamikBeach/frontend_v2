@@ -1,5 +1,13 @@
 # 🚦 CHANGELOG
 
+## [1.4.2](https://github.com/SamikBeach/frontend_v2/compare/1.4.1...1.4.2) (2025-05-20)
+
+
+### Bug Fixes
+
+* 서재 인기도 차트의 legend를 세로로 표시하도록 수정 ([4a63cfd](https://github.com/SamikBeach/frontend_v2/commit/4a63cfd4f9f5f3f319c31cc0a41e6544e9bf5445))
+* 스타일 수정 ([5f299a2](https://github.com/SamikBeach/frontend_v2/commit/5f299a2bed29d26994471c6e000d3909b4defb04))
+
 ## [1.4.1](https://github.com/SamikBeach/frontend_v2/compare/1.4.0...1.4.1) (2025-05-20)
 
 
