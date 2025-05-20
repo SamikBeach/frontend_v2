@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 interface UseUserFollowResult {
   isFollowing: boolean;
   setIsFollowing: (isFollowing: boolean) => void;
-  toggleFollow: (userId: number) => Promise<void>;
+  toggleFollow: (userId: number, username?: string) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -53,8 +53,9 @@ export function useUserFollow(initialIsFollowing = false): UseUserFollowResult {
   /**
    * 팔로우/언팔로우 토글 함수
    * @param userId 대상 사용자 ID
+   * @param username 대상 사용자 이름(선택)
    */
-  const toggleFollow = async (userId: number) => {
+  const toggleFollow = async (userId: number, username?: string) => {
     // 로그인 체크는 컴포넌트에서 처리하므로 여기서는 API 호출만 처리
     if (!isLoggedIn) return;
 
@@ -65,7 +66,11 @@ export function useUserFollow(initialIsFollowing = false): UseUserFollowResult {
 
       if (newFollowingState) {
         await follow(userId);
-        toast.success('사용자를 팔로우했습니다.');
+        toast.success(
+          username
+            ? `${username}님을 팔로우했습니다.`
+            : '사용자를 팔로우했습니다.'
+        );
       } else {
         await unfollow(userId);
         toast.success('팔로우를 취소했습니다.');
