@@ -68,7 +68,7 @@ export function useReviewComments(
   const comments = commentsResponse.comments || [];
 
   // 댓글 추가 mutation
-  const { mutateAsync: addComment, isPending: isAddingComment } = useMutation({
+  const { mutateAsync: addComment } = useMutation({
     mutationFn: async () => {
       return apiCreateComment(reviewId, {
         content: commentText,
@@ -79,11 +79,29 @@ export function useReviewComments(
       queryClient.invalidateQueries({
         queryKey: ['review-comments', reviewId],
       });
-
-      // 커뮤니티 리뷰의 댓글 수도 업데이트
-      queryClient.invalidateQueries({
-        queryKey: ['communityReviews'],
-      });
+      // communityReviews의 모든 관련 쿼리 인스턴스의 commentCount를 직접 증가
+      queryClient
+        .getQueryCache()
+        .findAll({ queryKey: ['communityReviews'] })
+        .forEach(query => {
+          queryClient.setQueryData(query.queryKey, (oldData: any) => {
+            if (!oldData || !oldData.pages) return oldData;
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                reviews: page.reviews.map((review: any) =>
+                  review.id === reviewId
+                    ? {
+                        ...review,
+                        commentCount: (review.commentCount || 0) + 1,
+                      }
+                    : review
+                ),
+              })),
+            };
+          });
+        });
     },
     onError: () => {
       toast.error('댓글 작성에 실패했습니다.');
@@ -91,29 +109,49 @@ export function useReviewComments(
   });
 
   // 댓글 삭제 mutation
-  const { mutateAsync: deleteComment, isPending: isDeletingComment } =
-    useMutation({
-      mutationFn: async (commentId: number) => {
-        return apiDeleteComment(commentId);
-      },
-      onSuccess: () => {
-        // 댓글 목록 새로고침
-        queryClient.invalidateQueries({
-          queryKey: ['review-comments', reviewId],
+  const { mutateAsync: deleteComment } = useMutation({
+    mutationFn: async (commentId: number) => {
+      return apiDeleteComment(commentId);
+    },
+    onSuccess: () => {
+      // 댓글 목록 새로고침
+      queryClient.invalidateQueries({
+        queryKey: ['review-comments', reviewId],
+      });
+      // communityReviews의 모든 관련 쿼리 인스턴스의 commentCount를 직접 감소
+      queryClient
+        .getQueryCache()
+        .findAll({ queryKey: ['communityReviews'] })
+        .forEach(query => {
+          queryClient.setQueryData(query.queryKey, (oldData: any) => {
+            if (!oldData || !oldData.pages) return oldData;
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                reviews: page.reviews.map((review: any) =>
+                  review.id === reviewId
+                    ? {
+                        ...review,
+                        commentCount: Math.max(
+                          0,
+                          (review.commentCount || 0) - 1
+                        ),
+                      }
+                    : review
+                ),
+              })),
+            };
+          });
         });
-
-        // 커뮤니티 리뷰의 댓글 수도 업데이트
-        queryClient.invalidateQueries({
-          queryKey: ['communityReviews'],
-        });
-      },
-      onError: () => {
-        toast.error('댓글 삭제에 실패했습니다.');
-      },
-    });
+    },
+    onError: () => {
+      toast.error('댓글 삭제에 실패했습니다.');
+    },
+  });
 
   // 댓글 좋아요 뮤테이션
-  const { mutate: likeComment, isPending: isLiking } = useMutation({
+  const { mutate: likeComment } = useMutation({
     mutationFn: (commentId: number) => apiLikeComment(commentId),
     onSuccess: () => {
       // 댓글 목록 새로고침
