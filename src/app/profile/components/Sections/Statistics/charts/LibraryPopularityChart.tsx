@@ -98,7 +98,7 @@ const CustomLegend = ({ payload }: any) => {
   if (!payload || payload.length === 0) return null;
 
   return (
-    <div className="flex justify-center gap-4 pb-1">
+    <div className="flex flex-col justify-center gap-2 pb-1">
       {payload.map((entry: any, index: number) => (
         <div key={`legend-${index}`} className="flex items-center gap-1.5">
           <div

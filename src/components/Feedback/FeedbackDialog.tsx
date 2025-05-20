@@ -69,7 +69,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
     <ResponsiveDialog open={isOpen} onOpenChange={onOpenChange}>
       <ResponsiveDialogContent
         className="rounded-2xl border-none p-0 sm:max-w-[425px]"
-        drawerClassName="w-full max-w-none rounded-t-[16px] border-none p-0"
+        drawerClassName="flex h-[100svh] min-h-0 w-full max-w-none flex-col rounded-t-[16px] border-none p-0"
       >
         <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
           <ResponsiveDialogTitle className="text-base font-medium">
@@ -86,7 +86,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
           </Button>
         </div>
 
-        <div className="px-5">
+        <div className="flex flex-1 flex-col overflow-y-auto px-5">
           <ResponsiveDialogDescription
             drawerClassName="mb-2"
             className="mb-4 text-sm text-gray-600 sm:mb-7 md:mb-6"

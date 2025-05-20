@@ -144,7 +144,7 @@ export function ReviewDialog({
       >
         <ResponsiveDialogContent
           className="max-w-md rounded-2xl border-none p-0"
-          drawerClassName="h-full min-h-0 max-h-full w-full max-w-none rounded-t-[16px] border-none p-0 z-52"
+          drawerClassName="flex h-[100svh] min-h-0 w-full max-w-none flex-col rounded-t-[16px] border-none p-0 z-52"
           drawerOverlayClassName="z-51"
         >
           <div className="sticky top-0 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
