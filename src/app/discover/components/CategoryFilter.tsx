@@ -22,16 +22,17 @@ const VISIBLE_CATEGORIES = 10;
 // CategoryFilterSkeleton 컴포넌트
 export function CategoryFilterSkeleton() {
   return (
-    <div className="w-full max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-4rem)]">
-      <div className="no-scrollbar w-full pt-0.5 pb-0.5 md:mb-2 md:pt-1 md:pb-1">
-        <div className="flex gap-1.5 md:gap-2">
+    <div className="w-full">
+      <div className="no-scrollbar w-full overflow-x-auto pt-0.5 pb-1 md:pt-1 md:pb-1">
+        <div className="flex gap-2 pl-2 after:block after:w-1 after:flex-shrink-0 after:content-[''] md:hidden">
           {[...Array(6)].map((_, i) => (
             <Skeleton
               key={i}
-              className="h-8 w-16 rounded-full md:h-9 md:w-20"
+              className="h-9 w-16 rounded-full px-4 text-sm font-medium"
             />
           ))}
         </div>
+        {/* 데스크탑용: md:flex md:flex-wrap ... 필요시 추가 */}
       </div>
     </div>
   );

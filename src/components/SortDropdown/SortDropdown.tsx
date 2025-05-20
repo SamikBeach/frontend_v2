@@ -207,7 +207,7 @@ export function SortDropdown<T = Book>({
               variant="ghost"
               size="sm"
               className={
-                `flex h-9 cursor-pointer items-center gap-1.5 rounded-full px-4 text-sm md:h-8 md:px-3 md:text-xs ` +
+                `flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs ` +
                 (isTimeRangeActive
                   ? 'border border-blue-200 bg-blue-50 text-blue-700'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100')
@@ -251,7 +251,7 @@ export function SortDropdown<T = Book>({
             variant="ghost"
             size="sm"
             className={
-              `flex h-9 cursor-pointer items-center gap-1.5 rounded-full px-4 text-sm md:h-8 md:px-3 md:text-xs ` +
+              `flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs ` +
               (isSortActive
                 ? 'border border-blue-200 bg-blue-50 text-blue-700'
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100')
