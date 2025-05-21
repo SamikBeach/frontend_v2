@@ -206,7 +206,7 @@ export function SignUpForm({
             onChange={emailField.onChange}
             onBlur={emailField.onBlur}
             name={emailField.name}
-            className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-sm transition-colors focus:bg-white focus:shadow-sm"
+            className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 transition-colors focus:bg-white focus:shadow-sm"
             autoComplete="email"
           />
           {errors.email && (
