@@ -246,7 +246,10 @@ function ResponsiveDialogFooter({
       data-slot={isMobile ? 'drawer-footer' : 'dialog-footer'}
       className={cn(
         isMobile
-          ? cn('mt-auto flex flex-col-reverse gap-2 p-4', drawerClassName)
+          ? cn(
+              'pb-safe mt-auto flex flex-col-reverse gap-2 p-4',
+              drawerClassName
+            )
           : cn(
               'flex flex-col-reverse gap-2 sm:flex-row sm:justify-end',
               className

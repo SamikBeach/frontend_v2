@@ -162,7 +162,7 @@ export function AuthDialog({
         <div
           className={`${
             isMobile ? 'flex-1 overflow-y-auto' : 'max-h-[80vh] overflow-y-auto'
-          } px-7 py-6`}
+          } px-7 py-6 ${isMobile ? 'pb-safe' : ''}`}
         >
           {/* 로그인 폼 */}
           {mode === 'login' && (
