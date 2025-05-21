@@ -1,5 +1,13 @@
 # 🚦 CHANGELOG
 
+# [1.6.0](https://github.com/SamikBeach/frontend_v2/compare/1.5.2...1.6.0) (2025-05-21)
+
+
+### Features
+
+* AuthDialog 입력 폰트 크기 수정으로 모바일 확대 방지 ([b7c6c60](https://github.com/SamikBeach/frontend_v2/commit/b7c6c6024a46633614361cfc5f4dee35e57b0149))
+* 모바일 환경에서 book 상세 페이지 스켈레톤 가로 스크롤 문제 수정 ([3c1908c](https://github.com/SamikBeach/frontend_v2/commit/3c1908c8c056969c96afb53dbd76e9976f210154))
+
 ## [1.5.2](https://github.com/SamikBeach/frontend_v2/compare/1.5.1...1.5.2) (2025-05-21)
 
 
