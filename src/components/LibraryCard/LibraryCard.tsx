@@ -95,15 +95,15 @@ export function LibraryCard({
                         <>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="10"
-                            height="10"
+                            width="8"
+                            height="8"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="mr-0.5 sm:mr-1 sm:h-12 sm:w-12"
+                            className="mr-0.5 sm:mr-1 sm:h-3.5 sm:w-3.5"
                           >
                             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
                             <circle cx="12" cy="12" r="3" />
@@ -114,15 +114,15 @@ export function LibraryCard({
                         <>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="10"
-                            height="10"
+                            width="8"
+                            height="8"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className="mr-0.5 sm:mr-1 sm:h-12 sm:w-12"
+                            className="mr-0.5 sm:mr-1 sm:h-3.5 sm:w-3.5"
                           >
                             <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
                             <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />

@@ -1,20 +1,37 @@
 import { Badge } from '@/components/ui/badge';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { useCallback } from 'react';
+import { ExternalLink } from 'lucide-react';
+import { useCallback, useState } from 'react';
 import { useBookDetails } from '../hooks';
+import { AladinDrawer } from './AladinDrawer';
 
 export function BookCoverSection() {
   const { book, isbn } = useBookDetails();
+  const [isAladinDrawerOpen, setIsAladinDrawerOpen] = useState(false);
+  const isMobile = useIsMobile();
 
-  // 알라딘으로 이동하는 함수
+  // 알라딘 페이지 열기 핸들러
   const handleOpenAladin = useCallback(() => {
     if (!isbn) return;
-    window.open(
-      `https://www.aladin.co.kr/shop/wproduct.aspx?isbn=${isbn}`,
-      '_blank'
-    );
-  }, [isbn]);
+
+    if (isMobile) {
+      // 모바일에서는 드로어 열기
+      setIsAladinDrawerOpen(true);
+    } else {
+      // 데스크톱에서는 새 창으로 열기
+      window.open(
+        `https://www.aladin.co.kr/shop/wproduct.aspx?isbn=${isbn}`,
+        '_blank'
+      );
+    }
+  }, [isbn, isMobile]);
+
+  // drawer 닫기
+  const handleCloseAladinDrawer = useCallback(() => {
+    setIsAladinDrawerOpen(false);
+  }, []);
 
   if (!book) return null;
 
@@ -76,7 +93,22 @@ export function BookCoverSection() {
             출간일: {formattedDate}
           </p>
         )}
+
+        <button
+          onClick={handleOpenAladin}
+          className="flex items-center text-sm text-blue-500 hover:text-blue-600"
+        >
+          <ExternalLink className="mr-1 h-3 w-3" />
+          알라딘에서 더 보기
+        </button>
       </div>
+
+      {/* 알라딘 드로어 - 모바일에서만 사용 */}
+      <AladinDrawer
+        isbn={isbn}
+        isOpen={isAladinDrawerOpen}
+        onClose={handleCloseAladinDrawer}
+      />
     </div>
   );
 }

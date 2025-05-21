@@ -100,7 +100,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
 
         <ResponsiveDialogFooter
           className="flex justify-end gap-2 border-t border-gray-100 px-5 py-4"
-          drawerClassName="flex flex-col-reverse gap-2 border-t border-gray-100 px-5 py-4"
+          drawerClassName="flex flex-col-reverse gap-2 border-t border-gray-100 px-5 py-4 pb-safe"
         >
           <Button
             type="button"

@@ -1,3 +1,4 @@
+export * from './AladinDrawer';
 export * from './BookActionButtons';
 export * from './BookCoverSection';
 export * from './BookHeader';

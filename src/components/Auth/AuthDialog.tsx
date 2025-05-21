@@ -126,7 +126,6 @@ export function AuthDialog({
           className="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
           drawerClassName="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
           onClose={() => props.onOpenChange?.(false)}
-          hideCloseButton={false}
         >
           <ResponsiveDialogTitle className="sr-only" drawerClassName="sr-only">
             로그인 / 회원가입
@@ -163,7 +162,7 @@ export function AuthDialog({
         <div
           className={`${
             isMobile ? 'flex-1 overflow-y-auto' : 'max-h-[80vh] overflow-y-auto'
-          } px-7 py-6`}
+          } px-7 py-6 ${isMobile ? 'pb-safe' : ''}`}
         >
           {/* 로그인 폼 */}
           {mode === 'login' && (

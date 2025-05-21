@@ -1,7 +1,6 @@
 'use client';
 
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -160,26 +159,25 @@ export function BookDialog() {
         shouldScaleBackground={false}
       >
         <ResponsiveDialogPortal>
-          <ResponsiveDialogContent drawerClassName="w-full bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg">
-            <div className="flex h-full flex-col">
-              <ResponsiveDialogTitle
-                className="sr-only"
-                drawerClassName="sr-only"
-              >
-                도서 상세 정보
-              </ResponsiveDialogTitle>
-
-              <ErrorBoundary FallbackComponent={ErrorFallback}>
-                <Suspense fallback={<BookFullSkeleton />}>
+          <ResponsiveDialogContent drawerClassName="w-full bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg outline-none focus:outline-none focus-visible:outline-none">
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <Suspense fallback={<BookFullSkeleton />}>
+                <div className="flex h-full flex-col">
+                  <ResponsiveDialogTitle
+                    className="sr-only"
+                    drawerClassName="sr-only"
+                  >
+                    도서 상세 정보
+                  </ResponsiveDialogTitle>
                   <ResponsiveDialogHeader className="p-0" onClose={close}>
-                    <BookHeader isDialog onClose={close} />
+                    <BookHeader isDialog />
                   </ResponsiveDialogHeader>
                   <div className="pb-safe h-full overflow-y-auto">
                     <MobileBookDialogContent />
                   </div>
-                </Suspense>
-              </ErrorBoundary>
-            </div>
+                </div>
+              </Suspense>
+            </ErrorBoundary>
           </ResponsiveDialogContent>
         </ResponsiveDialogPortal>
       </ResponsiveDialog>
@@ -199,13 +197,15 @@ export function BookDialog() {
           <div className="min-h-full rounded-lg py-5">
             <DialogPrimitive.Content
               aria-describedby={undefined}
-              className="relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg md:max-w-screen-xl"
+              className="relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg outline-none focus:outline-none focus-visible:outline-none md:max-w-screen-xl"
               onEscapeKeyDown={e => {
                 if (hasOpenDropdown) {
                   e.preventDefault();
                   return;
                 }
               }}
+              onOpenAutoFocus={e => e.preventDefault()}
+              onCloseAutoFocus={e => e.preventDefault()}
             >
               {/* DialogTitle 컴포넌트는 접근성 목적으로 필요하지만 실제 화면에 표시되는 제목은 BookHeader 컴포넌트에 있습니다. */}
               <DialogPrimitive.Title className="sr-only">
@@ -217,10 +217,6 @@ export function BookDialog() {
                   <DesktopBookDialogContent />
                 </Suspense>
               </ErrorBoundary>
-              <DialogPrimitive.Close className="ring-offset-background focus:ring-ring absolute top-4 right-4 cursor-pointer rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:pointer-events-none">
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </DialogPrimitive.Close>
             </DialogPrimitive.Content>
           </div>
         </DialogPrimitive.Overlay>
