@@ -117,7 +117,7 @@ export function AuthDialog({
     >
       <ResponsiveDialogContent
         className="w-[400px] max-w-[90vw] overflow-hidden rounded-2xl border-0 p-0 shadow-xl"
-        drawerClassName="w-full max-w-none overflow-hidden rounded-t-[16px] border-0 p-0 shadow-xl h-[100dvh]"
+        drawerClassName="w-full max-w-none overflow-hidden rounded-t-[16px] border-0 p-0 shadow-xl"
         onPointerDownOutside={handlePointerDownOutside}
         aria-describedby={undefined}
       >
@@ -125,7 +125,6 @@ export function AuthDialog({
         <ResponsiveDialogHeader
           className="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
           drawerClassName="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
-          closeButton
           onClose={() => props.onOpenChange?.(false)}
           hideCloseButton={false}
         >

@@ -146,8 +146,6 @@ function ResponsiveDialogContent({
           className={cn(
             'group/drawer-content bg-background fixed z-50 flex flex-col',
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[20px] data-[vaul-drawer-direction=bottom]:border-t-0',
-            // Height adapts to content
-            'max-h-[100dvh]',
             drawerClassName
           )}
           {...props}

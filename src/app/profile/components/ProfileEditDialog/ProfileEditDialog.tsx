@@ -88,7 +88,7 @@ export function ProfileEditDialog({
     <ResponsiveDialog open={isOpen} onOpenChange={onClose}>
       <ResponsiveDialogContent
         className="overflow-hidden p-0 sm:max-w-[450px]"
-        drawerClassName="p-0 overflow-hidden h-[100dvh]"
+        drawerClassName="p-0 overflow-hidden"
       >
         <ResponsiveDialogHeader
           className="border-b border-gray-100 bg-white/95 px-4 py-4 backdrop-blur-sm"

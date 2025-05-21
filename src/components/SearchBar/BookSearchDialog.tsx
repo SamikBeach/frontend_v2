@@ -119,10 +119,9 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
       <ResponsiveDialogPortal>
         <ResponsiveDialogContent
           className={cn(
-            'animate-expandDown fixed top-[6px] left-1/2 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full',
-            query ? 'h-[calc(100vh-32px)]' : 'auto'
+            'animate-expandDown fixed top-[6px] left-1/2 max-w-[calc(100vw-32px)] min-w-[800px] -translate-x-1/2 translate-y-0 gap-1 overflow-visible border-none bg-transparent p-0 shadow-none outline-none max-md:top-[16px] max-md:h-[calc(100vh-80px)] max-md:w-full'
           )}
-          drawerClassName="animate-expandUp flex h-[100svh] min-h-0 w-full max-w-none flex-col gap-1 overflow-hidden p-0 shadow-none outline-none z-[100]"
+          drawerClassName="h-[100dvh] animate-expandUp flex min-h-0 w-full max-w-none flex-col gap-1 overflow-hidden p-0 shadow-none outline-none z-[100]"
           dialogOverlayClassName="bg-black/5"
           drawerOverlayClassName="bg-black/5"
         >
@@ -131,13 +130,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
           </ResponsiveDialogTitle>
           <div
             className={cn(
-              'animate-expandDown flex h-full w-full flex-col overflow-hidden rounded-xl bg-white p-4 ring-1 ring-black/5 transition-all',
-              query
-                ? 'h-full max-h-full'
-                : view === 'recent'
-                  ? 'h-auto max-h-[640px]'
-                  : 'auto',
-              'max-md:h-full max-md:rounded-none max-md:px-2 max-md:pt-2 max-md:pb-0 max-md:ring-0'
+              'animate-expandDown flex h-full w-full flex-col overflow-hidden rounded-xl bg-white p-4 ring-1 ring-black/5 transition-all max-md:h-full max-md:rounded-none max-md:px-2 max-md:pt-2 max-md:pb-0 max-md:ring-0'
             )}
           >
             <div className="flex h-full flex-col overflow-hidden">

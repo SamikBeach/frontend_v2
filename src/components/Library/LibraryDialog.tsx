@@ -171,12 +171,11 @@ export function LibraryDialog({
         <ResponsiveDialogContent
           onOpenAutoFocus={e => e.preventDefault()}
           className="fixed top-1/2 left-1/2 max-w-md -translate-x-1/2 -translate-y-1/2 transform rounded-2xl border-none p-0 shadow-lg"
-          drawerClassName="flex h-[100svh] min-h-0 w-full max-w-none flex-col rounded-t-2xl border-t p-0 z-52"
+          drawerClassName="flex min-h-0 w-full max-w-none flex-col rounded-t-2xl border-t p-0 z-52"
           drawerOverlayClassName="z-51"
         >
           <ResponsiveDialogHeader
             className="flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl"
-            closeButton
             onClose={() => onOpenChange(false)}
           >
             <ResponsiveDialogTitle className="text-base font-medium">
