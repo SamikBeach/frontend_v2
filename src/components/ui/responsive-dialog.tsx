@@ -148,6 +148,9 @@ function ResponsiveDialogContent({
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[20px] data-[vaul-drawer-direction=bottom]:border-t-0',
             drawerClassName
           )}
+          onOpenAutoFocus={e => {
+            e.preventDefault();
+          }}
           {...props}
         >
           <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
@@ -171,6 +174,7 @@ function ResponsiveDialogContent({
           'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border p-6 shadow-lg duration-200 sm:max-w-lg',
           className
         )}
+        onOpenAutoFocus={e => e.preventDefault()}
         {...props}
       >
         {children}
@@ -210,7 +214,7 @@ function ResponsiveDialogHeader({
             data-slot="drawer-close"
             aria-label="닫기"
             onClick={onClose}
-            className="ml-2 flex h-8 w-8 items-center justify-center rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none"
+            className="ml-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full opacity-70 transition-opacity hover:bg-gray-100 hover:opacity-100 focus:ring-1 focus:ring-gray-200 focus:outline-hidden disabled:pointer-events-none"
           >
             <XIcon className="h-4 w-4" />
           </DrawerPrimitive.Close>
@@ -219,7 +223,7 @@ function ResponsiveDialogHeader({
             data-slot="dialog-close"
             aria-label="닫기"
             onClick={onClose}
-            className="ml-2 flex h-8 w-8 items-center justify-center rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none"
+            className="ml-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full opacity-70 transition-opacity hover:bg-gray-100 hover:opacity-100 focus:ring-1 focus:ring-gray-200 focus:outline-hidden disabled:pointer-events-none"
           >
             <XIcon className="h-4 w-4" />
           </DialogPrimitive.Close>
@@ -310,7 +314,6 @@ function ResponsiveDialogDescription({
     />
   );
 }
-
 // Close component
 function ResponsiveDialogClose({
   className,
@@ -323,13 +326,13 @@ function ResponsiveDialogClose({
   return isMobile ? (
     <DrawerPrimitive.Close
       data-slot="drawer-close"
-      className={cn(drawerClassName)}
+      className={cn('cursor-pointer flex h-8 w-8 items-center justify-center opacity-70 transition-opacity hover:bg-gray-100 hover:opacity-100 focus:outline-none disabled:pointer-events-none', drawerClassName)}
       {...props}
     />
   ) : (
     <DialogPrimitive.Close
       data-slot="dialog-close"
-      className={cn(className)}
+      className={cn('cursor-pointer flex h-8 w-8 items-center justify-center opacity-70 transition-opacity hover:bg-gray-100 hover:opacity-100 focus:outline-none disabled:pointer-events-none', className)}
       {...props}
     />
   );

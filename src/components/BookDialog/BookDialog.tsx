@@ -172,7 +172,7 @@ export function BookDialog() {
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <Suspense fallback={<BookFullSkeleton />}>
                   <ResponsiveDialogHeader className="p-0" onClose={close}>
-                    <BookHeader isDialog onClose={close} />
+                    <BookHeader isDialog />
                   </ResponsiveDialogHeader>
                   <div className="pb-safe h-full overflow-y-auto">
                     <MobileBookDialogContent />

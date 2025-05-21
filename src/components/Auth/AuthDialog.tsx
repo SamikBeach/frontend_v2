@@ -126,7 +126,6 @@ export function AuthDialog({
           className="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
           drawerClassName="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
           onClose={() => props.onOpenChange?.(false)}
-          hideCloseButton={false}
         >
           <ResponsiveDialogTitle className="sr-only" drawerClassName="sr-only">
             로그인 / 회원가입
