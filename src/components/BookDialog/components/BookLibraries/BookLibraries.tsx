@@ -23,7 +23,6 @@ import { useAtom } from 'jotai';
 import { ListPlus, Plus } from 'lucide-react';
 import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { toast } from 'sonner';
 import { useBookDetails, useBookLibraries } from '../../hooks';
 import { useLibrary } from '../../hooks/useLibrary';
 import { useUserLibraries } from '../../hooks/useUserLibraries';
@@ -80,15 +79,7 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
       return;
     }
 
-    try {
-      const newLibrary = await createLibrary(libraryData);
-      if (newLibrary && book) {
-        // 새로 생성된 서재에 책 추가 - 책 데이터는 필요한 경우에만 추가
-        toast.success(`'${newLibrary.name}' 서재가 생성되었습니다.`);
-      }
-    } catch {
-      toast.error('서재 생성 중 오류가 발생했습니다');
-    }
+    await createLibrary(libraryData);
   };
 
   // 서재에 담기 핸들러 래퍼 함수
@@ -167,6 +158,14 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
 
         {/* 로그인 다이얼로그 */}
         <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
+
+        {/* 새 서재 생성 다이얼로그 */}
+        <LibraryDialog
+          open={isNewLibraryDialogOpen}
+          onOpenChange={setIsNewLibraryDialogOpen}
+          mode="create"
+          onCreateLibrary={handleCreateLibraryWithBook}
+        />
       </div>
     );
   }
@@ -210,14 +209,6 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
         </div>
       )}
 
-      {/* 새 서재 생성 다이얼로그 */}
-      <LibraryDialog
-        open={isNewLibraryDialogOpen}
-        onOpenChange={setIsNewLibraryDialogOpen}
-        mode="create"
-        onCreateLibrary={handleCreateLibraryWithBook}
-      />
-
       {/* 충돌 알림 다이얼로그 */}
       <ConflictAlertDialog
         open={conflictDialogOpen}
@@ -227,6 +218,14 @@ function LibrariesList({ sortOption }: { sortOption?: LibrarySortOption }) {
 
       {/* 로그인 다이얼로그 */}
       <AuthDialog open={authDialogOpen} onOpenChange={setAuthDialogOpen} />
+
+      {/* 새 서재 생성 다이얼로그 */}
+      <LibraryDialog
+        open={isNewLibraryDialogOpen}
+        onOpenChange={setIsNewLibraryDialogOpen}
+        mode="create"
+        onCreateLibrary={handleCreateLibraryWithBook}
+      />
     </div>
   );
 }

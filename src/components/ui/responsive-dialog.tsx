@@ -326,13 +326,19 @@ function ResponsiveDialogClose({
   return isMobile ? (
     <DrawerPrimitive.Close
       data-slot="drawer-close"
-      className={cn('cursor-pointer flex h-8 w-8 items-center justify-center opacity-70 transition-opacity hover:bg-gray-100 hover:opacity-100 focus:outline-none disabled:pointer-events-none', drawerClassName)}
+      className={cn(
+        'flex h-8 w-8 cursor-pointer items-center justify-center opacity-70 transition-opacity hover:bg-gray-100 hover:opacity-100 focus:outline-none disabled:pointer-events-none',
+        drawerClassName
+      )}
       {...props}
     />
   ) : (
     <DialogPrimitive.Close
       data-slot="dialog-close"
-      className={cn('cursor-pointer flex h-8 w-8 items-center justify-center opacity-70 transition-opacity hover:bg-gray-100 hover:opacity-100 focus:outline-none disabled:pointer-events-none', className)}
+      className={cn(
+        'flex h-8 w-8 cursor-pointer items-center justify-center opacity-70 transition-opacity hover:bg-gray-100 hover:opacity-100 focus:outline-none disabled:pointer-events-none',
+        className
+      )}
       {...props}
     />
   );

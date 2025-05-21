@@ -177,7 +177,7 @@ export function BookMobileSkeleton() {
       <div className="space-y-6">
         {/* 책 표지 및 기본 정보 */}
         <div className="relative mx-auto w-44 overflow-hidden rounded-2xl bg-gray-50">
-          <Skeleton className="h-[264px] w-full" />
+            <Skeleton className="h-[264px] w-full" />
         </div>
         {/* 별점 정보 스켈레톤 */}
         <div className="h-24 animate-pulse rounded-xl bg-gray-50 p-4"></div>
