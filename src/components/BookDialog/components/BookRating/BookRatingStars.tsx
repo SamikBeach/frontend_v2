@@ -27,6 +27,7 @@ export function RatingStars() {
         setAuthDialogOpen(true);
         return;
       }
+      // 로그인 상태에서만 별점 상태 업데이트
       handleRatingClick(star);
     },
     [currentUser, handleRatingClick]

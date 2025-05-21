@@ -124,10 +124,8 @@ function ResponsiveDialogContent({
   children,
   drawerOverlayClassName,
   dialogOverlayClassName,
-  hideCloseButton = false,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  hideCloseButton?: boolean;
   drawerClassName?: string;
   drawerOverlayClassName?: string;
   dialogOverlayClassName?: string;
@@ -148,8 +146,6 @@ function ResponsiveDialogContent({
           className={cn(
             'group/drawer-content bg-background fixed z-50 flex flex-col',
             'data-[vaul-drawer-direction=bottom]:inset-x-0 data-[vaul-drawer-direction=bottom]:bottom-0 data-[vaul-drawer-direction=bottom]:rounded-t-[20px] data-[vaul-drawer-direction=bottom]:border-t-0',
-            // Height adapts to content
-            'max-h-[100dvh]',
             drawerClassName
           )}
           {...props}
@@ -178,12 +174,6 @@ function ResponsiveDialogContent({
         {...props}
       >
         {children}
-        {!hideCloseButton && (
-          <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4">
-            <XIcon />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
       </DialogPrimitive.Content>
     </DialogPrimitive.Portal>
   );
@@ -193,21 +183,48 @@ function ResponsiveDialogContent({
 function ResponsiveDialogHeader({
   className,
   drawerClassName,
+  onClose,
+  hideCloseButton = false,
   ...props
 }: React.ComponentProps<'div'> & {
   drawerClassName?: string;
+  onClose?: () => void;
+  hideCloseButton?: boolean;
 }) {
   const { isMobile } = useResponsiveDialog();
   return (
     <div
       data-slot={isMobile ? 'drawer-header' : 'dialog-header'}
       className={cn(
+        'sticky top-0 z-10 flex flex-row items-center justify-between',
         isMobile
-          ? cn('flex flex-col gap-1.5 p-4', drawerClassName)
-          : cn('flex flex-col gap-2 text-center sm:text-left', className)
+          ? cn('gap-1.5 p-4', drawerClassName)
+          : cn('gap-2 text-center sm:text-left', className)
       )}
       {...props}
-    />
+    >
+      <div className="min-w-0 flex-1">{props.children}</div>
+      {!hideCloseButton &&
+        (isMobile ? (
+          <DrawerPrimitive.Close
+            data-slot="drawer-close"
+            aria-label="닫기"
+            onClick={onClose}
+            className="ml-2 flex h-8 w-8 items-center justify-center rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none"
+          >
+            <XIcon className="h-4 w-4" />
+          </DrawerPrimitive.Close>
+        ) : (
+          <DialogPrimitive.Close
+            data-slot="dialog-close"
+            aria-label="닫기"
+            onClick={onClose}
+            className="ml-2 flex h-8 w-8 items-center justify-center rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none"
+          >
+            <XIcon className="h-4 w-4" />
+          </DialogPrimitive.Close>
+        ))}
+    </div>
   );
 }
 

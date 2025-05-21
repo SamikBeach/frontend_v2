@@ -9,6 +9,7 @@ import {
   ResponsiveDialogContent,
   ResponsiveDialogDescription,
   ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 import {
@@ -144,17 +145,17 @@ export function ReviewDialog({
       >
         <ResponsiveDialogContent
           className="max-w-md rounded-2xl border-none p-0"
-          drawerClassName="flex h-[100svh] min-h-0 w-full max-w-none flex-col rounded-t-[16px] border-none p-0 z-52"
+          drawerClassName="flex min-h-0 w-full max-w-none flex-col rounded-t-[16px] border-none p-0 z-52"
           drawerOverlayClassName="z-51"
         >
-          <div className="sticky top-0 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
+          <ResponsiveDialogHeader className="flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
             <ResponsiveDialogTitle
               className="text-base font-medium"
               drawerClassName="text-base font-medium"
             >
               {getDialogTitle()}
             </ResponsiveDialogTitle>
-          </div>
+          </ResponsiveDialogHeader>
 
           <div className="flex-1 overflow-y-auto px-5">
             <ResponsiveDialogDescription

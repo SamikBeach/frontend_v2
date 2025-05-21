@@ -1,7 +1,7 @@
 import { submitFeedback } from '@/apis/feedback';
 import { FeedbackDto } from '@/apis/feedback/types';
 import { useMutation } from '@tanstack/react-query';
-import { Send, X } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Button } from '../ui/button';
@@ -10,6 +10,7 @@ import {
   ResponsiveDialogContent,
   ResponsiveDialogDescription,
   ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from '../ui/responsive-dialog';
 import { Textarea } from '../ui/textarea';
@@ -69,22 +70,13 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
     <ResponsiveDialog open={isOpen} onOpenChange={onOpenChange}>
       <ResponsiveDialogContent
         className="rounded-2xl border-none p-0 sm:max-w-[425px]"
-        drawerClassName="flex h-[100svh] min-h-0 w-full max-w-none flex-col rounded-t-[16px] border-none p-0"
+        drawerClassName="flex min-h-0 w-full max-w-none flex-col rounded-t-[16px] border-none p-0"
       >
-        <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
+        <ResponsiveDialogHeader className="flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
           <ResponsiveDialogTitle className="text-base font-medium">
             피드백 보내기
           </ResponsiveDialogTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            onClick={() => onOpenChange(false)}
-            disabled={isPending}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+        </ResponsiveDialogHeader>
 
         <div className="flex flex-1 flex-col overflow-y-auto px-5">
           <ResponsiveDialogDescription
