@@ -159,7 +159,7 @@ export function BookDialog() {
         shouldScaleBackground={false}
       >
         <ResponsiveDialogPortal>
-          <ResponsiveDialogContent drawerClassName="w-full bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg">
+          <ResponsiveDialogContent drawerClassName="w-full bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg outline-none focus:outline-none focus-visible:outline-none">
             <ErrorBoundary FallbackComponent={ErrorFallback}>
               <Suspense fallback={<BookFullSkeleton />}>
                 <div className="flex h-full flex-col">
@@ -197,7 +197,7 @@ export function BookDialog() {
           <div className="min-h-full rounded-lg py-5">
             <DialogPrimitive.Content
               aria-describedby={undefined}
-              className="relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg md:max-w-screen-xl"
+              className="relative left-[50%] min-w-[960px] translate-x-[-50%] rounded-lg border bg-white p-0 shadow-lg outline-none focus:outline-none focus-visible:outline-none md:max-w-screen-xl"
               onEscapeKeyDown={e => {
                 if (hasOpenDropdown) {
                   e.preventDefault();

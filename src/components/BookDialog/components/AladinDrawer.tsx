@@ -35,7 +35,7 @@ export function AladinDrawer({ isbn, isOpen, onClose }: AladinDrawerProps) {
       shouldScaleBackground={false}
     >
       <ResponsiveDialogPortal>
-        <ResponsiveDialogContent drawerClassName="w-full h-[100dvh] bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg">
+        <ResponsiveDialogContent drawerClassName="w-full h-[100dvh] bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg outline-none focus:outline-none focus-visible:outline-none">
           <div className="flex h-full flex-col">
             <ResponsiveDialogTitle
               className="sr-only"
