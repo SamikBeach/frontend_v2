@@ -12,9 +12,11 @@ import {
   BookInfoSkeleton,
 } from '@/components/BookDialog/components/BookInfo';
 import {
+  BookMobileSkeleton,
   BookSkeleton,
   ErrorFallback,
 } from '@/components/BookDialog/components/common';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -62,10 +64,14 @@ function BookPageContent() {
 }
 
 export default function BookPage() {
+  const isMobile = useIsMobile();
+
   return (
     <main className="min-h-screen w-full bg-white">
       <ErrorBoundary FallbackComponent={ErrorFallback}>
-        <Suspense fallback={<BookSkeleton />}>
+        <Suspense
+          fallback={isMobile ? <BookMobileSkeleton /> : <BookSkeleton />}
+        >
           <div className="pb-safe h-full overflow-y-auto">
             <BookPageContent />
           </div>
