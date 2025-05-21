@@ -1,5 +1,18 @@
 # 🚦 CHANGELOG
 
+## [1.5.1](https://github.com/SamikBeach/frontend_v2/compare/1.5.0...1.5.1) (2025-05-21)
+
+
+### Bug Fixes
+
+* BookDialog 스켈레톤 UI 및 로딩 상태 개선 ([fd1d7b6](https://github.com/SamikBeach/frontend_v2/commit/fd1d7b683070739587be0b165027698090469859))
+* BookDialog 포커스 효과(회색 테두리) 제거 ([2db3147](https://github.com/SamikBeach/frontend_v2/commit/2db3147ba709f519c4844353a9141b1f4aaede75))
+* BookLibraries 컴포넌트의 새 서재 만들기 로직 수정 ([9307c12](https://github.com/SamikBeach/frontend_v2/commit/9307c1214e006e80209b2839ce1bd7ca5f7c857a))
+* 라이브러리 카드의 공개/비공개 아이콘 크기 조정 ([d8467d6](https://github.com/SamikBeach/frontend_v2/commit/d8467d684c03818fd7ab04719775280148b6913c))
+* 모바일 다이얼로그에서 키패드 표시 시 하단 안전 영역 처리 추가 ([1b678d8](https://github.com/SamikBeach/frontend_v2/commit/1b678d83d59e37df30cf66f85150d6b2802e426e))
+* 스타일 수정 ([3795388](https://github.com/SamikBeach/frontend_v2/commit/3795388176f718ec892510625e439dfabfb5beae))
+* 알라딘 드로어에서 헤더 제거 ([d84c74d](https://github.com/SamikBeach/frontend_v2/commit/d84c74db787e5f14c9de1040d109cf9d0aa00c5d))
+
 # [1.5.0](https://github.com/SamikBeach/frontend_v2/compare/1.4.2...1.5.0) (2025-05-21)
 
 
