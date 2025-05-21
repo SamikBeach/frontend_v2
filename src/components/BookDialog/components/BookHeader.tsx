@@ -17,10 +17,10 @@ export function BookHeaderSkeleton() {
     <div
       className={cn(
         'sticky top-0 z-10 flex items-center justify-between rounded-t-lg bg-white/80 backdrop-blur-xl',
-        isMobile ? 'h-12 px-4' : 'h-16 px-10'
+        isMobile ? 'h-12 px-4' : 'h-16 px-8'
       )}
     >
-      <Skeleton className="h-7 w-56 rounded-md" />
+      <Skeleton className="h-6 w-56 rounded-md" />
     </div>
   );
 }
