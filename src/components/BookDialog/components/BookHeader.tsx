@@ -15,7 +15,7 @@ export function BookHeaderSkeleton() {
   return (
     <div
       className={cn(
-        'sticky top-0 z-10 flex items-center justify-between rounded-t-lg bg-white/80 backdrop-blur-xl',
+        'flex items-center justify-between rounded-t-lg bg-white/80 backdrop-blur-xl',
         isMobile ? 'h-12 px-4' : 'h-16 px-10'
       )}
     >
@@ -37,7 +37,10 @@ interface BookHeaderProps {
   isDialog?: boolean;
 }
 
-export function BookHeader({ isDialog = false }: BookHeaderProps) {
+export function BookHeader({
+  isDialog = false,
+  onClose,
+}: BookHeaderProps & { onClose?: () => void }) {
   const { close } = useDialogQuery({ type: 'book' });
   const { book } = useBookDetails();
   const isMobile = useIsMobile();
@@ -46,7 +49,7 @@ export function BookHeader({ isDialog = false }: BookHeaderProps) {
   return (
     <div
       className={cn(
-        'sticky top-0 z-10 flex items-center justify-between rounded-t-lg bg-white/80 backdrop-blur-xl',
+        'flex items-center justify-between rounded-t-lg bg-white/80 backdrop-blur-xl',
         isMobile ? 'h-12 px-4' : 'h-16 px-10'
       )}
     >
@@ -61,19 +64,6 @@ export function BookHeader({ isDialog = false }: BookHeaderProps) {
         <h1 className="max-w-[80%] truncate pl-2 text-xl font-bold text-gray-900">
           {bookTitle}
         </h1>
-      )}
-      {isDialog && (
-        <Button
-          variant="ghost"
-          size={isMobile ? 'sm' : 'icon'}
-          className={cn(
-            'cursor-pointer transition-colors',
-            isMobile ? 'h-8 w-8 rounded-full p-0' : 'rounded-full'
-          )}
-          onClick={() => close()}
-        >
-          <X className={isMobile ? 'h-3.5 w-3.5' : 'h-4 w-4'} />
-        </Button>
       )}
     </div>
   );

@@ -24,6 +24,7 @@ import { hasOpenDropdownAtom } from '@/atoms/book-dialog';
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
+  ResponsiveDialogHeader,
   ResponsiveDialogPortal,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
@@ -159,10 +160,7 @@ export function BookDialog() {
         shouldScaleBackground={false}
       >
         <ResponsiveDialogPortal>
-          <ResponsiveDialogContent
-            drawerClassName="w-full bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg"
-            hideCloseButton
-          >
+          <ResponsiveDialogContent drawerClassName="w-full bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg">
             <div className="flex h-full flex-col">
               <ResponsiveDialogTitle
                 className="sr-only"
@@ -173,9 +171,9 @@ export function BookDialog() {
 
               <ErrorBoundary FallbackComponent={ErrorFallback}>
                 <Suspense fallback={<BookFullSkeleton />}>
-                  <div className="sticky top-0 z-10">
-                    <BookHeader isDialog />
-                  </div>
+                  <ResponsiveDialogHeader className="p-0" onClose={close}>
+                    <BookHeader isDialog onClose={close} />
+                  </ResponsiveDialogHeader>
                   <div className="pb-safe h-full overflow-y-auto">
                     <MobileBookDialogContent />
                   </div>

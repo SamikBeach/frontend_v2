@@ -91,8 +91,8 @@ export function ProfileEditDialog({
         drawerClassName="p-0 overflow-hidden h-[100dvh]"
       >
         <ResponsiveDialogHeader
-          className="sticky top-0 z-10 border-b border-gray-100 bg-white/95 px-4 py-4 backdrop-blur-sm"
-          drawerClassName="sticky top-0 z-10 bg-white/95 backdrop-blur-sm px-4 py-4 border-b border-gray-100"
+          className="border-b border-gray-100 bg-white/95 px-4 py-4 backdrop-blur-sm"
+          drawerClassName="bg-white/95 backdrop-blur-sm px-4 py-4 border-b border-gray-100"
         >
           <ResponsiveDialogTitle className="text-lg font-medium">
             프로필 수정
@@ -108,8 +108,8 @@ export function ProfileEditDialog({
         </div>
 
         <ResponsiveDialogFooter
-          className="sticky bottom-0 z-10 mt-0 border-t border-gray-100 bg-white px-4 py-4"
-          drawerClassName="sticky bottom-0 z-10 px-4 py-4 bg-white border-t border-gray-100 mt-0 pb-safe"
+          className="mt-0 border-t border-gray-100 bg-white px-4 py-4"
+          drawerClassName="px-4 py-4 bg-white border-t border-gray-100 mt-0 pb-safe"
         >
           <div className="flex w-full gap-3 sm:justify-end">
             <Button

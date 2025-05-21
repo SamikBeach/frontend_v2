@@ -123,7 +123,6 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
             query ? 'h-[calc(100vh-32px)]' : 'auto'
           )}
           drawerClassName="animate-expandUp flex h-[100svh] min-h-0 w-full max-w-none flex-col gap-1 overflow-hidden p-0 shadow-none outline-none z-[100]"
-          hideCloseButton
           dialogOverlayClassName="bg-black/5"
           drawerOverlayClassName="bg-black/5"
         >
@@ -147,15 +146,13 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
                 shouldFilter={false}
                 loop={true}
               >
-                <div className="sticky top-0 z-20 flex-shrink-0 border-b border-gray-100 bg-white">
-                  <CommandInput
-                    ref={inputRef}
-                    value={query}
-                    onValueChange={setQuery}
-                    className="h-12 rounded-none border-0 py-3 text-base shadow-none focus:ring-0 md:h-16 md:py-4"
-                    placeholder="도서 제목을 검색해보세요"
-                  />
-                </div>
+                <CommandInput
+                  ref={inputRef}
+                  value={query}
+                  onValueChange={setQuery}
+                  className="h-12 rounded-none border-0 py-3 text-base shadow-none focus:ring-0 md:h-16 md:py-4"
+                  placeholder="도서 제목을 검색해보세요"
+                />
                 <div className="min-h-0 flex-1 overflow-hidden">
                   <Suspense
                     fallback={

@@ -15,6 +15,7 @@ import {
   ResponsiveDialog,
   ResponsiveDialogContent,
   ResponsiveDialogFooter,
+  ResponsiveDialogHeader,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 import { Switch } from '@/components/ui/switch';
@@ -22,7 +23,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { getTagColor } from '@/utils/tags';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { BookOpen, Edit, X } from 'lucide-react';
+import { BookOpen, Edit } from 'lucide-react';
 import { Suspense, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toast } from 'sonner';
@@ -173,20 +174,15 @@ export function LibraryDialog({
           drawerClassName="flex h-[100svh] min-h-0 w-full max-w-none flex-col rounded-t-2xl border-t p-0 z-52"
           drawerOverlayClassName="z-51"
         >
-          <div className="sticky top-0 z-10 flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl">
+          <ResponsiveDialogHeader
+            className="flex h-14 items-center justify-between rounded-t-2xl bg-white/95 px-5 backdrop-blur-xl"
+            closeButton
+            onClose={() => onOpenChange(false)}
+          >
             <ResponsiveDialogTitle className="text-base font-medium">
               {mode === 'create' ? '새 서재 만들기' : '서재 정보 수정'}
             </ResponsiveDialogTitle>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+          </ResponsiveDialogHeader>
 
           <div className="overflow-y-auto px-5">
             <div className="space-y-6">

@@ -119,13 +119,15 @@ export function AuthDialog({
         className="w-[400px] max-w-[90vw] overflow-hidden rounded-2xl border-0 p-0 shadow-xl"
         drawerClassName="w-full max-w-none overflow-hidden rounded-t-[16px] border-0 p-0 shadow-xl h-[100dvh]"
         onPointerDownOutside={handlePointerDownOutside}
-        hideCloseButton
         aria-describedby={undefined}
       >
         {/* 헤더 - 로고와 뒤로가기 버튼 */}
         <ResponsiveDialogHeader
           className="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
           drawerClassName="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
+          closeButton
+          onClose={() => props.onOpenChange?.(false)}
+          hideCloseButton={false}
         >
           <ResponsiveDialogTitle className="sr-only" drawerClassName="sr-only">
             로그인 / 회원가입
