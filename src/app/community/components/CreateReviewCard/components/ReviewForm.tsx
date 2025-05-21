@@ -89,7 +89,13 @@ export function ReviewForm({
           target.style.height = 'auto';
           target.style.height = `${target.scrollHeight}px`;
         }}
-        onFocus={onTextareaFocus}
+        onFocus={e => {
+          if (onTextareaFocus) {
+            onTextareaFocus();
+            // 비로그인 상태에서 AuthDialog가 뜰 때 포커스를 제거하기 위해
+            e.currentTarget.blur();
+          }
+        }}
       />
 
       {/* 선택된 책 정보 및 별점/읽기 상태 표시 (children으로 받음) */}
