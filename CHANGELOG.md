@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.5.2](https://github.com/SamikBeach/frontend_v2/compare/1.5.1...1.5.2) (2025-05-21)
+
+
+### Bug Fixes
+
+* iOS 모바일에서 키보드 표시 시 다이얼로그 위치 문제 해결 ([2d43534](https://github.com/SamikBeach/frontend_v2/commit/2d435346bfa1cbc7de70c8974842337ee5ed104e))
+
 ## [1.5.1](https://github.com/SamikBeach/frontend_v2/compare/1.5.0...1.5.1) (2025-05-21)
 
 
