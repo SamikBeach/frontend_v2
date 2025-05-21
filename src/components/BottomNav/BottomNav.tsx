@@ -8,6 +8,7 @@ import { Compass, Flame, Home, Library, User, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useBottomNavScrollVisibility } from './hooks';
 
 const NAV_ITEMS = [
   {
@@ -42,6 +43,7 @@ export function BottomNav() {
   const router = useRouter();
   const currentUser = useCurrentUser();
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [showBottomNav] = useBottomNavScrollVisibility();
 
   // activeColor는 green-800, inactiveColor는 gray-500으로 조금 더 진하게
   const activeColor = 'text-green-800';
@@ -52,7 +54,9 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed right-0 bottom-0 left-0 z-50 flex h-16 w-full items-center justify-between border-t border-gray-100 bg-white px-1 md:hidden"
+      className={`fixed right-0 bottom-0 left-0 z-50 flex h-16 w-full items-center justify-between border-t border-gray-100 bg-white px-1 transition-transform duration-300 md:hidden ${
+        showBottomNav ? 'translate-y-0' : 'translate-y-full'
+      }`}
       role="navigation"
       aria-label="모바일 하단 메뉴"
     >
@@ -94,7 +98,7 @@ export function BottomNav() {
       <button
         type="button"
         className={cn(
-          'flex flex-1 flex-col items-center justify-center gap-0.5 rounded-md py-1.5 transition-colors duration-150 hover:bg-gray-50 focus:outline-none',
+          'flex flex-1 flex-col items-center justify-center gap-0.5 rounded-md py-1.5 transition-colors duration-150 hover:bg-gray-50',
           pathname.startsWith('/profile') ? activeColor : inactiveColor
         )}
         aria-current={pathname.startsWith('/profile') ? 'page' : undefined}
