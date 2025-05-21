@@ -1,5 +1,21 @@
 # 🚦 CHANGELOG
 
+# [1.5.0](https://github.com/SamikBeach/frontend_v2/compare/1.4.2...1.5.0) (2025-05-21)
+
+
+### Bug Fixes
+
+* 비로그인 상태에서 BookDialog 별점 클릭 시 별점 상태가 업데이트되지 않고 AuthDialog만 뜨도록 수정 ([c861cca](https://github.com/SamikBeach/frontend_v2/commit/c861cca37a5be6ddd936013f4b4b4e8034a2a104))
+* 비로그인 상태에서 CreateReviewCard textarea 포커스 방지 ([b8b1e23](https://github.com/SamikBeach/frontend_v2/commit/b8b1e23e8b2cf39ed90d0778439c2fb4aba453a7))
+* 스타일 수정 ([32333d6](https://github.com/SamikBeach/frontend_v2/commit/32333d62f4fdc905bee7b0f5b0612a17932b3d21))
+
+
+### Features
+
+* AuthDialog 인풋 폰트사이즈 16px, placeholder는 기존 크기 유지 ([55a39c9](https://github.com/SamikBeach/frontend_v2/commit/55a39c92d002748a5f746b31b6519ef0926ba9e0))
+* BottomNav 컴포넌트 스크롤 감지 기능 추가 ([c9bb79e](https://github.com/SamikBeach/frontend_v2/commit/c9bb79eb51e7733b1f90d4a61ae4ae0fdff2395f))
+* responsive-dialog drawer가 항상 100svh/100dvh로 고정되지 않고 컨텐츠 크기에 맞게 높이 지정되도록 수정 ([274ebba](https://github.com/SamikBeach/frontend_v2/commit/274ebba9aad9263159181d6d1a683af12ae2f5cb))
+
 ## [1.4.2](https://github.com/SamikBeach/frontend_v2/compare/1.4.1...1.4.2) (2025-05-20)
 
 
