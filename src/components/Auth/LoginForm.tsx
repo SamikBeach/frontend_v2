@@ -167,7 +167,7 @@ export function LoginForm({
             type="email"
             placeholder="이메일"
             {...emailField}
-            className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-sm transition-colors focus:bg-white focus:shadow-sm"
+            className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 transition-colors focus:bg-white focus:shadow-sm"
             autoComplete="email"
           />
           {errors.email && (
@@ -184,7 +184,7 @@ export function LoginForm({
               type={showPassword ? 'text' : 'password'}
               placeholder="비밀번호"
               {...passwordField}
-              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 pr-10 text-sm transition-colors focus:bg-white focus:shadow-sm"
+              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 pr-10 transition-colors focus:bg-white focus:shadow-sm"
               autoComplete="current-password"
             />
             <Button

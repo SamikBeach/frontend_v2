@@ -190,7 +190,7 @@ export function VerifyCodeForm({ email, onSuccess }: VerifyCodeFormProps) {
               onBlur={codeField.onBlur}
               name={codeField.name}
               ref={codeField.ref}
-              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-base transition-colors focus:bg-white focus:shadow-sm md:text-sm"
+              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 transition-colors focus:bg-white focus:shadow-sm"
               maxLength={6}
               inputMode="numeric"
               autoComplete="one-time-code"

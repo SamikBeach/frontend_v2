@@ -120,7 +120,7 @@ export function UserInfoForm({ email, onSuccess }: UserInfoFormProps) {
             type="email"
             value={email}
             disabled
-            className="h-10 rounded-xl border-gray-200 bg-gray-100 px-4 py-2 text-base opacity-80 md:text-sm"
+            className="h-10 rounded-xl border-gray-200 bg-gray-100 px-4 py-2 opacity-80"
           />
         </div>
 
@@ -134,7 +134,7 @@ export function UserInfoForm({ email, onSuccess }: UserInfoFormProps) {
             placeholder="사용자 이름"
             value={username}
             onChange={handleUsernameChange}
-            className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 text-base transition-colors focus:bg-white focus:shadow-sm md:text-sm"
+            className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 transition-colors focus:bg-white focus:shadow-sm"
             autoComplete="name"
           />
         </div>
@@ -150,7 +150,7 @@ export function UserInfoForm({ email, onSuccess }: UserInfoFormProps) {
               placeholder="비밀번호 (8자 이상)"
               value={password}
               onChange={handlePasswordChange}
-              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 pr-10 text-base transition-colors focus:bg-white focus:shadow-sm md:text-sm"
+              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 pr-10 transition-colors focus:bg-white focus:shadow-sm"
               autoComplete="new-password"
             />
             <Button
@@ -184,7 +184,7 @@ export function UserInfoForm({ email, onSuccess }: UserInfoFormProps) {
               placeholder="비밀번호 확인"
               value={confirmPassword}
               onChange={handleConfirmPasswordChange}
-              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 pr-10 text-base transition-colors focus:bg-white focus:shadow-sm md:text-sm"
+              className="h-10 rounded-xl border-gray-200 bg-gray-50/50 px-4 py-2 pr-10 transition-colors focus:bg-white focus:shadow-sm"
               autoComplete="new-password"
             />
             <Button
