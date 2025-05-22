@@ -184,7 +184,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
           <div className="flex gap-2">
             <Textarea
               placeholder="댓글을 입력하세요..."
-              className="max-h-[150px] min-h-[36px] flex-1 resize-none rounded-lg border-gray-200 bg-white py-2 text-sm shadow-none"
+              className="max-h-[150px] min-h-[36px] flex-1 resize-none rounded-lg border-gray-200 bg-white py-2 shadow-none"
               value={commentText}
               onChange={e => handleCommentTextChange(e.target.value)}
               onKeyDown={e => {
