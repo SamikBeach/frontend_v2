@@ -13,8 +13,7 @@ import { toast } from 'sonner';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Separator } from '../ui/separator';
-import { AppleIcon } from './icons/AppleIcon';
-import { GoogleIcon } from './icons/GoogleIcon';
+import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from './icons';
 
 interface LoginFormProps {
   onClickSignUp: () => void;
@@ -152,6 +151,16 @@ export function LoginForm({
     }
   };
 
+  // 네이버 로그인 핸들러 (UI만 구현)
+  const handleNaverLogin = () => {
+    toast.info('네이버 로그인은 아직 구현되지 않았습니다.');
+  };
+
+  // 카카오 로그인 핸들러 (UI만 구현)
+  const handleKakaoLogin = () => {
+    toast.info('카카오 로그인은 아직 구현되지 않았습니다.');
+  };
+
   return (
     <div className="flex flex-col space-y-5">
       <div className="space-y-1">
@@ -255,25 +264,49 @@ export function LoginForm({
         </div>
       </div>
 
-      <div className="space-y-2.5">
+      <div className="flex justify-center gap-4">
         <Button
           type="button"
           variant="outline"
-          className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
+          size="icon"
+          className="h-12 w-12 rounded-full border-gray-200"
           onClick={handleGoogleLogin}
+          aria-label="Google로 로그인"
         >
-          <GoogleIcon className="mr-2 h-4 w-4" />
-          Google로 로그인
+          <GoogleIcon className="h-5 w-5 text-gray-700" />
         </Button>
 
         <Button
           type="button"
           variant="outline"
-          className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
+          size="icon"
+          className="h-12 w-12 rounded-full border-gray-200"
           onClick={handleAppleLogin}
+          aria-label="Apple로 로그인"
         >
-          <AppleIcon className="mr-2 h-4 w-4" />
-          Apple로 로그인
+          <AppleIcon className="h-5 w-5 text-gray-700" />
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="h-12 w-12 rounded-full border-gray-200 bg-[#03C75A] hover:bg-[#03C75A]/90"
+          onClick={handleNaverLogin}
+          aria-label="네이버로 로그인"
+        >
+          <NaverIcon className="h-5 w-5 text-white" />
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="h-12 w-12 rounded-full border-gray-200 bg-[#FEE500] hover:bg-[#FEE500]/90"
+          onClick={handleKakaoLogin}
+          aria-label="카카오로 로그인"
+        >
+          <KakaoIcon className="h-5 w-5 text-[#3A1D1C]" />
         </Button>
       </div>
 
