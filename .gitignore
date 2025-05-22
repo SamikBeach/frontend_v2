@@ -141,3 +141,5 @@ dist
 *.mdc
 # Sentry Config File
 .env.sentry-build-plugin
+
+*.p8

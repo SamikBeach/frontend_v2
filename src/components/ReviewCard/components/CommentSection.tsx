@@ -2,7 +2,7 @@ import { Comment as ApiComment } from '@/apis/review/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, SendHorizontal } from 'lucide-react';
+import { MessageCircle, Send } from 'lucide-react';
 import { Comment } from '../types';
 import { getNameInitial } from '../utils';
 import { CommentItem } from './CommentItem';
@@ -82,7 +82,7 @@ export function CommentSection({
               onClick={handleSubmitComment}
               disabled={!commentText.trim() || isCommentLoading}
             >
-              <SendHorizontal className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Button>
           </div>
         </div>

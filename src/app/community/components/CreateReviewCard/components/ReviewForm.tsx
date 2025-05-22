@@ -9,7 +9,8 @@ import {
 } from '@/components/ui/responsive-select';
 import { Textarea } from '@/components/ui/textarea';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { BookOpen, SendHorizontal } from 'lucide-react';
+import { useCurrentUser } from '@/hooks/useCurrentUser';
+import { BookOpen, Send } from 'lucide-react';
 import { ReactNode, useEffect, useMemo, useRef } from 'react';
 
 interface ReviewFormProps {
@@ -37,6 +38,7 @@ export function ReviewForm({
 }: ReviewFormProps) {
   const isMobile = useIsMobile();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const currentUser = useCurrentUser();
 
   // 제출 후 content가 비워지면 textarea 높이 초기화
   useEffect(() => {
@@ -92,8 +94,10 @@ export function ReviewForm({
         onFocus={e => {
           if (onTextareaFocus) {
             onTextareaFocus();
-            // 비로그인 상태에서 AuthDialog가 뜰 때 포커스를 제거하기 위해
-            e.currentTarget.blur();
+            // 비로그인 상태일 때만 blur 처리
+            if (!currentUser) {
+              e.currentTarget.blur();
+            }
           }
         }}
       />
@@ -195,7 +199,7 @@ export function ReviewForm({
           onClick={handleSubmitReview}
           disabled={!content.trim() || isLoading}
         >
-          <SendHorizontal className="mr-1 h-3 w-3 sm:mr-1.5 sm:h-4 sm:w-4" />
+          <Send className="mr-1 h-3 w-3 sm:mr-1.5 sm:h-4 sm:w-4" />
           제출하기
         </Button>
       </div>
