@@ -1,5 +1,19 @@
 # 🚦 CHANGELOG
 
+# [1.7.0](https://github.com/SamikBeach/frontend_v2/compare/1.6.0...1.7.0) (2025-05-22)
+
+
+### Bug Fixes
+
+* social login ui 구현 ([1cda8f4](https://github.com/SamikBeach/frontend_v2/commit/1cda8f4066b5f564264755d5bc408d39885c390d))
+* 스타일 수정 ([eb3fe9f](https://github.com/SamikBeach/frontend_v2/commit/eb3fe9f7f17439ee357038ed48add4ba488134cd))
+
+
+### Features
+
+* CreateReviewCard 컴포넌트에서 로그인 사용자는 포커스 유지되도록 수정 ([d815bfb](https://github.com/SamikBeach/frontend_v2/commit/d815bfb3869b1f0e4d6fbfc3236eafb00a50937e))
+* 댓글 좋아요 버튼 색상을 그린 계열로 변경하여 리뷰와 통일 ([3eb458a](https://github.com/SamikBeach/frontend_v2/commit/3eb458a7ecf57bc66edffa96285e69070f920540))
+
 # [1.6.0](https://github.com/SamikBeach/frontend_v2/compare/1.5.2...1.6.0) (2025-05-21)
 
 
