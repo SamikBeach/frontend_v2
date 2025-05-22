@@ -9,7 +9,7 @@ import {
   ResponsiveSelectTrigger,
 } from '@/components/ui/responsive-select';
 import { Textarea } from '@/components/ui/textarea';
-import { BookOpen, SendHorizontal, Star, X } from 'lucide-react';
+import { BookOpen, Send, Star, X } from 'lucide-react';
 import { useMemo } from 'react';
 
 interface ReviewEditFormProps {
@@ -218,7 +218,7 @@ export function ReviewEditForm({
             onClick={onSave}
             disabled={!content.trim()}
           >
-            <SendHorizontal className="mr-1.5 h-4 w-4" />
+            <Send className="mr-1.5 h-4 w-4" />
             저장
           </Button>
         </div>

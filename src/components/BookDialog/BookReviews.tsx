@@ -4,6 +4,7 @@ import {
   MessageSquare,
   MoreHorizontal,
   Pencil,
+  Send,
   Star,
   ThumbsUp,
   Trash,
@@ -206,10 +207,10 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
             />
             <Button
               onClick={handleCommentSubmitWithAuth}
-              className="h-9 cursor-pointer rounded-lg bg-gray-900 px-3 text-white hover:bg-gray-800"
+              className="h-9 w-9 cursor-pointer rounded-lg bg-green-600 p-0 text-white hover:bg-green-700"
               disabled={!commentText.trim() || isSubmitting}
             >
-              {isSubmitting ? '등록 중...' : '등록'}
+              <Send className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -279,13 +280,11 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                       </Button>
                       <Button
                         size="sm"
-                        className="h-7 cursor-pointer rounded-md bg-gray-900 px-2 text-xs text-white hover:bg-gray-800"
+                        className="h-7 w-7 cursor-pointer rounded-md bg-green-600 p-0 text-white hover:bg-green-700"
                         onClick={() => handleUpdateComment(comment.id)}
                         disabled={updateCommentMutation.isPending}
                       >
-                        {updateCommentMutation.isPending
-                          ? '저장 중...'
-                          : '저장'}
+                        <Send className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </div>
@@ -382,12 +381,12 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                         disabled={isLikingComment}
                         className={`flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-colors ${
                           comment.isLiked
-                            ? 'bg-pink-50 text-pink-500'
+                            ? 'bg-green-50 text-green-600'
                             : 'text-gray-500 hover:bg-gray-100'
                         }`}
                       >
                         <ThumbsUp
-                          className={`h-3 w-3 ${comment.isLiked ? 'fill-pink-500' : ''}`}
+                          className={`h-3 w-3 ${comment.isLiked ? 'fill-green-600' : ''}`}
                         />
                         <span>{comment.likeCount || 0}</span>
                       </button>

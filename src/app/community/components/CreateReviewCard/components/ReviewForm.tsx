@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/responsive-select';
 import { Textarea } from '@/components/ui/textarea';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { BookOpen, SendHorizontal } from 'lucide-react';
+import { BookOpen, Send } from 'lucide-react';
 import { ReactNode, useEffect, useMemo, useRef } from 'react';
 
 interface ReviewFormProps {
@@ -195,7 +195,7 @@ export function ReviewForm({
           onClick={handleSubmitReview}
           disabled={!content.trim() || isLoading}
         >
-          <SendHorizontal className="mr-1 h-3 w-3 sm:mr-1.5 sm:h-4 sm:w-4" />
+          <Send className="mr-1 h-3 w-3 sm:mr-1.5 sm:h-4 sm:w-4" />
           제출하기
         </Button>
       </div>
