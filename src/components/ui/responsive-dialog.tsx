@@ -154,7 +154,7 @@ function ResponsiveDialogContent({
           }}
           {...props}
         >
-          <div className="mx-auto mt-2.5 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
+          <div className="mx-auto mt-2.5 mb-2 h-1 w-[36px] flex-none shrink-0 rounded-full bg-gray-300" />
           <div className="flex-1 overflow-auto">{children}</div>
         </DrawerPrimitive.Content>
       </DrawerPrimitive.Portal>
