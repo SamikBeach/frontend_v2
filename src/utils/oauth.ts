@@ -13,7 +13,7 @@ export const calculatePopupPosition = (width: number, height: number) => {
  * 소셜 로그인 팝업을 열고 결과를 Promise로 반환
  */
 export const openSocialLoginPopup = (
-  provider: AuthProvider.GOOGLE | AuthProvider.APPLE
+  provider: AuthProvider.GOOGLE | AuthProvider.APPLE | AuthProvider.NAVER
 ): Promise<{
   accessToken: string;
   refreshToken: string;
@@ -21,7 +21,22 @@ export const openSocialLoginPopup = (
 }> => {
   return new Promise((resolve, reject) => {
     // 로그인 방식에 따른 URL 설정
-    const providerPath = provider === AuthProvider.GOOGLE ? 'google' : 'apple';
+    let providerPath: string;
+    switch (provider) {
+      case AuthProvider.GOOGLE:
+        providerPath = 'google';
+        break;
+      case AuthProvider.APPLE:
+        providerPath = 'apple';
+        break;
+      case AuthProvider.NAVER:
+        providerPath = 'naver';
+        break;
+      default:
+        reject(new Error('지원하지 않는 로그인 방식입니다.'));
+        return;
+    }
+
     const authUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || ''}/auth/${providerPath}`;
 
     // 팝업 설정
@@ -68,11 +83,23 @@ export const openSocialLoginPopup = (
       if (!popup || popup.closed) {
         clearInterval(checkPopupClosed);
         window.removeEventListener('message', handleMessage);
-        reject(
-          new Error(
-            `${provider === AuthProvider.GOOGLE ? '구글' : '애플'} 로그인이 완료되지 않았습니다.`
-          )
-        );
+
+        let providerName: string;
+        switch (provider) {
+          case AuthProvider.GOOGLE:
+            providerName = '구글';
+            break;
+          case AuthProvider.APPLE:
+            providerName = '애플';
+            break;
+          case AuthProvider.NAVER:
+            providerName = '네이버';
+            break;
+          default:
+            providerName = '소셜';
+        }
+
+        reject(new Error(`${providerName} 로그인이 완료되지 않았습니다.`));
       }
     }, 500);
   });
