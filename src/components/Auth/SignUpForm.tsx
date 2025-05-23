@@ -199,10 +199,30 @@ export function SignUpForm({
     }
   };
 
-  // 카카오 회원가입 핸들러 (UI만 구현)
-  const handleKakaoSignUp = () => {
+  // 카카오 회원가입 핸들러
+  const handleKakaoSignUp = async () => {
     setError(null);
-    toast.info('카카오 회원가입은 아직 구현되지 않았습니다.');
+
+    try {
+      const { accessToken, refreshToken, user } = await openSocialLoginPopup(
+        AuthProvider.KAKAO
+      );
+
+      // 토큰 및 사용자 정보 저장
+      authUtils.setTokens(accessToken, refreshToken);
+      setUser(user);
+
+      // 성공 토스트 메시지
+      toast.success(`${user.username}님, 환영합니다!`);
+
+      // 성공 콜백
+      onSuccess?.();
+    } catch (err) {
+      console.error('카카오 회원가입 오류:', err);
+      setError(
+        err instanceof Error ? err.message : '카카오 회원가입에 실패했습니다.'
+      );
+    }
   };
 
   // 로딩 상태 확인
