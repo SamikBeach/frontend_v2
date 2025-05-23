@@ -23,31 +23,35 @@ export function ReviewText({
 
   return (
     <div className="mt-2">
-      <p
-        className={`text-[15px] leading-relaxed whitespace-pre-line text-gray-800 ${!expanded ? 'line-clamp-7' : ''}`}
-        {...(isMobile && shouldEnableExpand
-          ? {
-              onClick: handleExpand,
-              role: 'button',
-              tabIndex: 0,
-              'aria-expanded': expanded,
-              style: { cursor: 'pointer' },
-            }
-          : {})}
+      <div
+        className={`relative ${shouldEnableExpand && isMobile ? 'cursor-pointer' : ''}`}
+        onClick={isMobile && shouldEnableExpand ? handleExpand : undefined}
+        role={isMobile && shouldEnableExpand ? 'button' : undefined}
+        tabIndex={isMobile && shouldEnableExpand ? 0 : undefined}
+        aria-expanded={isMobile && shouldEnableExpand ? expanded : undefined}
       >
-        {content}
-      </p>
-      {shouldEnableExpand && (
-        <span
-          className="mt-2 inline-block cursor-pointer text-sm text-[#A0AEC0] hover:underline"
-          onClick={handleExpand}
-          tabIndex={0}
-          role="button"
-          aria-expanded={expanded}
+        <p
+          className={`text-[15px] leading-relaxed whitespace-pre-line text-gray-800 ${
+            !expanded ? 'line-clamp-7' : ''
+          }`}
         >
-          더 보기
-        </span>
-      )}
+          {content}
+        </p>
+        {shouldEnableExpand && (
+          <span
+            className="mt-2 inline-block cursor-pointer text-sm text-[#A0AEC0] hover:underline"
+            onClick={e => {
+              e.stopPropagation();
+              handleExpand();
+            }}
+            tabIndex={0}
+            role="button"
+            aria-expanded={expanded}
+          >
+            더 보기
+          </span>
+        )}
+      </div>
     </div>
   );
 }
