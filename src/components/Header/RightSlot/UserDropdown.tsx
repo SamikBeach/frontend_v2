@@ -103,19 +103,23 @@ export function UserDropdown({ trigger }: UserDropdownProps) {
       </ResponsiveDropdownMenuTrigger>
       <ResponsiveDropdownMenuContent
         align="end"
-        className="w-56"
+        className="w-auto max-w-80 min-w-56"
         drawerClassName="w-full"
       >
         <div className="flex w-full items-center justify-start gap-2 p-2">
-          <Avatar className="h-8 w-8">
+          <Avatar className="h-8 w-8 flex-shrink-0">
             <AvatarImage src={avatarUrl || undefined} alt={displayName} />
             <AvatarFallback className="bg-gray-200 text-gray-700">
               {initial}
             </AvatarFallback>
           </Avatar>
-          <div className="flex flex-col space-y-0.5 text-left">
-            <p className="text-sm leading-none font-medium">{displayName}</p>
-            <p className="text-xs leading-none text-gray-500">{user.email}</p>
+          <div className="flex min-w-0 flex-1 flex-col space-y-0.5 text-left">
+            <p className="truncate text-sm leading-none font-medium">
+              {displayName}
+            </p>
+            <p className="text-xs leading-none break-all text-gray-500">
+              {user.email}
+            </p>
           </div>
         </div>
         <ResponsiveDropdownMenuSeparator />
