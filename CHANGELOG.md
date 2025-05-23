@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.9.0](https://github.com/SamikBeach/frontend_v2/compare/1.8.1...1.9.0) (2025-05-23)
+
+
+### Features
+
+* 네이버 OAuth 로그인 구현 ([a0143d6](https://github.com/SamikBeach/frontend_v2/commit/a0143d640f8afd582acac611e3da150f41aeb7ac))
+
 ## [1.8.1](https://github.com/SamikBeach/frontend_v2/compare/1.8.0...1.8.1) (2025-05-23)
 
 
