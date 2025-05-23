@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.8.1](https://github.com/SamikBeach/frontend_v2/compare/1.8.0...1.8.1) (2025-05-23)
+
+
+### Bug Fixes
+
+* UserDropdown에서 긴 이메일 주소 표시 개선 ([d49a3d0](https://github.com/SamikBeach/frontend_v2/commit/d49a3d0c4f9f372999aafc9ec7feaa5320836b12))
+
 # [1.8.0](https://github.com/SamikBeach/frontend_v2/compare/1.7.0...1.8.0) (2025-05-23)
 
 
