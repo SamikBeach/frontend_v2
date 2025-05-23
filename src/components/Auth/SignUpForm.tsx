@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { useController, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from './icons';
+import { PrivacyDialog, TermsDialog } from './PolicyDialogs';
 
 interface SignUpFormProps {
   onClickLogin: () => void;
@@ -251,6 +252,16 @@ export function SignUpForm({
                 이용약관 동의
               </Label>
               <span className="ml-1 text-xs text-red-500">(필수)</span>
+              <TermsDialog
+                trigger={
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 pl-1 text-xs font-medium text-gray-500"
+                  >
+                    보기
+                  </Button>
+                }
+              />
             </div>
           </div>
           {errors.termsAgreed && (
@@ -273,6 +284,16 @@ export function SignUpForm({
                 개인정보 수집 및 이용 동의
               </Label>
               <span className="ml-1 text-xs text-red-500">(필수)</span>
+              <PrivacyDialog
+                trigger={
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 pl-1 text-xs font-medium text-gray-500"
+                  >
+                    보기
+                  </Button>
+                }
+              />
             </div>
           </div>
           {errors.privacyAgreed && (
