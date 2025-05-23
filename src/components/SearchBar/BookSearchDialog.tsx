@@ -145,6 +145,7 @@ export function BookSearchDialog({ isOpen, setIsOpen }: BookSearchDialogProps) {
                   onValueChange={setQuery}
                   className="h-12 rounded-none border-0 py-3 text-base shadow-none focus:ring-0 md:h-16 md:py-4"
                   placeholder="도서 제목을 검색해보세요"
+                  autoFocus
                 />
                 <div className="min-h-0 flex-1 overflow-hidden">
                   <Suspense

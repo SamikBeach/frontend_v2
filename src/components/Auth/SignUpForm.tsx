@@ -13,8 +13,9 @@ import { useMutation } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useController, useForm } from 'react-hook-form';
-import { AppleIcon } from './icons/AppleIcon';
-import { GoogleIcon } from './icons/GoogleIcon';
+import { toast } from 'sonner';
+import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from './icons';
+import { PrivacyDialog, TermsDialog } from './PolicyDialogs';
 
 interface SignUpFormProps {
   onClickLogin: () => void;
@@ -131,11 +132,6 @@ export function SignUpForm({
 
   // 구글 회원가입 핸들러
   const handleGoogleSignUp = async () => {
-    if (!termsAgreed || !privacyAgreed) {
-      setError('필수 약관에 동의해주세요.');
-      return;
-    }
-
     setError(null);
 
     try {
@@ -159,11 +155,6 @@ export function SignUpForm({
 
   // 애플 회원가입 핸들러
   const handleAppleSignUp = async () => {
-    if (!termsAgreed || !privacyAgreed) {
-      setError('필수 약관에 동의해주세요.');
-      return;
-    }
-
     setError(null);
 
     try {
@@ -183,6 +174,18 @@ export function SignUpForm({
         err instanceof Error ? err.message : '애플 회원가입에 실패했습니다.'
       );
     }
+  };
+
+  // 네이버 회원가입 핸들러 (UI만 구현)
+  const handleNaverSignUp = () => {
+    setError(null);
+    toast.info('네이버 회원가입은 아직 구현되지 않았습니다.');
+  };
+
+  // 카카오 회원가입 핸들러 (UI만 구현)
+  const handleKakaoSignUp = () => {
+    setError(null);
+    toast.info('카카오 회원가입은 아직 구현되지 않았습니다.');
   };
 
   // 로딩 상태 확인
@@ -249,6 +252,16 @@ export function SignUpForm({
                 이용약관 동의
               </Label>
               <span className="ml-1 text-xs text-red-500">(필수)</span>
+              <TermsDialog
+                trigger={
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 pl-1 text-xs font-medium text-gray-500"
+                  >
+                    보기
+                  </Button>
+                }
+              />
             </div>
           </div>
           {errors.termsAgreed && (
@@ -271,6 +284,16 @@ export function SignUpForm({
                 개인정보 수집 및 이용 동의
               </Label>
               <span className="ml-1 text-xs text-red-500">(필수)</span>
+              <PrivacyDialog
+                trigger={
+                  <Button
+                    variant="link"
+                    className="h-auto p-0 pl-1 text-xs font-medium text-gray-500"
+                  >
+                    보기
+                  </Button>
+                }
+              />
             </div>
           </div>
           {errors.privacyAgreed && (
@@ -324,26 +347,53 @@ export function SignUpForm({
         </div>
       </div>
 
-      <div className="space-y-2.5">
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
-          onClick={handleGoogleSignUp}
-        >
-          <GoogleIcon className="mr-2 h-4 w-4" />
-          Google로 회원가입
-        </Button>
+      {/* 소셜 로그인 */}
+      <div className="space-y-3">
+        <div className="flex justify-center gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200"
+            onClick={handleGoogleSignUp}
+            aria-label="Google로 회원가입"
+          >
+            <GoogleIcon className="h-5 w-5 text-gray-700" />
+          </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
-          onClick={handleAppleSignUp}
-        >
-          <AppleIcon className="mr-2 h-4 w-4" />
-          Apple로 회원가입
-        </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200"
+            onClick={handleAppleSignUp}
+            aria-label="Apple로 회원가입"
+          >
+            <AppleIcon className="h-5 w-5 text-gray-700" />
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200 bg-[#03C75A] hover:bg-[#03C75A]/90"
+            onClick={handleNaverSignUp}
+            aria-label="네이버로 회원가입"
+          >
+            <NaverIcon className="h-5 w-5 text-white" />
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200 bg-[#FEE500] hover:bg-[#FEE500]/90"
+            onClick={handleKakaoSignUp}
+            aria-label="카카오로 회원가입"
+          >
+            <KakaoIcon className="h-5 w-5 text-[#3A1D1C]" />
+          </Button>
+        </div>
       </div>
 
       <div className="text-center text-xs">

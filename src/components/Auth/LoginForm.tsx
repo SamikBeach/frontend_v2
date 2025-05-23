@@ -264,50 +264,50 @@ export function LoginForm({
         </div>
       </div>
 
-      <div className="flex justify-center gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full border-gray-200"
-          onClick={handleGoogleLogin}
-          aria-label="Google로 로그인"
-        >
-          <GoogleIcon className="h-5 w-5 text-gray-700" />
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full border-gray-200"
-          onClick={handleAppleLogin}
-          aria-label="Apple로 로그인"
-        >
-          <AppleIcon className="h-5 w-5 text-gray-700" />
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full border-gray-200 bg-[#03C75A] hover:bg-[#03C75A]/90"
-          onClick={handleNaverLogin}
-          aria-label="네이버로 로그인"
-        >
-          <NaverIcon className="h-5 w-5 text-white" />
-        </Button>
-
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full border-gray-200 bg-[#FEE500] hover:bg-[#FEE500]/90"
-          onClick={handleKakaoLogin}
-          aria-label="카카오로 로그인"
-        >
-          <KakaoIcon className="h-5 w-5 text-[#3A1D1C]" />
-        </Button>
+      {/* 소셜 로그인 영역 */}
+      <div className="space-y-3">
+        <div className="flex justify-center gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200"
+            onClick={handleGoogleLogin}
+            aria-label="Google로 로그인"
+          >
+            <GoogleIcon className="h-5 w-5 text-gray-700" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200"
+            onClick={handleAppleLogin}
+            aria-label="Apple로 로그인"
+          >
+            <AppleIcon className="h-5 w-5 text-gray-700" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200 bg-[#03C75A] hover:bg-[#03C75A]/90"
+            onClick={handleNaverLogin}
+            aria-label="네이버로 로그인"
+          >
+            <NaverIcon className="h-5 w-5 text-white" />
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200 bg-[#FEE500] hover:bg-[#FEE500]/90"
+            onClick={handleKakaoLogin}
+            aria-label="카카오로 로그인"
+          >
+            <KakaoIcon className="h-5 w-5 text-[#3A1D1C]" />
+          </Button>
+        </div>
       </div>
 
       <div className="text-center text-xs">

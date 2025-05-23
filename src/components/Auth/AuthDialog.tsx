@@ -12,6 +12,7 @@ import {
   ResponsiveDialogTrigger,
 } from '../ui/responsive-dialog';
 import { LoginForm } from './LoginForm';
+import { PrivacyDialog, TermsDialog } from './PolicyDialogs';
 import { ResetPasswordForm } from './ResetPasswordForm';
 import { SignUpForm } from './SignUpForm';
 import { UserInfoForm } from './UserInfoForm';
@@ -203,6 +204,32 @@ export function AuthDialog({
               onClose={() => changeMode('login')}
             />
           )}
+        </div>
+
+        {/* 약관 및 개인정보처리방침 링크 */}
+        <div className="border-t border-gray-100 px-7 py-3 text-center">
+          <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+            <TermsDialog
+              trigger={
+                <Button
+                  variant="link"
+                  className="h-auto p-0 text-xs font-medium text-gray-500 hover:text-gray-700"
+                >
+                  이용약관
+                </Button>
+              }
+            />
+            <PrivacyDialog
+              trigger={
+                <Button
+                  variant="link"
+                  className="h-auto p-0 text-xs font-medium text-gray-500 hover:text-gray-700"
+                >
+                  개인정보 처리방침
+                </Button>
+              }
+            />
+          </div>
         </div>
       </ResponsiveDialogContent>
     </ResponsiveDialog>
