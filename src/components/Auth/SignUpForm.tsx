@@ -176,10 +176,27 @@ export function SignUpForm({
     }
   };
 
-  // 네이버 회원가입 핸들러 (UI만 구현)
-  const handleNaverSignUp = () => {
+  // 네이버 회원가입 핸들러
+  const handleNaverSignUp = async () => {
     setError(null);
-    toast.info('네이버 회원가입은 아직 구현되지 않았습니다.');
+
+    try {
+      const { accessToken, refreshToken, user } = await openSocialLoginPopup(
+        AuthProvider.NAVER
+      );
+
+      // 토큰 및 사용자 정보 저장
+      authUtils.setTokens(accessToken, refreshToken);
+      setUser(user);
+
+      // 성공 콜백
+      onSuccess?.();
+    } catch (err) {
+      console.error('네이버 회원가입 오류:', err);
+      setError(
+        err instanceof Error ? err.message : '네이버 회원가입에 실패했습니다.'
+      );
+    }
   };
 
   // 카카오 회원가입 핸들러 (UI만 구현)

@@ -151,9 +151,32 @@ export function LoginForm({
     }
   };
 
-  // 네이버 로그인 핸들러 (UI만 구현)
-  const handleNaverLogin = () => {
-    toast.info('네이버 로그인은 아직 구현되지 않았습니다.');
+  // 네이버 로그인 핸들러
+  const handleNaverLogin = async () => {
+    clearErrors();
+
+    try {
+      const { accessToken, refreshToken, user } = await openSocialLoginPopup(
+        AuthProvider.NAVER
+      );
+
+      // 토큰 및 사용자 정보 저장
+      authUtils.setTokens(accessToken, refreshToken);
+      setUser(user);
+
+      // 성공 토스트 메시지
+      toast.success(`${user.username}님, 환영합니다!`);
+
+      // 성공 콜백
+      onSuccess?.();
+    } catch (err) {
+      console.error('네이버 로그인 오류:', err);
+      setFormError('root', {
+        type: 'manual',
+        message:
+          err instanceof Error ? err.message : '네이버 로그인에 실패했습니다.',
+      });
+    }
   };
 
   // 카카오 로그인 핸들러 (UI만 구현)
