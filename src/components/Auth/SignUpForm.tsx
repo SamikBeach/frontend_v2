@@ -131,11 +131,6 @@ export function SignUpForm({
 
   // 구글 회원가입 핸들러
   const handleGoogleSignUp = async () => {
-    if (!termsAgreed || !privacyAgreed) {
-      setError('필수 약관에 동의해주세요.');
-      return;
-    }
-
     setError(null);
 
     try {
@@ -159,11 +154,6 @@ export function SignUpForm({
 
   // 애플 회원가입 핸들러
   const handleAppleSignUp = async () => {
-    if (!termsAgreed || !privacyAgreed) {
-      setError('필수 약관에 동의해주세요.');
-      return;
-    }
-
     setError(null);
 
     try {
@@ -187,20 +177,12 @@ export function SignUpForm({
 
   // 네이버 회원가입 핸들러 (UI만 구현)
   const handleNaverSignUp = () => {
-    if (!termsAgreed || !privacyAgreed) {
-      setError('필수 약관에 동의해주세요.');
-      return;
-    }
     setError(null);
     toast.info('네이버 회원가입은 아직 구현되지 않았습니다.');
   };
 
   // 카카오 회원가입 핸들러 (UI만 구현)
   const handleKakaoSignUp = () => {
-    if (!termsAgreed || !privacyAgreed) {
-      setError('필수 약관에 동의해주세요.');
-      return;
-    }
     setError(null);
     toast.info('카카오 회원가입은 아직 구현되지 않았습니다.');
   };
@@ -344,50 +326,53 @@ export function SignUpForm({
         </div>
       </div>
 
-      <div className="flex justify-center gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full border-gray-200"
-          onClick={handleGoogleSignUp}
-          aria-label="Google로 회원가입"
-        >
-          <GoogleIcon className="h-5 w-5 text-gray-700" />
-        </Button>
+      {/* 소셜 로그인 */}
+      <div className="space-y-3">
+        <div className="flex justify-center gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200"
+            onClick={handleGoogleSignUp}
+            aria-label="Google로 회원가입"
+          >
+            <GoogleIcon className="h-5 w-5 text-gray-700" />
+          </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full border-gray-200"
-          onClick={handleAppleSignUp}
-          aria-label="Apple로 회원가입"
-        >
-          <AppleIcon className="h-5 w-5 text-gray-700" />
-        </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200"
+            onClick={handleAppleSignUp}
+            aria-label="Apple로 회원가입"
+          >
+            <AppleIcon className="h-5 w-5 text-gray-700" />
+          </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full border-gray-200 bg-[#03C75A] hover:bg-[#03C75A]/90"
-          onClick={handleNaverSignUp}
-          aria-label="네이버로 회원가입"
-        >
-          <NaverIcon className="h-5 w-5 text-white" />
-        </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200 bg-[#03C75A] hover:bg-[#03C75A]/90"
+            onClick={handleNaverSignUp}
+            aria-label="네이버로 회원가입"
+          >
+            <NaverIcon className="h-5 w-5 text-white" />
+          </Button>
 
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-12 w-12 rounded-full border-gray-200 bg-[#FEE500] hover:bg-[#FEE500]/90"
-          onClick={handleKakaoSignUp}
-          aria-label="카카오로 회원가입"
-        >
-          <KakaoIcon className="h-5 w-5 text-[#3A1D1C]" />
-        </Button>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-12 w-12 rounded-full border-gray-200 bg-[#FEE500] hover:bg-[#FEE500]/90"
+            onClick={handleKakaoSignUp}
+            aria-label="카카오로 회원가입"
+          >
+            <KakaoIcon className="h-5 w-5 text-[#3A1D1C]" />
+          </Button>
+        </div>
       </div>
 
       <div className="text-center text-xs">
