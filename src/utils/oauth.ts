@@ -13,7 +13,11 @@ export const calculatePopupPosition = (width: number, height: number) => {
  * 소셜 로그인 팝업을 열고 결과를 Promise로 반환
  */
 export const openSocialLoginPopup = (
-  provider: AuthProvider.GOOGLE | AuthProvider.APPLE | AuthProvider.NAVER
+  provider:
+    | AuthProvider.GOOGLE
+    | AuthProvider.APPLE
+    | AuthProvider.NAVER
+    | AuthProvider.KAKAO
 ): Promise<{
   accessToken: string;
   refreshToken: string;
@@ -31,6 +35,9 @@ export const openSocialLoginPopup = (
         break;
       case AuthProvider.NAVER:
         providerPath = 'naver';
+        break;
+      case AuthProvider.KAKAO:
+        providerPath = 'kakao';
         break;
       default:
         reject(new Error('지원하지 않는 로그인 방식입니다.'));
@@ -94,6 +101,9 @@ export const openSocialLoginPopup = (
             break;
           case AuthProvider.NAVER:
             providerName = '네이버';
+            break;
+          case AuthProvider.KAKAO:
+            providerName = '카카오';
             break;
           default:
             providerName = '소셜';

@@ -179,9 +179,32 @@ export function LoginForm({
     }
   };
 
-  // 카카오 로그인 핸들러 (UI만 구현)
-  const handleKakaoLogin = () => {
-    toast.info('카카오 로그인은 아직 구현되지 않았습니다.');
+  // 카카오 로그인 핸들러
+  const handleKakaoLogin = async () => {
+    clearErrors();
+
+    try {
+      const { accessToken, refreshToken, user } = await openSocialLoginPopup(
+        AuthProvider.KAKAO
+      );
+
+      // 토큰 및 사용자 정보 저장
+      authUtils.setTokens(accessToken, refreshToken);
+      setUser(user);
+
+      // 성공 토스트 메시지
+      toast.success(`${user.username}님, 환영합니다!`);
+
+      // 성공 콜백
+      onSuccess?.();
+    } catch (err) {
+      console.error('카카오 로그인 오류:', err);
+      setFormError('root', {
+        type: 'manual',
+        message:
+          err instanceof Error ? err.message : '카카오 로그인에 실패했습니다.',
+      });
+    }
   };
 
   return (
