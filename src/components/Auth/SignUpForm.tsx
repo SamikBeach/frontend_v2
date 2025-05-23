@@ -13,8 +13,8 @@ import { useMutation } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
 import { useState } from 'react';
 import { useController, useForm } from 'react-hook-form';
-import { AppleIcon } from './icons/AppleIcon';
-import { GoogleIcon } from './icons/GoogleIcon';
+import { toast } from 'sonner';
+import { AppleIcon, GoogleIcon, KakaoIcon, NaverIcon } from './icons';
 
 interface SignUpFormProps {
   onClickLogin: () => void;
@@ -185,6 +185,26 @@ export function SignUpForm({
     }
   };
 
+  // 네이버 회원가입 핸들러 (UI만 구현)
+  const handleNaverSignUp = () => {
+    if (!termsAgreed || !privacyAgreed) {
+      setError('필수 약관에 동의해주세요.');
+      return;
+    }
+    setError(null);
+    toast.info('네이버 회원가입은 아직 구현되지 않았습니다.');
+  };
+
+  // 카카오 회원가입 핸들러 (UI만 구현)
+  const handleKakaoSignUp = () => {
+    if (!termsAgreed || !privacyAgreed) {
+      setError('필수 약관에 동의해주세요.');
+      return;
+    }
+    setError(null);
+    toast.info('카카오 회원가입은 아직 구현되지 않았습니다.');
+  };
+
   // 로딩 상태 확인
   const isLoading = checkEmailMutation.isPending;
 
@@ -324,25 +344,49 @@ export function SignUpForm({
         </div>
       </div>
 
-      <div className="space-y-2.5">
+      <div className="flex justify-center gap-4">
         <Button
           type="button"
           variant="outline"
-          className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
+          size="icon"
+          className="h-12 w-12 rounded-full border-gray-200"
           onClick={handleGoogleSignUp}
+          aria-label="Google로 회원가입"
         >
-          <GoogleIcon className="mr-2 h-4 w-4" />
-          Google로 회원가입
+          <GoogleIcon className="h-5 w-5 text-gray-700" />
         </Button>
 
         <Button
           type="button"
           variant="outline"
-          className="w-full justify-center rounded-xl border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50/80 hover:text-gray-900"
+          size="icon"
+          className="h-12 w-12 rounded-full border-gray-200"
           onClick={handleAppleSignUp}
+          aria-label="Apple로 회원가입"
         >
-          <AppleIcon className="mr-2 h-4 w-4" />
-          Apple로 회원가입
+          <AppleIcon className="h-5 w-5 text-gray-700" />
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="h-12 w-12 rounded-full border-gray-200 bg-[#03C75A] hover:bg-[#03C75A]/90"
+          onClick={handleNaverSignUp}
+          aria-label="네이버로 회원가입"
+        >
+          <NaverIcon className="h-5 w-5 text-white" />
+        </Button>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className="h-12 w-12 rounded-full border-gray-200 bg-[#FEE500] hover:bg-[#FEE500]/90"
+          onClick={handleKakaoSignUp}
+          aria-label="카카오로 회원가입"
+        >
+          <KakaoIcon className="h-5 w-5 text-[#3A1D1C]" />
         </Button>
       </div>
 
