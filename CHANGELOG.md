@@ -1,5 +1,22 @@
 # 🚦 CHANGELOG
 
+# [1.8.0](https://github.com/SamikBeach/frontend_v2/compare/1.7.0...1.8.0) (2025-05-23)
+
+
+### Bug Fixes
+
+* HTML 특수 문자 이스케이프 처리 ([42fd023](https://github.com/SamikBeach/frontend_v2/commit/42fd023a2352f9eea7d923e9ef0345fe54aac117))
+* 소셜 로그인 버튼 위 구분선 제거 ([cfaa3fd](https://github.com/SamikBeach/frontend_v2/commit/cfaa3fd36847e45bb9ff81b46289c0820ea39735))
+* 스타일 수정 ([00579c3](https://github.com/SamikBeach/frontend_v2/commit/00579c372f8523e4aa2a2792d0bf423b0b7a30a5))
+* 이용약관 및 개인정보처리방침 다이얼로그 UI 개선 ([fec571f](https://github.com/SamikBeach/frontend_v2/commit/fec571f94a8f245a1a87cbee6c71c027013b8b6d))
+
+
+### Features
+
+* BookSearchDialog 입력창 자동 포커스 기능 추가 ([53d0ace](https://github.com/SamikBeach/frontend_v2/commit/53d0ace42c5b46c85dc47ebd74c60a878520919d))
+* ReviewCard 그라데이션 효과 제거 및 모바일 터치 확장 기능 개선 ([357ff29](https://github.com/SamikBeach/frontend_v2/commit/357ff2980893fa52b96042c1741823fb7639f4e1))
+* 알라딘 드로워 핸들 하단 여백 추가 ([82ddc80](https://github.com/SamikBeach/frontend_v2/commit/82ddc8048de85fdb6a2de5ce647dbd1a2b27ac7e))
+
 # [1.7.0](https://github.com/SamikBeach/frontend_v2/compare/1.6.0...1.7.0) (2025-05-22)
 
 
