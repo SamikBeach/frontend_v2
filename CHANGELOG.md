@@ -1,5 +1,7 @@
 # 🚦 CHANGELOG
 
+## [1.9.1](https://github.com/SamikBeach/frontend_v2/compare/1.9.0...1.9.1) (2025-05-23)
+
 # [1.9.0](https://github.com/SamikBeach/frontend_v2/compare/1.8.1...1.9.0) (2025-05-23)
 
 
