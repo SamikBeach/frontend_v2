@@ -49,9 +49,10 @@ export function PrivacyDialog({ trigger, ...props }: PrivacyDialogProps) {
             <h2 className="text-xl font-semibold">개인정보 처리방침</h2>
 
             <p className="mt-4">
-              미역서점(이하 '회사'라 함)은 이용자의 개인정보를 중요시하며,
-              「정보통신망 이용촉진 및 정보보호 등에 관한 법률」, 「개인정보
-              보호법」 등 관련 법령을 준수하기 위하여 노력하고 있습니다.
+              미역서점(이하 &apos;회사&apos;라 함)은 이용자의 개인정보를
+              중요시하며, 「정보통신망 이용촉진 및 정보보호 등에 관한 법률」,
+              「개인정보 보호법」 등 관련 법령을 준수하기 위하여 노력하고
+              있습니다.
             </p>
 
             <p className="mt-4">
