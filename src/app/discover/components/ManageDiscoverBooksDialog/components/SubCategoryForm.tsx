@@ -19,7 +19,7 @@ export function SubCategoryForm({
   };
 
   return (
-    <div className="ml-7 rounded-lg border border-gray-200 bg-gray-50 p-4">
+    <div className="mb-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="subCategoryName" className="text-sm font-medium">

@@ -22,10 +22,10 @@ export function ManageDiscoverBooksDialog({
   return (
     <DndProvider backend={HTML5Backend}>
       <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
-        <ResponsiveDialogContent className="max-h-[95vh] w-[1600px] min-w-[70vw] overflow-hidden rounded-xl p-0 shadow-lg md:p-0">
+        <ResponsiveDialogContent className="max-h-[98vh] w-full max-w-[95vw] overflow-hidden rounded-xl p-0 shadow-lg md:max-h-[95vh] md:w-[1600px] md:min-w-[70vw] md:p-0">
           <div className="flex h-full flex-col">
-            <ResponsiveDialogHeader className="border-b border-gray-100 bg-white p-5">
-              <ResponsiveDialogTitle className="text-xl font-semibold text-gray-900">
+            <ResponsiveDialogHeader className="border-b border-gray-100 bg-white p-3 md:p-5">
+              <ResponsiveDialogTitle className="text-lg font-semibold text-gray-900 md:text-xl">
                 발견하기 관리
               </ResponsiveDialogTitle>
             </ResponsiveDialogHeader>
@@ -33,19 +33,24 @@ export function ManageDiscoverBooksDialog({
             <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
-              className="flex h-[80vh] flex-col"
+              className="flex h-[92vh] flex-col md:h-[80vh]"
             >
-              <TabsList className="mx-5 mt-3 grid w-fit grid-cols-2">
-                <TabsTrigger value="books" className="flex items-center gap-2">
-                  <BookOpen className="h-4 w-4" />
-                  도서 관리
+              <TabsList className="mx-3 mt-2 grid w-fit grid-cols-2 md:mx-5 md:mt-3">
+                <TabsTrigger
+                  value="books"
+                  className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
+                >
+                  <BookOpen className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline">도서 관리</span>
+                  <span className="sm:hidden">도서</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="categories"
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
                 >
-                  <Settings className="h-4 w-4" />
-                  카테고리 관리
+                  <Settings className="h-3 w-3 md:h-4 md:w-4" />
+                  <span className="hidden sm:inline">카테고리 관리</span>
+                  <span className="sm:hidden">카테고리</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -55,7 +60,7 @@ export function ManageDiscoverBooksDialog({
 
               <TabsContent
                 value="categories"
-                className="flex-1 overflow-hidden p-5"
+                className="flex-1 overflow-hidden p-2 md:p-4"
               >
                 <CategoriesManagementTab />
               </TabsContent>

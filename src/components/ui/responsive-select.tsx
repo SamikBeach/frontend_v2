@@ -370,12 +370,13 @@ function ResponsiveSelectLabel({
 // Value component
 function ResponsiveSelectValue({
   placeholder,
+  children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
   const { isMobile, value } = useResponsiveSelect();
 
   if (isMobile) {
-    return value || placeholder || null;
+    return children || placeholder || null;
   }
 
   return (
