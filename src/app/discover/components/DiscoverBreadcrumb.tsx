@@ -17,8 +17,8 @@ export function DiscoverBreadcrumb() {
     discoverSubcategoryFilterAtom
   );
 
-  // 카테고리 정보 가져오기
-  const { categories } = useDiscoverCategories();
+  // 카테고리 정보 가져오기 - 활성 카테고리만 표시
+  const { categories } = useDiscoverCategories({ includeInactive: false });
 
   // 선택된 카테고리 정보
   const currentCategory = categories?.find(

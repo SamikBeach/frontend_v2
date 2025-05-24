@@ -50,8 +50,8 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   // 모든 카테고리를 표시할지 여부 상태 추가
   const [showAllCategories, setShowAllCategories] = useState(false);
 
-  // 카테고리 정보 가져오기
-  const { categories } = useDiscoverCategories();
+  // 카테고리 정보 가져오기 - 활성 카테고리만 표시
+  const { categories } = useDiscoverCategories({ includeInactive: false });
 
   const DEFAULT_CATEGORY = 'all';
   const DEFAULT_SUBCATEGORY = 'all';
@@ -61,7 +61,10 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
     category => category.id.toString() === selectedCategory
   );
 
-  const subcategories = selectedCategoryObj?.subCategories || [];
+  // 활성화된 서브카테고리만 필터링
+  const subcategories = (selectedCategoryObj?.subCategories || []).filter(
+    sub => sub.isActive
+  );
 
   // 표시할 카테고리 결정
   const visibleCategories = showAllCategories
