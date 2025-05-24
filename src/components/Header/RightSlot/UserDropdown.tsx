@@ -18,6 +18,7 @@ import { useAtom } from 'jotai';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { LoginButton } from './LoginButton';
 
 interface UserDropdownProps {
@@ -47,11 +48,13 @@ export function UserDropdown({ trigger }: UserDropdownProps) {
     onSuccess: () => {
       setUser(null);
       authUtils.removeTokens();
+      toast.success('로그아웃되었습니다.');
     },
     onError: error => {
       console.error('로그아웃 실패:', error);
       setUser(null);
       authUtils.removeTokens();
+      toast.success('로그아웃되었습니다.');
     },
   });
 

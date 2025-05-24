@@ -1,6 +1,6 @@
 'use client';
 
-import { HelpCircle } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import {
@@ -26,7 +26,7 @@ export function FeedbackButton() {
               onClick={() => setIsOpen(true)}
               aria-label="피드백 남기기"
             >
-              <HelpCircle className="h-5 w-5 text-gray-500" />
+              <Send className="h-5 w-5 text-gray-500" />
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom">

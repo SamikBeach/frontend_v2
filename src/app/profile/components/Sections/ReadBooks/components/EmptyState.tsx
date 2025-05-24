@@ -1,7 +1,12 @@
+import { BookOpen } from 'lucide-react';
+import { EmptyState as CommonEmptyState } from '../../../common';
+
 export function EmptyState() {
   return (
-    <div className="flex h-32 w-full items-center justify-center rounded-lg bg-gray-50 px-4 py-6 sm:h-40 sm:py-8">
-      <p className="text-xs text-gray-500 sm:text-sm">책 목록이 없습니다.</p>
-    </div>
+    <CommonEmptyState
+      title="책 목록이 없습니다"
+      description="아직 등록된 책이 없습니다. 책을 추가해보세요."
+      icon={<BookOpen className="h-6 w-6 text-gray-400 sm:h-8 sm:w-8" />}
+    />
   );
 }
