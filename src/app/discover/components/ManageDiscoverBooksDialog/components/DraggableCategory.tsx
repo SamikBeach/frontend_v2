@@ -165,10 +165,11 @@ export function DraggableCategory({
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>카테고리 삭제</AlertDialogTitle>
+                <AlertDialogTitle>카테고
+                  리 삭제</AlertDialogTitle>
                 <AlertDialogDescription>
-                  "{category.name}" 카테고리를 삭제하시겠습니까? 이 작업은
-                  되돌릴 수 없습니다.
+                  &quot;{category.name}&quot; 카테고리를 삭제하시겠습니까? 이
+                  작업은 되돌릴 수 없습니다.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

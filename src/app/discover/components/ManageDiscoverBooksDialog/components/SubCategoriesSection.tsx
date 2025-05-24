@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useCallback } from 'react';
 import { useSubCategoryFormState, useSubCategoryMutations } from '../hooks';
@@ -9,7 +8,6 @@ import { DraggableSubCategory } from './DraggableSubCategory';
 import { SubCategoryForm } from './SubCategoryForm';
 
 export function SubCategoriesSection() {
-  const queryClient = useQueryClient();
   const { selectedCategoryForManagement, setSelectedCategoryForManagement } =
     useCategoryManagement();
 
@@ -102,28 +100,25 @@ export function SubCategoriesSection() {
   );
 
   // 서브카테고리 드롭 시 API 호출
-  const handleSubCategoryDrop = useCallback(
-    (dragIndex: number, hoverIndex: number) => {
-      if (
-        !selectedCategoryForManagement?.subCategories ||
-        reorderSubCategoriesMutation.isPending
-      )
-        return;
+  const handleSubCategoryDrop = useCallback(() => {
+    if (
+      !selectedCategoryForManagement?.subCategories ||
+      reorderSubCategoriesMutation.isPending
+    )
+      return;
 
-      const reorderData = {
-        categoryId: selectedCategoryForManagement.id,
-        subCategories: selectedCategoryForManagement.subCategories.map(
-          (subCategory, index) => ({
-            id: subCategory.id,
-            displayOrder: index,
-          })
-        ),
-      };
+    const reorderData = {
+      categoryId: selectedCategoryForManagement.id,
+      subCategories: selectedCategoryForManagement.subCategories.map(
+        (subCategory, index) => ({
+          id: subCategory.id,
+          displayOrder: index,
+        })
+      ),
+    };
 
-      reorderSubCategoriesMutation.mutate(reorderData);
-    },
-    [reorderSubCategoriesMutation, selectedCategoryForManagement]
-  );
+    reorderSubCategoriesMutation.mutate(reorderData);
+  }, [reorderSubCategoriesMutation, selectedCategoryForManagement]);
 
   // 서브카테고리 활성화 토글 함수
   const handleToggleSubCategoryActive = useCallback(

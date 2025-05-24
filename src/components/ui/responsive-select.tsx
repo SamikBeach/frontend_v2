@@ -373,7 +373,7 @@ function ResponsiveSelectValue({
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Value>) {
-  const { isMobile, value } = useResponsiveSelect();
+  const { isMobile } = useResponsiveSelect();
 
   if (isMobile) {
     return children || placeholder || null;

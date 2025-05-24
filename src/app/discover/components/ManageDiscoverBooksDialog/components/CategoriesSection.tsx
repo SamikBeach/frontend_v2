@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useDiscoverCategories } from '../../../hooks/useDiscoverCategories';
@@ -14,7 +13,6 @@ import { CategoryForm } from './CategoryForm';
 import { DraggableCategory } from './DraggableCategory';
 
 export function CategoriesSection() {
-  const queryClient = useQueryClient();
   const { categories: originalCategories } = useDiscoverCategories({
     includeInactive: true,
   });
@@ -133,22 +131,17 @@ export function CategoriesSection() {
   );
 
   // 카테고리 드롭 시 API 호출
-  const handleCategoryDrop = useCallback(
-    (dragIndex: number, hoverIndex: number) => {
-      if (reorderCategoriesMutation.isPending) return;
+  const handleCategoryDrop = useCallback(() => {
+    if (reorderCategoriesMutation.isPending) return;
 
-      // 현재 로컬 카테고리 순서를 기반으로 reorderData 생성
-      const reorderData = localCategories.map(
-        (category: any, index: number) => ({
-          id: category.id,
-          displayOrder: index,
-        })
-      );
+    // 현재 로컬 카테고리 순서를 기반으로 reorderData 생성
+    const reorderData = localCategories.map((category: any, index: number) => ({
+      id: category.id,
+      displayOrder: index,
+    }));
 
-      reorderCategoriesMutation.mutate(reorderData);
-    },
-    [reorderCategoriesMutation, localCategories]
-  );
+    reorderCategoriesMutation.mutate(reorderData);
+  }, [reorderCategoriesMutation, localCategories]);
 
   // 카테고리 활성화 토글 함수
   const handleToggleCategoryActive = useCallback(
