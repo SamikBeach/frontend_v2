@@ -1,5 +1,14 @@
 # 🚦 CHANGELOG
 
+# [1.10.0](https://github.com/SamikBeach/frontend_v2/compare/1.9.1...1.10.0) (2025-05-24)
+
+
+### Features
+
+* Empty 통일 ([87e5e0d](https://github.com/SamikBeach/frontend_v2/commit/87e5e0de765eb9082fe7e59f5530f7bcda9cb6f4))
+* 로그아웃 시 토스트 메시지 추가 ([ac53014](https://github.com/SamikBeach/frontend_v2/commit/ac53014afcf65e029557206e1c0b23ffb4964a93))
+* 헤더 피드백 버튼 아이콘을 Send로 변경 ([c2f707d](https://github.com/SamikBeach/frontend_v2/commit/c2f707d6675935f7900c9c82a4b9e0a06f0c4560))
+
 ## [1.9.1](https://github.com/SamikBeach/frontend_v2/compare/1.9.0...1.9.1) (2025-05-23)
 
 # [1.9.0](https://github.com/SamikBeach/frontend_v2/compare/1.8.1...1.9.0) (2025-05-23)
