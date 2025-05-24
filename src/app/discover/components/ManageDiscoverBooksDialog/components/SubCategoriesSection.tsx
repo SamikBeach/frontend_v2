@@ -78,7 +78,7 @@ export function SubCategoriesSection() {
     },
   });
 
-  // 서브카테고리 순서 변경 함수 - react-query 캐시 직접 업데이트
+  // 서브카테고리 순서 변경 함수 - 로컬 상태만 업데이트
   const moveSubCategory = useCallback(
     (dragIndex: number, hoverIndex: number) => {
       if (!selectedCategoryForManagement?.subCategories) return;
@@ -91,26 +91,14 @@ export function SubCategoriesSection() {
       newSubCategories.splice(dragIndex, 1);
       newSubCategories.splice(hoverIndex, 0, draggedSubCategory);
 
-      // 로컬 상태 즉시 업데이트
+      // 로컬 상태만 업데이트
       const updatedCategory = {
         ...selectedCategoryForManagement,
         subCategories: newSubCategories,
       };
       setSelectedCategoryForManagement(updatedCategory);
-
-      // react-query 캐시도 업데이트
-      queryClient.setQueryData(['discover-categories'], (oldData: any) => {
-        if (!oldData) return oldData;
-        return oldData.map((cat: any) =>
-          cat.id === selectedCategoryForManagement.id ? updatedCategory : cat
-        );
-      });
     },
-    [
-      selectedCategoryForManagement,
-      setSelectedCategoryForManagement,
-      queryClient,
-    ]
+    [selectedCategoryForManagement, setSelectedCategoryForManagement]
   );
 
   // 서브카테고리 드롭 시 API 호출

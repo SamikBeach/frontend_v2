@@ -106,7 +106,7 @@ export function CategoriesSection() {
     },
   });
 
-  // 카테고리 순서 변경 함수 - react-query 캐시 직접 업데이트
+  // 카테고리 순서 변경 함수 - 로컬 상태만 업데이트
   const moveCategory = useCallback(
     (dragIndex: number, hoverIndex: number) => {
       const draggedCategory = localCategories[dragIndex];
@@ -116,17 +116,8 @@ export function CategoriesSection() {
       newCategories.splice(dragIndex, 1);
       newCategories.splice(hoverIndex, 0, draggedCategory);
 
-      // 로컬 상태 즉시 업데이트
+      // 로컬 상태만 업데이트
       setLocalCategories(newCategories);
-
-      // react-query 캐시도 업데이트 (올바른 queryKey 사용)
-      queryClient.setQueryData(
-        ['discover-categories', true],
-        (oldData: any) => {
-          if (!oldData) return oldData;
-          return newCategories;
-        }
-      );
 
       // 현재 선택된 카테고리가 이동된 카테고리라면 selectedCategoryForManagement도 업데이트
       if (selectedCategoryForManagement?.id === draggedCategory.id) {
@@ -136,7 +127,6 @@ export function CategoriesSection() {
     [
       localCategories,
       setLocalCategories,
-      queryClient,
       selectedCategoryForManagement,
       setSelectedCategoryForManagement,
     ]
