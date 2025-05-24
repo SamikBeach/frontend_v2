@@ -153,8 +153,8 @@ export function DraggableSubCategory({
               <AlertDialogHeader>
                 <AlertDialogTitle>서브카테고리 삭제</AlertDialogTitle>
                 <AlertDialogDescription>
-                  "{subCategory.name}" 서브카테고리를 삭제하시겠습니까? 이
-                  작업은 되돌릴 수 없습니다.
+                  &quot;{subCategory.name}&quot; 서브카테고리를
+                  삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

@@ -58,4 +58,4 @@ export const getBookIdentifier = (book: SearchResult): string => {
   const isbn = book.isbn || '';
   const isbn13 = book.isbn13 || '';
   return `${isbn}-${isbn13}-${book.title}`;
-}; 
+};
