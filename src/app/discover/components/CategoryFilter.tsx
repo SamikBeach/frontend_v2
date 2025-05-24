@@ -50,8 +50,8 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
   // 모든 카테고리를 표시할지 여부 상태 추가
   const [showAllCategories, setShowAllCategories] = useState(false);
 
-  // 카테고리 정보 가져오기
-  const { categories } = useDiscoverCategories();
+  // 카테고리 정보 가져오기 - 활성 카테고리만 표시
+  const { categories } = useDiscoverCategories({ includeInactive: false });
 
   const DEFAULT_CATEGORY = 'all';
   const DEFAULT_SUBCATEGORY = 'all';

@@ -4,6 +4,9 @@ import {
   CreateDiscoverSubCategoryDto,
   DiscoverCategory,
   DiscoverSubCategory,
+  ReorderCategoriesDto,
+  ReorderResponse,
+  ReorderSubCategoriesDto,
   UpdateDiscoverCategoryDto,
   UpdateDiscoverSubCategoryDto,
 } from './types';
@@ -130,4 +133,30 @@ export const updateDiscoverSubCategory = async (
  */
 export const deleteDiscoverSubCategory = async (id: number): Promise<void> => {
   await api.delete(`/discover-categories/subcategories/${id}`);
+};
+
+/**
+ * 발견하기 카테고리 순서 변경
+ */
+export const reorderDiscoverCategories = async (
+  data: ReorderCategoriesDto
+): Promise<ReorderResponse> => {
+  const response = await api.put<ReorderResponse>(
+    '/discover-categories/reorder',
+    data
+  );
+  return response.data;
+};
+
+/**
+ * 발견하기 서브카테고리 순서 변경
+ */
+export const reorderDiscoverSubCategories = async (
+  data: ReorderSubCategoriesDto
+): Promise<ReorderResponse> => {
+  const response = await api.put<ReorderResponse>(
+    '/discover-categories/subcategories/reorder',
+    data
+  );
+  return response.data;
 };
