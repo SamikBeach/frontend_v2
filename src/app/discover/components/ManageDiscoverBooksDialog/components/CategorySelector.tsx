@@ -80,10 +80,20 @@ export function CategorySelector() {
     return categories.find((c: any) => c.id.toString() === selectedCategoryId);
   }, [categories, selectedCategoryId]);
 
+  const selectedSubcategory = useMemo(() => {
+    if (!selectedCategory || !selectedSubcategoryId) return null;
+    return selectedCategory.subCategories?.find(
+      (sub: any) => sub.id.toString() === selectedSubcategoryId
+    );
+  }, [selectedCategory, selectedSubcategoryId]);
+
   return (
-    <div className="mb-5 flex flex-wrap items-end gap-4">
-      <div className="flex-1 space-y-1.5">
-        <Label htmlFor="category" className="text-sm font-medium text-gray-700">
+    <div className="mb-1 flex flex-row items-end gap-2 md:mb-2 md:flex-row md:items-end md:gap-3">
+      <div className="flex-1 space-y-1">
+        <Label
+          htmlFor="category"
+          className="text-xs font-medium text-gray-700 md:text-sm"
+        >
           카테고리
         </Label>
         <ResponsiveSelect
@@ -92,9 +102,11 @@ export function CategorySelector() {
         >
           <ResponsiveSelectTrigger
             id="category"
-            className="h-10 cursor-pointer border-gray-200 transition-all hover:border-gray-300 focus:ring-2 focus:ring-blue-100"
+            className="h-8 cursor-pointer border-gray-200 text-xs transition-all hover:border-gray-300 focus:ring-2 focus:ring-blue-100 md:h-10 md:text-sm"
           >
-            <ResponsiveSelectValue placeholder="카테고리 선택" />
+            <ResponsiveSelectValue>
+              {selectedCategory ? selectedCategory.name : '카테고리 선택'}
+            </ResponsiveSelectValue>
           </ResponsiveSelectTrigger>
           <ResponsiveSelectContent className="border border-gray-100 shadow-md">
             {categories.map(category => (
@@ -128,10 +140,10 @@ export function CategorySelector() {
       </div>
 
       {selectedCategory && selectedCategory.subCategories.length > 0 && (
-        <div className="flex-1 space-y-1.5">
+        <div className="flex-1 space-y-1">
           <Label
             htmlFor="subcategory"
-            className="text-sm font-medium text-gray-700"
+            className="text-xs font-medium text-gray-700 md:text-sm"
           >
             서브카테고리
           </Label>
@@ -141,9 +153,13 @@ export function CategorySelector() {
           >
             <ResponsiveSelectTrigger
               id="subcategory"
-              className="h-10 cursor-pointer border-gray-200 transition-all hover:border-gray-300 focus:ring-2 focus:ring-blue-100"
+              className="h-8 cursor-pointer border-gray-200 text-xs transition-all hover:border-gray-300 focus:ring-2 focus:ring-blue-100 md:h-10 md:text-sm"
             >
-              <ResponsiveSelectValue placeholder="서브카테고리 선택" />
+              <ResponsiveSelectValue>
+                {selectedSubcategory
+                  ? selectedSubcategory.name
+                  : '서브카테고리 선택'}
+              </ResponsiveSelectValue>
             </ResponsiveSelectTrigger>
             <ResponsiveSelectContent className="border border-gray-100 shadow-md">
               {selectedCategory.subCategories.map(subcategory => (

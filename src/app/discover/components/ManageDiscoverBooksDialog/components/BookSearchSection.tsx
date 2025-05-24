@@ -157,11 +157,13 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-white p-5">
-      <div className="mb-5 flex items-center justify-between">
-        <h3 className="text-lg font-medium text-gray-800">도서 검색 및 추가</h3>
+    <div className="flex h-full flex-col overflow-hidden bg-white p-3 md:p-5">
+      <div className="mb-2 flex items-center justify-between md:mb-3">
+        <h3 className="text-base font-medium text-gray-800 md:text-lg">
+          도서 검색 및 추가
+        </h3>
         {searchResults.length > 0 && (
-          <div className="rounded-full bg-gray-50 px-3 py-1 text-sm text-gray-500">
+          <div className="rounded-full bg-gray-50 px-2 py-1 text-xs text-gray-500 md:px-3 md:text-sm">
             검색 결과:{' '}
             <span className="font-semibold text-gray-700">
               {totalSearchResults}권
@@ -172,22 +174,22 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
 
       {isSelectionComplete() ? (
         <>
-          <div className="relative mb-5">
+          <div className="relative mb-1 md:mb-2">
             <Input
               ref={searchInputRef}
               type="text"
               placeholder="도서 제목, 저자, ISBN 등으로 검색"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="focus:ring-opacity-50 h-10 rounded-full border-gray-200 pr-10 pl-10 transition-all hover:border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200"
+              className="focus:ring-opacity-50 h-9 rounded-full border-gray-200 pr-10 pl-10 text-sm transition-all hover:border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 md:h-10 md:text-base"
             />
-            <Search className="absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+            <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 transform text-gray-400 md:left-3.5 md:h-4 md:w-4" />
             {searchQuery && (
               <button
-                className="absolute top-1/2 right-3.5 -translate-y-1/2 transform cursor-pointer text-gray-400 hover:text-gray-600"
+                className="absolute top-1/2 right-3 -translate-y-1/2 transform cursor-pointer text-gray-400 hover:text-gray-600 md:right-3.5"
                 onClick={() => setSearchQuery('')}
               >
-                <X className="h-4 w-4" />
+                <X className="h-3 w-3 md:h-4 md:w-4" />
               </button>
             )}
           </div>
@@ -197,10 +199,10 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
             onScroll={handleSearchScroll}
           >
             {searchQuery.length === 0 ? (
-              <div className="flex h-full items-center justify-center p-8 text-center">
-                <div className="space-y-3">
-                  <Search className="mx-auto h-8 w-8 text-gray-200" />
-                  <h3 className="text-sm font-medium text-gray-700">
+              <div className="flex h-full items-center justify-center p-6 text-center md:p-8">
+                <div className="space-y-2 md:space-y-3">
+                  <Search className="mx-auto h-6 w-6 text-gray-200 md:h-8 md:w-8" />
+                  <h3 className="text-xs font-medium text-gray-700 md:text-sm">
                     도서를 검색하세요
                   </h3>
                   <p className="mx-auto max-w-xs text-xs text-gray-500">
@@ -210,17 +212,17 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
               </div>
             ) : isSearchLoading ? (
               <div className="flex h-full items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                <Loader2 className="h-6 w-6 animate-spin text-blue-500 md:h-8 md:w-8" />
               </div>
             ) : searchResults.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center px-4 py-12 text-center">
-                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-50">
-                  <span className="text-3xl">📚</span>
+              <div className="flex h-full flex-col items-center justify-center px-4 py-8 text-center md:py-12">
+                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-50 md:mb-4 md:h-16 md:w-16">
+                  <span className="text-2xl md:text-3xl">📚</span>
                 </div>
-                <h3 className="mb-1 text-lg font-medium text-gray-800">
+                <h3 className="mb-1 text-base font-medium text-gray-800 md:text-lg">
                   검색 결과가 없습니다
                 </h3>
-                <p className="max-w-sm text-sm text-gray-500">
+                <p className="max-w-sm text-xs text-gray-500 md:text-sm">
                   다른 검색어를 입력해보세요
                 </p>
               </div>
@@ -232,9 +234,9 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
                   return (
                     <div
                       key={getBookIdentifier(book)}
-                      className="group relative flex h-auto items-start gap-4 px-4 py-4 transition-colors hover:bg-gray-50"
+                      className="group relative flex h-auto items-start gap-3 px-3 py-3 transition-colors hover:bg-gray-50 md:gap-4 md:px-4 md:py-4"
                     >
-                      <div className="relative h-[145px] w-[100px] flex-shrink-0 overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm">
+                      <div className="relative h-[120px] w-[80px] flex-shrink-0 overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm md:h-[145px] md:w-[100px]">
                         <img
                           src={imageUrl}
                           alt={book.title}
@@ -247,31 +249,31 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
                       </div>
 
                       <div className="flex min-w-0 flex-1 flex-col justify-start pt-1">
-                        <h4 className="line-clamp-2 text-base font-medium text-gray-800 group-hover:text-gray-700">
+                        <h4 className="line-clamp-3 text-sm font-medium text-gray-800 group-hover:text-gray-700 md:line-clamp-2 md:text-base">
                           {highlightText(book.title, searchQuery)}
                         </h4>
 
                         {book.author && (
-                          <p className="mt-1.5 line-clamp-1 text-sm text-gray-500">
+                          <p className="mt-1 line-clamp-1 text-xs text-gray-500 md:mt-1.5 md:text-sm">
                             {book.author}
                           </p>
                         )}
 
-                        <div className="mt-2 flex items-center gap-3">
+                        <div className="mt-1.5 flex flex-col gap-1 md:mt-2 md:flex-row md:items-center md:gap-3">
                           <div className="flex items-center">
                             {renderStarRating(book.rating)}
-                            <span className="mx-1.5 text-sm font-medium text-gray-800">
+                            <span className="mx-1 text-xs font-medium text-gray-800 md:mx-1.5 md:text-sm">
                               {typeof book.rating === 'number'
                                 ? book.rating.toFixed(1)
                                 : book.rating || '0.0'}
                             </span>
-                            <span className="text-sm text-gray-500">
+                            <span className="text-xs text-gray-500 md:text-sm">
                               ({book.totalRatings || 0})
                             </span>
                           </div>
 
-                          <div className="flex items-center border-l border-gray-200 pl-3">
-                            <span className="ml-1.5 text-sm text-gray-500">
+                          <div className="flex items-center md:border-l md:border-gray-200 md:pl-3">
+                            <span className="text-xs text-gray-500 md:ml-1.5 md:text-sm">
                               리뷰{' '}
                               {book.reviews && book.reviews > 999
                                 ? `${Math.floor(book.reviews / 1000)}k`
@@ -283,7 +285,7 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
 
                       <Button
                         size="sm"
-                        className="ml-auto cursor-pointer self-center bg-blue-500 text-white shadow-sm transition-colors hover:bg-blue-600 hover:shadow"
+                        className="ml-auto cursor-pointer self-center bg-blue-500 text-xs text-white shadow-sm transition-colors hover:bg-blue-600 hover:shadow md:text-sm"
                         onClick={() => addBookToCategory(book)}
                       >
                         추가
@@ -293,8 +295,8 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
                 })}
 
                 {isFetchingNextSearchPage && (
-                  <div className="flex justify-center py-4">
-                    <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+                  <div className="flex justify-center py-3 md:py-4">
+                    <Loader2 className="h-5 w-5 animate-spin text-blue-500 md:h-6 md:w-6" />
                   </div>
                 )}
               </div>
@@ -302,12 +304,12 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
           </ScrollArea>
         </>
       ) : (
-        <div className="flex h-full flex-col items-center justify-center px-4 py-12 text-center">
-          <BookOpen className="mb-3 h-12 w-12 text-gray-200" />
-          <h3 className="mb-1 text-lg font-medium text-gray-800">
+        <div className="flex h-full flex-col items-center justify-center px-4 py-8 text-center md:py-12">
+          <BookOpen className="mb-2 h-8 w-8 text-gray-200 md:mb-3 md:h-12 md:w-12" />
+          <h3 className="mb-1 text-base font-medium text-gray-800 md:text-lg">
             카테고리 선택이 필요합니다
           </h3>
-          <p className="max-w-sm text-sm text-gray-500">
+          <p className="max-w-sm text-xs text-gray-500 md:text-sm">
             도서 검색 및 추가를 위해 카테고리 및 서브카테고리를 선택해 주세요.
           </p>
         </div>

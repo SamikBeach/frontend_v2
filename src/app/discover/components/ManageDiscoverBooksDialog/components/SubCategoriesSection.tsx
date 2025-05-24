@@ -198,29 +198,24 @@ export function SubCategoriesSection() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-medium text-gray-800">서브카테고리</h3>
+      <div className="mb-2 flex items-center justify-between md:mb-3">
+        <h3 className="text-base font-medium text-gray-800 md:text-lg">
+          서브카테고리
+        </h3>
         <Button
           onClick={() => setIsCreatingSubCategory(true)}
           size="sm"
-          className="flex items-center gap-2"
+          className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
           disabled={!selectedCategoryForManagement}
         >
-          <Plus className="h-4 w-4" />새 서브카테고리
+          <Plus className="h-3 w-3 md:h-4 md:w-4" />
+          <span className="hidden sm:inline">새 서브카테고리</span>
+          <span className="sm:hidden">추가</span>
         </Button>
       </div>
 
       {selectedCategoryForManagement ? (
         <>
-          <div className="mb-4 rounded-lg bg-blue-50 p-3">
-            <p className="text-sm text-blue-700">
-              <span className="font-medium">
-                {selectedCategoryForManagement.name}
-              </span>{' '}
-              카테고리의 서브카테고리를 관리합니다.
-            </p>
-          </div>
-
           {/* 서브카테고리 생성 폼 */}
           {isCreatingSubCategory && (
             <SubCategoryForm
@@ -234,7 +229,7 @@ export function SubCategoriesSection() {
           )}
 
           <ScrollArea className="min-h-0 flex-1">
-            <div className="space-y-2 pr-4">
+            <div className="space-y-2 pr-2 md:pr-4">
               {(selectedCategoryForManagement.subCategories || []).map(
                 (subCategory, index) => (
                   <div key={subCategory.id} className="space-y-2">
@@ -266,13 +261,13 @@ export function SubCategoriesSection() {
         </>
       ) : (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
-            <span className="text-2xl">📁</span>
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 md:mb-4 md:h-16 md:w-16">
+            <span className="text-xl md:text-2xl">📁</span>
           </div>
-          <h3 className="mb-1 text-lg font-medium text-gray-800">
+          <h3 className="mb-1 text-base font-medium text-gray-800 md:text-lg">
             카테고리를 선택하세요
           </h3>
-          <p className="max-w-sm text-sm text-gray-500">
+          <p className="max-w-sm text-xs text-gray-500 md:text-sm">
             서브카테고리를 관리하려면 먼저 카테고리를 선택해주세요.
           </p>
         </div>

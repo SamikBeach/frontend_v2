@@ -216,14 +216,18 @@ export function CategoriesSection() {
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-lg font-medium text-gray-800">카테고리</h3>
+      <div className="mb-2 flex items-center justify-between md:mb-3">
+        <h3 className="text-base font-medium text-gray-800 md:text-lg">
+          카테고리
+        </h3>
         <Button
           onClick={() => setIsCreatingCategory(true)}
           size="sm"
-          className="flex items-center gap-2"
+          className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
         >
-          <Plus className="h-4 w-4" />새 카테고리
+          <Plus className="h-3 w-3 md:h-4 md:w-4" />
+          <span className="hidden sm:inline">새 카테고리</span>
+          <span className="sm:hidden">추가</span>
         </Button>
       </div>
 
@@ -240,7 +244,7 @@ export function CategoriesSection() {
       )}
 
       <ScrollArea className="min-h-0 flex-1">
-        <div className="space-y-2 pr-4">
+        <div className="space-y-2 pr-2 md:pr-4">
           {localCategories.map((category, index) => (
             <div key={category.id} className="space-y-2">
               <DraggableCategory

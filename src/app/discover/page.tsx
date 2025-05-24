@@ -133,8 +133,8 @@ export default function DiscoverPage() {
         </Suspense>
       </div>
 
-      {/* 발견하기 도서관리 버튼을 우하단에 고정 */}
-      <div className="fixed right-6 bottom-6 z-50">
+      {/* 발견하기 도서관리 버튼을 우하단에 고정 - 모바일에서는 BottomNav 위로 */}
+      <div className="fixed right-6 bottom-20 z-50 md:bottom-6">
         <AdminBookManageButton />
       </div>
     </div>
