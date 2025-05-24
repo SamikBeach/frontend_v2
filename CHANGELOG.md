@@ -1,5 +1,14 @@
 # 🚦 CHANGELOG
 
+## [1.10.1](https://github.com/SamikBeach/frontend_v2/compare/1.10.0...1.10.1) (2025-05-24)
+
+
+### Bug Fixes
+
+* fix lint ([1851589](https://github.com/SamikBeach/frontend_v2/commit/1851589486d732895fafd0e149a1e9d6459538ed))
+* 모바일에서 카테고리 드롭다운 버튼에 ID 대신 이름이 표시되도록 수정 ([11f635a](https://github.com/SamikBeach/frontend_v2/commit/11f635a866825d3d1dafbb4ffa63e07aa9892411))
+* 카테고리 DnD hover 시 즉시 위치 변경 구현 ([e696acc](https://github.com/SamikBeach/frontend_v2/commit/e696accd428bc7de23fe29d74c43712b520d8052))
+
 # [1.10.0](https://github.com/SamikBeach/frontend_v2/compare/1.9.1...1.10.0) (2025-05-24)
 
 
