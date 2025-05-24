@@ -1,17 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useCallback } from 'react';
-import {
-  useCategoryManagement,
-  useSubCategoryFormState,
-  useSubCategoryMutations,
-} from '../hooks';
+import { useSubCategoryFormState, useSubCategoryMutations } from '../hooks';
+import { useCategoryManagement } from '../hooks/useManageDiscoverState';
 import { DraggableSubCategory } from './DraggableSubCategory';
 import { SubCategoryForm } from './SubCategoryForm';
 
 export function SubCategoriesSection() {
-  const { selectedCategoryForManagement } = useCategoryManagement();
+  const queryClient = useQueryClient();
+  const { selectedCategoryForManagement, setSelectedCategoryForManagement } =
+    useCategoryManagement();
 
   const {
     isCreatingSubCategory,
@@ -28,29 +28,96 @@ export function SubCategoriesSection() {
     deleteSubCategoryMutation,
     reorderSubCategoriesMutation,
   } = useSubCategoryMutations({
-    onSubCategoryCreated: () => {
+    onSubCategoryCreated: newSubCategory => {
       setIsCreatingSubCategory(false);
       setSubCategoryForm({ name: '', isActive: true });
+
+      // atom 업데이트
+      if (selectedCategoryForManagement) {
+        const currentSubCategories =
+          selectedCategoryForManagement.subCategories || [];
+        const updatedCategory = {
+          ...selectedCategoryForManagement,
+          subCategories: [...currentSubCategories, newSubCategory].sort(
+            (a, b) => a.displayOrder - b.displayOrder
+          ),
+        };
+        setSelectedCategoryForManagement(updatedCategory);
+      }
     },
-    onSubCategoryUpdated: () => {
+    onSubCategoryUpdated: updatedSubCategory => {
       setIsEditingSubCategory(null);
       setSubCategoryForm({ name: '', isActive: true });
+
+      // atom 업데이트
+      if (selectedCategoryForManagement) {
+        const currentSubCategories =
+          selectedCategoryForManagement.subCategories || [];
+        const updatedCategory = {
+          ...selectedCategoryForManagement,
+          subCategories: currentSubCategories.map(sub =>
+            sub.id === updatedSubCategory.id ? updatedSubCategory : sub
+          ),
+        };
+        setSelectedCategoryForManagement(updatedCategory);
+      }
+    },
+    onSubCategoryDeleted: deletedSubCategoryId => {
+      // atom 업데이트
+      if (selectedCategoryForManagement) {
+        const currentSubCategories =
+          selectedCategoryForManagement.subCategories || [];
+        const updatedCategory = {
+          ...selectedCategoryForManagement,
+          subCategories: currentSubCategories.filter(
+            sub => sub.id !== deletedSubCategoryId
+          ),
+        };
+        setSelectedCategoryForManagement(updatedCategory);
+      }
     },
   });
 
-  // 서브카테고리 순서 변경 함수
+  // 서브카테고리 순서 변경 함수 - react-query 캐시 직접 업데이트
   const moveSubCategory = useCallback(
     (dragIndex: number, hoverIndex: number) => {
-      // 로컬 상태 업데이트는 DraggableSubCategory에서 처리
+      if (!selectedCategoryForManagement?.subCategories) return;
+
+      const draggedSubCategory =
+        selectedCategoryForManagement.subCategories[dragIndex];
+      const newSubCategories = [...selectedCategoryForManagement.subCategories];
+
+      // 드래그된 항목을 제거하고 새 위치에 삽입
+      newSubCategories.splice(dragIndex, 1);
+      newSubCategories.splice(hoverIndex, 0, draggedSubCategory);
+
+      // 로컬 상태 즉시 업데이트
+      const updatedCategory = {
+        ...selectedCategoryForManagement,
+        subCategories: newSubCategories,
+      };
+      setSelectedCategoryForManagement(updatedCategory);
+
+      // react-query 캐시도 업데이트
+      queryClient.setQueryData(['discover-categories'], (oldData: any) => {
+        if (!oldData) return oldData;
+        return oldData.map((cat: any) =>
+          cat.id === selectedCategoryForManagement.id ? updatedCategory : cat
+        );
+      });
     },
-    []
+    [
+      selectedCategoryForManagement,
+      setSelectedCategoryForManagement,
+      queryClient,
+    ]
   );
 
   // 서브카테고리 드롭 시 API 호출
   const handleSubCategoryDrop = useCallback(
     (dragIndex: number, hoverIndex: number) => {
       if (
-        !selectedCategoryForManagement ||
+        !selectedCategoryForManagement?.subCategories ||
         reorderSubCategoriesMutation.isPending
       )
         return;
@@ -77,19 +144,38 @@ export function SubCategoriesSection() {
         id: subCategoryId,
         data: { isActive },
       });
+
+      // 현재 선택된 카테고리의 서브카테고리 활성화 상태를 즉시 업데이트
+      if (selectedCategoryForManagement) {
+        const currentSubCategories =
+          selectedCategoryForManagement.subCategories || [];
+        const updatedCategory = {
+          ...selectedCategoryForManagement,
+          subCategories: currentSubCategories.map(sub =>
+            sub.id === subCategoryId ? { ...sub, isActive } : sub
+          ),
+        };
+        setSelectedCategoryForManagement(updatedCategory);
+      }
     },
-    [updateSubCategoryMutation]
+    [
+      updateSubCategoryMutation,
+      selectedCategoryForManagement,
+      setSelectedCategoryForManagement,
+    ]
   );
 
   const handleCreateSubCategory = () => {
     if (!subCategoryForm.name.trim() || !selectedCategoryForManagement) {
       return;
     }
+    const currentSubCategories =
+      selectedCategoryForManagement.subCategories || [];
     createSubCategoryMutation.mutate({
       discoverCategoryId: selectedCategoryForManagement.id,
       name: subCategoryForm.name,
       description: '',
-      displayOrder: selectedCategoryForManagement.subCategories.length,
+      displayOrder: currentSubCategories.length,
     });
   };
 
@@ -161,7 +247,7 @@ export function SubCategoriesSection() {
 
           <ScrollArea className="min-h-0 flex-1">
             <div className="space-y-2 pr-4">
-              {selectedCategoryForManagement.subCategories.map(
+              {(selectedCategoryForManagement.subCategories || []).map(
                 (subCategory, index) => (
                   <div key={subCategory.id} className="space-y-2">
                     <DraggableSubCategory

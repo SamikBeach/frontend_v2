@@ -6,8 +6,10 @@ import {
   ResponsiveSelectTrigger,
   ResponsiveSelectValue,
 } from '@/components/ui/responsive-select';
+import { useAtom } from 'jotai';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useDiscoverCategories } from '../../../hooks/useDiscoverCategories';
+import { selectedCategoryForManagementAtom } from '../atoms';
 import { useCategorySelection } from '../hooks';
 
 export function CategorySelector() {
@@ -18,6 +20,9 @@ export function CategorySelector() {
     setSelectedSubcategoryId,
   } = useCategorySelection();
 
+  const [, setSelectedCategoryForManagement] = useAtom(
+    selectedCategoryForManagementAtom
+  );
   const { categories } = useDiscoverCategories({ includeInactive: true });
 
   // 카테고리 변경 시 서브카테고리 처리 함수
@@ -28,17 +33,24 @@ export function CategorySelector() {
       const category = categories.find(
         (c: any) => c.id.toString() === categoryId
       );
-      if (
-        category &&
-        category.subCategories &&
-        category.subCategories.length > 0
-      ) {
-        setSelectedSubcategoryId(category.subCategories[0].id.toString());
-      } else {
-        setSelectedSubcategoryId('');
+
+      if (category) {
+        // 카테고리 관리 탭의 상태도 함께 업데이트
+        setSelectedCategoryForManagement(category);
+
+        if (category.subCategories && category.subCategories.length > 0) {
+          setSelectedSubcategoryId(category.subCategories[0].id.toString());
+        } else {
+          setSelectedSubcategoryId('');
+        }
       }
     },
-    [categories, setSelectedCategoryId, setSelectedSubcategoryId]
+    [
+      categories,
+      setSelectedCategoryId,
+      setSelectedSubcategoryId,
+      setSelectedCategoryForManagement,
+    ]
   );
 
   // 초기 카테고리 선택
@@ -53,12 +65,15 @@ export function CategorySelector() {
 
       setSelectedCategoryId(categoryId);
       setSelectedSubcategoryId(subcategoryId);
+      // 카테고리 관리 탭의 상태도 함께 업데이트
+      setSelectedCategoryForManagement(firstCategory);
     }
   }, [
     categories,
     selectedCategoryId,
     setSelectedCategoryId,
     setSelectedSubcategoryId,
+    setSelectedCategoryForManagement,
   ]);
 
   const selectedCategory = useMemo(() => {

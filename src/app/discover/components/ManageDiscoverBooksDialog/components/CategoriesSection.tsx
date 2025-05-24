@@ -1,24 +1,25 @@
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useDiscoverCategories } from '../../../hooks/useDiscoverCategories';
 import {
   useCategoryFormState,
   useCategoryManagement,
   useCategoryMutations,
+  useCategorySelection,
 } from '../hooks';
 import { CategoryForm } from './CategoryForm';
 import { DraggableCategory } from './DraggableCategory';
 
 export function CategoriesSection() {
+  const queryClient = useQueryClient();
   const { categories } = useDiscoverCategories({ includeInactive: true });
-  const {
-    selectedCategoryForManagement,
-    setSelectedCategoryForManagement,
-    localCategoriesState,
-    setLocalCategoriesState,
-  } = useCategoryManagement();
+  const { selectedCategoryForManagement, setSelectedCategoryForManagement } =
+    useCategoryManagement();
+  const { setSelectedCategoryId, setSelectedSubcategoryId } =
+    useCategorySelection();
 
   const {
     isCreatingCategory,
@@ -29,21 +30,32 @@ export function CategoriesSection() {
     setCategoryForm,
   } = useCategoryFormState();
 
-  // 카테고리 데이터가 변경될 때 로컬 상태 동기화
-  const localCategories = useMemo(() => {
-    if (categories.length > 0) {
-      if (
-        localCategoriesState.length === 0 ||
-        localCategoriesState.length !== categories.length
-      ) {
-        setLocalCategoriesState(categories);
+  // 카테고리 선택 핸들러
+  const handleCategorySelect = useCallback(
+    (category: any) => {
+      setSelectedCategoryForManagement(category);
+
+      // 도서 관리 탭의 상태도 함께 업데이트
+      setSelectedCategoryId(category.id.toString());
+      if (category.subCategories && category.subCategories.length > 0) {
+        setSelectedSubcategoryId(category.subCategories[0].id.toString());
+      } else {
+        setSelectedSubcategoryId('');
       }
-      return localCategoriesState.length > 0
-        ? localCategoriesState
-        : categories;
+    },
+    [
+      setSelectedCategoryForManagement,
+      setSelectedCategoryId,
+      setSelectedSubcategoryId,
+    ]
+  );
+
+  // 카테고리 목록이 로드되면 첫 번째 카테고리를 자동으로 선택
+  useEffect(() => {
+    if (categories.length > 0 && !selectedCategoryForManagement) {
+      handleCategorySelect(categories[0]);
     }
-    return categories;
-  }, [categories, localCategoriesState, setLocalCategoriesState]);
+  }, [categories, selectedCategoryForManagement, handleCategorySelect]);
 
   const {
     createCategoryMutation,
@@ -52,39 +64,51 @@ export function CategoriesSection() {
     reorderCategoriesMutation,
   } = useCategoryMutations({
     onCategoryCreated: newCategory => {
-      setLocalCategoriesState(prev => [...prev, newCategory]);
       setIsCreatingCategory(false);
       setCategoryForm({ name: '', isActive: true });
+
+      // 새로 생성된 카테고리를 자동으로 선택
+      handleCategorySelect(newCategory);
     },
     onCategoryUpdated: updatedCategory => {
-      setLocalCategoriesState(prev =>
-        prev.map(cat => (cat.id === updatedCategory.id ? updatedCategory : cat))
-      );
-      if (selectedCategoryForManagement?.id === updatedCategory.id) {
-        setSelectedCategoryForManagement(updatedCategory);
-      }
       setIsEditingCategory(null);
       setCategoryForm({ name: '', isActive: true });
+
+      // 현재 선택된 카테고리가 업데이트된 카테고리라면 atom 업데이트
+      if (selectedCategoryForManagement?.id === updatedCategory.id) {
+        const updatedCategoryWithSubCategories = {
+          ...updatedCategory,
+          subCategories: selectedCategoryForManagement.subCategories || [],
+        };
+        setSelectedCategoryForManagement(updatedCategoryWithSubCategories);
+      }
     },
     onCategoryDeleted: deletedCategoryId => {
-      setLocalCategoriesState(prev =>
-        prev.filter(cat => cat.id !== deletedCategoryId)
-      );
+      // 삭제된 카테고리가 현재 선택된 카테고리라면 선택 해제
       if (selectedCategoryForManagement?.id === deletedCategoryId) {
         setSelectedCategoryForManagement(null);
+        // 다른 카테고리가 있다면 첫 번째 카테고리 선택
+        const remainingCategories = categories.filter(
+          cat => cat.id !== deletedCategoryId
+        );
+        if (remainingCategories.length > 0) {
+          handleCategorySelect(remainingCategories[0]);
+        }
       }
     },
   });
 
-  // 카테고리 순서 변경 함수
+  // 카테고리 순서 변경 함수 - react-query 캐시 직접 업데이트
   const moveCategory = useCallback(
     (dragIndex: number, hoverIndex: number) => {
-      const updatedCategories = [...localCategoriesState];
+      const updatedCategories = [...categories];
       const [draggedCategory] = updatedCategories.splice(dragIndex, 1);
       updatedCategories.splice(hoverIndex, 0, draggedCategory);
-      setLocalCategoriesState(updatedCategories);
+
+      // react-query 캐시 즉시 업데이트
+      queryClient.setQueryData(['discover-categories'], updatedCategories);
     },
-    [localCategoriesState, setLocalCategoriesState]
+    [categories, queryClient]
   );
 
   // 카테고리 드롭 시 API 호출
@@ -92,42 +116,35 @@ export function CategoriesSection() {
     (dragIndex: number, hoverIndex: number) => {
       if (reorderCategoriesMutation.isPending) return;
 
-      const reorderData = {
-        categories: localCategoriesState.map((category, index) => ({
-          id: category.id,
-          displayOrder: index,
-        })),
-      };
+      const reorderData = categories.map((category, index) => ({
+        id: category.id,
+        displayOrder: index,
+      }));
 
       reorderCategoriesMutation.mutate(reorderData);
     },
-    [reorderCategoriesMutation, localCategoriesState]
+    [reorderCategoriesMutation, categories]
   );
 
   // 카테고리 활성화 토글 함수
   const handleToggleCategoryActive = useCallback(
     (categoryId: number, isActive: boolean) => {
-      setLocalCategoriesState(prev =>
-        prev.map(cat => (cat.id === categoryId ? { ...cat, isActive } : cat))
-      );
-
-      if (selectedCategoryForManagement?.id === categoryId) {
-        const updatedCategory = {
-          ...selectedCategoryForManagement,
-          isActive,
-        };
-        setSelectedCategoryForManagement(updatedCategory);
-      }
-
       updateCategoryMutation.mutate({
         id: categoryId,
         data: { isActive },
       });
+
+      // 현재 선택된 카테고리의 활성화 상태를 즉시 업데이트
+      if (selectedCategoryForManagement?.id === categoryId) {
+        setSelectedCategoryForManagement({
+          ...selectedCategoryForManagement,
+          isActive,
+        });
+      }
     },
     [
       updateCategoryMutation,
       selectedCategoryForManagement,
-      setLocalCategoriesState,
       setSelectedCategoryForManagement,
     ]
   );
@@ -200,13 +217,13 @@ export function CategoriesSection() {
 
       <ScrollArea className="min-h-0 flex-1">
         <div className="space-y-2 pr-4">
-          {localCategories.map((category, index) => (
+          {categories.map((category, index) => (
             <div key={category.id} className="space-y-2">
               <DraggableCategory
                 category={category}
                 index={index}
                 isSelected={selectedCategoryForManagement?.id === category.id}
-                onSelect={setSelectedCategoryForManagement}
+                onSelect={handleCategorySelect}
                 onEdit={handleEditCategory}
                 onDelete={deleteCategoryMutation.mutate}
                 onToggleActive={handleToggleCategoryActive}

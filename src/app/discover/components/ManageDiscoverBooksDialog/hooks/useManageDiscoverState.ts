@@ -1,16 +1,27 @@
-import { DiscoverCategory } from '@/apis/discover-category/types';
+import { useAtom } from 'jotai';
 import { useState } from 'react';
-import { CategoryFormData, SubCategoryFormData } from '../types';
+import {
+  activeTabAtom,
+  searchQueryAtom,
+  selectedCategoryForManagementAtom,
+  selectedCategoryIdAtom,
+  selectedSubcategoryIdAtom,
+} from '../atoms';
 
+// 탭 상태 관리
 export const useTabState = () => {
-  const [activeTab, setActiveTab] = useState('books');
+  const [activeTab, setActiveTab] = useAtom(activeTabAtom);
   return { activeTab, setActiveTab };
 };
 
+// 카테고리 선택 상태 관리 (도서 관리용)
 export const useCategorySelection = () => {
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
-  const [selectedSubcategoryId, setSelectedSubcategoryId] =
-    useState<string>('all');
+  const [selectedCategoryId, setSelectedCategoryId] = useAtom(
+    selectedCategoryIdAtom
+  );
+  const [selectedSubcategoryId, setSelectedSubcategoryId] = useAtom(
+    selectedSubcategoryIdAtom
+  );
 
   return {
     selectedCategoryId,
@@ -20,62 +31,61 @@ export const useCategorySelection = () => {
   };
 };
 
+// 검색 상태 관리
 export const useSearchState = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   return { searchQuery, setSearchQuery };
 };
 
-export const useManageDiscoverState = () => {
-  // 카테고리 관리 상태
+// 카테고리 관리용 선택 상태
+export const useCategoryManagement = () => {
   const [selectedCategoryForManagement, setSelectedCategoryForManagement] =
-    useState<DiscoverCategory | null>(null);
+    useAtom(selectedCategoryForManagementAtom);
+
+  return {
+    selectedCategoryForManagement,
+    setSelectedCategoryForManagement,
+  };
+};
+
+// 카테고리 폼 상태 (로컬 상태로 충분)
+export const useCategoryFormState = () => {
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
   const [isEditingCategory, setIsEditingCategory] = useState<number | null>(
     null
   );
-  const [isCreatingSubCategory, setIsCreatingSubCategory] = useState(false);
-  const [isEditingSubCategory, setIsEditingSubCategory] = useState<
-    number | null
-  >(null);
-
-  // 카테고리 폼 상태
-  const [categoryForm, setCategoryForm] = useState<CategoryFormData>({
+  const [categoryForm, setCategoryForm] = useState({
     name: '',
     isActive: true,
   });
-
-  // 서브카테고리 폼 상태
-  const [subCategoryForm, setSubCategoryForm] = useState<SubCategoryFormData>({
-    name: '',
-    isActive: true,
-  });
-
-  // 로컬 카테고리 상태 - 드래그 앤 드롭을 위한 임시 상태
-  const [localCategoriesState, setLocalCategoriesState] = useState<
-    DiscoverCategory[]
-  >([]);
 
   return {
-    // 관리 상태
-    selectedCategoryForManagement,
-    setSelectedCategoryForManagement,
     isCreatingCategory,
     setIsCreatingCategory,
     isEditingCategory,
     setIsEditingCategory,
+    categoryForm,
+    setCategoryForm,
+  };
+};
+
+// 서브카테고리 폼 상태 (로컬 상태로 충분)
+export const useSubCategoryFormState = () => {
+  const [isCreatingSubCategory, setIsCreatingSubCategory] = useState(false);
+  const [isEditingSubCategory, setIsEditingSubCategory] = useState<
+    number | null
+  >(null);
+  const [subCategoryForm, setSubCategoryForm] = useState({
+    name: '',
+    isActive: true,
+  });
+
+  return {
     isCreatingSubCategory,
     setIsCreatingSubCategory,
     isEditingSubCategory,
     setIsEditingSubCategory,
-
-    // 폼 상태
-    categoryForm,
-    setCategoryForm,
     subCategoryForm,
     setSubCategoryForm,
-
-    // 로컬 상태
-    localCategoriesState,
-    setLocalCategoriesState,
   };
 };

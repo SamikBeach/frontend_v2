@@ -38,14 +38,18 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
     );
     if (!category) return false;
 
+    // 서브카테고리가 있는 경우
     if (category.subCategories && category.subCategories.length > 0) {
+      // 서브카테고리가 선택되어야 함 (빈 문자열이나 'none'이 아닌 유효한 값)
       return (
+        selectedSubcategoryId &&
         selectedSubcategoryId !== '' &&
         selectedSubcategoryId !== 'none' &&
         !isNaN(parseInt(selectedSubcategoryId))
       );
     }
 
+    // 서브카테고리가 없는 경우는 카테고리만 선택되면 됨
     return true;
   }, [selectedCategoryId, selectedSubcategoryId, categories]);
 
@@ -131,7 +135,8 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
       parseInt(selectedCategoryId),
       selectedSubcategoryId &&
         selectedSubcategoryId !== 'none' &&
-        selectedSubcategoryId !== 'all'
+        selectedSubcategoryId !== 'all' &&
+        !isNaN(parseInt(selectedSubcategoryId))
         ? parseInt(selectedSubcategoryId)
         : undefined,
       isbn

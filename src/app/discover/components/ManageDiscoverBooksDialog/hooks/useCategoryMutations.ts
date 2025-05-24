@@ -77,9 +77,8 @@ export const useCategoryMutations = ({
   });
 
   const reorderCategoriesMutation = useMutation({
-    mutationFn: (data: {
-      categories: { id: number; displayOrder: number }[];
-    }) => reorderDiscoverCategories(data),
+    mutationFn: (data: { id: number; displayOrder: number }[]) =>
+      reorderDiscoverCategories({ categories: data }),
     onSuccess: () => {
       toast.success('카테고리 순서가 변경되었습니다.');
       queryClient.invalidateQueries({

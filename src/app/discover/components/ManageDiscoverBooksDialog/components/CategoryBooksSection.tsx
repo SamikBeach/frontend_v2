@@ -1,4 +1,5 @@
 import { getDiscoverBooks } from '@/apis/book/book';
+import { Book, BookSearchResponse } from '@/apis/book/types';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
@@ -24,41 +25,46 @@ export function CategoryBooksSection({ open }: CategoryBooksListProps) {
     );
     if (!category) return false;
 
+    // 서브카테고리가 있는 경우
     if (category.subCategories && category.subCategories.length > 0) {
+      // 서브카테고리가 선택되어야 함 (빈 문자열이나 'none'이 아닌 유효한 값)
       return (
+        selectedSubcategoryId &&
         selectedSubcategoryId !== '' &&
         selectedSubcategoryId !== 'none' &&
         !isNaN(parseInt(selectedSubcategoryId))
       );
     }
 
+    // 서브카테고리가 없는 경우는 카테고리만 선택되면 됨
     return true;
   }, [selectedCategoryId, selectedSubcategoryId, categories]);
 
   // 카테고리 도서 목록 가져오기
-  const { data: booksResponse, isLoading: isBooksLoading } = useQuery({
-    queryKey: [
-      'admin-discover-category-books',
-      selectedCategoryId ? parseInt(selectedCategoryId) : 0,
-      selectedSubcategoryId && selectedSubcategoryId !== 'all'
-        ? parseInt(selectedSubcategoryId)
-        : undefined,
-    ],
-    queryFn: () => {
-      const categoryId = parseInt(selectedCategoryId);
-      const subcategoryId =
+  const { data: booksResponse, isLoading: isBooksLoading } =
+    useQuery<BookSearchResponse>({
+      queryKey: [
+        'admin-discover-category-books',
+        selectedCategoryId ? parseInt(selectedCategoryId) : 0,
         selectedSubcategoryId && selectedSubcategoryId !== 'all'
           ? parseInt(selectedSubcategoryId)
-          : undefined;
+          : undefined,
+      ],
+      queryFn: () => {
+        const categoryId = parseInt(selectedCategoryId);
+        const subcategoryId =
+          selectedSubcategoryId && selectedSubcategoryId !== 'all'
+            ? parseInt(selectedSubcategoryId)
+            : undefined;
 
-      return getDiscoverBooks({
-        discoverCategoryId: categoryId,
-        discoverSubCategoryId: subcategoryId,
-        limit: 100,
-      });
-    },
-    enabled: open && isSelectionComplete(),
-  });
+        return getDiscoverBooks({
+          discoverCategoryId: categoryId,
+          discoverSubCategoryId: subcategoryId,
+          limit: 100,
+        });
+      },
+      enabled: Boolean(open && isSelectionComplete()),
+    });
 
   const booksData = booksResponse?.books || [];
 
@@ -107,7 +113,7 @@ export function CategoryBooksSection({ open }: CategoryBooksListProps) {
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
-            {booksData.map(book => (
+            {booksData.map((book: Book) => (
               <div
                 key={book.id}
                 className="flex items-start gap-4 p-4 transition-colors hover:bg-gray-50"

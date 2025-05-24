@@ -6474,7 +6474,7 @@ __metadata:
     framer-motion: "npm:^12.6.5"
     globals: "npm:^16.0.0"
     josa: "npm:^3.0.1"
-    jotai: "npm:^2.12.2"
+    jotai: "npm:^2.12.4"
     lucide-react: "npm:^0.486.0"
     next: "npm:^15.2.4"
     next-intl: "npm:^4.1.0"
@@ -7622,9 +7622,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jotai@npm:^2.12.2":
-  version: 2.12.2
-  resolution: "jotai@npm:2.12.2"
+"jotai@npm:^2.12.4":
+  version: 2.12.4
+  resolution: "jotai@npm:2.12.4"
   peerDependencies:
     "@types/react": ">=17.0.0"
     react: ">=17.0.0"
@@ -7633,7 +7633,7 @@ __metadata:
       optional: true
     react:
       optional: true
-  checksum: 10c0/df135d8a8c635df5d34bdb30b2e24afa93292c9c0bdac589ed9df31da50cec8c4820f66d04f23fa05f6c0ed0726e86c83b0767ca9c6abae4d281a253526d2db3
+  checksum: 10c0/b03cbfe1f5b6a1065bf0f73aba1aaa0dc46843f4bfc1a54aa9cc24ca1c9416535c40c1de143f67c8de77622f6f24298dd47286557bd52f94af2109b4120d3bb3
   languageName: node
   linkType: hard
 
