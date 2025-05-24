@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useDiscoverCategories } from '../../../hooks/useDiscoverCategories';
 import {
   useCategoryFormState,
@@ -15,7 +15,10 @@ import { DraggableCategory } from './DraggableCategory';
 
 export function CategoriesSection() {
   const queryClient = useQueryClient();
-  const { categories } = useDiscoverCategories({ includeInactive: true });
+  const { categories: originalCategories } = useDiscoverCategories({
+    includeInactive: true,
+  });
+  const [localCategories, setLocalCategories] = useState(originalCategories);
   const { selectedCategoryForManagement, setSelectedCategoryForManagement } =
     useCategoryManagement();
   const { setSelectedCategoryId, setSelectedSubcategoryId } =
@@ -29,6 +32,11 @@ export function CategoriesSection() {
     categoryForm,
     setCategoryForm,
   } = useCategoryFormState();
+
+  // originalCategories가 변경되면 localCategories도 업데이트
+  useEffect(() => {
+    setLocalCategories(originalCategories);
+  }, [originalCategories]);
 
   // 카테고리 선택 핸들러
   const handleCategorySelect = useCallback(
@@ -52,10 +60,10 @@ export function CategoriesSection() {
 
   // 카테고리 목록이 로드되면 첫 번째 카테고리를 자동으로 선택
   useEffect(() => {
-    if (categories.length > 0 && !selectedCategoryForManagement) {
-      handleCategorySelect(categories[0]);
+    if (localCategories.length > 0 && !selectedCategoryForManagement) {
+      handleCategorySelect(localCategories[0]);
     }
-  }, [categories, selectedCategoryForManagement, handleCategorySelect]);
+  }, [localCategories, selectedCategoryForManagement, handleCategorySelect]);
 
   const {
     createCategoryMutation,
@@ -88,7 +96,7 @@ export function CategoriesSection() {
       if (selectedCategoryForManagement?.id === deletedCategoryId) {
         setSelectedCategoryForManagement(null);
         // 다른 카테고리가 있다면 첫 번째 카테고리 선택
-        const remainingCategories = categories.filter(
+        const remainingCategories = localCategories.filter(
           cat => cat.id !== deletedCategoryId
         );
         if (remainingCategories.length > 0) {
@@ -101,14 +109,37 @@ export function CategoriesSection() {
   // 카테고리 순서 변경 함수 - react-query 캐시 직접 업데이트
   const moveCategory = useCallback(
     (dragIndex: number, hoverIndex: number) => {
-      const updatedCategories = [...categories];
-      const [draggedCategory] = updatedCategories.splice(dragIndex, 1);
-      updatedCategories.splice(hoverIndex, 0, draggedCategory);
+      const draggedCategory = localCategories[dragIndex];
+      const newCategories = [...localCategories];
 
-      // react-query 캐시 즉시 업데이트
-      queryClient.setQueryData(['discover-categories'], updatedCategories);
+      // 드래그된 항목을 제거하고 새 위치에 삽입
+      newCategories.splice(dragIndex, 1);
+      newCategories.splice(hoverIndex, 0, draggedCategory);
+
+      // 로컬 상태 즉시 업데이트
+      setLocalCategories(newCategories);
+
+      // react-query 캐시도 업데이트 (올바른 queryKey 사용)
+      queryClient.setQueryData(
+        ['discover-categories', true],
+        (oldData: any) => {
+          if (!oldData) return oldData;
+          return newCategories;
+        }
+      );
+
+      // 현재 선택된 카테고리가 이동된 카테고리라면 selectedCategoryForManagement도 업데이트
+      if (selectedCategoryForManagement?.id === draggedCategory.id) {
+        setSelectedCategoryForManagement(draggedCategory);
+      }
     },
-    [categories, queryClient]
+    [
+      localCategories,
+      setLocalCategories,
+      queryClient,
+      selectedCategoryForManagement,
+      setSelectedCategoryForManagement,
+    ]
   );
 
   // 카테고리 드롭 시 API 호출
@@ -116,14 +147,17 @@ export function CategoriesSection() {
     (dragIndex: number, hoverIndex: number) => {
       if (reorderCategoriesMutation.isPending) return;
 
-      const reorderData = categories.map((category, index) => ({
-        id: category.id,
-        displayOrder: index,
-      }));
+      // 현재 로컬 카테고리 순서를 기반으로 reorderData 생성
+      const reorderData = localCategories.map(
+        (category: any, index: number) => ({
+          id: category.id,
+          displayOrder: index,
+        })
+      );
 
       reorderCategoriesMutation.mutate(reorderData);
     },
-    [reorderCategoriesMutation, categories]
+    [reorderCategoriesMutation, localCategories]
   );
 
   // 카테고리 활성화 토글 함수
@@ -156,7 +190,7 @@ export function CategoriesSection() {
     createCategoryMutation.mutate({
       name: categoryForm.name,
       description: '',
-      displayOrder: categories.length,
+      displayOrder: localCategories.length,
       isActive: categoryForm.isActive,
     });
   };
@@ -217,7 +251,7 @@ export function CategoriesSection() {
 
       <ScrollArea className="min-h-0 flex-1">
         <div className="space-y-2 pr-4">
-          {categories.map((category, index) => (
+          {localCategories.map((category, index) => (
             <div key={category.id} className="space-y-2">
               <DraggableCategory
                 category={category}

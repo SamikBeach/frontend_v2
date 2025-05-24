@@ -61,7 +61,10 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
     category => category.id.toString() === selectedCategory
   );
 
-  const subcategories = selectedCategoryObj?.subCategories || [];
+  // 활성화된 서브카테고리만 필터링
+  const subcategories = (selectedCategoryObj?.subCategories || []).filter(
+    sub => sub.isActive
+  );
 
   // 표시할 카테고리 결정
   const visibleCategories = showAllCategories

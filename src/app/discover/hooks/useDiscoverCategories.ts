@@ -24,9 +24,9 @@ export function useDiscoverCategories(
         .map(category => ({
           ...category,
           subCategories: category.subCategories
-            ? [...category.subCategories].sort(
-                (a, b) => a.displayOrder - b.displayOrder
-              )
+            ? [...category.subCategories]
+                .filter(sub => includeInactive || sub.isActive) // 서브카테고리도 활성화 필터링
+                .sort((a, b) => a.displayOrder - b.displayOrder)
             : [],
         }))
         .sort((a, b) => a.displayOrder - b.displayOrder);
