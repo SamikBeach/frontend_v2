@@ -259,6 +259,16 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
                           </p>
                         )}
 
+                        {(book.publisher || book.publishDate) && (
+                          <p className="mt-1 line-clamp-1 text-xs text-gray-500 md:text-sm">
+                            {book.publisher && book.publishDate
+                              ? `${book.publisher} · ${new Date(book.publishDate).getFullYear()}`
+                              : book.publisher ||
+                                (book.publishDate &&
+                                  new Date(book.publishDate).getFullYear())}
+                          </p>
+                        )}
+
                         <div className="mt-1.5 flex flex-col gap-1 md:mt-2 md:flex-row md:items-center md:gap-3">
                           <div className="flex items-center">
                             {renderStarRating(book.rating)}
