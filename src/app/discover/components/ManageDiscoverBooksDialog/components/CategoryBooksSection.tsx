@@ -137,12 +137,17 @@ export function CategoryBooksSection({ open }: CategoryBooksListProps) {
                   <p className="line-clamp-1 text-xs text-gray-500 md:text-sm">
                     {book.author}
                   </p>
-                  <div className="mt-1 flex items-center gap-2">
-                    <span className="text-xs text-gray-500">
-                      {book.publisher} ·{' '}
-                      {new Date(book.publishDate).getFullYear()}
-                    </span>
-                  </div>
+                  {(book.publisher || book.publishDate) && (
+                    <div className="mt-1 flex items-center gap-2">
+                      <span className="text-xs text-gray-500">
+                        {book.publisher && book.publishDate
+                          ? `${book.publisher} · ${new Date(book.publishDate).getFullYear()}`
+                          : book.publisher ||
+                            (book.publishDate &&
+                              new Date(book.publishDate).getFullYear())}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 <Button
                   variant="outline"
