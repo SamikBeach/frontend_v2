@@ -22,7 +22,7 @@ export function ManageDiscoverBooksDialog({
   return (
     <DndProvider backend={HTML5Backend}>
       <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
-        <ResponsiveDialogContent className="max-h-[98vh] w-full max-w-[95vw] overflow-hidden rounded-xl p-0 shadow-lg md:max-h-[95vh] md:w-[1600px] md:min-w-[70vw] md:p-0">
+        <ResponsiveDialogContent className="max-h-[98vh] w-full max-w-[95vw] overflow-hidden rounded-xl p-0 shadow-lg md:max-h-[95vh] md:w-[1600px] md:min-w-[95vw] md:p-0">
           <div className="flex h-full flex-col">
             <ResponsiveDialogHeader className="border-b border-gray-100 bg-white p-3 md:p-5">
               <ResponsiveDialogTitle className="text-lg font-semibold text-gray-900 md:text-xl">
