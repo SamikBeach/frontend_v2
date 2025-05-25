@@ -1,5 +1,20 @@
 # 🚦 CHANGELOG
 
+# [1.11.0](https://github.com/SamikBeach/frontend_v2/compare/1.10.1...1.11.0) (2025-05-25)
+
+
+### Bug Fixes
+
+* BookSkeleton import 오류 수정 ([d78b44c](https://github.com/SamikBeach/frontend_v2/commit/d78b44c9e2ba16b3f38fa6181e475d6bdc9e0514))
+* 모바일에서 탭 메뉴와 정렬 필터 겹침 문제 해결 ([8ea60de](https://github.com/SamikBeach/frontend_v2/commit/8ea60de51d41f3db3738c5e9ed16518f397046ab))
+* 스타일 수정 ([fadedca](https://github.com/SamikBeach/frontend_v2/commit/fadedca876d9c9186a2ee3808cb367105aa23139))
+
+
+### Features
+
+* 관련 영상 섹션 추가 ([06ac1f7](https://github.com/SamikBeach/frontend_v2/commit/06ac1f707fe9fe44b163e31e6cf5fb247cb762dd))
+* 모바일 가로형 BookCard 이미지 크기 확대 ([430bb8e](https://github.com/SamikBeach/frontend_v2/commit/430bb8ee8d08b56a6069e07fa724ac73f85b08aa))
+
 ## [1.10.1](https://github.com/SamikBeach/frontend_v2/compare/1.10.0...1.10.1) (2025-05-24)
 
 
