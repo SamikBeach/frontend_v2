@@ -38,7 +38,7 @@ export function BookHeader({ isDialog = false }: BookHeaderProps) {
   return (
     <div
       className={cn(
-        'sticky top-0 z-10 flex items-center justify-between rounded-t-lg bg-white/80 backdrop-blur-xl',
+        'sticky top-0 z-10 flex items-center justify-between rounded-t-lg border-b-0 bg-white/80 backdrop-blur-xl',
         isMobile ? 'h-12 px-4' : 'h-16 px-8'
       )}
     >
