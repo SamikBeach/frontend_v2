@@ -76,7 +76,7 @@ export function BookFullSkeleton() {
 // 헤더 스켈레톤
 export function BookHeaderSkeleton() {
   return (
-    <div className="sticky top-0 z-50 flex h-16 items-center justify-between rounded-lg border-b border-gray-200 bg-white/95 px-6 py-4 backdrop-blur">
+    <div className="sticky top-0 z-50 flex h-16 items-center justify-between rounded-lg bg-white/95 px-6 py-4 backdrop-blur">
       <div className="flex items-center space-x-4">
         <Skeleton className="h-6 w-40 rounded" />
       </div>
