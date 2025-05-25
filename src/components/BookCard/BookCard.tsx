@@ -55,7 +55,7 @@ export const BookCard = React.memo(
           <div
             className={cn(
               'relative flex flex-col items-center justify-end overflow-hidden rounded-md bg-white',
-              horizontal ? 'h-auto w-24 flex-shrink-0' : 'aspect-[3/4.5] w-full'
+              horizontal ? 'h-auto w-32 flex-shrink-0' : 'aspect-[3/4.5] w-full'
             )}
           >
             <img
