@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.12.0](https://github.com/SamikBeach/frontend_v2/compare/1.11.1...1.12.0) (2025-05-25)
+
+
+### Features
+
+* ManageDiscoverBooksDialog 우측 검색 결과에 무한스크롤 기능 개선 ([38eb868](https://github.com/SamikBeach/frontend_v2/commit/38eb868133864f9f1dfda69b212b1f82d370e679))
+
 ## [1.11.1](https://github.com/SamikBeach/frontend_v2/compare/1.11.0...1.11.1) (2025-05-25)
 
 
