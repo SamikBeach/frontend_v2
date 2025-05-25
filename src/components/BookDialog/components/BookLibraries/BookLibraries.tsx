@@ -8,7 +8,7 @@ import {
 import { bookLibrariesDropdownAtom } from '@/atoms/book-dialog';
 import { AuthDialog } from '@/components/Auth/AuthDialog';
 import { LibraryDialog } from '@/components/Library';
-import { LibraryCard } from '@/components/LibraryCard';
+import { LibraryCard, LibraryCardSkeleton } from '@/components/LibraryCard';
 import { Button } from '@/components/ui/button';
 import {
   ResponsiveDropdownMenu,
@@ -16,7 +16,6 @@ import {
   ResponsiveDropdownMenuItem,
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { getTagColor } from '@/utils/tags';
 import { useAtom } from 'jotai';
@@ -236,27 +235,7 @@ export function LibrariesSkeleton() {
     <div className="p-1">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {[1, 2, 3, 4].map(i => (
-          <div key={i} className="h-full rounded-xl bg-[#F9FAFB] p-4">
-            <div className="flex items-center gap-3">
-              <Skeleton className="h-9 w-9 rounded-full" />
-              <div className="flex-1 space-y-1.5">
-                <Skeleton className="h-4 w-32 rounded-full" />
-                <Skeleton className="h-3 w-24 rounded-full" />
-              </div>
-            </div>
-            <div className="mt-2 space-y-1">
-              <Skeleton className="h-4 w-full rounded" />
-              <Skeleton className="h-4 w-4/5 rounded" />
-            </div>
-            <div className="mt-3 flex gap-1">
-              <Skeleton className="h-5 w-12 rounded-full" />
-              <Skeleton className="h-5 w-12 rounded-full" />
-            </div>
-            <div className="mt-3 flex gap-4">
-              <Skeleton className="h-3 w-16 rounded" />
-              <Skeleton className="h-3 w-16 rounded" />
-            </div>
-          </div>
+          <LibraryCardSkeleton key={i} />
         ))}
       </div>
     </div>

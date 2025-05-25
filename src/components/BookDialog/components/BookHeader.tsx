@@ -21,6 +21,7 @@ export function BookHeaderSkeleton() {
       )}
     >
       <Skeleton className="h-6 w-56 rounded-md" />
+      <div className="h-8 w-8 rounded-full bg-gray-100" />
     </div>
   );
 }

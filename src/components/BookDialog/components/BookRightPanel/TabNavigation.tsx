@@ -7,7 +7,7 @@ import { LibrarySortDropdown } from '../BookLibraries';
 import { ReviewSortDropdown } from '../BookReviews';
 
 // 탭 타입 정의
-export type TabType = 'reviews' | 'libraries';
+export type TabType = 'reviews' | 'libraries' | 'videos';
 
 interface TabNavigationProps {
   activeTab: TabType;
@@ -67,6 +67,18 @@ export function TabNavigation({
         >
           이 책이 등록된 서재{' '}
           {libraryCount !== undefined && `(${libraryCount})`}
+        </button>
+        <button
+          className={cn(
+            'ml-6 cursor-pointer pb-2 text-sm font-medium whitespace-nowrap transition-colors',
+            activeTab === 'videos'
+              ? 'border-b-2 border-gray-900 text-gray-900'
+              : 'text-gray-500 hover:text-gray-700',
+            isMobile && 'text-sm'
+          )}
+          onClick={() => onTabChange('videos')}
+        >
+          관련 영상
         </button>
       </div>
 

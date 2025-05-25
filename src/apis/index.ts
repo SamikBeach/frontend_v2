@@ -64,3 +64,4 @@ export { reviewModule };
 
 export * from './search';
 export * from './user';
+export * from './youtube';
