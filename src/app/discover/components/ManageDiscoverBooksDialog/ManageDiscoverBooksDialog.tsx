@@ -24,8 +24,8 @@ export function ManageDiscoverBooksDialog({
       <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
         <ResponsiveDialogContent className="max-h-[98vh] w-full max-w-[95vw] overflow-hidden rounded-xl p-0 shadow-lg md:max-h-[95vh] md:w-[1600px] md:min-w-[95vw] md:p-0">
           <div className="flex h-full flex-col">
-            <ResponsiveDialogHeader className="border-b border-gray-100 bg-white p-3 md:p-5">
-              <ResponsiveDialogTitle className="text-lg font-semibold text-gray-900 md:text-xl">
+            <ResponsiveDialogHeader className="border-b border-gray-100 bg-white p-2 md:p-3">
+              <ResponsiveDialogTitle className="text-base font-semibold text-gray-900 md:text-lg">
                 발견하기 관리
               </ResponsiveDialogTitle>
             </ResponsiveDialogHeader>
@@ -33,9 +33,9 @@ export function ManageDiscoverBooksDialog({
             <Tabs
               value={activeTab}
               onValueChange={setActiveTab}
-              className="flex h-[92vh] flex-col md:h-[80vh]"
+              className="flex h-[94vh] flex-col md:h-[85vh]"
             >
-              <TabsList className="mx-3 mt-2 grid w-fit grid-cols-2 md:mx-5 md:mt-3">
+              <TabsList className="mx-2 mt-1 grid w-fit grid-cols-2 md:mx-3 md:mt-2">
                 <TabsTrigger
                   value="books"
                   className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
@@ -60,7 +60,7 @@ export function ManageDiscoverBooksDialog({
 
               <TabsContent
                 value="categories"
-                className="flex-1 overflow-hidden p-2 md:p-4"
+                className="flex-1 overflow-hidden p-1 md:p-2"
               >
                 <CategoriesManagementTab />
               </TabsContent>

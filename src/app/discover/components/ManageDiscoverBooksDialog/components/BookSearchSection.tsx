@@ -3,7 +3,6 @@ import { searchBooks } from '@/apis/search';
 import { SearchResult } from '@/apis/search/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { BookOpen, Loader2, Search, X } from 'lucide-react';
@@ -94,14 +93,20 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
   }, [open, setSearchQuery]);
 
   // 스크롤 이벤트 핸들러
-  const handleSearchScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (!hasNextSearchPage || isFetchingNextSearchPage) return;
+  const handleSearchScroll = useCallback(
+    (e: React.UIEvent<HTMLDivElement>) => {
+      if (!hasNextSearchPage || isFetchingNextSearchPage) return;
 
-    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
-    if (scrollHeight - scrollTop - clientHeight < 200) {
-      fetchNextSearchPage();
-    }
-  };
+      const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
+      const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
+
+      // 스크롤이 90% 이상 내려갔을 때 다음 페이지 로드
+      if (scrollPercentage >= 0.9) {
+        fetchNextSearchPage();
+      }
+    },
+    [hasNextSearchPage, isFetchingNextSearchPage, fetchNextSearchPage]
+  );
 
   // 검색 결과에서 도서를 카테고리에 즉시 추가하는 함수
   const addBookToCategory = (book: SearchResult): void => {
@@ -157,11 +162,8 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
   };
 
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-white p-3 md:p-5">
-      <div className="mb-2 flex items-center justify-between md:mb-3">
-        <h3 className="text-base font-medium text-gray-800 md:text-lg">
-          도서 검색 및 추가
-        </h3>
+    <div className="flex h-full flex-col overflow-hidden bg-white p-2 md:p-3">
+      <div className="mb-1 flex items-center justify-between md:mb-2">
         {searchResults.length > 0 && (
           <div className="rounded-full bg-gray-50 px-2 py-1 text-xs text-gray-500 md:px-3 md:text-sm">
             검색 결과:{' '}
@@ -194,7 +196,7 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
             )}
           </div>
 
-          <ScrollArea
+          <div
             className="flex-1 overflow-y-auto rounded-lg border border-gray-100 shadow-sm [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent"
             onScroll={handleSearchScroll}
           >
@@ -309,9 +311,22 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
                     <Loader2 className="h-5 w-5 animate-spin text-blue-500 md:h-6 md:w-6" />
                   </div>
                 )}
+
+                {hasNextSearchPage && !isFetchingNextSearchPage && (
+                  <div className="flex justify-center py-3 md:py-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => fetchNextSearchPage()}
+                      className="text-xs md:text-sm"
+                    >
+                      더 보기
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
-          </ScrollArea>
+          </div>
         </>
       ) : (
         <div className="flex h-full flex-col items-center justify-center px-4 py-8 text-center md:py-12">
