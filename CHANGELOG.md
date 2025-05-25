@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.11.1](https://github.com/SamikBeach/frontend_v2/compare/1.11.0...1.11.1) (2025-05-25)
+
+
+### Bug Fixes
+
+* BookFullSkeleton의 BookHeaderSkeleton에서도 border 제거 ([dcb00e4](https://github.com/SamikBeach/frontend_v2/commit/dcb00e4f55261947742867b39ac0b158913cfdf2))
+
 # [1.11.0](https://github.com/SamikBeach/frontend_v2/compare/1.10.1...1.11.0) (2025-05-25)
 
 
