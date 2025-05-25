@@ -1,13 +1,17 @@
 import { LibrarySortOption } from '@/apis/library/types';
 import { BookReviews } from '@/components/BookDialog/BookReviews';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Suspense, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useBookDetails, useBookLibraries } from '../../hooks';
-import { BookLibraries } from '../BookLibraries/BookLibraries';
+import {
+  BookLibraries,
+  LibrariesSkeleton,
+} from '../BookLibraries/BookLibraries';
+import { BookVideos } from '../BookVideos';
 import { SimpleErrorFallback } from '../common/ErrorFallback';
-import { LibrariesSkeleton } from '../common/Skeletons';
 import { TabNavigation, TabType } from './TabNavigation';
 
 export function BookRightPanel() {
@@ -50,7 +54,7 @@ export function BookRightPanel() {
         libraryCount={libraryCount}
         onLibrarySortChange={handleLibrarySortChange}
         librarySortValue={librarySort}
-        className={isMobile ? 'mb-3' : 'mb-4'}
+        className={isMobile ? 'mb-2' : 'mb-4'}
       />
 
       <div className={cn('overflow-hidden rounded-lg')}>
@@ -59,7 +63,7 @@ export function BookRightPanel() {
             <Suspense
               fallback={
                 <div className="flex h-16 items-center justify-center">
-                  <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-gray-500"></div>
+                  <LoadingSpinner size="sm" />
                 </div>
               }
             >
@@ -72,6 +76,20 @@ export function BookRightPanel() {
           <ErrorBoundary FallbackComponent={SimpleErrorFallback}>
             <Suspense fallback={<LibrariesSkeleton />}>
               <BookLibraries sortOption={librarySort} />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+
+        {activeTab === 'videos' && (
+          <ErrorBoundary FallbackComponent={SimpleErrorFallback}>
+            <Suspense
+              fallback={
+                <div className="flex h-64 items-center justify-center">
+                  <LoadingSpinner />
+                </div>
+              }
+            >
+              <BookVideos />
             </Suspense>
           </ErrorBoundary>
         )}
