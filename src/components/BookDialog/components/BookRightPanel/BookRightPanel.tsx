@@ -54,7 +54,7 @@ export function BookRightPanel() {
         libraryCount={libraryCount}
         onLibrarySortChange={handleLibrarySortChange}
         librarySortValue={librarySort}
-        className={isMobile ? 'mb-3' : 'mb-4'}
+        className={isMobile ? 'mb-2' : 'mb-4'}
       />
 
       <div className={cn('overflow-hidden rounded-lg')}>
