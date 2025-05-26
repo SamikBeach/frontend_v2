@@ -12,7 +12,6 @@ import {
   ResponsiveDropdownMenuSeparator,
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useMutation } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
 import { LogOut, Settings, User as UserIcon } from 'lucide-react';
@@ -26,7 +25,6 @@ interface UserDropdownProps {
 }
 
 export function UserDropdown({ trigger }: UserDropdownProps) {
-  const isMobile = useIsMobile();
   const [user, setUser] = useAtom(userAtom);
   const [isMounted, setIsMounted] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -84,8 +82,12 @@ export function UserDropdown({ trigger }: UserDropdownProps) {
   const avatarUrl = user?.profileImage || null;
 
   if (!user) {
-    if (isMobile || !isMounted) return null;
-    return <LoginButton />;
+    if (!isMounted) return null;
+    return (
+      <div className="hidden md:block">
+        <LoginButton />
+      </div>
+    );
   }
 
   return (

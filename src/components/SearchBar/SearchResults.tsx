@@ -1,8 +1,7 @@
 import { SearchResult } from '@/apis/search/types';
 import { CommandEmpty, CommandGroup } from '@/components/ui/command';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { Command as CommandPrimitive } from 'cmdk';
+import { CommandPrimitive } from 'cmdk';
 import { Clock, Loader2 } from 'lucide-react';
 import { Suspense, useEffect, useRef } from 'react';
 import {
@@ -38,7 +37,6 @@ function RecentSearches({
   const { data: recentSearchData } = useRecentSearches();
   const { mutate: deleteAllRecentSearches } = useDeleteAllRecentSearches();
   const { mutate: deleteRecentSearch } = useDeleteRecentSearch();
-  const isMobile = useIsMobile();
 
   const recentSearches = recentSearchData?.books || [];
 
@@ -46,8 +44,7 @@ function RecentSearches({
     <CommandPrimitive.List
       className={cn(
         'h-full !max-h-none overflow-y-auto pr-0',
-        !isMobile &&
-          '[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent'
+        'md:[&::-webkit-scrollbar]:w-2 md:[&::-webkit-scrollbar-thumb]:rounded-full md:[&::-webkit-scrollbar-thumb]:bg-gray-200 md:[&::-webkit-scrollbar-track]:bg-transparent'
       )}
     >
       {/* 최근 검색 목록 */}
@@ -143,7 +140,6 @@ export function SearchResults({
 }: SearchResultsProps) {
   const { mutate: logSelection } = useLogBookSelection();
   const listRef = useRef<HTMLDivElement>(null);
-  const isMobile = useIsMobile();
 
   // 검색 아이템 클릭 시 검색어 저장
   const handleItemClick = (item: any) => {
@@ -210,8 +206,7 @@ export function SearchResults({
         ref={listRef}
         className={cn(
           'h-full !max-h-none overflow-y-auto',
-          !isMobile &&
-            '[&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-gray-200 [&::-webkit-scrollbar-track]:bg-transparent'
+          'md:[&::-webkit-scrollbar]:w-2 md:[&::-webkit-scrollbar-thumb]:rounded-full md:[&::-webkit-scrollbar-thumb]:bg-gray-200 md:[&::-webkit-scrollbar-track]:bg-transparent'
         )}
       >
         <div className="flex h-full min-h-[400px] w-full items-center justify-center">

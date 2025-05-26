@@ -8,7 +8,6 @@ import {
   ResponsiveSelectTrigger,
 } from '@/components/ui/responsive-select';
 import { Textarea } from '@/components/ui/textarea';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { BookOpen, Send } from 'lucide-react';
 import { ReactNode, useEffect, useMemo, useRef } from 'react';
@@ -36,7 +35,6 @@ export function ReviewForm({
   children,
   onTextareaFocus,
 }: ReviewFormProps) {
-  const isMobile = useIsMobile();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const currentUser = useCurrentUser();
 
@@ -107,10 +105,7 @@ export function ReviewForm({
 
       <div className="mt-2 flex flex-wrap items-center gap-1 sm:mt-3 sm:gap-2">
         <ResponsiveSelect value={type} onValueChange={handleTypeChange}>
-          <ResponsiveSelectTrigger
-            size={isMobile ? 'sm' : 'default'}
-            className="h-7 w-[110px] cursor-pointer rounded-lg border-gray-200 bg-white text-xs font-medium text-gray-700 sm:h-9 sm:w-[130px] sm:rounded-xl sm:text-sm"
-          >
+          <ResponsiveSelectTrigger className="h-7 w-[110px] cursor-pointer rounded-lg border-gray-200 bg-white text-xs font-medium text-gray-700 sm:h-9 sm:w-[130px] sm:rounded-xl sm:text-sm">
             <div className="flex items-center">
               <span
                 className="mr-1 inline-block h-2 w-2 rounded-full sm:mr-1.5 sm:h-2.5 sm:w-2.5"

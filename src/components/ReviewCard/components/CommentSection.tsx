@@ -25,7 +25,6 @@ interface CommentSectionProps {
     isLiked: boolean
   ) => Promise<void>;
   highlightedCommentId?: number | null;
-  isMobile?: boolean;
 }
 
 export function CommentSection({

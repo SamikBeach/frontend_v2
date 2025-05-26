@@ -1,6 +1,5 @@
 'use client';
 
-import { useIsMobile } from '@/hooks/use-mobile';
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
@@ -15,8 +14,6 @@ interface PrivacyDialogProps
 }
 
 export function PrivacyDialog({ trigger, ...props }: PrivacyDialogProps) {
-  const isMobile = useIsMobile();
-
   return (
     <ResponsiveDialog {...props}>
       <ResponsiveDialogTrigger asChild>{trigger}</ResponsiveDialogTrigger>
@@ -38,13 +35,7 @@ export function PrivacyDialog({ trigger, ...props }: PrivacyDialogProps) {
           </ResponsiveDialogTitle>
         </ResponsiveDialogHeader>
 
-        <div
-          className={`${
-            isMobile
-              ? 'pb-safe flex-1 overflow-y-auto'
-              : 'max-h-[70vh] overflow-y-auto'
-          } px-7 py-6`}
-        >
+        <div className="pb-safe max-h-[70vh] flex-1 overflow-y-auto px-7 py-6 md:flex-none">
           <div className="prose prose-sm max-w-none text-gray-700">
             <h2 className="text-xl font-semibold">개인정보 처리방침</h2>
 

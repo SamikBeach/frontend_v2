@@ -1,4 +1,4 @@
-import { ReadingStatusType } from '@/apis/reading-status';
+import { ReadingStatusType } from '@/apis/reading-status/types';
 import {
   statusIcons,
   statusTexts,
@@ -18,7 +18,6 @@ import {
   ResponsiveDropdownMenuItem,
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { ChevronDown, PenLine, Star, Trash2, X } from 'lucide-react';
 import { useState } from 'react';
@@ -52,7 +51,6 @@ export function ReviewDialog({
   isSubmitting = false,
   onCancel,
 }: ReviewDialogProps) {
-  const isMobile = useIsMobile();
   const [readingStatusDropdownOpen, setReadingStatusDropdownOpen] =
     useState(false);
 
@@ -299,7 +297,7 @@ export function ReviewDialog({
               </div>
             )}
 
-            <div className={isMobile ? 'mb-4 flex-1' : 'mb-4'}>
+            <div className="mb-4 flex-1 md:flex-none">
               <textarea
                 value={content}
                 onChange={e => setContent(e.target.value)}

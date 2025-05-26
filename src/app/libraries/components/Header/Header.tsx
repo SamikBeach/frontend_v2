@@ -1,7 +1,6 @@
 'use client';
 
 import { TimeRangeOptions } from '@/apis/library/types';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { SortOption } from '../../types';
 import { FilterBar, SearchBar, SortDropdown } from './';
 
@@ -24,9 +23,8 @@ export function Header({
   onTimeRangeChange,
   onSearchChange,
 }: HeaderProps) {
-  const isMobile = useIsMobile();
   return (
-    <div className={`${!isMobile ? 'sticky top-[56px] z-30' : ''} bg-white`}>
+    <div className="bg-white md:sticky md:top-[56px] md:z-30">
       <div className="w-full pt-2 pb-1 md:pt-4 md:pb-2">
         <div className="relative">
           {/* xl 이상 화면에서 보이는 검색바와 정렬 버튼 */}

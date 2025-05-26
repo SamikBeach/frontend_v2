@@ -2,8 +2,6 @@
 
 import { getBookVideos, YouTubeVideoResult } from '@/apis/youtube';
 import { useBookDetails } from '@/components/BookDialog/hooks';
-import { useIsMobile } from '@/hooks/use-mobile';
-import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { VideoPlayer } from './VideoPlayer';
@@ -17,7 +15,6 @@ function decodeHtmlEntities(text: string): string {
 
 export function BookVideos() {
   const { book } = useBookDetails();
-  const isMobile = useIsMobile();
   const [selectedVideo, setSelectedVideo] = useState<YouTubeVideoResult | null>(
     null
   );
@@ -52,7 +49,7 @@ export function BookVideos() {
 
   return (
     <>
-      <div className={cn('space-y-3 md:space-y-6', isMobile ? 'px-1' : 'px-2')}>
+      <div className="space-y-3 px-1 md:space-y-6 md:px-2">
         {videos.map(video => (
           <div
             key={video.id}
@@ -64,10 +61,7 @@ export function BookVideos() {
                 <img
                   src={video.thumbnailUrl}
                   alt={decodeHtmlEntities(video.title)}
-                  className={cn(
-                    'rounded-xl object-cover transition-opacity duration-200 group-hover:opacity-90',
-                    isMobile ? 'h-24 w-40' : 'h-32 w-56'
-                  )}
+                  className="h-24 w-40 rounded-xl object-cover transition-opacity duration-200 group-hover:opacity-90 md:h-32 md:w-56"
                 />
               </div>
               <div className="min-w-0 flex-1 space-y-1">
