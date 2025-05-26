@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.13.1](https://github.com/SamikBeach/frontend_v2/compare/1.13.0...1.13.1) (2025-05-26)
+
+
+### Bug Fixes
+
+* infinite scroll ([3411740](https://github.com/SamikBeach/frontend_v2/commit/341174054d6c830aaed70916cadad8feb7661287))
+
 # [1.13.0](https://github.com/SamikBeach/frontend_v2/compare/1.12.0...1.13.0) (2025-05-26)
 
 
