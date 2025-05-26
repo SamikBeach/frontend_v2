@@ -19,7 +19,7 @@ export function BooksContent() {
   const openBookDetail = useBookDetailOpen();
 
   // 무한 스크롤로 도서 데이터 가져오기
-  const { books, fetchNextPage, hasNextPage, isLoading } =
+  const { books, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
     useDiscoverBooksQuery();
 
   // 도서 선택 핸들러
@@ -38,6 +38,12 @@ export function BooksContent() {
     clearQueryParams();
   }, [clearQueryParams]);
 
+  const handleLoadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
   return (
     <>
       {isLoading ? (
@@ -47,7 +53,7 @@ export function BooksContent() {
       ) : books && books.length > 0 ? (
         <InfiniteScroll
           dataLength={books.length}
-          next={fetchNextPage}
+          next={handleLoadMore}
           hasMore={!!hasNextPage}
           loader={
             <div className="my-8 flex justify-center">
