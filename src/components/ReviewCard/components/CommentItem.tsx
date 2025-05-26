@@ -145,7 +145,7 @@ export function CommentItem({
         id={`comment-${comment.id}`}
         className="flex w-full gap-1.5 sm:gap-2"
       >
-        <Avatar className="h-6 w-6 flex-shrink-0 sm:h-7 sm:w-7">
+        <Avatar className="h-7 w-7 flex-shrink-0 sm:h-7 sm:w-7">
           {comment.author.profileImage && (
             <AvatarImage
               src={comment.author.profileImage}
@@ -153,7 +153,7 @@ export function CommentItem({
               className="object-cover"
             />
           )}
-          <AvatarFallback className="bg-gray-200 text-xs text-gray-700">
+          <AvatarFallback className="text-xs">
             {comment.author.username.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
@@ -164,11 +164,11 @@ export function CommentItem({
             <div className="flex items-center gap-1 sm:gap-1.5">
               <Link
                 href={`/profile/${comment.author.username}`}
-                className="text-xs font-medium text-gray-900 hover:underline sm:text-sm"
+                className="text-sm font-medium text-gray-900 hover:underline sm:text-sm"
               >
                 {comment.author.username}
               </Link>
-              <span className="text-[10px] text-gray-500 sm:text-xs">
+              <span className="text-xs text-gray-500 sm:text-xs">
                 {formatDate(comment.createdAt)}
               </span>
             </div>
@@ -198,14 +198,14 @@ export function CommentItem({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-6 cursor-pointer rounded-full px-2.5 py-1 text-xs sm:h-7 sm:px-3"
+                  className="h-8 cursor-pointer rounded-full px-3 py-1 text-sm sm:h-9 sm:px-4"
                   onClick={handleCancelEdit}
                 >
                   취소
                 </Button>
                 <Button
                   size="sm"
-                  className="h-6 cursor-pointer rounded-full bg-gray-900 px-2.5 py-1 text-xs text-white hover:bg-gray-800 sm:h-7 sm:px-3"
+                  className="h-8 cursor-pointer rounded-full bg-gray-900 px-3 py-1 text-sm text-white hover:bg-gray-800 sm:h-9 sm:px-4"
                   onClick={handleSaveEdit}
                   disabled={!editedContent.trim()}
                 >
@@ -215,7 +215,7 @@ export function CommentItem({
             </div>
           ) : (
             <>
-              <p className="mt-1 text-xs text-gray-800 sm:text-sm">
+              <p className="mt-1 text-sm whitespace-pre-wrap text-gray-800 sm:text-sm">
                 {comment.content}
               </p>
 
@@ -223,14 +223,14 @@ export function CommentItem({
               <div className="mt-1 flex justify-start">
                 <button
                   onClick={handleLikeToggle}
-                  className={`flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-xs transition-colors ${
+                  className={`flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-sm transition-colors ${
                     isLiked
                       ? 'bg-green-50 text-green-600'
                       : 'text-gray-500 hover:bg-gray-100'
                   }`}
                 >
                   <ThumbsUp
-                    className={`h-2.5 w-2.5 sm:h-3 sm:w-3 ${isLiked ? 'fill-green-600' : ''}`}
+                    className={`h-3.5 w-3.5 sm:h-3.5 sm:w-3.5 ${isLiked ? 'fill-green-600' : ''}`}
                   />
                   <span>{likeCount}</span>
                 </button>

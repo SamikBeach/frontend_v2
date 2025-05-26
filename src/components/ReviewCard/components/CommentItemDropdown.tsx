@@ -42,9 +42,9 @@ export function CommentItemDropdown({
         <Button
           variant="ghost"
           size="icon"
-          className="h-6 w-6 cursor-pointer p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+          className="h-7 w-7 cursor-pointer p-0 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
         >
-          <MoreHorizontal className="h-4 w-4" />
+          <MoreHorizontal className="h-4.5 w-4.5" />
         </Button>
       </ResponsiveDropdownMenuTrigger>
       <ResponsiveDropdownMenuContent align="end" className="w-36">
@@ -52,7 +52,7 @@ export function CommentItemDropdown({
           className="flex cursor-pointer items-center gap-2 text-sm"
           onSelect={onEditComment}
         >
-          <Pencil className="h-3.5 w-3.5" />
+          <Pencil className="h-4 w-4" />
           수정하기
         </ResponsiveDropdownMenuItem>
         <ResponsiveAlertDialog>
@@ -61,7 +61,7 @@ export function CommentItemDropdown({
               className="flex cursor-pointer items-center gap-2 text-sm text-red-500 hover:text-red-500 data-[highlighted]:bg-red-50 data-[highlighted]:text-red-500"
               onSelect={e => e.preventDefault()}
             >
-              <Trash className="h-3.5 w-3.5 text-red-500" />
+              <Trash className="h-4 w-4 text-red-500" />
               삭제하기
             </ResponsiveDropdownMenuItem>
           </ResponsiveAlertDialogTrigger>

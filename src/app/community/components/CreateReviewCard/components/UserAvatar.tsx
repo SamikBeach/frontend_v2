@@ -9,7 +9,7 @@ export function UserAvatar({ user }: UserAvatarProps) {
   // Safely get first letter of name for avatar fallback
   const getNameInitial = () => {
     if (!user?.username) return '?';
-    return user.username.charAt(0);
+    return user.username.charAt(0).toUpperCase();
   };
 
   return (
@@ -19,7 +19,7 @@ export function UserAvatar({ user }: UserAvatarProps) {
         alt={user.username}
         className="object-cover"
       />
-      <AvatarFallback className="bg-gray-100 text-xs text-gray-800 sm:text-sm">
+      <AvatarFallback className="text-xs sm:text-sm">
         {getNameInitial()}
       </AvatarFallback>
     </Avatar>

@@ -230,7 +230,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                     src={comment.author.profileImage || undefined}
                     alt={comment.author.username}
                   />
-                  <AvatarFallback className="bg-gray-200 text-gray-700">
+                  <AvatarFallback className="text-xs">
                     {comment.author.username.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Link>
@@ -273,14 +273,14 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-7 cursor-pointer rounded-md border-gray-200 px-2 text-xs"
+                        className="h-8 cursor-pointer rounded-md border-gray-200 px-3 text-xs sm:h-9 sm:px-4"
                         onClick={handleCancelEditComment}
                       >
                         취소
                       </Button>
                       <Button
                         size="sm"
-                        className="h-7 w-7 cursor-pointer rounded-md bg-green-600 p-0 text-white hover:bg-green-700"
+                        className="h-8 w-8 cursor-pointer rounded-md bg-green-600 p-0 text-white hover:bg-green-700 sm:h-9 sm:w-9"
                         onClick={() => handleUpdateComment(comment.id)}
                         disabled={updateCommentMutation.isPending}
                       >
@@ -620,8 +620,8 @@ function ReviewsList({
                       src={review.author.profileImage || undefined}
                       alt={review.author.username}
                     />
-                    <AvatarFallback className="bg-gray-100">
-                      {review.author.username.charAt(0)}
+                    <AvatarFallback className="text-sm">
+                      {review.author.username.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Link>
                 </Avatar>
