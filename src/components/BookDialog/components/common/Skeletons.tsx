@@ -1,70 +1,61 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { useIsMobile } from '@/hooks/use-mobile';
 
-// 전체 북 다이얼로그 스켈레톤
+// 전체 북 다이얼로그 스켈레톤 - 통합 버전 (모바일/데스크톱 공통)
 export function BookFullSkeleton() {
-  const isMobile = useIsMobile();
-
-  if (isMobile) {
-    return <BookMobileSkeleton />;
-  }
-
-  // 데스크톱용 - BookHeader + DesktopBookDialogContent 구조
   return (
-    <div className="w-full overflow-hidden">
-      {/* BookHeader 스켈레톤 */}
-      <BookHeaderSkeleton />
-      {/* DesktopBookDialogContent 스켈레톤 */}
-      <div className="mx-auto w-full max-w-screen-xl px-10 pt-4 pb-10">
-        <div className="grid gap-10 md:grid-cols-[380px_1fr]">
-          {/* 왼쪽: 책 표지 및 기본 정보 */}
-          <div className="space-y-6">
-            {/* 책 표지 이미지 */}
-            <div className="relative mx-auto w-44 overflow-hidden rounded-2xl bg-gray-50 md:w-56 lg:w-64">
-              <Skeleton className="h-[264px] w-full md:h-[320px]" />
-            </div>
-            {/* 제목/저자/출판사/출간일 */}
-            <div className="space-y-2 px-1 md:px-0">
-              <div className="text-center md:text-left">
-                <Skeleton className="inline-block h-7 w-32 rounded md:h-8 md:w-48" />
-                <Skeleton className="ml-2 inline-block h-5 w-12 rounded-full align-text-bottom" />
-                <Skeleton className="ml-1 inline-block h-5 w-10 rounded-full align-text-bottom" />
+    <div className="min-h-screen w-full bg-white">
+      <div className="pb-safe h-full overflow-y-auto">
+        <div className="mx-auto w-full p-3 md:p-8">
+          <div className="space-y-6 md:grid md:grid-cols-[380px_1fr] md:gap-10 md:space-y-0">
+            {/* 왼쪽: 책 표지 및 기본 정보 */}
+            <div className="space-y-6">
+              {/* 책 표지 이미지 */}
+              <div className="relative mx-auto w-44 overflow-hidden rounded-2xl bg-gray-50 md:w-56 lg:w-64">
+                <Skeleton className="h-[264px] w-full md:h-[320px]" />
               </div>
-              <Skeleton className="mx-auto h-5 w-24 rounded md:mx-0 md:w-32" />
-              <Skeleton className="mx-auto h-5 w-20 rounded md:mx-0 md:w-28" />
-              <Skeleton className="mx-auto h-5 w-28 rounded md:mx-0 md:w-36" />
-            </div>
-            {/* 별점 정보 스켈레톤 */}
-            <div className="h-24 animate-pulse rounded-xl bg-gray-50 p-4"></div>
-            {/* 읽기 통계 스켈레톤 */}
-            <Skeleton className="h-20 w-full rounded-xl" />
-            {/* 기능 버튼 스켈레톤 */}
-            <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-2">
-                <Skeleton className="h-10 w-full rounded-full" />
-                <Skeleton className="h-10 w-full rounded-full" />
+              {/* 제목/저자/출판사/출간일 */}
+              <div className="space-y-2 px-1 md:px-0">
+                <div className="text-center md:text-left">
+                  <Skeleton className="mx-auto inline-block h-7 w-32 rounded md:mx-0 md:h-8 md:w-48" />
+                  <Skeleton className="ml-2 inline-block h-5 w-12 rounded-full align-text-bottom" />
+                  <Skeleton className="ml-1 inline-block h-5 w-10 rounded-full align-text-bottom" />
+                </div>
+                <Skeleton className="mx-auto h-5 w-24 rounded md:mx-0 md:w-32" />
+                <Skeleton className="mx-auto h-5 w-20 rounded md:mx-0 md:w-28" />
+                <Skeleton className="mx-auto h-5 w-28 rounded md:mx-0 md:w-36" />
               </div>
-            </div>
-            {/* 책 설명 스켈레톤 */}
-            <BookInfoSkeleton />
-            <p className="mt-2 text-right text-xs text-gray-400">
-              정보제공: 알라딘
-            </p>
-          </div>
-          {/* 오른쪽: 리뷰 및 관련 정보 스켈레톤 - BookRightPanel과 동일한 구조 */}
-          <div className="relative flex flex-col">
-            {/* 탭 네비게이션 스켈레톤 - BookRightPanel의 TabNavigation과 동일한 구조 */}
-            <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-3">
-              <div className="flex gap-6">
-                <Skeleton className="h-6 w-20 rounded" />
-                <Skeleton className="h-6 w-36 rounded" />
-                <Skeleton className="h-6 w-16 rounded" />
+              {/* 별점 정보 스켈레톤 */}
+              <div className="h-24 animate-pulse rounded-xl bg-gray-50 p-4"></div>
+              {/* 읽기 통계 스켈레톤 */}
+              <Skeleton className="h-20 w-full rounded-xl" />
+              {/* 기능 버튼 스켈레톤 */}
+              <div className="flex flex-col gap-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <Skeleton className="h-10 w-full rounded-full" />
+                  <Skeleton className="h-10 w-full rounded-full" />
+                </div>
               </div>
-              <Skeleton className="h-8 w-24 rounded-full" />
+              {/* 책 설명 스켈레톤 */}
+              <BookInfoSkeleton />
+              <p className="mt-2 text-right text-xs text-gray-400">
+                정보제공: 알라딘
+              </p>
             </div>
-            {/* 컨텐츠 영역 스켈레톤 - BookRightPanel의 overflow-hidden rounded-lg div와 동일 */}
-            <div className="overflow-hidden rounded-lg">
-              <BookReviewsSkeleton />
+            {/* 오른쪽: 리뷰 및 관련 정보 스켈레톤 - 데스크톱에서만 표시 */}
+            <div className="relative hidden flex-col md:flex">
+              {/* 탭 네비게이션 스켈레톤 */}
+              <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-3">
+                <div className="flex gap-6">
+                  <Skeleton className="h-6 w-20 rounded" />
+                  <Skeleton className="h-6 w-36 rounded" />
+                  <Skeleton className="h-6 w-16 rounded" />
+                </div>
+                <Skeleton className="h-8 w-24 rounded-full" />
+              </div>
+              {/* 컨텐츠 영역 스켈레톤 */}
+              <div className="overflow-hidden rounded-lg">
+                <BookReviewsSkeleton />
+              </div>
             </div>
           </div>
         </div>

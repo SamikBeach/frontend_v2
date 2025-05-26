@@ -1,18 +1,18 @@
 'use client';
 
-import { useIsMobile } from '@/hooks/use-mobile';
-import { useState } from 'react';
-import { Logo } from '../Logo';
-import { Button } from '../ui/button';
+import { Logo } from '@/components/Logo';
+import { Button } from '@/components/ui/button';
 import {
   ResponsiveDialog,
   ResponsiveDialogContent,
   ResponsiveDialogHeader,
   ResponsiveDialogTitle,
   ResponsiveDialogTrigger,
-} from '../ui/responsive-dialog';
+} from '@/components/ui/responsive-dialog';
+import { useState } from 'react';
 import { LoginForm } from './LoginForm';
-import { PrivacyDialog, TermsDialog } from './PolicyDialogs';
+import { PrivacyDialog } from './PolicyDialogs/PrivacyDialog';
+import { TermsDialog } from './PolicyDialogs/TermsDialog';
 import { ResetPasswordForm } from './ResetPasswordForm';
 import { SignUpForm } from './SignUpForm';
 import { UserInfoForm } from './UserInfoForm';
@@ -41,7 +41,6 @@ export function AuthDialog({
   const [email, setEmail] = useState<string>('');
   // 이전 모드 저장용 히스토리
   const [modeHistory, setModeHistory] = useState<AuthMode[]>([]);
-  const isMobile = useIsMobile();
 
   // 다이얼로그 외부 클릭 처리 (일부 모드에서는 닫기 방지)
   const handlePointerDownOutside = (e: Event) => {
@@ -160,11 +159,7 @@ export function AuthDialog({
         </ResponsiveDialogHeader>
 
         {/* 폼 컨테이너 */}
-        <div
-          className={`${
-            isMobile ? 'flex-1 overflow-y-auto' : 'max-h-[80vh] overflow-y-auto'
-          } px-7 py-6 ${isMobile ? 'pb-safe' : ''}`}
-        >
+        <div className="pb-safe max-h-[80vh] flex-1 overflow-y-auto px-7 py-6 md:flex-none">
           {/* 로그인 폼 */}
           {mode === 'login' && (
             <LoginForm

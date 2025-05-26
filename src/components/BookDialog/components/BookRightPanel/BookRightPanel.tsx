@@ -1,7 +1,6 @@
 import { LibrarySortOption } from '@/apis/library/types';
 import { BookReviews } from '@/components/BookDialog/BookReviews';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Suspense, useEffect, useState } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -22,7 +21,6 @@ export function BookRightPanel() {
   const [librarySort, setLibrarySort] = useState<LibrarySortOption>(
     LibrarySortOption.SUBSCRIBERS
   );
-  const isMobile = useIsMobile();
 
   // 서재 수 가져오기
   const { meta } = useBookLibraries(book?.id, 10, librarySort);
@@ -46,7 +44,7 @@ export function BookRightPanel() {
   if (!book) return null;
 
   return (
-    <div className={cn('relative flex flex-col', isMobile ? 'mt-4 mb-16' : '')}>
+    <div className="relative mt-4 mb-16 flex flex-col md:mt-0 md:mb-0">
       <TabNavigation
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -54,7 +52,7 @@ export function BookRightPanel() {
         libraryCount={libraryCount}
         onLibrarySortChange={handleLibrarySortChange}
         librarySortValue={librarySort}
-        className={isMobile ? 'mb-2' : 'mb-4'}
+        className="mb-2 md:mb-4"
       />
 
       <div className={cn('overflow-hidden rounded-lg')}>

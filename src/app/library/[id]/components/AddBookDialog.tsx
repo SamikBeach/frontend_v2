@@ -24,7 +24,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useDebounce } from '@/hooks/useDebounce';
 import { cn } from '@/lib/utils';
 import {
@@ -64,7 +63,6 @@ export function AddBookDialog({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const queryClient = useQueryClient();
-  const isMobile = useIsMobile();
 
   // 다이얼로그가 열릴 때 검색 입력창에 포커스
   useEffect(() => {
@@ -310,12 +308,10 @@ export function AddBookDialog({
         }}
       >
         <div className="flex h-full flex-col overflow-hidden">
-          {/* 모바일 Drawer에서는 Header 영역을 렌더링하지 않음 */}
-          {!isMobile && (
-            <ResponsiveDialogHeader className="mb-0.5 flex-shrink-0 px-4 pt-4 md:px-0 md:pt-0">
-              <ResponsiveDialogTitle>책 추가하기</ResponsiveDialogTitle>
-            </ResponsiveDialogHeader>
-          )}
+          {/* 모바일에서는 Header 영역을 숨김 */}
+          <ResponsiveDialogHeader className="mb-0.5 hidden flex-shrink-0 px-4 pt-4 md:block md:px-0 md:pt-0">
+            <ResponsiveDialogTitle>책 추가하기</ResponsiveDialogTitle>
+          </ResponsiveDialogHeader>
 
           {/* 선택된 책 목록 섹션 */}
           {selectedBooks.length > 0 && (
