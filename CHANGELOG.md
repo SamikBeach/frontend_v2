@@ -1,5 +1,14 @@
 # 🚦 CHANGELOG
 
+## [1.14.1](https://github.com/SamikBeach/frontend_v2/compare/1.14.0...1.14.1) (2025-05-26)
+
+
+### Bug Fixes
+
+* fix type errors ([17213a6](https://github.com/SamikBeach/frontend_v2/commit/17213a6acde4defb7f557f1bd9352d8852a62a9b))
+* useIsMobile -> tailwindcss ([5644249](https://github.com/SamikBeach/frontend_v2/commit/564424965d2963c34c9453e159608924f11f518e))
+* useIsMobile 훅 하이드레이션 미스매치 및 깜빡임 문제 해결 ([0201b21](https://github.com/SamikBeach/frontend_v2/commit/0201b2191eaba682466d8eac4e570421c9994ca8))
+
 # [1.14.0](https://github.com/SamikBeach/frontend_v2/compare/1.13.1...1.14.0) (2025-05-26)
 
 
