@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.14.0](https://github.com/SamikBeach/frontend_v2/compare/1.13.1...1.14.0) (2025-05-26)
+
+
+### Features
+
+* next-scroll-restorer를 활용한 모바일 무한스크롤 스크롤 위치 복원 구현 ([536c99d](https://github.com/SamikBeach/frontend_v2/commit/536c99d34f9faa5bf27990d7df239738a0625a9d))
+
 ## [1.13.1](https://github.com/SamikBeach/frontend_v2/compare/1.13.0...1.13.1) (2025-05-26)
 
 
