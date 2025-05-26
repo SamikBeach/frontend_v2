@@ -1,7 +1,7 @@
 import { SearchResult } from '@/apis/search/types';
 import { CommandEmpty, CommandGroup } from '@/components/ui/command';
 import { cn } from '@/lib/utils';
-import { CommandPrimitive } from 'cmdk';
+import { Command as CommandPrimitive } from 'cmdk';
 import { Clock, Loader2 } from 'lucide-react';
 import { Suspense, useEffect, useRef } from 'react';
 import {
