@@ -1,5 +1,21 @@
 # 🚦 CHANGELOG
 
+# [1.13.0](https://github.com/SamikBeach/frontend_v2/compare/1.12.0...1.13.0) (2025-05-26)
+
+
+### Bug Fixes
+
+* 프로필 페이지에서 하이드레이션 에러 시 에러뷰 표시 방지 ([f6427a5](https://github.com/SamikBeach/frontend_v2/commit/f6427a5de92e88aec9f14cdb102e2667f457d353))
+
+
+### Features
+
+* BookDialog 좌측 영역에서 알라딘 더보기 버튼 제거 ([4908488](https://github.com/SamikBeach/frontend_v2/commit/4908488d62291edb5f585c1d628a491ee1042fe0))
+* 댓글 및 리뷰 수정 시 포커스 관리 개선 ([ea0d4df](https://github.com/SamikBeach/frontend_v2/commit/ea0d4dfd5a5b72bc8b67fff904a3831d8141a374))
+* 댓글 수정 버튼 크기 증가 ([20a15e0](https://github.com/SamikBeach/frontend_v2/commit/20a15e07d3aeba588059c7200f91f1d9930bcb68))
+* 댓글 수정창 모바일 폰트 크기 개선 ([4071699](https://github.com/SamikBeach/frontend_v2/commit/4071699d40af0e375c44007ce8a3f47db0c643bb))
+* 모바일 BookCard 별점/댓글 영역 폰트 및 아이콘 크기 증대 ([570eeee](https://github.com/SamikBeach/frontend_v2/commit/570eeeed330f3c1fdaa439855474c7b60e05b578))
+
 # [1.12.0](https://github.com/SamikBeach/frontend_v2/compare/1.11.1...1.12.0) (2025-05-25)
 
 
