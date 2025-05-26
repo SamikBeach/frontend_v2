@@ -1,18 +1,15 @@
 'use client';
 
 import { useQueryParams } from '@/hooks';
-import { useRouter } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useState } from 'react';
 
 import {
   Community,
   CommunitySkeleton,
   ErrorBoundary,
-  ErrorView,
   HeaderSkeleton,
   Libraries,
   LibrariesSkeleton,
-  PageSkeleton,
   ProfileHeader,
   ProfileSkeleton,
   ProfileStats,
@@ -28,50 +25,15 @@ import {
 export default function ProfilePage() {
   const { getQueryParam, updateQueryParams } = useQueryParams();
   const activeSection = getQueryParam('section') || 'read';
-  const router = useRouter();
-
-  const [isLoading, setIsLoading] = useState(true);
-  const [hasError, setHasError] = useState(false);
 
   // 선택한 메뉴 아이템에 기반한 섹션 상태
   const [selectedSection, setSelectedSection] = useState(activeSection);
-
-  // 간단한 로딩 처리 (비로그인 사용자도 프로필 페이지 접근 가능)
-  useEffect(() => {
-    // 로딩 지연 시간을 짧게 추가하여 상태 전환 안정화
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // 섹션 변경 핸들러
   const handleSectionChange = (sectionId: string) => {
     setSelectedSection(sectionId);
     updateQueryParams({ section: sectionId });
   };
-
-  // 다시 시도 핸들러
-  const handleRetry = () => {
-    setIsLoading(true);
-    setHasError(false);
-    // 약간의 지연 후 다시 로드
-    setTimeout(() => {
-      setIsLoading(false);
-      router.refresh();
-    }, 500);
-  };
-
-  // 로딩 중이면 스켈레톤 UI 표시
-  if (isLoading) {
-    return <PageSkeleton />;
-  }
-
-  // 오류 상태면 오류 컴포넌트 표시
-  if (hasError) {
-    return <ErrorView onRetry={handleRetry} />;
-  }
 
   // 선택된 섹션에 따라 컨텐츠 렌더링
   const renderSectionContent = () => {
