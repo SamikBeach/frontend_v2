@@ -75,23 +75,44 @@ export const BookCard = React.memo(
             )}
           >
             <div>
-              <h3 className="line-clamp-2 text-[15px] font-medium text-gray-900">
+              <h3
+                className={cn(
+                  'line-clamp-2 font-medium text-gray-900',
+                  horizontal
+                    ? 'text-base sm:text-[15px]'
+                    : 'text-base sm:text-[15px]'
+                )}
+              >
                 {book.title}
               </h3>
-              <p className="mt-0.5 line-clamp-1 text-[13px] text-gray-500">
+              <p
+                className={cn(
+                  'mt-0.5 line-clamp-2 text-gray-500',
+                  horizontal
+                    ? 'text-sm sm:text-[13px]'
+                    : 'text-sm sm:text-[13px]'
+                )}
+              >
                 {book.author}
               </p>
             </div>
-            <div className="flex items-center gap-2 pt-1 text-[13px] text-gray-600">
+            <div
+              className={cn(
+                'flex items-center gap-2 pt-1 text-gray-600',
+                horizontal
+                  ? 'text-[15px] sm:text-[13px]'
+                  : 'text-[15px] sm:text-[13px]'
+              )}
+            >
               <div className="flex items-center gap-1">
-                <Star className="h-3.5 w-3.5 text-[#FFAB00]" />
+                <Star className="h-[18px] w-[18px] text-[#FFAB00] sm:h-3.5 sm:w-3.5" />
                 <span>
                   {rating.toFixed(1)}{' '}
                   {totalRatings !== undefined && `(${totalRatings})`}
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <MessageSquare className="h-3.5 w-3.5" />
+                <MessageSquare className="h-[18px] w-[18px] sm:h-3.5 sm:w-3.5" />
                 <span>{reviews}</span>
               </div>
             </div>
