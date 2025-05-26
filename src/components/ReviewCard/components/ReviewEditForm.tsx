@@ -10,7 +10,8 @@ import {
 } from '@/components/ui/responsive-select';
 import { Textarea } from '@/components/ui/textarea';
 import { BookOpen, Send, Star, X } from 'lucide-react';
-import { useMemo } from 'react';
+import { useLayoutEffect, useMemo } from 'react';
+import { useFocusManagement } from '../hooks/useFocusManagement';
 
 interface ReviewEditFormProps {
   content: string;
@@ -25,6 +26,7 @@ interface ReviewEditFormProps {
   onBookDialogOpen: () => void;
   onRemoveSelectedBook: () => void;
   originalType: ReviewType;
+  isEditMode?: boolean;
 }
 
 export function ReviewEditForm({
@@ -40,7 +42,32 @@ export function ReviewEditForm({
   onBookDialogOpen,
   onRemoveSelectedBook,
   originalType,
+  isEditMode = true,
 }: ReviewEditFormProps) {
+  // 포커스 관리 훅 사용
+  const { elementRef: textareaRef, ensureFocus } = useFocusManagement({
+    delay: 150,
+    debugPrefix: 'ReviewEditForm',
+  });
+
+  // 수정 모드가 활성화될 때 textarea에 포커스
+  useLayoutEffect(() => {
+    if (isEditMode) {
+      ensureFocus();
+    }
+  }, [isEditMode, ensureFocus]);
+
+  // 타입 변경 핸들러 - 모바일에서 드로어 닫힌 후 포커스 복원
+  const handleTypeChange = (newType: ReviewType) => {
+    setType(newType);
+    // 모바일에서 드로어가 닫힌 후 포커스 복원
+    setTimeout(() => {
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      }
+    }, 100);
+  };
+
   const getTagName = (tagType: string) => {
     switch (tagType) {
       case 'discussion':
@@ -69,6 +96,7 @@ export function ReviewEditForm({
   return (
     <div className="flex-1">
       <Textarea
+        ref={textareaRef}
         placeholder="어떤 책에 대해 이야기하고 싶으신가요?"
         className="min-h-[100px] resize-none rounded-xl border-gray-200 bg-[#F9FAFB] text-base md:text-[15px]"
         value={content}
@@ -77,7 +105,7 @@ export function ReviewEditForm({
         }
       />
       <div className="mt-3 flex flex-wrap items-center gap-2">
-        <ResponsiveSelect value={type} onValueChange={setType as any}>
+        <ResponsiveSelect value={type} onValueChange={handleTypeChange}>
           <ResponsiveSelectTrigger className="h-9 w-[130px] cursor-pointer rounded-xl border-gray-200 bg-white font-medium text-gray-700">
             <div className="flex items-center">
               <span

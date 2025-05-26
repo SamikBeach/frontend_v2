@@ -22,7 +22,7 @@ export function BooksContent() {
   const openBookDetail = useBookDetailOpen();
 
   // Get books with infinite query
-  const { books, hasNextPage, fetchNextPage, isLoading } =
+  const { books, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
     usePopularBooksQuery();
 
   const handleBookSelect = (book: Book) => {
@@ -42,6 +42,12 @@ export function BooksContent() {
     });
   };
 
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
+
   return (
     <>
       {isLoading ? (
@@ -51,7 +57,7 @@ export function BooksContent() {
       ) : books && books.length > 0 ? (
         <InfiniteScroll
           dataLength={books.length}
-          next={fetchNextPage}
+          next={handleLoadMore}
           hasMore={!!hasNextPage}
           loader={
             <div className="my-8 flex justify-center">

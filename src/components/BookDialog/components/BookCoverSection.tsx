@@ -2,7 +2,6 @@ import { Badge } from '@/components/ui/badge';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { format, parseISO } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { ExternalLink } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useBookDetails } from '../hooks';
 import { AladinDrawer } from './AladinDrawer';
@@ -93,14 +92,6 @@ export function BookCoverSection() {
             출간일: {formattedDate}
           </p>
         )}
-
-        <button
-          onClick={handleOpenAladin}
-          className="flex items-center text-sm text-blue-500 hover:text-blue-600"
-        >
-          <ExternalLink className="mr-1 h-3 w-3" />
-          알라딘에서 더 보기
-        </button>
       </div>
 
       {/* 알라딘 드로어 - 모바일에서만 사용 */}

@@ -19,6 +19,8 @@ export default function ReactQueryProvider({
             retry: 1,
             // 화면에 포커스가 있을 때 자동으로 리페치하지 않음
             refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchOnReconnect: false,
           },
         },
       })

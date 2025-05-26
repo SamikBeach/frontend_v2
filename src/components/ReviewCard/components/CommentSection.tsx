@@ -44,7 +44,7 @@ export function CommentSection({
     <div className="w-full space-y-2.5 sm:space-y-3">
       {/* 댓글 입력 */}
       <div className="flex w-full gap-2">
-        <Avatar className="mt-1 h-6 w-6 flex-shrink-0 sm:h-7 sm:w-7">
+        <Avatar className="mt-1 h-7 w-7 flex-shrink-0 sm:h-7 sm:w-7">
           {currentUser.avatar && (
             <AvatarImage
               src={currentUser.avatar}
@@ -52,7 +52,7 @@ export function CommentSection({
               className="object-cover"
             />
           )}
-          <AvatarFallback className="bg-gray-200 text-xs text-gray-700">
+          <AvatarFallback className="text-xs">
             {getNameInitial(currentUser.username)}
           </AvatarFallback>
         </Avatar>
@@ -63,7 +63,7 @@ export function CommentSection({
                 placeholder="댓글을 입력하세요..."
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
-                className="h-8 w-full flex-1 rounded-lg border-gray-200 bg-gray-50 text-base shadow-none sm:h-9 sm:rounded-xl md:text-sm"
+                className="h-9 w-full flex-1 rounded-lg border-gray-200 bg-gray-50 text-sm shadow-none sm:h-10 sm:rounded-xl sm:text-sm"
                 disabled={isCommentLoading}
                 onKeyDown={e => {
                   // Cmd+Enter(Mac) 또는 Ctrl+Enter(Windows)로 댓글 제출
@@ -78,11 +78,11 @@ export function CommentSection({
             </div>
             <Button
               size="icon"
-              className="h-8 w-8 cursor-pointer rounded-lg bg-green-600 text-white hover:bg-green-700 sm:h-9 sm:w-9 sm:rounded-xl"
+              className="h-9 w-9 cursor-pointer rounded-lg bg-green-600 text-white hover:bg-green-700 sm:h-10 sm:w-10 sm:rounded-xl"
               onClick={handleSubmitComment}
               disabled={!commentText.trim() || isCommentLoading}
             >
-              <Send className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <Send className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
             </Button>
           </div>
         </div>
@@ -127,7 +127,7 @@ export function CommentSection({
           </p>
           <Button
             variant="outline"
-            className="mt-4 h-7 cursor-pointer rounded-full border-gray-300 bg-white px-4 py-1 text-xs font-medium text-gray-700 hover:bg-gray-100 sm:h-8"
+            className="mt-4 h-8 cursor-pointer rounded-full border-gray-300 bg-white px-4 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 sm:h-9"
             onClick={() => {
               // 댓글 입력창에 포커스
               const commentInput = document.querySelector(
@@ -136,7 +136,7 @@ export function CommentSection({
               if (commentInput) commentInput.focus();
             }}
           >
-            <MessageCircle className="mr-1.5 h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            <MessageCircle className="mr-1.5 h-3.5 w-3.5 sm:h-4 sm:w-4" />
             댓글 작성하기
           </Button>
         </div>

@@ -19,7 +19,6 @@ import { useSetAtom } from 'jotai';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import {
   AdminBookManageButton,
   BooksContent,
@@ -28,15 +27,6 @@ import {
   DiscoverBreadcrumb,
   DiscoverSortDropdown,
 } from './components';
-
-// 책 컨텐츠 로딩 스켈레톤
-function BooksLoading() {
-  return (
-    <div className="flex h-[calc(100vh-250px)] w-full items-center justify-center">
-      <LoadingSpinner />
-    </div>
-  );
-}
 
 // 기본값 상수 정의
 const DEFAULT_CATEGORY = 'all';
@@ -126,11 +116,9 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      {/* 도서 목록 - 로딩 상태일 때 스켈레톤 표시 */}
+      {/* 도서 목록 - Suspense 제거하고 BooksContent에서 직접 로딩 처리 */}
       <div className="mx-auto w-full px-2 pt-1 sm:px-4">
-        <Suspense fallback={<BooksLoading />}>
-          <BooksContent />
-        </Suspense>
+        <BooksContent />
       </div>
 
       {/* 발견하기 도서관리 버튼을 우하단에 고정 - 모바일에서는 BottomNav 위로 */}

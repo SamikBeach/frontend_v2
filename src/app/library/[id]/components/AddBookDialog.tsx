@@ -366,6 +366,7 @@ export function AddBookDialog({
                   ref={inputRef}
                   value={query}
                   onValueChange={setQuery}
+                  autoFocus
                   className="h-12 rounded-none border-0 py-4 text-base shadow-none focus:ring-0"
                   placeholder="도서 제목, 저자, ISBN 등으로 검색"
                 />

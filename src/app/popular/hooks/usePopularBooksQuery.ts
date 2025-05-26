@@ -12,7 +12,7 @@ import {
   timeRangeAtom,
 } from '@/atoms/popular';
 import { isValidSortOption } from '@/utils/type-guards';
-import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
@@ -53,7 +53,7 @@ export function usePopularBooksQuery(initialPageParam = 1, pageSize = 20) {
   };
 
   // Query implementation
-  const query = useSuspenseInfiniteQuery<BookSearchResponse>({
+  const query = useInfiniteQuery<BookSearchResponse>({
     queryKey: [
       'popular-books-infinite',
       categoryId,
@@ -81,7 +81,6 @@ export function usePopularBooksQuery(initialPageParam = 1, pageSize = 20) {
       }
       return undefined;
     },
-    staleTime: 1000 * 60 * 2, // 2 minutes
   });
 
   // Flatten pages into a single array of books
@@ -96,5 +95,8 @@ export function usePopularBooksQuery(initialPageParam = 1, pageSize = 20) {
     ...query,
     books,
     hasNextPage,
+    // 캐시된 데이터가 있으면 로딩 상태를 false로 처리
+    isLoading: query.isLoading && !query.data,
+    isFetchingNextPage: query.isFetchingNextPage,
   };
 }
