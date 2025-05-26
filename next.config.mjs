@@ -8,9 +8,6 @@ const nextConfig = {
   images: {
     domains: ['placehold.co', 'picsum.photos', 'image.aladin.co.kr'],
   },
-  experimental: {
-    scrollRestoration: true,
-  },
 };
 
 export default withSentryConfig(withNextIntl(nextConfig), {

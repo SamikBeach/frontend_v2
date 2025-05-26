@@ -81,6 +81,9 @@ export function usePopularBooksQuery(initialPageParam = 1, pageSize = 20) {
       }
       return undefined;
     },
+    // 스크롤 복원을 위한 캐시 설정
+    gcTime: 1000 * 60 * 10, // 10분간 캐시 유지
+    staleTime: 1000 * 60 * 5, // 5분간 fresh 상태 유지
   });
 
   // Flatten pages into a single array of books
