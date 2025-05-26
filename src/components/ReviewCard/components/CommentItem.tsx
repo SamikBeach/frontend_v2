@@ -6,8 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ThumbsUp } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { useFocusManagement } from '../hooks/useFocusManagement';
 import { CommentItemProps } from '../types';
 import { CommentItemDropdown } from './CommentItemDropdown';
 
@@ -29,8 +30,14 @@ export function CommentItem({
   const [isDeleting, setIsDeleting] = useState(false);
   const queryClient = useQueryClient();
 
+  // 포커스 관리 훅 사용 - ResponsiveDropdownMenu의 100ms 지연을 고려
+  const { elementRef: textareaRef, ensureFocus } = useFocusManagement({
+    delay: 250, // ResponsiveDropdownMenu 닫힘 지연(100ms)보다 충분히 긴 지연
+    debugPrefix: 'CommentItem',
+  });
+
   // 하이라이트 효과 관리 - 3초 후 사라짐
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isHighlighted) {
       setHighlightBg(true);
       const timer = setTimeout(() => {
@@ -55,27 +62,35 @@ export function CommentItem({
       return updateComment(commentId, { content });
     },
     onSuccess: () => {
-      // 댓글 목록 리로드
+      // 백그라운드에서 댓글 목록 리로드
       queryClient.invalidateQueries({
         queryKey: ['review-comments'],
         exact: false,
       });
-      setIsEditing(false);
       toast.success('댓글이 수정되었습니다.');
     },
     onError: () => {
+      // 에러 발생 시 원래 내용으로 복원
+      setEditedContent(comment.content);
+      setIsEditing(true); // 수정 모드 다시 활성화
       toast.error('댓글 수정 중 오류가 발생했습니다.');
     },
   });
 
   const handleEditComment = () => {
+    console.log('handleEditComment 호출됨');
     setIsEditing(true);
     setIsDropdownOpen(false);
+    ensureFocus();
   };
 
   const handleSaveEdit = async () => {
     if (!editedContent.trim()) return;
 
+    // 낙관적 업데이트: 즉시 수정 모드 종료
+    setIsEditing(false);
+
+    // 백그라운드에서 API 호출
     updateCommentMutation.mutate({
       commentId: comment.id,
       content: editedContent,
@@ -177,6 +192,7 @@ export function CommentItem({
                   setEditedContent(e.target.value)
                 }
                 className="min-h-[50px] w-full resize-none rounded-lg border-gray-200 bg-white text-xs sm:min-h-[60px]"
+                ref={textareaRef}
               />
               <div className="mt-2 flex justify-end gap-1.5 sm:gap-2">
                 <Button
