@@ -1,4 +1,5 @@
 import { BottomNav } from '@/components';
+import ClientSideScrollRestorer from '@/components/ClientSideScrollRestorer';
 import { Header } from '@/components/Header';
 import { Initializer } from '@/components/Initializer';
 import { AppSidebar } from '@/components/Sidebar';
@@ -11,7 +12,7 @@ import '@/styles/globals.css';
 import { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
-import { ReactNode } from 'react';
+import { ReactNode, Suspense } from 'react';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -96,6 +97,9 @@ export default async function RootLayout({
                   <BottomNav />
                 </SidebarProvider>
                 <Toaster />
+                <Suspense>
+                  <ClientSideScrollRestorer />
+                </Suspense>
               </DialogProvider>
             </NextIntlClientProvider>
           </AtomsProvider>

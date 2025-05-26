@@ -58,9 +58,9 @@ export function useQueryParams() {
       const query = search ? `?${search}` : '';
 
       if (options.replace) {
-        router.replace(`${pathname}${query}`);
+        router.replace(`${pathname}${query}`, { scroll: false });
       } else {
-        router.push(`${pathname}${query}`);
+        router.push(`${pathname}${query}`, { scroll: false });
       }
     },
     [searchParams, pathname, router]
