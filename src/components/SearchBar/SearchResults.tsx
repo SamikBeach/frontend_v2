@@ -28,7 +28,6 @@ interface SearchResultsProps {
   totalResults?: number;
 }
 
-// 최근 검색어 컴포넌트
 function RecentSearches({
   onItemClick,
   onOpenChange,
