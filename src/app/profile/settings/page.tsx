@@ -95,10 +95,8 @@ export default function ProfileSettingsPage() {
       return;
     }
 
-    // 서버 에러 초기화
     setServerError(null);
 
-    // API 호출
     changePasswordMutation({
       currentPassword: data.currentPassword,
       newPassword: data.newPassword,
