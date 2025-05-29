@@ -84,9 +84,7 @@ export default function ProfileSettingsPage() {
     authUtils.removeTokens();
   };
 
-  // 비밀번호 변경 제출 핸들러
   const onPasswordChangeSubmit = (data: PasswordChangeFormValues) => {
-    // 비밀번호 일치 여부 확인
     if (data.newPassword !== data.confirmPassword) {
       passwordChangeForm.setError('confirmPassword', {
         type: 'validate',
@@ -95,10 +93,8 @@ export default function ProfileSettingsPage() {
       return;
     }
 
-    // 서버 에러 초기화
     setServerError(null);
 
-    // API 호출
     changePasswordMutation({
       currentPassword: data.currentPassword,
       newPassword: data.newPassword,
