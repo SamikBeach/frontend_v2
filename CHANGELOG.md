@@ -1,5 +1,7 @@
 # 🚦 CHANGELOG
 
+## [1.14.3](https://github.com/SamikBeach/frontend_v2/compare/1.14.2...1.14.3) (2025-05-29)
+
 ## [1.14.2](https://github.com/SamikBeach/frontend_v2/compare/1.14.1...1.14.2) (2025-05-27)
 
 ## [1.14.1](https://github.com/SamikBeach/frontend_v2/compare/1.14.0...1.14.1) (2025-05-26)
