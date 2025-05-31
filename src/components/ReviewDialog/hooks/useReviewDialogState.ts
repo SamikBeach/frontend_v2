@@ -20,10 +20,8 @@ export function useReviewDialogState({
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
 
-  // 수정 모드가 아닐 때만 useBookDetails 호출
-  const { userReadingStatus } = isEditMode
-    ? { userReadingStatus: null }
-    : useBookDetails();
+  // 항상 useBookDetails 호출 (조건부 호출 금지)
+  const { userReadingStatus } = useBookDetails();
 
   // atom 대신 로컬 상태 사용
   const [readingStatus, setReadingStatus] = useState<ReadingStatusType | null>(
