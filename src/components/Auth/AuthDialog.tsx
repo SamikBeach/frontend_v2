@@ -123,8 +123,8 @@ export function AuthDialog({
       >
         {/* 헤더 - 로고와 뒤로가기 버튼 */}
         <ResponsiveDialogHeader
-          className="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
-          drawerClassName="relative flex h-14 items-center justify-center border-b border-gray-100 px-6"
+          className="relative flex h-14 items-center border-b border-gray-100 px-6"
+          drawerClassName="relative flex h-14 items-center border-b border-gray-100 px-6"
           onClose={() => props.onOpenChange?.(false)}
         >
           <ResponsiveDialogTitle className="sr-only" drawerClassName="sr-only">
@@ -135,7 +135,7 @@ export function AuthDialog({
               variant="ghost"
               size="icon"
               onClick={goBack}
-              className="absolute top-1/2 left-4 h-8 w-8 -translate-y-1/2 rounded-full p-0"
+              className="relative z-10 h-8 w-8 rounded-full p-0"
               aria-label="뒤로 가기"
             >
               <svg
@@ -155,7 +155,9 @@ export function AuthDialog({
               </svg>
             </Button>
           )}
-          <Logo />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <Logo />
+          </div>
         </ResponsiveDialogHeader>
 
         {/* 폼 컨테이너 */}

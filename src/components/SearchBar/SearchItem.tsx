@@ -278,7 +278,7 @@ export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
       onSelect={onClick}
     >
       {/* 이미지 섬네일 */}
-      <div className="relative w-[85px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white md:w-[160px]">
+      <div className="relative w-[110px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white md:w-[160px]">
         {!imageError ? (
           <img
             src={imageUrl}
@@ -288,7 +288,7 @@ export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
             loading="lazy"
           />
         ) : (
-          <div className="flex h-[100px] w-full items-center justify-center bg-gray-50 md:h-[190px]">
+          <div className="flex h-[130px] w-full items-center justify-center bg-gray-50 md:h-[190px]">
             <span className="text-2xl md:text-3xl">📚</span>
           </div>
         )}
