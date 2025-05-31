@@ -9,7 +9,7 @@ import {
   ResponsiveAlertDialogHeader,
   ResponsiveAlertDialogTitle,
 } from '@/components/ui/responsive-alert-dialog';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -26,11 +26,21 @@ export function DeleteLibraryDialog({
   library,
 }: DeleteLibraryDialogProps) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [isDeleting, setIsDeleting] = useState(false);
 
   const { mutateAsync } = useMutation({
     mutationFn: (id: number) => deleteLibrary(id),
     onSuccess: () => {
+      // 서재 관련 캐시들 무효화
+      queryClient.invalidateQueries({ queryKey: ['libraries'] });
+      queryClient.invalidateQueries({ queryKey: ['user-libraries'] });
+      queryClient.invalidateQueries({ queryKey: ['user-libraries-infinite'] });
+      queryClient.invalidateQueries({
+        queryKey: ['user-subscribed-libraries-infinite'],
+      });
+      queryClient.invalidateQueries({ queryKey: ['home', 'popularLibraries'] });
+
       toast.success('서재가 삭제되었습니다.');
       router.back(); // 이전 페이지로 이동
     },
