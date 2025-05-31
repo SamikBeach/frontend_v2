@@ -1,4 +1,5 @@
 import { ReadingStatusType } from '@/apis/reading-status/types';
+import { TimeRangeOptions } from '@/apis/user/types';
 import { getUserBooks } from '@/apis/user/user';
 import { TimeRange } from '@/components/SortDropdown';
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
@@ -14,7 +15,7 @@ import { useParams } from 'next/navigation';
 export function useUserBooks(
   status?: ReadingStatusType,
   sort: string = 'createdAt-desc',
-  timeRange: TimeRange = 'all'
+  timeRange: TimeRange = TimeRangeOptions.ALL
 ) {
   const params = useParams();
   const userId = Number(params.id as string);
