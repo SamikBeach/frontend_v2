@@ -63,5 +63,9 @@ import * as reviewModule from './review';
 export { reviewModule };
 
 export * from './search';
-export * from './user';
+
+// Import and re-export user module explicitly to resolve TimeRangeOptions naming conflict
+import * as userModule from './user';
+export { userModule };
+
 export * from './youtube';
