@@ -25,7 +25,7 @@ export function CommunityContentSkeleton() {
       {Array.from({ length: 6 }).map((_, index) => (
         <div
           key={index}
-          className="overflow-hidden rounded-lg border border-gray-100 bg-white p-4 shadow-sm"
+          className="overflow-hidden rounded-lg border border-gray-100 bg-white p-4"
         >
           <div className="flex gap-3">
             {/* Avatar and username */}
