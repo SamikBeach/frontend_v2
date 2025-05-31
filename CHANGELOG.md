@@ -1,5 +1,22 @@
 # 🚦 CHANGELOG
 
+# [1.16.0](https://github.com/SamikBeach/frontend_v2/compare/1.15.1...1.16.0) (2025-05-31)
+
+
+### Bug Fixes
+
+* BookDialog 로딩 중 skeleton에서 Dialog radius 누락 문제 수정 ([16b0a4e](https://github.com/SamikBeach/frontend_v2/commit/16b0a4ec5c6a8b9b2df366ade3a7c0772a3ea2d2))
+* fix lint ([0c84336](https://github.com/SamikBeach/frontend_v2/commit/0c84336a7ac3092cfb121319417e009c90031723))
+* 리뷰 수정 시 React 훅 조건부 호출 에러 수정 ([a4c1a55](https://github.com/SamikBeach/frontend_v2/commit/a4c1a5528136f9caf8e34f8d866ee8530219d937))
+* 모바일 BookDialog 높이가 100dvh를 초과하는 문제 해결 ([7861b3c](https://github.com/SamikBeach/frontend_v2/commit/7861b3c585415f6011bc7ccfaeab7e00592e019a))
+* 별점 x버튼 호버 시 별점 호버 효과 충돌 문제 해결 ([fd34d33](https://github.com/SamikBeach/frontend_v2/commit/fd34d33abf38109eaeabbe64e590db09cccebf04))
+* 서재 삭제 후 이전 페이지 서재 목록 갱신 문제 해결 ([069001b](https://github.com/SamikBeach/frontend_v2/commit/069001bba83e97c01881eb7ed6db7d58a0316358))
+
+
+### Features
+
+* BookDialog 리뷰에 더보기 기능 추가 ([950ae50](https://github.com/SamikBeach/frontend_v2/commit/950ae506f33f4bcf1124c8ea4ed5db00f2b8adcf))
+
 ## [1.15.1](https://github.com/SamikBeach/frontend_v2/compare/1.15.0...1.15.1) (2025-05-31)
 
 
