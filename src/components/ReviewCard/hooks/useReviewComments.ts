@@ -79,6 +79,7 @@ export function useReviewComments(
       queryClient.invalidateQueries({
         queryKey: ['review-comments', reviewId],
       });
+
       // communityReviews의 모든 관련 쿼리 인스턴스의 commentCount를 직접 증가
       queryClient
         .getQueryCache()
@@ -102,6 +103,54 @@ export function useReviewComments(
             };
           });
         });
+
+      // 프로필 리뷰 섹션의 user-reviews-infinite 쿼리도 업데이트
+      queryClient
+        .getQueryCache()
+        .findAll({ queryKey: ['user-reviews-infinite'] })
+        .forEach(query => {
+          queryClient.setQueryData(query.queryKey, (oldData: any) => {
+            if (!oldData || !oldData.pages) return oldData;
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                reviews: page.reviews.map((review: any) =>
+                  review.id === reviewId
+                    ? {
+                        ...review,
+                        commentCount: (review.commentCount || 0) + 1,
+                      }
+                    : review
+                ),
+              })),
+            };
+          });
+        });
+
+      // 프로필 활동 섹션의 user-activity-infinite 쿼리도 업데이트
+      queryClient
+        .getQueryCache()
+        .findAll({ queryKey: ['user-activity-infinite'] })
+        .forEach(query => {
+          queryClient.setQueryData(query.queryKey, (oldData: any) => {
+            if (!oldData || !oldData.pages) return oldData;
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                activities: page.activities.map((activity: any) =>
+                  activity.id === reviewId
+                    ? {
+                        ...activity,
+                        commentCount: (activity.commentCount || 0) + 1,
+                      }
+                    : activity
+                ),
+              })),
+            };
+          });
+        });
     },
     onError: () => {
       toast.error('댓글 작성에 실패했습니다.');
@@ -118,6 +167,7 @@ export function useReviewComments(
       queryClient.invalidateQueries({
         queryKey: ['review-comments', reviewId],
       });
+
       // communityReviews의 모든 관련 쿼리 인스턴스의 commentCount를 직접 감소
       queryClient
         .getQueryCache()
@@ -139,6 +189,60 @@ export function useReviewComments(
                         ),
                       }
                     : review
+                ),
+              })),
+            };
+          });
+        });
+
+      // 프로필 리뷰 섹션의 user-reviews-infinite 쿼리도 업데이트
+      queryClient
+        .getQueryCache()
+        .findAll({ queryKey: ['user-reviews-infinite'] })
+        .forEach(query => {
+          queryClient.setQueryData(query.queryKey, (oldData: any) => {
+            if (!oldData || !oldData.pages) return oldData;
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                reviews: page.reviews.map((review: any) =>
+                  review.id === reviewId
+                    ? {
+                        ...review,
+                        commentCount: Math.max(
+                          0,
+                          (review.commentCount || 0) - 1
+                        ),
+                      }
+                    : review
+                ),
+              })),
+            };
+          });
+        });
+
+      // 프로필 활동 섹션의 user-activity-infinite 쿼리도 업데이트
+      queryClient
+        .getQueryCache()
+        .findAll({ queryKey: ['user-activity-infinite'] })
+        .forEach(query => {
+          queryClient.setQueryData(query.queryKey, (oldData: any) => {
+            if (!oldData || !oldData.pages) return oldData;
+            return {
+              ...oldData,
+              pages: oldData.pages.map((page: any) => ({
+                ...page,
+                activities: page.activities.map((activity: any) =>
+                  activity.id === reviewId
+                    ? {
+                        ...activity,
+                        commentCount: Math.max(
+                          0,
+                          (activity.commentCount || 0) - 1
+                        ),
+                      }
+                    : activity
                 ),
               })),
             };
