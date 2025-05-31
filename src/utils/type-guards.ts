@@ -4,6 +4,8 @@ import {
   TimeRange,
   TimeRangeOptions,
 } from '@/apis/book/types';
+import { ReadingStatusType } from '@/apis/reading-status/types';
+import { UserBooksSortOptions } from '@/apis/user/types';
 
 /**
  * SortOption 타입 가드
@@ -21,6 +23,30 @@ export const isValidSortOption = (value: string): value is SortOption => {
   ];
 
   return validOptions.includes(value as SortOption);
+};
+
+/**
+ * UserBooksSortOptions 타입 가드
+ * @param value 확인할 값
+ * @returns 값이 유효한 UserBooksSortOptions인지 여부
+ */
+export const isValidUserBooksSortOption = (
+  value: string
+): value is UserBooksSortOptions => {
+  return Object.values(UserBooksSortOptions).includes(
+    value as UserBooksSortOptions
+  );
+};
+
+/**
+ * ReadingStatusType 타입 가드
+ * @param value 확인할 값
+ * @returns 값이 유효한 ReadingStatusType인지 여부
+ */
+export const isValidReadingStatusType = (
+  value: string
+): value is ReadingStatusType => {
+  return Object.values(ReadingStatusType).includes(value as ReadingStatusType);
 };
 
 /**

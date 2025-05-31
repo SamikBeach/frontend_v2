@@ -18,7 +18,7 @@ export function renderNotificationIcon(notification: Notification) {
           />
         )}
         <AvatarFallback className="bg-gray-100 text-gray-600">
-          {notification.actor.username.charAt(0).toUpperCase()}
+          {notification.actor.username.charAt(0)}
         </AvatarFallback>
       </Avatar>
     );
@@ -33,7 +33,7 @@ export function renderNotificationIcon(notification: Notification) {
           />
         )}
         <AvatarFallback className="bg-gray-100 text-gray-600">
-          {notification.user.name.charAt(0).toUpperCase()}
+          {notification.user.name.charAt(0)}
         </AvatarFallback>
       </Avatar>
     );

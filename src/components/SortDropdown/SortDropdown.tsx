@@ -9,7 +9,7 @@ import {
   Star,
   Users,
 } from 'lucide-react';
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import { Book } from '@/apis/book/types';
 import { Button } from '@/components/ui/button';
@@ -326,35 +326,3 @@ export const getDateFromTimeRange = (timeRange: TimeRange): Date | null => {
       return null;
   }
 };
-
-export function useSortedBooks<T extends object>(
-  books: T[],
-  selectedSort: string,
-  sortOptions: SortOption<T>[],
-  selectedTimeRange: TimeRange = TimeRangeOptions.ALL
-): T[] {
-  // 현재 선택된 정렬 옵션 가져오기
-  const currentSortOption =
-    sortOptions.find(option => option.id === selectedSort) || sortOptions[0];
-
-  // 정렬된 책 목록 반환
-  return useMemo(() => {
-    let filteredBooks = [...books];
-
-    // 기간별 필터링 (supportsTimeRange가 true인 정렬 옵션일 때만)
-    if (
-      currentSortOption.supportsTimeRange &&
-      selectedTimeRange !== TimeRangeOptions.ALL
-    ) {
-      const cutoffDate = getDateFromTimeRange(selectedTimeRange);
-      if (cutoffDate && books.length > 0 && 'publishDate' in books[0]) {
-        filteredBooks = filteredBooks.filter(book => {
-          const bookDate = new Date((book as any).publishDate);
-          return bookDate >= cutoffDate;
-        });
-      }
-    }
-
-    return filteredBooks.sort(currentSortOption.sortFn);
-  }, [books, currentSortOption, selectedTimeRange]);
-}

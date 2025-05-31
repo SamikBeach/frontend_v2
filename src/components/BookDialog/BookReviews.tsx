@@ -177,7 +177,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
               alt={currentUser?.username || 'User'}
             />
             <AvatarFallback className="bg-gray-200 text-gray-700">
-              {currentUser?.username?.[0]?.toUpperCase() || 'U'}
+              {currentUser?.username?.[0] || 'U'}
             </AvatarFallback>
           </Link>
         </Avatar>
@@ -231,7 +231,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                     alt={comment.author.username}
                   />
                   <AvatarFallback className="text-xs">
-                    {comment.author.username.charAt(0).toUpperCase()}
+                    {comment.author.username.charAt(0)}
                   </AvatarFallback>
                 </Link>
               </Avatar>
@@ -621,7 +621,7 @@ function ReviewsList({
                       alt={review.author.username}
                     />
                     <AvatarFallback className="text-sm">
-                      {review.author.username.charAt(0).toUpperCase()}
+                      {review.author.username.charAt(0)}
                     </AvatarFallback>
                   </Link>
                 </Avatar>

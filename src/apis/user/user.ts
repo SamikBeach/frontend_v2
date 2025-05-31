@@ -180,14 +180,18 @@ export const getUserFollowing = async (
  * @param status 독서 상태 필터 (선택 사항)
  * @param page 페이지 번호 (기본값: 1)
  * @param limit 페이지당 항목 수 (기본값: 10)
+ * @param sort 정렬 옵션 (기본값: 'createdAt-desc')
+ * @param timeRange 기간 필터 (기본값: 'all')
  */
 export const getUserBooks = async (
   userId: number,
   status?: ReadingStatusType,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
+  sort: string = 'createdAt-desc',
+  timeRange: string = 'all'
 ): Promise<UserBooksResponseDto> => {
-  const params: Record<string, any> = { page, limit };
+  const params: Record<string, any> = { page, limit, sort, timeRange };
 
   // 상태 필터가 제공된 경우에만 파라미터에 추가
   if (status) {

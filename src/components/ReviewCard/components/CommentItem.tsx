@@ -154,7 +154,7 @@ export function CommentItem({
             />
           )}
           <AvatarFallback className="text-xs">
-            {comment.author.username.charAt(0).toUpperCase()}
+            {comment.author.username.charAt(0)}
           </AvatarFallback>
         </Avatar>
         <div

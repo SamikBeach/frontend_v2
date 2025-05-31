@@ -211,7 +211,7 @@ function UserListItem({
             className="object-cover"
           />
           <AvatarFallback className="bg-gray-100 text-gray-800">
-            {(displayName[0] || '?').toUpperCase()}
+            {displayName[0] || '?'}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 overflow-hidden">

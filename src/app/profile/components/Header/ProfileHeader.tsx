@@ -45,7 +45,7 @@ export default function ProfileHeader() {
 
   // 사용자 표시 정보 설정
   const displayName = user.username || user.email?.split('@')[0] || '';
-  const initial = displayName.charAt(0).toUpperCase();
+  const initial = displayName.charAt(0);
 
   // 팔로우 버튼 클릭 핸들러
   const handleFollowClick = async () => {

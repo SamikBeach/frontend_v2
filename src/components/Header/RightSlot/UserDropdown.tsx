@@ -78,7 +78,7 @@ export function UserDropdown({ trigger }: UserDropdownProps) {
 
   // 사용자 표시 정보 설정
   const displayName = user?.username || user?.email.split('@')[0];
-  const initial = displayName?.charAt(0).toUpperCase();
+  const initial = displayName?.charAt(0);
   const avatarUrl = user?.profileImage || null;
 
   if (!user) {
