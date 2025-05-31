@@ -77,6 +77,28 @@ export function ReviewDialog({
     open,
   });
 
+  // 별점 호버 상태 관리
+  const [isHovering, setIsHovering] = useState(false);
+  const [hoveredRating, setHoveredRating] = useState(0);
+
+  // 별점 호버 핸들러
+  const handleStarHover = (star: number) => {
+    setIsHovering(true);
+    setHoveredRating(star);
+  };
+
+  // 별점 호버 해제 핸들러
+  const handleStarLeave = () => {
+    setIsHovering(false);
+    setHoveredRating(0);
+  };
+
+  // x버튼 호버 시 별점 호버 상태 해제
+  const handleXButtonHover = () => {
+    setIsHovering(false);
+    setHoveredRating(0);
+  };
+
   const handleReadingStatusChange = (status: ReadingStatusType | null) => {
     if (!isSubmitting) {
       setReadingStatus(status);
@@ -166,16 +188,17 @@ export function ReviewDialog({
 
             <div className="mb-6 flex flex-col items-center space-y-3">
               <div className="relative flex w-full items-center justify-center">
-                <div className="flex space-x-2">
+                <div className="flex space-x-2" onMouseLeave={handleStarLeave}>
                   {[1, 2, 3, 4, 5].map(star => (
                     <Star
                       key={star}
                       className={`h-9 w-9 cursor-pointer ${
-                        star <= rating
+                        star <= (isHovering ? hoveredRating : rating)
                           ? 'fill-yellow-400 text-yellow-400'
                           : 'text-gray-200 hover:text-gray-300'
                       }`}
                       onClick={() => !isSubmitting && setRating(star)}
+                      onMouseEnter={() => handleStarHover(star)}
                     />
                   ))}
                 </div>
@@ -185,6 +208,7 @@ export function ReviewDialog({
                     size="icon"
                     className="absolute -right-10 h-8 w-8 rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
                     onClick={handleResetRating}
+                    onMouseEnter={handleXButtonHover}
                     disabled={isSubmitting}
                     title="별점 취소"
                   >
