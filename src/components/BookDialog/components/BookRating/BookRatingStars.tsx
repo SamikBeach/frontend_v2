@@ -48,31 +48,39 @@ export function RatingStars() {
     }
   }, [removeRating]);
 
+  // x버튼 호버 시 별점 호버 상태 해제
+  const handleXButtonHover = useCallback(() => {
+    handleRatingLeave();
+  }, [handleRatingLeave]);
+
   return (
     <>
-      <div
-        className="text-muted-foreground flex items-center gap-1"
-        onMouseLeave={handleRatingLeave}
-      >
-        {Array.from({ length: 5 }, (_, i) => i + 1).map(star => (
-          <Star
-            key={star}
-            className={cn(
-              'h-5 w-5 cursor-pointer transition-colors',
-              (isRatingHovered ? hoveredRating >= star : userRating >= star)
-                ? 'fill-yellow-400 text-yellow-400'
-                : 'fill-none'
-            )}
-            onClick={() => handleStarClick(star)}
-            onMouseEnter={() => handleStarHover(star)}
-          />
-        ))}
+      <div className="text-muted-foreground flex items-center gap-1">
+        <div
+          className="flex items-center gap-1"
+          onMouseLeave={handleRatingLeave}
+        >
+          {Array.from({ length: 5 }, (_, i) => i + 1).map(star => (
+            <Star
+              key={star}
+              className={cn(
+                'h-5 w-5 cursor-pointer transition-colors',
+                (isRatingHovered ? hoveredRating >= star : userRating >= star)
+                  ? 'fill-yellow-400 text-yellow-400'
+                  : 'fill-none'
+              )}
+              onClick={() => handleStarClick(star)}
+              onMouseEnter={() => handleStarHover(star)}
+            />
+          ))}
+        </div>
         {userRating > 0 && (
           <Button
             variant="ghost"
             size="icon"
             className="ml-1 h-7 w-7 cursor-pointer rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
             onClick={handleRemoveRating}
+            onMouseEnter={handleXButtonHover}
             title="별점 취소"
           >
             <X className="h-3.5 w-3.5" />

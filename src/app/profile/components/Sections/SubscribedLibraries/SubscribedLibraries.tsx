@@ -10,15 +10,11 @@ export default function SubscribedLibraries() {
   const pageSize = 6;
 
   // 구독한 서재 목록 가져오기 (무한 스크롤)
-  const {
-    libraries,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useUserSubscribedLibraries({
-    userId,
-    pageSize,
-  });
+  const { libraries, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useUserSubscribedLibraries({
+      userId,
+      pageSize,
+    });
 
   // 태그 리스트 생성
   const tags = useLibraryTags(libraries);

@@ -39,6 +39,7 @@ import {
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
 import { Textarea } from '@/components/ui/textarea';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
 import { invalidateUserProfileQueries } from '@/utils/query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -434,6 +435,71 @@ function ErrorFallback({
   );
 }
 
+// 리뷰 텍스트 컴포넌트 (더보기 기능 포함)
+function ReviewText({
+  content,
+  reviewId,
+  expandedReviews,
+  setExpandedReviews,
+}: {
+  content: string;
+  reviewId: number;
+  expandedReviews: Record<number, boolean>;
+  setExpandedReviews: (
+    updater: (prev: Record<number, boolean>) => Record<number, boolean>
+  ) => void;
+}) {
+  const isMobile = useIsMobile();
+
+  // 텍스트가 길면 접어두기 (7줄 기준)
+  const lineCount = content.split('\n').length;
+  const isLongContent = lineCount > 7 || content.length > 500;
+  const expanded = expandedReviews[reviewId] || false;
+
+  const handleExpand = () => {
+    if (!expanded) {
+      setExpandedReviews(prev => ({
+        ...prev,
+        [reviewId]: true,
+      }));
+    }
+  };
+
+  const shouldEnableExpand = isLongContent && !expanded;
+
+  return (
+    <div
+      className={`relative ${shouldEnableExpand && isMobile ? 'cursor-pointer' : ''}`}
+      onClick={isMobile && shouldEnableExpand ? handleExpand : undefined}
+      role={isMobile && shouldEnableExpand ? 'button' : undefined}
+      tabIndex={isMobile && shouldEnableExpand ? 0 : undefined}
+      aria-expanded={isMobile && shouldEnableExpand ? expanded : undefined}
+    >
+      <p
+        className={`text-[15px] leading-relaxed whitespace-pre-line text-gray-800 ${
+          !expanded ? 'line-clamp-7' : ''
+        }`}
+      >
+        {content}
+      </p>
+      {shouldEnableExpand && (
+        <span
+          className="mt-2 inline-block cursor-pointer text-sm text-[#A0AEC0] hover:underline"
+          onClick={e => {
+            e.stopPropagation();
+            handleExpand();
+          }}
+          tabIndex={0}
+          role="button"
+          aria-expanded={expanded}
+        >
+          더 보기
+        </span>
+      )}
+    </div>
+  );
+}
+
 // 메인 리뷰 목록 컴포넌트
 function ReviewsList({
   onReviewCountChange,
@@ -480,6 +546,11 @@ function ReviewsList({
 
   // 확장된 댓글 상태 관리
   const [expandedComments, setExpandedComments] = useState<
+    Record<number, boolean>
+  >({});
+
+  // 확장된 리뷰 상태 관리 (더보기 기능)
+  const [expandedReviews, setExpandedReviews] = useState<
     Record<number, boolean>
   >({});
 
@@ -729,9 +800,14 @@ function ReviewsList({
                     )}
                   </div>
 
-                  <p className="mt-2 text-[15px] leading-relaxed whitespace-pre-line text-gray-800">
-                    {review.content}
-                  </p>
+                  <div className="mt-2">
+                    <ReviewText
+                      content={review.content}
+                      reviewId={review.id}
+                      expandedReviews={expandedReviews}
+                      setExpandedReviews={setExpandedReviews}
+                    />
+                  </div>
 
                   {/* 이미지가 있는 경우 표시 */}
                   {review.images && review.images.length > 0 && (

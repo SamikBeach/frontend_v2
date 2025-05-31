@@ -33,7 +33,7 @@ import {
 } from '@tanstack/react-query';
 import {
   BookOpen,
-  CheckCircle2,
+  Check,
   Clock,
   Loader2,
   MessageSquare,
@@ -308,48 +308,19 @@ export function AddBookDialog({
         }}
       >
         <div className="flex h-full flex-col overflow-hidden">
-          {/* 모바일에서는 Header 영역을 숨김 */}
-          <ResponsiveDialogHeader className="mb-0.5 hidden flex-shrink-0 px-4 pt-4 md:block md:px-0 md:pt-0">
-            <ResponsiveDialogTitle>책 추가하기</ResponsiveDialogTitle>
+          {/* 헤더 - x버튼이 우측 끝에 오도록 수정 */}
+          <ResponsiveDialogHeader
+            className="mb-0.5 flex-shrink-0 px-0 pt-0"
+            drawerClassName="mb-0.5 flex-shrink-0 px-4 pt-4"
+            onClose={handleCloseDialog}
+          >
+            <ResponsiveDialogTitle
+              className="text-lg font-medium"
+              drawerClassName="text-lg font-medium"
+            >
+              책 추가하기
+            </ResponsiveDialogTitle>
           </ResponsiveDialogHeader>
-
-          {/* 선택된 책 목록 섹션 */}
-          {selectedBooks.length > 0 && (
-            <div className="mt-2 mb-2 flex-shrink-0 px-4 md:px-0">
-              <h3 className="mb-1 px-2 text-xs font-medium text-gray-700">
-                선택된 책 ({selectedBooks.length})
-              </h3>
-              <ScrollArea className="max-h-20 w-full overflow-y-auto rounded-md border border-gray-100 bg-gray-50 p-2">
-                <div className="flex flex-wrap gap-2">
-                  {selectedBooks.map(book => (
-                    <Badge
-                      key={`selected-${getBookIdentifier(book)}`}
-                      variant="outline"
-                      className="flex items-center gap-1 bg-white py-1 pr-1 pl-2"
-                    >
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="max-w-[150px] truncate text-xs md:max-w-[200px]">
-                            {book.title}
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>{book.title}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <button
-                        onClick={() => removeSelectedBook(book)}
-                        className="ml-1 rounded-full p-1 hover:bg-gray-200"
-                        aria-label="책 선택 해제"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </Badge>
-                  ))}
-                </div>
-              </ScrollArea>
-            </div>
-          )}
 
           <div className="min-h-0 flex-1 overflow-hidden">
             <Command
@@ -377,6 +348,44 @@ export function AddBookDialog({
                   <div className="sticky top-0 z-10 bg-white px-4 py-2 text-xs font-medium text-gray-500">
                     &ldquo;{query}&rdquo; 검색 결과
                     {totalResults ? ` (${totalResults})` : ''}
+                  </div>
+                )}
+
+                {/* 선택된 책 목록 섹션 - 검색 결과 아래, 상단 고정 */}
+                {selectedBooks.length > 0 && (
+                  <div className="sticky top-8 z-10 mb-2 flex-shrink-0 bg-white px-4 pt-2 pb-2">
+                    <h3 className="mb-2 text-xs font-medium text-gray-700">
+                      선택된 책 ({selectedBooks.length})
+                    </h3>
+                    <ScrollArea className="max-h-20 w-full overflow-y-auto rounded-md border border-gray-100 bg-gray-50 p-2">
+                      <div className="flex flex-wrap gap-2">
+                        {selectedBooks.map(book => (
+                          <Badge
+                            key={`selected-${getBookIdentifier(book)}`}
+                            variant="outline"
+                            className="flex items-center gap-1 bg-white py-1 pr-1 pl-2"
+                          >
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="max-w-[150px] truncate text-xs md:max-w-[200px]">
+                                  {book.title}
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>{book.title}</p>
+                              </TooltipContent>
+                            </Tooltip>
+                            <button
+                              onClick={() => removeSelectedBook(book)}
+                              className="ml-1 rounded-full p-1 hover:bg-gray-200"
+                              aria-label="책 선택 해제"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    </ScrollArea>
                   </div>
                 )}
 
@@ -519,7 +528,7 @@ export function AddBookDialog({
                                       ReadingStatusType.READ && (
                                       <div className="inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600 md:px-2.5 md:py-1">
                                         <span className="flex items-center">
-                                          <CheckCircle2 className="h-3 w-3 text-green-500 md:h-3.5 md:w-3.5" />
+                                          <Check className="h-3 w-3 text-green-500 md:h-3.5 md:w-3.5" />
                                           <span className="ml-1">
                                             읽었어요
                                             {(book.readingStats
@@ -534,7 +543,6 @@ export function AddBookDialog({
                                   </div>
                                 )}
 
-                                {/* 읽기 상태 태그 (사용자가 읽기 상태가 없는 경우에만 표시) */}
                                 {!book.userReadingStatus &&
                                   book.readingStats?.readingStatusCounts && (
                                     <div className="mt-1.5 flex flex-wrap gap-1 md:mt-3 md:gap-1.5">
@@ -584,7 +592,7 @@ export function AddBookDialog({
                                       ] ?? 0) > 0 && (
                                         <div className="inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-600 md:px-2.5 md:py-1">
                                           <span className="flex items-center">
-                                            <CheckCircle2 className="h-3 w-3 text-green-500 md:h-3.5 md:w-3.5" />
+                                            <Check className="h-3 w-3 text-green-500 md:h-3.5 md:w-3.5" />
                                             <span className="ml-1">
                                               읽었어요{' '}
                                               {
@@ -601,10 +609,9 @@ export function AddBookDialog({
                                   )}
                               </div>
 
-                              {/* 선택 상태 표시 배지 */}
                               {isSelected && (
-                                <div className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-gray-900 text-white shadow-sm md:h-6 md:w-6">
-                                  <span className="text-xs font-bold">✓</span>
+                                <div className="absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full bg-green-600 text-white">
+                                  <Check className="h-4 w-4 text-white" />
                                 </div>
                               )}
                             </CommandItem>
@@ -629,7 +636,7 @@ export function AddBookDialog({
               <Button
                 onClick={handleAddBooks}
                 disabled={selectedBooks.length === 0 || isPending}
-                className="h-9 px-3 text-sm md:h-10 md:px-4"
+                className="h-9 bg-green-600 px-3 text-sm hover:bg-green-700 md:h-10 md:px-4"
               >
                 {isPending ? '추가 중...' : '추가하기'}
               </Button>

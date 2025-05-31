@@ -24,10 +24,8 @@ import {
 
 // 에러 폴백 컴포넌트
 function ErrorFallback({
-  error,
   resetErrorBoundary,
 }: {
-  error: Error;
   resetErrorBoundary: () => void;
 }) {
   return (

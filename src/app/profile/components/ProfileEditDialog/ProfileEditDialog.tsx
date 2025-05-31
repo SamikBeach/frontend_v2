@@ -124,7 +124,7 @@ export function ProfileEditDialog({
               type="submit"
               form="profile-edit-form"
               disabled={isSubmitting}
-              className="h-11 flex-1 sm:flex-none"
+              className="h-11 flex-1 bg-green-600 hover:bg-green-700 sm:flex-none"
             >
               {isSubmitting ? '저장 중...' : '저장'}
             </Button>

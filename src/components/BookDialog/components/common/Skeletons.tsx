@@ -3,7 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 // 전체 북 다이얼로그 스켈레톤 - 통합 버전 (모바일/데스크톱 공통)
 export function BookFullSkeleton() {
   return (
-    <div className="min-h-screen w-full bg-white">
+    <div className="w-full overflow-hidden rounded-lg">
       <div className="pb-safe h-full overflow-y-auto">
         <div className="mx-auto w-full p-3 md:p-8">
           <div className="space-y-6 md:grid md:grid-cols-[380px_1fr] md:gap-10 md:space-y-0">
@@ -171,7 +171,7 @@ export function LibrariesSkeleton() {
 // 모바일 전용 책 상세 스켈레톤
 export function BookMobileSkeleton() {
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-white">
+    <div className="w-full overflow-hidden rounded-t-[16px]">
       <div className="pb-safe h-full overflow-y-auto">
         <div className="mx-auto w-full px-4 pt-4">
           <div className="space-y-6">
