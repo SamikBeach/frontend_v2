@@ -3,7 +3,6 @@ import { LibraryDialog } from '@/components/Library';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { useIsMyProfile } from '../../../hooks';
-import { LibrariesSkeleton } from '../../Skeletons';
 import {
   CreateLibraryButton,
   EmptyLibraryState,
@@ -19,12 +18,10 @@ export default function Libraries() {
   const pageSize = 6;
 
   // 서재 목록 가져오기 (무한 스크롤)
-  const { libraries, fetchNextPage, hasNextPage, isLoading } = useUserLibraries(
-    {
-      userId,
-      pageSize,
-    }
-  );
+  const { libraries, fetchNextPage, hasNextPage } = useUserLibraries({
+    userId,
+    pageSize,
+  });
 
   // 태그 포맷팅 훅 사용
   const tags = useLibraryTags(libraries);
@@ -43,11 +40,6 @@ export default function Libraries() {
   const handleCreateNewLibrary = async (libraryData: CreateLibraryDto) => {
     return createLibraryMutation(libraryData);
   };
-
-  // 서재가 로딩 중인 경우
-  if (isLoading) {
-    return <LibrariesSkeleton />;
-  }
 
   // 서재가 없는 경우
   if (libraries.length === 0) {

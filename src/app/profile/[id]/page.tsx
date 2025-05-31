@@ -2,11 +2,11 @@
 
 import { useQueryParams } from '@/hooks';
 import { Suspense, useState } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
 
 import {
   Community,
   CommunitySkeleton,
-  ErrorBoundary,
   HeaderSkeleton,
   Libraries,
   LibrariesSkeleton,
@@ -21,6 +21,34 @@ import {
   SubscribedLibraries,
   SummarySkeleton,
 } from '../components';
+
+// 에러 폴백 컴포넌트
+function ErrorFallback({
+  error,
+  resetErrorBoundary,
+}: {
+  error: Error;
+  resetErrorBoundary: () => void;
+}) {
+  return (
+    <div className="flex min-h-[400px] flex-col items-center justify-center space-y-4 p-8">
+      <div className="text-center">
+        <h2 className="mb-2 text-xl font-semibold text-gray-900">
+          정보를 불러올 수 없습니다
+        </h2>
+        <p className="mb-4 text-gray-600">
+          프로필 정보를 불러오는 중 문제가 발생했습니다.
+        </p>
+        <button
+          onClick={resetErrorBoundary}
+          className="rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
+        >
+          다시 시도
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export default function ProfilePage() {
   const { getQueryParam, updateQueryParams } = useQueryParams();
@@ -84,7 +112,13 @@ export default function ProfilePage() {
   };
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onReset={() => {
+        // 페이지 새로고침으로 상태 초기화
+        window.location.reload();
+      }}
+    >
       <div className="bg-white">
         {/* 프로필 헤더 */}
         <Suspense fallback={<HeaderSkeleton />}>
