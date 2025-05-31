@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.15.1](https://github.com/SamikBeach/frontend_v2/compare/1.15.0...1.15.1) (2025-05-31)
+
+
+### Bug Fixes
+
+* 프로필 서재 섹션 ErrorBoundary 문제 해결 및 react-error-boundary 적용 ([1d698c6](https://github.com/SamikBeach/frontend_v2/commit/1d698c601d41295c6c31a384540b2c59de56b316))
+
 # [1.15.0](https://github.com/SamikBeach/frontend_v2/compare/1.14.4...1.15.0) (2025-05-31)
 
 
