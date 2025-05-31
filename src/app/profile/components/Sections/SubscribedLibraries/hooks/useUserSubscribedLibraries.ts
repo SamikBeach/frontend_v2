@@ -1,6 +1,6 @@
 import api from '@/apis/axios';
 import { LibraryPreviewDto } from '@/apis/user/types';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 
 interface UseUserSubscribedLibrariesProps {
   userId: number;
@@ -13,8 +13,6 @@ interface UseUserSubscribedLibrariesResult {
   fetchNextPage: () => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
-  isLoading: boolean;
-  error: Error | null;
 }
 
 /**
@@ -42,22 +40,16 @@ export function useUserSubscribedLibraries({
     };
   };
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    status,
-    error,
-  } = useInfiniteQuery({
-    queryKey: ['user-subscribed-libraries-infinite', userId, pageSize],
-    queryFn: fetchUserSubscribedLibraries,
-    getNextPageParam: lastPage => {
-      // 다음 페이지가 있는 경우 페이지 번호 반환, 없는 경우 undefined
-      return lastPage.hasNextPage ? lastPage.page + 1 : undefined;
-    },
-    initialPageParam: 1,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useSuspenseInfiniteQuery({
+      queryKey: ['user-subscribed-libraries-infinite', userId, pageSize],
+      queryFn: fetchUserSubscribedLibraries,
+      getNextPageParam: lastPage => {
+        // 다음 페이지가 있는 경우 페이지 번호 반환, 없는 경우 undefined
+        return lastPage.hasNextPage ? lastPage.page + 1 : undefined;
+      },
+      initialPageParam: 1,
+    });
 
   // 모든 페이지의 서재 목록을 하나의 배열로 병합
   const libraries = data?.pages.flatMap(page => page.libraries || []) || [];
@@ -71,7 +63,5 @@ export function useUserSubscribedLibraries({
     fetchNextPage,
     hasNextPage: !!hasNextPage,
     isFetchingNextPage,
-    isLoading: status === 'pending',
-    error: error as Error | null,
   };
 }
