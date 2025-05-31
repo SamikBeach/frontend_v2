@@ -49,7 +49,7 @@ export const LibrarySidebarOwner: FC<LibrarySidebarOwnerProps> = ({
           <Link href={`/profile/${owner.id}`}>
             <Avatar className="h-12 w-12 cursor-pointer border border-gray-200 transition-opacity hover:opacity-90">
               <AvatarImage src={owner.profileImage} alt={owner.username} />
-              <AvatarFallback className="bg-blue-100 text-blue-600">
+              <AvatarFallback className="bg-gray-100 text-gray-600">
                 {owner.username[0]}
               </AvatarFallback>
             </Avatar>

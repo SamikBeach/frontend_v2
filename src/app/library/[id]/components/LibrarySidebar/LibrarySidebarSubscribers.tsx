@@ -70,7 +70,7 @@ const SubscriberItem: FC<SubscriberItemProps> = ({
       <Avatar className="h-8 w-8 border border-gray-200">
         <AvatarImage src={subscriber.profileImage} alt={subscriber.username} />
         <AvatarFallback className="bg-gray-200">
-          {subscriber.username[0].toUpperCase()}
+          {subscriber.username[0]}
         </AvatarFallback>
       </Avatar>
       <div className="flex-1">

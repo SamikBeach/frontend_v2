@@ -18,7 +18,7 @@ export function AvatarUpload({
     initialImage && initialImage.length > 0 ? initialImage : null
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const initial = username.charAt(0).toUpperCase();
+  const initial = username.charAt(0);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];

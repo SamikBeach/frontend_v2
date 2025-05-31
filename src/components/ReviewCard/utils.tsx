@@ -50,10 +50,10 @@ export const renderStarRating = (rating: number | string): ReactNode => {
   );
 };
 
-// 이름의 첫 글자를 대문자로 가져오는 유틸리티 함수
+// 이름의 첫 글자를 가져오는 유틸리티 함수
 export const getNameInitial = (name?: string): string => {
   if (!name) return '?';
-  return name.charAt(0).toUpperCase();
+  return name.charAt(0);
 };
 
 // 날짜 포맷팅 함수

@@ -128,11 +128,7 @@ export function BottomNav() {
               />
             ) : null}
             <AvatarFallback className="bg-gray-200 text-xs text-gray-700">
-              {(
-                currentUser.username?.[0] ||
-                currentUser.email?.[0] ||
-                '?'
-              ).toUpperCase()}
+              {currentUser.username?.[0] || currentUser.email?.[0] || '?'}
             </AvatarFallback>
           </Avatar>
         ) : (
