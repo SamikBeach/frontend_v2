@@ -19,7 +19,11 @@ export function useReviewDialogState({
   const [content, setContent] = useState(initialContent);
   const [alertDialogOpen, setAlertDialogOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const { userReadingStatus } = useBookDetails();
+
+  // 수정 모드가 아닐 때만 useBookDetails 호출
+  const { userReadingStatus } = isEditMode
+    ? { userReadingStatus: null }
+    : useBookDetails();
 
   // atom 대신 로컬 상태 사용
   const [readingStatus, setReadingStatus] = useState<ReadingStatusType | null>(
@@ -57,13 +61,13 @@ export function useReviewDialogState({
     }
   }, [open, isEditMode]);
 
-  // 모달이 열릴 때 현재 읽기 상태 설정
+  // 모달이 열릴 때 현재 읽기 상태 설정 (수정 모드가 아닐 때만)
   useEffect(() => {
-    if (open && isCreateMode) {
+    if (open && isCreateMode && !isEditMode) {
       // 읽기 상태 기본값 설정 - 사용자의 현재 읽기 상태 또는 READ 사용
       setReadingStatus(userReadingStatus || ReadingStatusType.READ);
     }
-  }, [open, isCreateMode, userReadingStatus]);
+  }, [open, isCreateMode, isEditMode, userReadingStatus]);
 
   // 별점 취소 핸들러
   const handleResetRating = () => {
