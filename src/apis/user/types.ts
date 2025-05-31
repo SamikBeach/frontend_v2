@@ -726,3 +726,26 @@ export interface RecentPopularSearchResponse {
   term: string;
   count: number;
 }
+
+/**
+ * 사용자 도서 목록 정렬 옵션
+ */
+export enum UserBooksSortOptions {
+  RATING_DESC = 'rating-desc',
+  REVIEWS_DESC = 'reviews-desc',
+  LIBRARY_COUNT_DESC = 'library-desc',
+  PUBLISH_DATE_DESC = 'publishDate-desc',
+  TITLE_ASC = 'title-asc',
+  CREATED_AT_DESC = 'createdAt-desc', // 등록 최신순 (기본값)
+}
+
+/**
+ * 기간 필터 옵션
+ */
+export enum TimeRangeOptions {
+  ALL = 'all',
+  TODAY = 'today',
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}

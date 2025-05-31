@@ -1,6 +1,7 @@
 import { Book } from '@/apis/book/types';
 import { ReadingStatusType } from '@/apis/reading-status/types';
 import { selectedBookIdAtom } from '@/atoms/book';
+import { TimeRange } from '@/components/SortDropdown';
 import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useAtom } from 'jotai';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -11,10 +12,16 @@ import { LoadingSpinner } from './LoadingSpinner';
 
 interface BooksListProps {
   status: ReadingStatusType | undefined;
+  sort: string;
+  timeRange: TimeRange;
 }
 
-export function BooksList({ status }: BooksListProps) {
-  const { books = [], fetchNextPage, hasNextPage } = useUserBooks(status);
+export function BooksList({ status, sort, timeRange }: BooksListProps) {
+  const {
+    books = [],
+    fetchNextPage,
+    hasNextPage,
+  } = useUserBooks(status, sort, timeRange);
   const [, setSelectedBookId] = useAtom(selectedBookIdAtom);
   const openBookDetail = useBookDetailOpen();
 
