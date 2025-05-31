@@ -1,5 +1,19 @@
 # 🚦 CHANGELOG
 
+# [1.15.0](https://github.com/SamikBeach/frontend_v2/compare/1.14.4...1.15.0) (2025-05-31)
+
+
+### Bug Fixes
+
+* ClientSideScrollRestorer 제거 ([d587be9](https://github.com/SamikBeach/frontend_v2/commit/d587be9fb2fbb5a718d4d000f750cdc6fa52bedf))
+* ClientSideScrollRestorer 제거 ([cb94ba4](https://github.com/SamikBeach/frontend_v2/commit/cb94ba4c3a43ce3cf9fa55bc145b8d1fb3f35864))
+* fix type errors ([64fc010](https://github.com/SamikBeach/frontend_v2/commit/64fc0105d3e9cad83f9dad877fcdb25885416240))
+
+
+### Features
+
+* 프로필 읽기 섹션에 정렬 및 기간 필터 기능 추가 ([edcdd0d](https://github.com/SamikBeach/frontend_v2/commit/edcdd0dffbd61b7ae82fbb2b727958bdd6ed61a3))
+
 ## [1.14.4](https://github.com/SamikBeach/frontend_v2/compare/1.14.3...1.14.4) (2025-05-29)
 
 ## [1.14.3](https://github.com/SamikBeach/frontend_v2/compare/1.14.2...1.14.3) (2025-05-29)
