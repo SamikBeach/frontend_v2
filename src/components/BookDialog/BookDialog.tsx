@@ -159,7 +159,7 @@ export function BookDialog() {
         shouldScaleBackground={false}
       >
         <ResponsiveDialogPortal>
-          <ResponsiveDialogContent drawerClassName="w-full bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg outline-none focus:outline-none focus-visible:outline-none">
+          <ResponsiveDialogContent drawerClassName="w-full h-[100dvh] bg-white p-0 rounded-t-[16px] overflow-hidden shadow-lg outline-none focus:outline-none focus-visible:outline-none">
             <ErrorBoundary FallbackComponent={ErrorFallback}>
               <Suspense fallback={<BookFullSkeleton />}>
                 <div className="flex h-full flex-col">
@@ -169,10 +169,13 @@ export function BookDialog() {
                   >
                     도서 상세 정보
                   </ResponsiveDialogTitle>
-                  <ResponsiveDialogHeader className="p-0" onClose={close}>
+                  <ResponsiveDialogHeader
+                    className="flex-shrink-0 p-0"
+                    onClose={close}
+                  >
                     <BookHeader isDialog />
                   </ResponsiveDialogHeader>
-                  <div className="pb-safe h-full overflow-y-auto">
+                  <div className="pb-safe flex-1 overflow-y-auto">
                     <MobileBookDialogContent />
                   </div>
                 </div>
