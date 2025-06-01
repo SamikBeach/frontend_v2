@@ -10,11 +10,17 @@ interface BookCardProps {
   book: Book;
   onClick?: (book: Book) => void;
   horizontal?: boolean;
+  forceHorizontal?: boolean; // 강제로 horizontal 레이아웃 사용 (발견하기/분야별 인기 페이지용)
 }
 
 // React.memo를 사용하여 props가 변경되지 않으면 리렌더링 방지
 export const BookCard = React.memo(
-  ({ book, onClick, horizontal = false }: BookCardProps) => {
+  ({
+    book,
+    onClick,
+    horizontal = false,
+    forceHorizontal = false,
+  }: BookCardProps) => {
     // 책 표지 이미지 - 없으면 기본 이미지 제공
     const coverImage =
       book.coverImage || `https://picsum.photos/seed/${book.id}/240/360`;
@@ -38,24 +44,39 @@ export const BookCard = React.memo(
       if (onClick) onClick(book);
     };
 
+    // forceHorizontal이 true면 모바일에서는 horizontal, 데스크톱에서는 vertical
+    const isResponsiveHorizontal = forceHorizontal;
+
     return (
       <div
         className={cn(
           'cursor-pointer overflow-hidden',
-          horizontal ? 'flex w-full' : 'flex h-full w-full flex-col'
+          isResponsiveHorizontal
+            ? 'flex w-full md:flex md:h-full md:w-full md:flex-col' // 모바일: horizontal, 데스크톱: vertical
+            : horizontal
+              ? 'flex w-full'
+              : 'flex h-full w-full flex-col'
         )}
         onClick={handleBookClick}
       >
         <div
           className={cn(
             'group w-full transition-all',
-            horizontal ? 'flex h-auto items-start' : 'h-full bg-white'
+            isResponsiveHorizontal
+              ? 'flex h-auto items-start md:h-full md:flex-col md:bg-white' // 모바일: horizontal, 데스크톱: vertical
+              : horizontal
+                ? 'flex h-auto items-start'
+                : 'h-full bg-white'
           )}
         >
           <div
             className={cn(
               'relative flex flex-col items-center justify-end overflow-hidden rounded-md bg-white',
-              horizontal ? 'h-auto w-32 flex-shrink-0' : 'aspect-[3/4.5] w-full'
+              isResponsiveHorizontal
+                ? 'h-auto w-32 flex-shrink-0 md:aspect-[3/4.5] md:w-full' // 모바일: 고정 크기, 데스크톱: aspect ratio
+                : horizontal
+                  ? 'h-auto w-32 flex-shrink-0'
+                  : 'aspect-[3/4.5] w-full'
             )}
           >
             <img
@@ -69,18 +90,18 @@ export const BookCard = React.memo(
           </div>
           <div
             className={cn(
-              horizontal
-                ? 'flex h-full flex-1 flex-col justify-between px-2 py-0.5'
-                : 'px-2.5 pt-2.5 pb-2.5'
+              isResponsiveHorizontal
+                ? 'flex h-full flex-1 flex-col justify-between px-2 py-0.5 md:px-2.5 md:pt-2.5 md:pb-2.5' // 모바일: horizontal 패딩, 데스크톱: vertical 패딩
+                : horizontal
+                  ? 'flex h-full flex-1 flex-col justify-between px-2 py-0.5'
+                  : 'px-2.5 pt-2.5 pb-2.5'
             )}
           >
             <div>
               <h3
                 className={cn(
                   'line-clamp-2 font-medium text-gray-900',
-                  horizontal
-                    ? 'text-base sm:text-[15px]'
-                    : 'text-base sm:text-[15px]'
+                  'text-base sm:text-[15px]'
                 )}
               >
                 {book.title}
@@ -88,9 +109,7 @@ export const BookCard = React.memo(
               <p
                 className={cn(
                   'mt-0.5 line-clamp-2 text-gray-500',
-                  horizontal
-                    ? 'text-sm sm:text-[13px]'
-                    : 'text-sm sm:text-[13px]'
+                  'text-sm sm:text-[13px]'
                 )}
               >
                 {book.author}
@@ -99,8 +118,8 @@ export const BookCard = React.memo(
             <div
               className={cn(
                 'flex items-center gap-2 pt-1 text-gray-600',
-                horizontal
-                  ? 'text-[15px] sm:text-[13px]'
+                isResponsiveHorizontal
+                  ? 'text-[15px] sm:text-[13px] md:text-[15px] md:sm:text-[13px]' // 모바일과 데스크톱 모두 동일한 크기
                   : 'text-[15px] sm:text-[13px]'
               )}
             >

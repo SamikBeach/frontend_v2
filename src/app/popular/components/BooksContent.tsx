@@ -9,14 +9,12 @@ import { BookCard } from '@/components/BookCard';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useQueryParams } from '@/hooks';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useAtom } from 'jotai';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { usePopularBooksQuery } from '../hooks';
 
 export function BooksContent() {
-  const isMobile = useIsMobile();
   const { updateQueryParams } = useQueryParams();
 
   // 프로필 페이지와 동일한 atom 사용 방식
@@ -80,24 +78,17 @@ export function BooksContent() {
       className="flex w-full flex-col pb-4"
       style={{ overflow: 'visible' }} // 스크롤바 숨기기
     >
-      {isMobile ? (
-        <div className="flex flex-col gap-4 px-0.5 py-1">
-          {books.map(book => (
-            <BookCard
-              key={book.id}
-              book={book}
-              onClick={handleBookSelect}
-              horizontal={true}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-          {books.map(book => (
-            <BookCard key={book.id} book={book} onClick={handleBookSelect} />
-          ))}
-        </div>
-      )}
+      {/* 모바일: flex-col (horizontal 카드), 데스크톱: grid */}
+      <div className="flex flex-col gap-4 px-0.5 py-1 md:grid md:grid-cols-3 md:gap-3 md:px-0 md:py-0 lg:grid-cols-4 xl:grid-cols-5">
+        {books.map(book => (
+          <BookCard
+            key={book.id}
+            book={book}
+            onClick={handleBookSelect}
+            forceHorizontal={true} // 모바일에서는 horizontal, 데스크톱에서는 vertical
+          />
+        ))}
+      </div>
     </InfiniteScroll>
   );
 }
