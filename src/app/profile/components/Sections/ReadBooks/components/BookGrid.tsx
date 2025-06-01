@@ -20,7 +20,7 @@ interface BookGridProps {
 export function BookGrid({ books, onBookSelect }: BookGridProps) {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
-      {books.map((book, index) => {
+      {books.map(book => {
         // BookCard에 필요한 최소한의 필드만 전달
         const bookData: Partial<Book> = {
           id: book.id,
