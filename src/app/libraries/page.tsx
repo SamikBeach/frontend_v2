@@ -62,6 +62,13 @@ export default function LibrariesPage() {
     } else {
       setSearchQuery('');
     }
+
+    // 필터나 정렬이 변경되었을 때 스크롤 위치를 맨 위로 이동
+    // 초기 로드가 아닌 경우에만 스크롤 이동
+    const isInitialLoad = !searchParams.toString();
+    if (!isInitialLoad) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }, [searchParams, setTagFilter, setSortOption, setTimeRange, setSearchQuery]);
 
   return (
