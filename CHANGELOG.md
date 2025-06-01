@@ -1,5 +1,17 @@
 # 🚦 CHANGELOG
 
+# [1.25.0](https://github.com/SamikBeach/frontend_v2/compare/1.24.3...1.25.0) (2025-06-01)
+
+
+### Bug Fixes
+
+* fix lint ([666419d](https://github.com/SamikBeach/frontend_v2/commit/666419dd6575521e1962374e4fef05a82698a770))
+
+
+### Features
+
+* BookCard img 태그를 Next.js Image 컴포넌트로 교체 ([92ec0e8](https://github.com/SamikBeach/frontend_v2/commit/92ec0e861b5c54efcbc3f55eae50e6b6f4dbb0ca))
+
 ## [1.24.3](https://github.com/SamikBeach/frontend_v2/compare/1.24.2...1.24.3) (2025-06-01)
 
 
