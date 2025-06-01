@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.25.6](https://github.com/SamikBeach/frontend_v2/compare/1.25.5...1.25.6) (2025-06-01)
+
+
+### Bug Fixes
+
+* horizontal BookCard 레이아웃 시프트 완전 방지 ([f7a97ae](https://github.com/SamikBeach/frontend_v2/commit/f7a97aeea4f2f1cbd12a3168af332286cdf969c9))
+
 ## [1.25.5](https://github.com/SamikBeach/frontend_v2/compare/1.25.4...1.25.5) (2025-06-01)
 
 
