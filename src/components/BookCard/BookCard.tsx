@@ -22,67 +22,6 @@ export const BookCard = React.memo(
     const coverImage =
       book.coverImage || `https://picsum.photos/seed/${book.id}/240/360`;
 
-    // 이미지 dimensions 계산
-    const getImageDimensions = () => {
-      // 백엔드에서 제공하는 실제 이미지 크기가 있으면 사용
-      if (book.coverImageWidth && book.coverImageHeight) {
-        return {
-          width: book.coverImageWidth,
-          height: book.coverImageHeight,
-          aspectRatio: book.coverImageWidth / book.coverImageHeight,
-        };
-      }
-
-      // 기본값: 표준 책 비율 (3:4.5)
-      return {
-        width: 240,
-        height: 360,
-        aspectRatio: 240 / 360, // 0.667
-      };
-    };
-
-    const imageDimensions = getImageDimensions();
-
-    // horizontal 모드에서 사용할 크기 계산
-    const getHorizontalImageSize = () => {
-      const containerWidth = 128; // w-32 = 128px
-      const aspectRatio = imageDimensions.aspectRatio;
-      const scaledHeight = Math.round(containerWidth / aspectRatio);
-
-      return {
-        width: containerWidth,
-        height: scaledHeight,
-        aspectRatio,
-      };
-    };
-
-    // 일반 모드에서 사용할 크기 계산 (컨테이너에 맞게 스케일링)
-    const getNormalImageSize = () => {
-      // 컨테이너 최대 너비를 기준으로 스케일링
-      const maxWidth = 240;
-      const aspectRatio = imageDimensions.aspectRatio;
-
-      if (imageDimensions.width <= maxWidth) {
-        // 원본 크기가 컨테이너보다 작으면 원본 사용
-        return {
-          width: imageDimensions.width,
-          height: imageDimensions.height,
-          aspectRatio,
-        };
-      } else {
-        // 원본이 크면 비율 유지하며 스케일 다운
-        const scaledHeight = Math.round(maxWidth / aspectRatio);
-        return {
-          width: maxWidth,
-          height: scaledHeight,
-          aspectRatio,
-        };
-      }
-    };
-
-    const horizontalSize = horizontal ? getHorizontalImageSize() : null;
-    const normalSize = !horizontal ? getNormalImageSize() : null;
-
     // 평점과 리뷰 수가 문자열인 경우를 처리
     const rating =
       typeof book.rating === 'string'
@@ -119,9 +58,7 @@ export const BookCard = React.memo(
           <div
             className={cn(
               'relative flex flex-col items-center justify-end overflow-hidden rounded-md bg-white',
-              horizontal
-                ? 'aspect-[3/4.5] w-32 flex-shrink-0'
-                : 'aspect-[3/4.5] w-full'
+              horizontal ? 'w-32 flex-shrink-0' : 'aspect-[3/4.5] w-full'
             )}
           >
             <div
