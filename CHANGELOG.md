@@ -1,5 +1,13 @@
 # 🚦 CHANGELOG
 
+# [1.23.0](https://github.com/SamikBeach/frontend_v2/compare/1.22.0...1.23.0) (2025-06-01)
+
+
+### Features
+
+* Next.js Image 컴포넌트로 이미지 최적화 및 캐싱 개선 ([755ffdd](https://github.com/SamikBeach/frontend_v2/commit/755ffdd05ecd582f3933c637adf1056d8b09f2ad))
+* 책카드 이미지에 연한 회색 테두리 추가 ([cba2c14](https://github.com/SamikBeach/frontend_v2/commit/cba2c14fdf214f6f4090b9cb5212b2b5c6b28a27))
+
 # [1.22.0](https://github.com/SamikBeach/frontend_v2/compare/1.21.0...1.22.0) (2025-06-01)
 
 
