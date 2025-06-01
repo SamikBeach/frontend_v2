@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.25.5](https://github.com/SamikBeach/frontend_v2/compare/1.25.4...1.25.5) (2025-06-01)
+
+
+### Bug Fixes
+
+* BookCard horizontal 모드에서 이미지 비율 가변 높이 적용 ([f02479d](https://github.com/SamikBeach/frontend_v2/commit/f02479d5d0048cfeec9d536dcc38b6e34a057500))
+
 ## [1.25.4](https://github.com/SamikBeach/frontend_v2/compare/1.25.3...1.25.4) (2025-06-01)
 
 
