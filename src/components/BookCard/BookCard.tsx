@@ -56,32 +56,50 @@ export const BookCard = React.memo(
           <div
             className={cn(
               'relative flex flex-col items-center justify-end overflow-hidden rounded-md bg-white',
-              horizontal ? 'h-auto w-32 flex-shrink-0' : 'aspect-[3/4.5] w-full'
+              horizontal ? 'w-32 flex-shrink-0' : 'aspect-[3/4.5] w-full'
             )}
           >
-            <div className="overflow-hidden rounded-md border border-gray-200">
-              <Image
-                src={coverImage}
-                alt={book.title}
-                width={240}
-                height={360}
-                className={cn(
-                  'h-auto w-full rounded-md object-cover transition-transform group-hover:scale-[1.02]'
-                )}
-                placeholder="blur"
-                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
-                sizes={
-                  horizontal
-                    ? '128px'
-                    : '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'
-                }
-                onError={e => {
-                  // 이미지 로드 실패 시 기본 이미지로 대체
-                  const target = e.currentTarget as HTMLImageElement;
-                  target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
-                }}
-              />
-            </div>
+            {horizontal ? (
+              <div className="w-full overflow-hidden rounded-md border border-gray-200">
+                <Image
+                  src={coverImage}
+                  alt={book.title}
+                  width={128}
+                  height={192}
+                  className={cn(
+                    'h-auto w-full rounded-md object-cover transition-transform group-hover:scale-[1.02]'
+                  )}
+                  placeholder="blur"
+                  blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
+                  sizes="128px"
+                  onError={e => {
+                    // 이미지 로드 실패 시 기본 이미지로 대체
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="w-full overflow-hidden rounded-md border border-gray-200">
+                <Image
+                  src={coverImage}
+                  alt={book.title}
+                  width={240}
+                  height={360}
+                  className={cn(
+                    'h-auto w-full rounded-md object-cover transition-transform group-hover:scale-[1.02]'
+                  )}
+                  placeholder="blur"
+                  blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
+                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                  onError={e => {
+                    // 이미지 로드 실패 시 기본 이미지로 대체
+                    const target = e.currentTarget as HTMLImageElement;
+                    target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
+                  }}
+                />
+              </div>
+            )}
           </div>
           <div
             className={cn(
