@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.19.0](https://github.com/SamikBeach/frontend_v2/compare/1.18.0...1.19.0) (2025-06-01)
+
+
+### Features
+
+* 발견하기/분야별 인기 페이지 스켈레톤을 실제 컨텐츠 크기에 맞게 개선 ([2ac23b4](https://github.com/SamikBeach/frontend_v2/commit/2ac23b4559595025558d4051475310d5803d6cd0))
+
 # [1.18.0](https://github.com/SamikBeach/frontend_v2/compare/1.17.0...1.18.0) (2025-06-01)
 
 
