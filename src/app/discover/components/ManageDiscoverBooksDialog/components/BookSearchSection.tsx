@@ -238,7 +238,7 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
                       key={getBookIdentifier(book)}
                       className="group relative flex h-auto items-start gap-3 px-3 py-3 transition-colors hover:bg-gray-50 md:gap-4 md:px-4 md:py-4"
                     >
-                      <div className="relative h-[120px] w-[80px] flex-shrink-0 overflow-hidden rounded-md border border-gray-100 bg-white shadow-sm md:h-[145px] md:w-[100px]">
+                      <div className="relative h-[120px] w-[80px] flex-shrink-0 overflow-hidden rounded-md border border-gray-100 bg-white shadow-[0_4px_20px_rgb(0,0,0,0.1)] md:h-[145px] md:w-[100px]">
                         <img
                           src={imageUrl}
                           alt={book.title}

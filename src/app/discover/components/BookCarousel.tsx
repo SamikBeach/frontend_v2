@@ -58,7 +58,7 @@ export function BookCarousel({ books, onSelectBook }: BookCarouselProps) {
           >
             <div className="cursor-pointer" onClick={() => onSelectBook(book)}>
               <div className="group h-full rounded-xl bg-[#F9FAFB] transition-all hover:bg-[#F2F4F6]">
-                <div className="relative aspect-[2/3] overflow-hidden rounded-t-xl">
+                <div className="relative aspect-[2/3] overflow-hidden rounded-t-xl shadow-[0_4px_20px_rgb(0,0,0,0.1)]">
                   <img
                     src={`https://picsum.photos/seed/${book.id}/240/360`}
                     alt={book.title}

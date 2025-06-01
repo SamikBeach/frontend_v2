@@ -49,7 +49,7 @@ export function BookCoverSection() {
     <div className="flex flex-col gap-4 md:gap-6">
       {/* 책 표지 이미지 */}
       <div
-        className="relative mx-auto w-44 cursor-pointer overflow-hidden rounded-2xl bg-gray-50 md:w-56 lg:w-64"
+        className="relative mx-auto w-44 cursor-pointer overflow-hidden rounded-2xl bg-gray-50 shadow-[0_8px_30px_rgb(0,0,0,0.12)] md:w-56 lg:w-64"
         onClick={handleOpenAladin}
       >
         <img
