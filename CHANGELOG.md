@@ -1,5 +1,15 @@
 # 🚦 CHANGELOG
 
+## [1.24.3](https://github.com/SamikBeach/frontend_v2/compare/1.24.2...1.24.3) (2025-06-01)
+
+
+### Bug Fixes
+
+* BookCard 스케일 변환 시 보더 유지 문제 해결 ([f287c55](https://github.com/SamikBeach/frontend_v2/commit/f287c5521142837560d589c27471fa0e9c9a64e2))
+* BookCard 호버 시 왼쪽 보더 사라짐 문제 해결 ([386b3a6](https://github.com/SamikBeach/frontend_v2/commit/386b3a6b7636999a13fcb04753748911d4669506))
+* fix lint ([e45bc95](https://github.com/SamikBeach/frontend_v2/commit/e45bc9561efc18003c7724b56921b4f23bf43f47))
+* Next.js Image 컴포넌트 로딩 시 검정색 배경 문제 해결 ([f73fece](https://github.com/SamikBeach/frontend_v2/commit/f73fece11caa7414e241fec0788e60b088eefb3f))
+
 ## [1.24.2](https://github.com/SamikBeach/frontend_v2/compare/1.24.1...1.24.2) (2025-06-01)
 
 
