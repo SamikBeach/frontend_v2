@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.22.0](https://github.com/SamikBeach/frontend_v2/compare/1.21.0...1.22.0) (2025-06-01)
+
+
+### Features
+
+* BookCard horizontal 레이아웃에서 컨텐츠 영역 높이 최적화 ([200e6c7](https://github.com/SamikBeach/frontend_v2/commit/200e6c7f84f1f425491b209353818da1f104cb0d))
+
 # [1.21.0](https://github.com/SamikBeach/frontend_v2/compare/1.20.1...1.21.0) (2025-06-01)
 
 
