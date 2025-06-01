@@ -2,8 +2,8 @@
 
 import { FeedbackButton } from '@/components/Feedback';
 import { SearchBar } from '@/components/SearchBar';
+import { useHeaderScrollVisibility } from '@/hooks';
 import { Settings } from 'lucide-react';
-import { useHeaderScrollVisibility } from './hooks/useHeaderScrollVisibility';
 import { LeftSlot } from './LeftSlot';
 import { Notification } from './RightSlot/Notification';
 import { UserDropdown } from './RightSlot/UserDropdown';
@@ -14,7 +14,7 @@ export function Header() {
   return (
     <header
       className={`fixed top-0 right-0 left-0 z-40 flex min-h-[56px] items-center justify-between border-b border-gray-200/50 bg-white px-2 transition-transform duration-300 sm:translate-y-0 md:px-4 ${
-        showHeader ? 'translate-y-0' : '-translate-y-full'
+        showHeader ? 'translate-y-0' : '-translate-y-[150%]'
       }`}
     >
       <div className="flex items-center gap-1">

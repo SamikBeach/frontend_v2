@@ -7,6 +7,7 @@ import {
 } from '@/atoms/community';
 import { ReviewCard } from '@/components/ReviewCard';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { useFilterScrollVisibility } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
 import { Suspense } from 'react';
@@ -90,6 +91,9 @@ function CommunityContent() {
   const [typeFilter, setTypeFilter] = useAtom(communityTypeFilterAtom);
   const [sortOption, setSortOption] = useAtom(communitySortOptionAtom);
 
+  // 필터 스크롤 가시성 훅 추가
+  const [showFilter] = useFilterScrollVisibility();
+
   // 필터 변경 핸들러
   const handleTypeFilterChange = (type: ReviewType | 'all') => {
     setTypeFilter(type);
@@ -101,8 +105,12 @@ function CommunityContent() {
 
   return (
     <div className="pb-3">
-      {/* 필터 바 - 스크롤 시 상단에 고정 */}
-      <div className="bg-white pt-2 pb-1 md:sticky md:top-[56px] md:z-30 md:pt-4 md:pb-2">
+      {/* 필터 바 - 모바일에서 스크롤에 따라 보임/숨김 */}
+      <div
+        className={`bg-white transition-transform duration-300 sm:translate-y-0 md:sticky md:top-[56px] md:z-30 ${
+          showFilter ? 'translate-y-0' : '-translate-y-[150%]'
+        } fixed top-[56px] right-0 left-0 z-20 pt-2 pb-1 sm:relative sm:top-0 md:pt-4 md:pb-2`}
+      >
         <FilterArea
           selectedCategory={typeFilter}
           selectedSort={sortOption}
@@ -111,8 +119,8 @@ function CommunityContent() {
         />
       </div>
 
-      {/* 메인 콘텐츠 */}
-      <div className="px-2 pt-1 sm:px-0">
+      {/* 메인 콘텐츠 - 모바일에서 필터 높이만큼 상단 여백 추가 */}
+      <div className="px-2 pt-[110px] sm:px-0 sm:pt-1">
         {/* 포스트 작성 */}
         <CreateReviewCard />
 

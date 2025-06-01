@@ -107,8 +107,8 @@ export function Libraries({ setSearchQuery }: LibrariesProps) {
         onSearchChange={onSearchChange}
       />
 
-      {/* 메인 콘텐츠 */}
-      <div className="px-2 pt-2 pb-4 md:px-4 md:pt-4">
+      {/* 메인 콘텐츠 - 모바일에서 필터 높이만큼 상단 여백 추가 */}
+      <div className="px-2 pt-[120px] pb-4 sm:pt-2 md:px-4 md:pt-4">
         {/* 서재 목록 */}
         {isLoading ? (
           <LibraryListSkeleton />
