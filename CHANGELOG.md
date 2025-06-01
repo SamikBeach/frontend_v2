@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.21.0](https://github.com/SamikBeach/frontend_v2/compare/1.20.1...1.21.0) (2025-06-01)
+
+
+### Features
+
+* BookCard horizontal 레이아웃 이미지 스타일 개선 ([1af1a61](https://github.com/SamikBeach/frontend_v2/commit/1af1a61eef573dbf59a39d551ade5d40717d1170))
+
 ## [1.20.1](https://github.com/SamikBeach/frontend_v2/compare/1.20.0...1.20.1) (2025-06-01)
 
 
