@@ -13,6 +13,7 @@ import {
   subcategoryFilterAtom,
   timeRangeAtom,
 } from '@/atoms/popular';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQueryParams } from '@/hooks';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
@@ -41,6 +42,15 @@ function CategoryFilterSkeleton() {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+// 도서 목록 로딩 컴포넌트
+function BooksContentLoading() {
+  return (
+    <div className="flex h-[calc(100vh-200px)] w-full items-center justify-center">
+      <LoadingSpinner size="lg" />
     </div>
   );
 }
@@ -128,9 +138,11 @@ export default function PopularPage() {
         </div>
       </div>
 
-      {/* 도서 목록 - Suspense 제거하고 BooksContent에서 직접 로딩 처리 */}
+      {/* 도서 목록 - Suspense로 감싸서 스크롤 복원 개선 */}
       <div className="mx-auto w-full px-2 pt-1 sm:px-4">
-        <BooksContent />
+        <Suspense fallback={<BooksContentLoading />}>
+          <BooksContent />
+        </Suspense>
       </div>
     </div>
   );

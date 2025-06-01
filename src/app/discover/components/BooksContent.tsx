@@ -19,7 +19,7 @@ export function BooksContent() {
   const openBookDetail = useBookDetailOpen();
 
   // 무한 스크롤로 도서 데이터 가져오기
-  const { books, fetchNextPage, hasNextPage, isLoading, isFetchingNextPage } =
+  const { books, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useDiscoverBooksQuery();
 
   // 도서 선택 핸들러
@@ -40,11 +40,7 @@ export function BooksContent() {
 
   return (
     <>
-      {isLoading ? (
-        <div className="flex h-[calc(100vh-200px)] w-full items-center justify-center">
-          <LoadingSpinner />
-        </div>
-      ) : books && books.length > 0 ? (
+      {books && books.length > 0 ? (
         <InfiniteScroll
           dataLength={books.length}
           next={fetchNextPage}
@@ -82,18 +78,19 @@ export function BooksContent() {
           )}
         </InfiniteScroll>
       ) : (
-        <div className="mt-8 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-12 text-center">
-          <div className="text-3xl">📚</div>
-          <h3 className="mt-4 text-lg font-medium text-gray-900">
-            검색 결과가 없습니다
-          </h3>
-          <p className="mt-2 text-sm text-gray-500">
-            다른 카테고리를 선택하거나 필터를 초기화해보세요.
-          </p>
+        <div className="flex h-[calc(100vh-200px)] w-full flex-col items-center justify-center space-y-4">
+          <div className="text-center">
+            <h3 className="text-lg font-medium text-gray-900">
+              검색 결과가 없습니다
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              다른 조건으로 검색해보세요
+            </p>
+          </div>
           <Button
             variant="outline"
-            className="mt-4"
             onClick={handleClearFilters}
+            className="mt-4"
           >
             필터 초기화
           </Button>
