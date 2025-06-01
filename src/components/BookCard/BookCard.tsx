@@ -65,7 +65,10 @@ export const BookCard = React.memo(
             )}
           >
             {horizontal ? (
-              <div className="relative w-32 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
+              <div
+                className="relative w-32 flex-shrink-0 overflow-hidden rounded-md border border-gray-200"
+                style={{ height: `${horizontalSize.height}px` }}
+              >
                 {/* 로딩 스켈레톤 */}
                 {!imageLoaded && (
                   <div className="absolute inset-0 animate-pulse bg-gray-200" />
@@ -76,7 +79,7 @@ export const BookCard = React.memo(
                   width={horizontalSize.width}
                   height={horizontalSize.height}
                   className={cn(
-                    'h-auto w-full rounded-md object-cover transition-all duration-300 group-hover:scale-[1.02]',
+                    'h-full w-full rounded-md object-cover transition-all duration-300 group-hover:scale-[1.02]',
                     imageLoaded ? 'opacity-100' : 'opacity-0'
                   )}
                   placeholder="blur"
