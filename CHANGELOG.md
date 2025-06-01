@@ -1,5 +1,14 @@
 # 🚦 CHANGELOG
 
+## [1.25.4](https://github.com/SamikBeach/frontend_v2/compare/1.25.3...1.25.4) (2025-06-01)
+
+
+### Bug Fixes
+
+* BookCard 스켈레톤과 실제 카드 높이 불일치 문제 해결 ([7bb5bac](https://github.com/SamikBeach/frontend_v2/commit/7bb5bac00c7b8dd411b08dec703f16b586a899f4))
+* BookCard 스켈레톤과 실제 카드 높이 불일치 문제 해결 ([e585cf0](https://github.com/SamikBeach/frontend_v2/commit/e585cf0635cb4fee68864bc907772d6a689b8183))
+* 일반 모드에서 이미지 바닥 정렬 복원 ([e2470ce](https://github.com/SamikBeach/frontend_v2/commit/e2470ce5e6923538c6f617fafb23e1f5e09a8086))
+
 ## [1.25.3](https://github.com/SamikBeach/frontend_v2/compare/1.25.2...1.25.3) (2025-06-01)
 
 
