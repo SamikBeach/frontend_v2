@@ -15,87 +15,74 @@ export function BooksContent() {
   const isMobile = useIsMobile();
   const { clearQueryParams } = useQueryParams();
 
-  const [_, setSelectedBookId] = useAtom(selectedBookIdAtom);
+  const [, setSelectedBookId] = useAtom(selectedBookIdAtom);
   const openBookDetail = useBookDetailOpen();
 
-  // 무한 스크롤로 도서 데이터 가져오기
-  const { books, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useDiscoverBooksQuery();
+  const { books = [], fetchNextPage, hasNextPage } = useDiscoverBooksQuery();
 
-  // 도서 선택 핸들러
   const handleBookSelect = useCallback(
     (book: Book) => {
       setSelectedBookId(book.id.toString());
-      // isbn13이 있으면 우선 사용하고, 없으면 isbn 사용
       const bookIsbn = book.isbn13 || book.isbn;
-      openBookDetail(bookIsbn);
+      openBookDetail(bookIsbn || book.id.toString());
     },
     [setSelectedBookId, openBookDetail]
   );
 
-  // 필터 초기화 핸들러
   const handleClearFilters = useCallback(() => {
     clearQueryParams();
   }, [clearQueryParams]);
 
+  if (books.length === 0) {
+    return (
+      <div className="flex h-[calc(100vh-200px)] w-full flex-col items-center justify-center space-y-4">
+        <div className="text-center">
+          <h3 className="text-lg font-medium text-gray-900">
+            검색 결과가 없습니다
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">
+            다른 조건으로 검색해보세요
+          </p>
+        </div>
+        <Button variant="outline" onClick={handleClearFilters} className="mt-4">
+          필터 초기화
+        </Button>
+      </div>
+    );
+  }
+
   return (
-    <>
-      {books && books.length > 0 ? (
-        <InfiniteScroll
-          dataLength={books.length}
-          next={fetchNextPage}
-          hasMore={hasNextPage}
-          loader={
-            <div className="my-8 flex justify-center">
-              <LoadingSpinner size="md" />
-            </div>
-          }
-          scrollThreshold={0.9}
-          className="flex w-full flex-col pb-4"
-          style={{ overflow: 'visible' }} // 스크롤바 숨기기
-        >
-          {isMobile ? (
-            <div className="flex flex-col gap-4 px-0.5 py-1">
-              {books.map(book => (
-                <BookCard
-                  key={book.id}
-                  book={book}
-                  onClick={handleBookSelect}
-                  horizontal={true}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {books.map(book => (
-                <BookCard
-                  key={book.id}
-                  book={book}
-                  onClick={handleBookSelect}
-                />
-              ))}
-            </div>
-          )}
-        </InfiniteScroll>
+    <InfiniteScroll
+      dataLength={books.length}
+      next={fetchNextPage}
+      hasMore={hasNextPage}
+      loader={
+        <div className="my-8 flex justify-center">
+          <LoadingSpinner size="md" />
+        </div>
+      }
+      scrollThreshold={0.9}
+      className="flex w-full flex-col pb-4"
+      style={{ overflow: 'visible' }}
+    >
+      {isMobile ? (
+        <div className="flex flex-col gap-4 px-0.5 py-1">
+          {books.map(book => (
+            <BookCard
+              key={book.id}
+              book={book}
+              onClick={handleBookSelect}
+              horizontal={true}
+            />
+          ))}
+        </div>
       ) : (
-        <div className="flex h-[calc(100vh-200px)] w-full flex-col items-center justify-center space-y-4">
-          <div className="text-center">
-            <h3 className="text-lg font-medium text-gray-900">
-              검색 결과가 없습니다
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              다른 조건으로 검색해보세요
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            onClick={handleClearFilters}
-            className="mt-4"
-          >
-            필터 초기화
-          </Button>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {books.map(book => (
+            <BookCard key={book.id} book={book} onClick={handleBookSelect} />
+          ))}
         </div>
       )}
-    </>
+    </InfiniteScroll>
   );
 }
