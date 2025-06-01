@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.25.3](https://github.com/SamikBeach/frontend_v2/compare/1.25.2...1.25.3) (2025-06-01)
+
+
+### Bug Fixes
+
+* BookCard 일반 모드에서 이미지 실제 비율 유지하도록 수정 ([8464190](https://github.com/SamikBeach/frontend_v2/commit/84641908c3781df9940b23581d3e1912f29d69f1))
+
 ## [1.25.2](https://github.com/SamikBeach/frontend_v2/compare/1.25.1...1.25.2) (2025-06-01)
 
 
