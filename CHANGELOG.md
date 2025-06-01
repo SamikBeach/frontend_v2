@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.24.1](https://github.com/SamikBeach/frontend_v2/compare/1.24.0...1.24.1) (2025-06-01)
+
+
+### Bug Fixes
+
+* BookCard 이미지 레이아웃 시프트 방지를 위한 명시적 크기 설정 ([a9920af](https://github.com/SamikBeach/frontend_v2/commit/a9920af1b4f1174137a0624649cd4ca36ad1f186))
+
 # [1.24.0](https://github.com/SamikBeach/frontend_v2/compare/1.23.0...1.24.0) (2025-06-01)
 
 
