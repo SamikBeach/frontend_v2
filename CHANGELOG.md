@@ -1,5 +1,13 @@
 # 🚦 CHANGELOG
 
+## [1.24.2](https://github.com/SamikBeach/frontend_v2/compare/1.24.1...1.24.2) (2025-06-01)
+
+
+### Bug Fixes
+
+* BookCard 이미지 비율을 실제 이미지에 맞게 가변적으로 조정 ([1d8047e](https://github.com/SamikBeach/frontend_v2/commit/1d8047ebb6e24ea5a66c169467f37ddceefcf45f))
+* NextJS Image 컴포넌트 레이아웃 시프트 방지 및 캐시 최적화 ([9df9b47](https://github.com/SamikBeach/frontend_v2/commit/9df9b47a559cce06baa0165cc8bb9c75428b4736))
+
 ## [1.24.1](https://github.com/SamikBeach/frontend_v2/compare/1.24.0...1.24.1) (2025-06-01)
 
 
