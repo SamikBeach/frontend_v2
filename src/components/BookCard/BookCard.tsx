@@ -59,14 +59,14 @@ export const BookCard = React.memo(
               horizontal ? 'h-auto w-32 flex-shrink-0' : 'aspect-[3/4.5] w-full'
             )}
           >
-            <div className="h-auto max-h-full w-auto max-w-full overflow-hidden rounded-md border border-gray-200">
+            <div className="overflow-hidden rounded-md border border-gray-200">
               <Image
                 src={coverImage}
                 alt={book.title}
                 width={240}
                 height={360}
                 className={cn(
-                  'h-auto max-h-full w-auto max-w-full rounded-md object-contain object-bottom transition-transform group-hover:scale-[1.02]'
+                  'h-auto w-full rounded-md object-cover transition-transform group-hover:scale-[1.02]'
                 )}
                 placeholder="blur"
                 blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
