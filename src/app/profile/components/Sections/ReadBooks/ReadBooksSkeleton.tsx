@@ -48,7 +48,7 @@ export function BooksGridSkeleton() {
       {Array.from({ length: 12 }).map((_, index) => (
         <div key={index} className="flex h-full w-full flex-col">
           <div className="h-full w-full">
-            <div className="relative aspect-[3/4.5] w-full overflow-hidden rounded-lg border border-gray-100 bg-gray-50 shadow-sm">
+            <div className="relative aspect-[3/4.5] w-full overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
               <Skeleton className="h-full w-full" />
             </div>
             <div className="mt-2.5 space-y-1.5">

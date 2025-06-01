@@ -87,7 +87,7 @@ export function AvatarUpload({
             type="button"
             onClick={handleRemoveAvatar}
             aria-label="프로필 이미지 삭제"
-            className="absolute -top-2 -right-2 flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300 active:bg-gray-400"
+            className="absolute -top-2 -right-2 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 transition-colors hover:bg-gray-300 active:bg-gray-400"
           >
             <X className="h-4 w-4" />
           </button>

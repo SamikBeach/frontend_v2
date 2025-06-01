@@ -34,6 +34,7 @@ function ResponsiveDialogRoot({
           onOpenChange={props.onOpenChange}
           modal={props.modal}
           repositionInputs={false}
+          fixed={true}
         >
           {children}
         </DrawerPrimitive.Root>
