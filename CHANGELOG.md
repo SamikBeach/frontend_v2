@@ -1,5 +1,20 @@
 # 🚦 CHANGELOG
 
+# [1.24.0](https://github.com/SamikBeach/frontend_v2/compare/1.23.0...1.24.0) (2025-06-01)
+
+
+### Bug Fixes
+
+* BookCard 이미지 로딩 중 검정색 배경 문제 해결 ([880b188](https://github.com/SamikBeach/frontend_v2/commit/880b188019fb40677a4d4fe13a44ee4956197c52))
+* BookCard에서 Next.js Image 로딩 시 검정색 배경 문제 해결 ([560424c](https://github.com/SamikBeach/frontend_v2/commit/560424cd5d7aeb6f77e1ccdc458b75c8788a1c8e)), closes [#f9](https://github.com/SamikBeach/frontend_v2/issues/f9) [#f3f4f6](https://github.com/SamikBeach/frontend_v2/issues/f3f4f6)
+* horizontal BookCard에서 별점 영역 justify-between 레이아웃 개선 ([b1c4f0a](https://github.com/SamikBeach/frontend_v2/commit/b1c4f0a9536d7624941f2272ee176ac873a65cb6))
+
+
+### Features
+
+* md 이상 화면에서 BookCard horizontal 모드 비활성화 ([77c05e2](https://github.com/SamikBeach/frontend_v2/commit/77c05e2121cf572731411f00c112efab336791d4))
+* 책 이미지에 좌우와 하단으로 퍼지는 그림자 효과 추가 ([a19f977](https://github.com/SamikBeach/frontend_v2/commit/a19f977432af44b83eadb759d13d0399399406d1))
+
 # [1.23.0](https://github.com/SamikBeach/frontend_v2/compare/1.22.0...1.23.0) (2025-06-01)
 
 
