@@ -11,7 +11,7 @@ import { useQueryParams } from '@/hooks';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useAtom } from 'jotai';
-import { useCallback, useEffect, useRef } from 'react';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { usePopularBooksQuery } from '../hooks';
 
 export function BooksContent() {
@@ -20,7 +20,6 @@ export function BooksContent() {
   const [, setSortOption] = useAtom(sortOptionAtom);
   const [, setTimeRange] = useAtom(timeRangeAtom);
   const openBookDetail = useBookDetailOpen();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Get books with infinite query
   const { books, hasNextPage, fetchNextPage, isLoading, isFetchingNextPage } =
@@ -43,26 +42,6 @@ export function BooksContent() {
     });
   };
 
-  // 무한스크롤 처리
-  const handleScroll = useCallback(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    const scrollHeight = document.documentElement.scrollHeight;
-    const clientHeight = window.innerHeight;
-
-    // 스크롤이 바닥에서 200px 위에 도달하면 다음 페이지 로드
-    if (scrollTop + clientHeight >= scrollHeight - 200) {
-      fetchNextPage();
-    }
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
-
-  // 스크롤 이벤트 리스너 등록
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
-
   return (
     <>
       {isLoading ? (
@@ -70,7 +49,19 @@ export function BooksContent() {
           <LoadingSpinner />
         </div>
       ) : books && books.length > 0 ? (
-        <div ref={scrollContainerRef}>
+        <InfiniteScroll
+          dataLength={books.length}
+          next={fetchNextPage}
+          hasMore={hasNextPage}
+          loader={
+            <div className="my-8 flex justify-center">
+              <LoadingSpinner size="md" />
+            </div>
+          }
+          scrollThreshold={0.9}
+          className="flex w-full flex-col pb-4"
+          style={{ overflow: 'visible' }} // 스크롤바 숨기기
+        >
           {isMobile ? (
             <div className="flex flex-col gap-4 px-0.5 py-1">
               {books.map(book => (
@@ -93,14 +84,7 @@ export function BooksContent() {
               ))}
             </div>
           )}
-
-          {/* 로딩 인디케이터 */}
-          {isFetchingNextPage && (
-            <div className="my-8 flex justify-center">
-              <LoadingSpinner size="md" />
-            </div>
-          )}
-        </div>
+        </InfiniteScroll>
       ) : (
         <div className="mt-8 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-12 text-center">
           <div className="text-3xl">📚</div>
