@@ -1,5 +1,17 @@
 # 🚦 CHANGELOG
 
+# [1.26.0](https://github.com/SamikBeach/frontend_v2/compare/1.25.7...1.26.0) (2025-06-01)
+
+
+### Bug Fixes
+
+* 분야별 인기 페이지 서브카테고리 동적 패딩 수정 ([6f2eb06](https://github.com/SamikBeach/frontend_v2/commit/6f2eb06509a3b063a8b4b72f7f5a5940870dfa0d))
+
+
+### Features
+
+* 필터/정렬 변경 시 스크롤 처리 개선 ([c3ad4fc](https://github.com/SamikBeach/frontend_v2/commit/c3ad4fc482ea59e2077ac55dd64e471c3568ae69))
+
 ## [1.25.7](https://github.com/SamikBeach/frontend_v2/compare/1.25.6...1.25.7) (2025-06-01)
 
 ## [1.25.6](https://github.com/SamikBeach/frontend_v2/compare/1.25.5...1.25.6) (2025-06-01)
