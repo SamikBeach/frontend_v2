@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.18.0](https://github.com/SamikBeach/frontend_v2/compare/1.17.0...1.18.0) (2025-06-01)
+
+
+### Features
+
+* 발견하기/분야별 인기 페이지 로딩 UI를 공통 스피너로 개선 ([a423948](https://github.com/SamikBeach/frontend_v2/commit/a423948f24e19ca13732a6a2ea49a6544ebcb4f3))
+
 # [1.17.0](https://github.com/SamikBeach/frontend_v2/compare/1.16.0...1.17.0) (2025-06-01)
 
 
