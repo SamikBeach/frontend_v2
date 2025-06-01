@@ -1,5 +1,23 @@
 # 🚦 CHANGELOG
 
+# [1.17.0](https://github.com/SamikBeach/frontend_v2/compare/1.16.0...1.17.0) (2025-06-01)
+
+
+### Bug Fixes
+
+* AuthDialog 헤더에서 뒤로가기 버튼과 로고 겹침 문제 해결 ([38510ce](https://github.com/SamikBeach/frontend_v2/commit/38510ceb326861db8ca6b26c78ea362fe16d810a))
+* 모바일 다이얼로그에서 키보드 등장 시 스크롤 문제 해결 ([157672c](https://github.com/SamikBeach/frontend_v2/commit/157672cdc5563543259a33af1e8aa4f7c0c54161))
+* 발견하기와 분야별 인기 페이지의 스크롤 위치 복원 문제 해결 ([746d8b4](https://github.com/SamikBeach/frontend_v2/commit/746d8b4beb6e1ca31b906d7fb437f22b5e3dcf5f))
+* 프로필 리뷰 섹션에서 댓글 개수 실시간 업데이트 기능 추가 ([838a5f6](https://github.com/SamikBeach/frontend_v2/commit/838a5f6838a891acf3c8bd23f731ce9cdc0ee548))
+* 프로필 스켈레톤에서 shadow 제거 ([19cc43f](https://github.com/SamikBeach/frontend_v2/commit/19cc43f74a0be19a713713b144879c19fe90e459))
+* 프로필 편집 다이얼로그 이미지 삭제 버튼에 cursor pointer 추가 ([baf646e](https://github.com/SamikBeach/frontend_v2/commit/baf646efafd111c0c5663e5dd89089fe64d84abf))
+
+
+### Features
+
+* HTML 엔티티 디코딩 기능 추가 ([18b6e20](https://github.com/SamikBeach/frontend_v2/commit/18b6e205d42bdd9957863d910942be6fd44777b4)), closes [#39](https://github.com/SamikBeach/frontend_v2/issues/39)
+* 서재 목록페이지 정렬버튼 반응형 브레이크포인트 조정 (xl→2xl) ([90a1f71](https://github.com/SamikBeach/frontend_v2/commit/90a1f71f880593b67e97ecc9999cf388504236a4))
+
 # [1.16.0](https://github.com/SamikBeach/frontend_v2/compare/1.15.1...1.16.0) (2025-05-31)
 
 
