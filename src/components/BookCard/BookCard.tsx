@@ -49,12 +49,12 @@ export const BookCard = React.memo(
         <div
           className={cn(
             'group w-full transition-all',
-            horizontal ? 'flex h-auto items-start' : 'h-full bg-white'
+            horizontal ? 'flex items-start' : 'h-full bg-white'
           )}
         >
           <div
             className={cn(
-              'relative flex flex-col items-center justify-end overflow-hidden rounded-md bg-white',
+              'relative flex flex-col items-center overflow-hidden rounded-md bg-white',
               horizontal
                 ? 'h-[150px] w-32 flex-shrink-0'
                 : 'aspect-[3/4.5] w-full'
@@ -73,7 +73,7 @@ export const BookCard = React.memo(
           <div
             className={cn(
               horizontal
-                ? 'flex h-full flex-1 flex-col justify-between px-2 py-0.5'
+                ? 'flex flex-1 flex-col justify-between px-2 py-0.5'
                 : 'px-2.5 pt-2.5 pb-2.5'
             )}
           >
