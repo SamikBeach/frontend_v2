@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.25.1](https://github.com/SamikBeach/frontend_v2/compare/1.25.0...1.25.1) (2025-06-01)
+
+
+### Bug Fixes
+
+* 모바일 기기에서 Next.js Image 표시 문제 해결 ([2cc6d2e](https://github.com/SamikBeach/frontend_v2/commit/2cc6d2ef0fff3bd12deeb09ef491976d2ae5e05f))
+
 # [1.25.0](https://github.com/SamikBeach/frontend_v2/compare/1.24.3...1.25.0) (2025-06-01)
 
 
