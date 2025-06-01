@@ -56,7 +56,7 @@ export const BookCard = React.memo(
         >
           <div
             className={cn(
-              'relative flex flex-col items-center overflow-hidden rounded-md border border-gray-200 bg-white',
+              'relative flex flex-col items-center overflow-hidden rounded-md border border-gray-200 bg-gray-100',
               horizontal
                 ? 'w-32 flex-shrink-0 justify-start'
                 : 'aspect-[3/4.5] w-full justify-end'
@@ -68,12 +68,12 @@ export const BookCard = React.memo(
               width={240}
               height={360}
               className={cn(
-                'rounded-md object-cover transition-transform group-hover:scale-[1.02]',
+                'rounded-md bg-gray-100 object-cover transition-transform group-hover:scale-[1.02]',
                 horizontal ? 'h-auto w-full' : 'h-full w-full object-center'
               )}
               priority={priority}
               placeholder="blur"
-              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
               sizes={
                 horizontal
                   ? '128px'
