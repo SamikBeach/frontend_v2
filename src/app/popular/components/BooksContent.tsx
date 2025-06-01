@@ -85,7 +85,7 @@ export function BooksContent() {
             key={book.id}
             book={book}
             onClick={handleBookSelect}
-            forceHorizontal={true} // 모바일에서는 horizontal, 데스크톱에서는 vertical
+            horizontal={true}
           />
         ))}
       </div>
