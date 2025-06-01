@@ -66,9 +66,10 @@ export const BookCard = React.memo(
               src={coverImage}
               alt={book.title}
               width={horizontal ? 128 : 240}
-              height={horizontal ? 192 : 360}
+              height={0}
               className={cn(
-                'rounded-md border border-gray-200 bg-gray-100 object-cover transition-transform group-hover:scale-[1.02]'
+                'rounded-md border border-gray-200 bg-gray-100 object-cover transition-transform group-hover:scale-[1.02]',
+                'h-auto w-full'
               )}
               priority={priority}
               placeholder="blur"
@@ -78,10 +79,7 @@ export const BookCard = React.memo(
                   ? '128px'
                   : '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'
               }
-              style={{
-                width: '100%',
-                height: 'auto',
-              }}
+              style={{ backgroundColor: '#f3f4f6', height: 'auto' }}
               onError={e => {
                 // 이미지 로드 실패 시 기본 이미지로 대체
                 const target = e.currentTarget as HTMLImageElement;
