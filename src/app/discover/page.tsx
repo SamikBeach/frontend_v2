@@ -15,7 +15,7 @@ import {
 } from '@/atoms/discover';
 import { useFilterScrollVisibility, useQueryParams } from '@/hooks';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
@@ -27,6 +27,7 @@ import {
   DiscoverBreadcrumb,
   DiscoverSortDropdown,
 } from './components';
+import { useDiscoverCategories } from './hooks/useDiscoverCategories';
 
 // 도서 목록 스켈레톤 컴포넌트 (실제 컨텐츠 크기에 맞춤)
 function BooksGridSkeleton() {
@@ -111,6 +112,37 @@ export default function DiscoverPage() {
   const setTimeRange = useSetAtom(discoverTimeRangeAtom);
   const setSelectedBookId = useSetAtom(selectedBookIdAtom);
 
+  // 현재 선택된 카테고리와 서브카테고리 상태 추가
+  const [categoryFilter] = useAtom(discoverCategoryFilterAtom);
+
+  // 카테고리 데이터 가져오기
+  const { categories } = useDiscoverCategories({ includeInactive: false });
+
+  // 서브카테고리가 활성화되었는지 확인하는 함수
+  const hasActiveSubcategories = () => {
+    // 카테고리가 'all'이면 서브카테고리 없음
+    if (categoryFilter === 'all') return false;
+
+    // 선택된 카테고리 찾기
+    const selectedCategory = categories.find(
+      (category: any) => category.id.toString() === categoryFilter
+    );
+
+    // 선택된 카테고리에 활성화된 서브카테고리가 있는지 확인
+    return (
+      selectedCategory?.subCategories &&
+      selectedCategory.subCategories.length > 0
+    );
+  };
+
+  // 동적 패딩 계산
+  const getContentPadding = () => {
+    if (hasActiveSubcategories()) {
+      return 'pt-[170px]'; // 기본 높이 + 서브카테고리 높이
+    }
+    return 'pt-[130px]'; // 기본 높이
+  };
+
   // URL 파라미터에서 필터 상태 초기화
   useEffect(() => {
     const category = searchParams.get('category') || DEFAULT_CATEGORY;
@@ -186,8 +218,10 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      {/* 도서 목록 - 모바일에서 필터 높이만큼 상단 여백 추가 */}
-      <div className="mx-auto w-full px-2 pt-[130px] sm:px-4 sm:pt-1">
+      {/* 도서 목록 - 모바일에서 필터 높이만큼 상단 여백 추가 (서브카테고리 고려) */}
+      <div
+        className={`mx-auto w-full px-2 ${getContentPadding()} sm:px-4 sm:pt-1`}
+      >
         <Suspense fallback={<BooksGridSkeleton />}>
           <BooksContent />
         </Suspense>

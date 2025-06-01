@@ -49,6 +49,9 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
         // 기본값인 경우 URL에서 제거
         updateQueryParams({ sort: undefined });
       }
+
+      // 스크롤을 맨 위로 이동
+      window.scrollTo({ top: 0 });
     }
   };
 
@@ -69,10 +72,16 @@ export function DiscoverSortDropdown({ className }: DiscoverSortDropdownProps) {
         // 기본값인 경우 URL에서 제거
         updateQueryParams({ timeRange: undefined });
       }
+
+      // 스크롤을 맨 위로 이동
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       setTimeRange(DEFAULT_TIME_RANGE);
       // 기본값으로 설정된 경우 URL에서 제거
       updateQueryParams({ timeRange: undefined });
+
+      // 스크롤을 맨 위로 이동
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
