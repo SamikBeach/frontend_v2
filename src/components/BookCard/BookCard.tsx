@@ -58,14 +58,16 @@ export const BookCard = React.memo(
               horizontal ? 'h-auto w-32 flex-shrink-0' : 'aspect-[3/4.5] w-full'
             )}
           >
-            <img
-              src={coverImage}
-              alt={book.title}
-              className={cn(
-                'h-auto max-h-full w-auto max-w-full rounded-md object-contain object-bottom transition-transform group-hover:scale-[1.02]'
-              )}
-              loading="lazy"
-            />
+            <div className="h-auto max-h-full w-auto max-w-full overflow-hidden rounded-md border border-gray-200">
+              <img
+                src={coverImage}
+                alt={book.title}
+                className={cn(
+                  'h-auto max-h-full w-auto max-w-full rounded-md object-contain object-bottom transition-transform group-hover:scale-[1.02]'
+                )}
+                loading="lazy"
+              />
+            </div>
           </div>
           <div
             className={cn(
