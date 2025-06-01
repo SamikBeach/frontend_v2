@@ -12,7 +12,7 @@ import {
   discoverTimeRangeAtom,
 } from '@/atoms/discover';
 import { isValidSortOption } from '@/utils/type-guards';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
 import { useAtomValue } from 'jotai';
 import { useMemo } from 'react';
 
@@ -53,7 +53,7 @@ export function useDiscoverBooksQuery(initialPageParam = 1, pageSize = 20) {
   };
 
   // Query implementation
-  const query = useInfiniteQuery<BookSearchResponse>({
+  const query = useSuspenseInfiniteQuery<BookSearchResponse>({
     queryKey: [
       'discover-books-infinite',
       discoverCategoryId,
@@ -98,8 +98,6 @@ export function useDiscoverBooksQuery(initialPageParam = 1, pageSize = 20) {
     ...query,
     books,
     hasNextPage,
-    // 캐시된 데이터가 있으면 로딩 상태를 false로 처리
-    isLoading: query.isLoading && !query.data,
     isFetchingNextPage: query.isFetchingNextPage,
   };
 }

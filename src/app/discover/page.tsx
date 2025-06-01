@@ -13,6 +13,7 @@ import {
   discoverSubcategoryFilterAtom,
   discoverTimeRangeAtom,
 } from '@/atoms/discover';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useQueryParams } from '@/hooks';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
 import { useSetAtom } from 'jotai';
@@ -27,6 +28,15 @@ import {
   DiscoverBreadcrumb,
   DiscoverSortDropdown,
 } from './components';
+
+// 도서 목록 로딩 컴포넌트
+function BooksContentLoading() {
+  return (
+    <div className="flex h-[calc(100vh-200px)] w-full items-center justify-center">
+      <LoadingSpinner size="lg" />
+    </div>
+  );
+}
 
 // 기본값 상수 정의
 const DEFAULT_CATEGORY = 'all';
@@ -116,9 +126,11 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      {/* 도서 목록 - Suspense 제거하고 BooksContent에서 직접 로딩 처리 */}
+      {/* 도서 목록 - Suspense로 감싸서 스크롤 복원 개선 */}
       <div className="mx-auto w-full px-2 pt-1 sm:px-4">
-        <BooksContent />
+        <Suspense fallback={<BooksContentLoading />}>
+          <BooksContent />
+        </Suspense>
       </div>
 
       {/* 발견하기 도서관리 버튼을 우하단에 고정 - 모바일에서는 BottomNav 위로 */}
