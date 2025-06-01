@@ -36,8 +36,8 @@ function BooksGridSkeleton() {
       <div className="flex flex-col gap-4 px-0.5 py-1 md:hidden">
         {Array.from({ length: 8 }).map((_, index) => (
           <div key={index} className="flex w-full">
-            <div className="h-[150px] w-32 flex-shrink-0">
-              <div className="h-full w-full overflow-hidden rounded-md bg-gray-50">
+            <div className="h-auto w-32 flex-shrink-0">
+              <div className="relative aspect-[3/4.5] w-full overflow-hidden rounded-md bg-gray-50">
                 <div className="h-full w-full animate-pulse bg-gray-200" />
               </div>
             </div>
