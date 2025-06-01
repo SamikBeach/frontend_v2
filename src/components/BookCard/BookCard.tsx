@@ -1,6 +1,7 @@
 'use client';
 
 import { MessageSquare, Star } from 'lucide-react';
+import Image from 'next/image';
 import React from 'react';
 
 import { Book } from '@/apis/book/types';
@@ -59,13 +60,26 @@ export const BookCard = React.memo(
             )}
           >
             <div className="h-auto max-h-full w-auto max-w-full overflow-hidden rounded-md border border-gray-200">
-              <img
+              <Image
                 src={coverImage}
                 alt={book.title}
+                width={240}
+                height={360}
                 className={cn(
                   'h-auto max-h-full w-auto max-w-full rounded-md object-contain object-bottom transition-transform group-hover:scale-[1.02]'
                 )}
-                loading="lazy"
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
+                sizes={
+                  horizontal
+                    ? '128px'
+                    : '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'
+                }
+                onError={e => {
+                  // 이미지 로드 실패 시 기본 이미지로 대체
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
+                }}
               />
             </div>
           </div>
