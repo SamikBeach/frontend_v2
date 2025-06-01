@@ -117,7 +117,7 @@ export function BookPreview({ book, onClick }: BookPreviewProps) {
         <img
           src={book.coverImage}
           alt={book.title}
-          className="h-[110px] w-[72px] rounded-lg object-cover shadow-sm"
+          className="h-[110px] w-[72px] rounded-lg object-cover shadow-[0_4px_20px_rgb(0,0,0,0.1)]"
         />
       </div>
       <div className="flex flex-1 flex-col justify-between py-1">
