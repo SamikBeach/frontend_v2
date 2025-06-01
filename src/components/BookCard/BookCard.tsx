@@ -124,56 +124,49 @@ export const BookCard = React.memo(
                 : 'aspect-[3/4.5] w-full'
             )}
           >
-            {horizontal ? (
-              <div
-                className="relative w-32 overflow-hidden rounded-md border border-gray-200"
-                style={{ aspectRatio: '3/4.5' }} // 표준 책 비율로 고정
-              >
-                {/* 로딩 스켈레톤 */}
-                {!imageLoaded && (
-                  <div className="absolute inset-0 animate-pulse bg-gray-200" />
+            <div
+              className={cn(
+                'overflow-hidden rounded-md border border-gray-200',
+                horizontal ? 'h-full w-full' : 'h-full w-full'
+              )}
+            >
+              {/* 로딩 스켈레톤 - 이미지와 동일한 크기로 표시 */}
+              {!imageLoaded && (
+                <div
+                  className={cn(
+                    'animate-pulse rounded-md bg-gray-200',
+                    'h-full w-full'
+                  )}
+                />
+              )}
+              <Image
+                src={coverImage}
+                alt={book.title}
+                width={horizontal ? horizontalSize!.width : normalSize!.width}
+                height={
+                  horizontal ? horizontalSize!.height : normalSize!.height
+                }
+                className={cn(
+                  'rounded-md object-cover transition-all duration-300 group-hover:scale-[1.02]',
+                  imageLoaded ? 'opacity-100' : 'opacity-0',
+                  'h-full w-full object-cover'
                 )}
-                <Image
-                  src={coverImage}
-                  alt={book.title}
-                  fill
-                  className={cn(
-                    'rounded-md object-cover transition-all duration-300 group-hover:scale-[1.02]',
-                    imageLoaded ? 'opacity-100' : 'opacity-0'
-                  )}
-                  placeholder="blur"
-                  blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
-                  sizes="128px"
-                  onLoad={() => setImageLoaded(true)}
-                  onError={e => {
-                    // 이미지 로드 실패 시 기본 이미지로 대체
-                    const target = e.currentTarget as HTMLImageElement;
-                    target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
-                    setImageLoaded(true);
-                  }}
-                />
-              </div>
-            ) : (
-              <div className="w-full overflow-hidden rounded-md border border-gray-200">
-                <Image
-                  src={coverImage}
-                  alt={book.title}
-                  width={240}
-                  height={360}
-                  className={cn(
-                    'h-auto w-full rounded-md object-cover transition-transform group-hover:scale-[1.02]'
-                  )}
-                  placeholder="blur"
-                  blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
-                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                  onError={e => {
-                    // 이미지 로드 실패 시 기본 이미지로 대체
-                    const target = e.currentTarget as HTMLImageElement;
-                    target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
-                  }}
-                />
-              </div>
-            )}
+                placeholder="blur"
+                blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
+                sizes={
+                  horizontal
+                    ? '128px'
+                    : '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'
+                }
+                onLoad={() => setImageLoaded(true)}
+                onError={e => {
+                  // 이미지 로드 실패 시 기본 이미지로 대체
+                  const target = e.currentTarget as HTMLImageElement;
+                  target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
+                  setImageLoaded(true);
+                }}
+              />
+            </div>
           </div>
           <div
             className={cn(
