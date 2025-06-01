@@ -56,45 +56,44 @@ export const BookCard = React.memo(
         >
           <div
             className={cn(
-              'flex flex-col items-center overflow-hidden rounded-md bg-gray-100',
+              'relative flex flex-col items-center overflow-hidden rounded-md bg-white',
               horizontal
                 ? 'w-32 flex-shrink-0 justify-start'
-                : 'w-full justify-end'
+                : 'aspect-[3/4.5] w-full justify-end'
             )}
           >
             <Image
               src={coverImage}
               alt={book.title}
-              width={horizontal ? 128 : 240}
-              height={0}
+              width={240}
+              height={360}
               className={cn(
-                'rounded-md border border-gray-200 bg-gray-100 object-cover transition-transform group-hover:scale-[1.02]',
-                'h-auto w-full'
+                'rounded-md border border-gray-200 object-cover transition-transform group-hover:scale-[1.02]',
+                horizontal ? 'h-auto w-full' : 'h-full w-full object-center'
               )}
               priority={priority}
               placeholder="blur"
-              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4K"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               sizes={
                 horizontal
                   ? '128px'
                   : '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'
               }
-              style={{ backgroundColor: '#f3f4f6', height: 'auto' }}
               onError={e => {
                 // 이미지 로드 실패 시 기본 이미지로 대체
                 const target = e.currentTarget as HTMLImageElement;
-                target.src = `https://placehold.co/${horizontal ? '128x192' : '240x360'}/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
+                target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
               }}
             />
           </div>
           <div
             className={cn(
               horizontal
-                ? 'flex h-full flex-1 flex-col justify-between px-2 py-0.5'
+                ? 'flex flex-1 flex-col justify-between px-2 py-0.5'
                 : 'px-2.5 pt-2.5 pb-2.5'
             )}
           >
-            <div className={horizontal ? 'flex-1' : ''}>
+            <div>
               <h3
                 className={cn(
                   'line-clamp-2 font-medium text-gray-900',
@@ -114,10 +113,10 @@ export const BookCard = React.memo(
             </div>
             <div
               className={cn(
-                'flex items-center gap-2 text-gray-600',
+                'flex items-center gap-2 pt-1 text-gray-600',
                 horizontal
-                  ? 'mt-auto pt-1 text-[15px] sm:text-[13px]'
-                  : 'pt-1 text-[15px] sm:text-[13px]'
+                  ? 'text-[15px] sm:text-[13px]'
+                  : 'text-[15px] sm:text-[13px]'
               )}
             >
               <div className="flex items-center gap-1">
