@@ -1,7 +1,6 @@
 'use client';
 
 import { MessageSquare, Star } from 'lucide-react';
-import Image from 'next/image';
 import React from 'react';
 
 import { Book } from '@/apis/book/types';
@@ -11,12 +10,11 @@ interface BookCardProps {
   book: Book;
   onClick?: (book: Book) => void;
   horizontal?: boolean;
-  priority?: boolean; // 이미지 우선 로딩 여부
 }
 
 // React.memo를 사용하여 props가 변경되지 않으면 리렌더링 방지
 export const BookCard = React.memo(
-  ({ book, onClick, horizontal = false, priority = false }: BookCardProps) => {
+  ({ book, onClick, horizontal = false }: BookCardProps) => {
     // 책 표지 이미지 - 없으면 기본 이미지 제공
     const coverImage =
       book.coverImage || `https://picsum.photos/seed/${book.id}/240/360`;
@@ -51,43 +49,25 @@ export const BookCard = React.memo(
         <div
           className={cn(
             'group w-full transition-all',
-            horizontal ? 'flex items-start' : 'h-full bg-white'
+            horizontal ? 'flex h-auto items-start' : 'h-full bg-white'
           )}
         >
           <div
             className={cn(
-              'flex flex-col items-center overflow-hidden rounded-md bg-gray-100',
-              horizontal
-                ? 'w-32 flex-shrink-0 justify-start'
-                : 'w-full justify-end'
+              'relative flex flex-col items-center justify-end overflow-hidden rounded-md bg-white',
+              horizontal ? 'h-auto w-32 flex-shrink-0' : 'aspect-[3/4.5] w-full'
             )}
           >
-            <Image
-              src={coverImage}
-              alt={book.title}
-              width={horizontal ? 128 : 240}
-              height={horizontal ? 192 : 360}
-              className={cn(
-                'rounded-md border border-gray-200 bg-gray-100 object-cover transition-transform group-hover:scale-[1.02]'
-              )}
-              priority={priority}
-              placeholder="blur"
-              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4K"
-              sizes={
-                horizontal
-                  ? '128px'
-                  : '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'
-              }
-              style={{
-                width: '100%',
-                height: 'auto',
-              }}
-              onError={e => {
-                // 이미지 로드 실패 시 기본 이미지로 대체
-                const target = e.currentTarget as HTMLImageElement;
-                target.src = `https://placehold.co/${horizontal ? '128x192' : '240x360'}/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
-              }}
-            />
+            <div className="h-auto max-h-full w-auto max-w-full overflow-hidden rounded-md border border-gray-200">
+              <img
+                src={coverImage}
+                alt={book.title}
+                className={cn(
+                  'h-auto max-h-full w-auto max-w-full rounded-md object-contain object-bottom transition-transform group-hover:scale-[1.02]'
+                )}
+                loading="lazy"
+              />
+            </div>
           </div>
           <div
             className={cn(
@@ -96,11 +76,13 @@ export const BookCard = React.memo(
                 : 'px-2.5 pt-2.5 pb-2.5'
             )}
           >
-            <div className={horizontal ? 'flex-1' : ''}>
+            <div>
               <h3
                 className={cn(
                   'line-clamp-2 font-medium text-gray-900',
-                  'text-base sm:text-[15px]'
+                  horizontal
+                    ? 'text-base sm:text-[15px]'
+                    : 'text-base sm:text-[15px]'
                 )}
               >
                 {book.title}
@@ -108,7 +90,9 @@ export const BookCard = React.memo(
               <p
                 className={cn(
                   'mt-0.5 line-clamp-2 text-gray-500',
-                  'text-sm sm:text-[13px]'
+                  horizontal
+                    ? 'text-sm sm:text-[13px]'
+                    : 'text-sm sm:text-[13px]'
                 )}
               >
                 {book.author}
@@ -116,10 +100,10 @@ export const BookCard = React.memo(
             </div>
             <div
               className={cn(
-                'flex items-center gap-2 text-gray-600',
+                'flex items-center gap-2 pt-1 text-gray-600',
                 horizontal
-                  ? 'mt-auto pt-1 text-[15px] sm:text-[13px]'
-                  : 'pt-1 text-[15px] sm:text-[13px]'
+                  ? 'text-[15px] sm:text-[13px]'
+                  : 'text-[15px] sm:text-[13px]'
               )}
             >
               <div className="flex items-center gap-1">
