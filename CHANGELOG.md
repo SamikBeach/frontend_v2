@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.20.1](https://github.com/SamikBeach/frontend_v2/compare/1.20.0...1.20.1) (2025-06-01)
+
+
+### Bug Fixes
+
+* 하이드레이션 불일치로 인한 스크롤 위치 복원 문제 해결 ([7467aab](https://github.com/SamikBeach/frontend_v2/commit/7467aab95cf9669b37759b208725885fd915b56f))
+
 # [1.20.0](https://github.com/SamikBeach/frontend_v2/compare/1.19.0...1.20.0) (2025-06-01)
 
 
