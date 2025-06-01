@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.25.2](https://github.com/SamikBeach/frontend_v2/compare/1.25.1...1.25.2) (2025-06-01)
+
+
+### Bug Fixes
+
+* fix next.config.mjs ([57ae5f9](https://github.com/SamikBeach/frontend_v2/commit/57ae5f99aed37a6e154d63a99582abc97190bb4a))
+
 ## [1.25.1](https://github.com/SamikBeach/frontend_v2/compare/1.25.0...1.25.1) (2025-06-01)
 
 
