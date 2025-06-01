@@ -1,6 +1,7 @@
 'use client';
 
 import { MessageSquare, Star } from 'lucide-react';
+import Image from 'next/image';
 import React from 'react';
 
 import { Book } from '@/apis/book/types';
@@ -10,11 +11,12 @@ interface BookCardProps {
   book: Book;
   onClick?: (book: Book) => void;
   horizontal?: boolean;
+  priority?: boolean; // 이미지 우선 로딩 여부
 }
 
 // React.memo를 사용하여 props가 변경되지 않으면 리렌더링 방지
 export const BookCard = React.memo(
-  ({ book, onClick, horizontal = false }: BookCardProps) => {
+  ({ book, onClick, horizontal = false, priority = false }: BookCardProps) => {
     // 책 표지 이미지 - 없으면 기본 이미지 제공
     const coverImage =
       book.coverImage || `https://picsum.photos/seed/${book.id}/240/360`;
@@ -56,18 +58,32 @@ export const BookCard = React.memo(
             className={cn(
               'relative flex flex-col items-center overflow-hidden rounded-md bg-white',
               horizontal
-                ? 'h-48 w-32 flex-shrink-0 justify-start md:h-auto md:max-h-none'
+                ? 'w-32 flex-shrink-0 justify-start'
                 : 'aspect-[3/4.5] w-full justify-end'
             )}
           >
-            <img
+            <Image
               src={coverImage}
               alt={book.title}
+              width={240}
+              height={360}
               className={cn(
-                'rounded-md object-cover transition-transform group-hover:scale-[1.02]',
+                'rounded-md border border-gray-200 object-cover transition-transform group-hover:scale-[1.02]',
                 horizontal ? 'h-auto w-full' : 'h-full w-full object-center'
               )}
-              loading="lazy"
+              priority={priority}
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+              sizes={
+                horizontal
+                  ? '128px'
+                  : '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'
+              }
+              onError={e => {
+                // 이미지 로드 실패 시 기본 이미지로 대체
+                const target = e.currentTarget as HTMLImageElement;
+                target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
+              }}
             />
           </div>
           <div
