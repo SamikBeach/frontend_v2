@@ -2,7 +2,7 @@
 
 import { MessageSquare, Star } from 'lucide-react';
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Book } from '@/apis/book/types';
 import { cn } from '@/lib/utils';
@@ -16,6 +16,8 @@ interface BookCardProps {
 // React.memo를 사용하여 props가 변경되지 않으면 리렌더링 방지
 export const BookCard = React.memo(
   ({ book, onClick, horizontal = false }: BookCardProps) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+
     // 책 표지 이미지 - 없으면 기본 이미지 제공
     const coverImage =
       book.coverImage || `https://picsum.photos/seed/${book.id}/240/360`;
@@ -60,22 +62,31 @@ export const BookCard = React.memo(
             )}
           >
             {horizontal ? (
-              <div className="w-full overflow-hidden rounded-md border border-gray-200">
+              <div
+                className="relative w-32 overflow-hidden rounded-md border border-gray-200"
+                style={{ aspectRatio: '3/4.5' }} // 표준 책 비율로 고정
+              >
+                {/* 로딩 스켈레톤 */}
+                {!imageLoaded && (
+                  <div className="absolute inset-0 animate-pulse bg-gray-200" />
+                )}
                 <Image
                   src={coverImage}
                   alt={book.title}
-                  width={128}
-                  height={192}
+                  fill
                   className={cn(
-                    'h-auto w-full rounded-md object-cover transition-transform group-hover:scale-[1.02]'
+                    'rounded-md object-cover transition-all duration-300 group-hover:scale-[1.02]',
+                    imageLoaded ? 'opacity-100' : 'opacity-0'
                   )}
                   placeholder="blur"
                   blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
                   sizes="128px"
+                  onLoad={() => setImageLoaded(true)}
                   onError={e => {
                     // 이미지 로드 실패 시 기본 이미지로 대체
                     const target = e.currentTarget as HTMLImageElement;
                     target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
+                    setImageLoaded(true);
                   }}
                 />
               </div>
