@@ -56,10 +56,10 @@ export const BookCard = React.memo(
         >
           <div
             className={cn(
-              'relative flex flex-col items-center overflow-hidden rounded-md bg-gray-100',
+              'flex flex-col items-center overflow-hidden rounded-md bg-gray-100',
               horizontal
                 ? 'w-32 flex-shrink-0 justify-start'
-                : 'aspect-[3/4.5] w-full justify-end'
+                : 'w-full justify-end'
             )}
           >
             <Image
@@ -68,8 +68,7 @@ export const BookCard = React.memo(
               width={horizontal ? 128 : 240}
               height={horizontal ? 192 : 360}
               className={cn(
-                'rounded-md border border-gray-200 bg-gray-100 object-cover transition-transform group-hover:scale-[1.02]',
-                horizontal ? 'h-auto w-full' : 'h-full w-full object-center'
+                'rounded-md border border-gray-200 bg-gray-100 object-cover transition-transform group-hover:scale-[1.02]'
               )}
               priority={priority}
               placeholder="blur"
@@ -79,7 +78,10 @@ export const BookCard = React.memo(
                   ? '128px'
                   : '(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw'
               }
-              style={{ backgroundColor: '#f3f4f6' }}
+              style={{
+                width: '100%',
+                height: 'auto',
+              }}
               onError={e => {
                 // 이미지 로드 실패 시 기본 이미지로 대체
                 const target = e.currentTarget as HTMLImageElement;
