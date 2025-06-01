@@ -64,7 +64,7 @@ export const BookCard = React.memo(
               src={coverImage}
               alt={book.title}
               className={cn(
-                'rounded-md object-cover transition-transform group-hover:scale-[1.02]',
+                'rounded-md border border-gray-200 object-cover transition-transform group-hover:scale-[1.02]',
                 horizontal ? 'h-auto w-full' : 'h-full w-full object-center'
               )}
               loading="lazy"
