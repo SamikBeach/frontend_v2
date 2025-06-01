@@ -43,15 +43,11 @@ export function BookGrid({ books, onBookSelect }: BookGridProps) {
           bookData.isbn13 = book.isbn13;
         }
 
-        // 첫 번째 행의 이미지들을 우선 로딩 (반응형 고려)
-        const isPriority = index < 6; // 최대 6개까지 우선 로딩
-
         return (
           <BookCard
             key={book.id}
             book={bookData as Book}
             onClick={onBookSelect}
-            priority={isPriority}
           />
         );
       })}
