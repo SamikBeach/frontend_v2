@@ -65,8 +65,8 @@ export const BookCard = React.memo(
             <Image
               src={coverImage}
               alt={book.title}
-              width={240}
-              height={360}
+              width={horizontal ? 128 : 240}
+              height={horizontal ? 192 : 360}
               className={cn(
                 'rounded-md border border-gray-200 bg-gray-100 object-cover transition-transform group-hover:scale-[1.02]',
                 horizontal ? 'h-auto w-full' : 'h-full w-full object-center'
@@ -83,7 +83,7 @@ export const BookCard = React.memo(
               onError={e => {
                 // 이미지 로드 실패 시 기본 이미지로 대체
                 const target = e.currentTarget as HTMLImageElement;
-                target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
+                target.src = `https://placehold.co/${horizontal ? '128x192' : '240x360'}/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
               }}
             />
           </div>
