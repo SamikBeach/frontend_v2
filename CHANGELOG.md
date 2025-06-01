@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.27.0](https://github.com/SamikBeach/frontend_v2/compare/1.26.0...1.27.0) (2025-06-01)
+
+
+### Features
+
+* 필터/정렬 변경 시 스크롤 위치를 useEffect에서 처리하도록 변경 ([7c95f38](https://github.com/SamikBeach/frontend_v2/commit/7c95f385647b75238cf68766ee66287d78751895))
+
 # [1.26.0](https://github.com/SamikBeach/frontend_v2/compare/1.25.7...1.26.0) (2025-06-01)
 
 
