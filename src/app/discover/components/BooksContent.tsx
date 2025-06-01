@@ -69,7 +69,7 @@ export function BooksContent() {
             key={book.id}
             book={book}
             onClick={handleBookSelect}
-            forceHorizontal={true}
+            horizontal={true}
           />
         ))}
       </div>
