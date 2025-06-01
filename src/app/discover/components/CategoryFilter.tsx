@@ -91,6 +91,9 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
         subcategory: undefined,
       });
     }
+
+    // 스크롤을 맨 위로 이동
+    window.scrollTo({ top: 0 });
   };
 
   const handleSubcategoryClick = (subcategoryId: string) => {
@@ -107,6 +110,9 @@ export const CategoryFilter = ({ className }: CategoryFilterProps) => {
         subcategory: undefined,
       });
     }
+
+    // 스크롤을 맨 위로 이동
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // 카테고리별 색상 가져오기

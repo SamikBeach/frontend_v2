@@ -142,6 +142,8 @@ export function useLibraries(): UseLibrariesResult {
   const handleSortChange = useCallback(
     (sortId: string) => {
       setSortOption(sortId);
+      // 스크롤을 맨 위로 이동
+      window.scrollTo({ top: 0 });
     },
     [setSortOption]
   );
@@ -149,6 +151,8 @@ export function useLibraries(): UseLibrariesResult {
   const handleTimeRangeChange = useCallback(
     (newTimeRange: TimeRangeOptions) => {
       setTimeRange(newTimeRange);
+      // 스크롤을 맨 위로 이동
+      window.scrollTo({ top: 0 });
     },
     [setTimeRange]
   );
@@ -156,6 +160,8 @@ export function useLibraries(): UseLibrariesResult {
   const handleSearchChange = useCallback(
     (value: string) => {
       setSearchQuery(value);
+      // 스크롤을 맨 위로 이동
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     [setSearchQuery]
   );
