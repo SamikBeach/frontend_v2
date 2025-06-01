@@ -89,11 +89,11 @@ export const BookCard = React.memo(
           <div
             className={cn(
               horizontal
-                ? 'flex flex-1 flex-col justify-between px-2 py-0.5'
+                ? 'flex h-full flex-1 flex-col justify-between px-2 py-0.5'
                 : 'px-2.5 pt-2.5 pb-2.5'
             )}
           >
-            <div>
+            <div className={horizontal ? 'flex-1' : ''}>
               <h3
                 className={cn(
                   'line-clamp-2 font-medium text-gray-900',
@@ -113,10 +113,10 @@ export const BookCard = React.memo(
             </div>
             <div
               className={cn(
-                'flex items-center gap-2 pt-1 text-gray-600',
+                'flex items-center gap-2 text-gray-600',
                 horizontal
-                  ? 'text-[15px] sm:text-[13px]'
-                  : 'text-[15px] sm:text-[13px]'
+                  ? 'mt-auto pt-1 text-[15px] sm:text-[13px]'
+                  : 'pt-1 text-[15px] sm:text-[13px]'
               )}
             >
               <div className="flex items-center gap-1">
