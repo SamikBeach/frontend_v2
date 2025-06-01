@@ -1,6 +1,7 @@
 'use client';
 
 import { TimeRangeOptions } from '@/apis/library/types';
+import { useFilterScrollVisibility } from '@/hooks';
 import { SortOption } from '../../types';
 import { FilterBar, SearchBar, SortDropdown } from './';
 
@@ -23,8 +24,15 @@ export function Header({
   onTimeRangeChange,
   onSearchChange,
 }: HeaderProps) {
+  // 필터 스크롤 가시성 훅 추가
+  const [showFilter] = useFilterScrollVisibility();
+
   return (
-    <div className="bg-white md:sticky md:top-[56px] md:z-30">
+    <div
+      className={`bg-white transition-transform duration-300 sm:translate-y-0 md:sticky md:top-[56px] md:z-30 ${
+        showFilter ? 'translate-y-0' : '-translate-y-[150%]'
+      } fixed top-[56px] right-0 left-0 z-20 sm:relative sm:top-0`}
+    >
       <div className="w-full pt-2 pb-1 md:px-4 md:pt-4 md:pb-2">
         <div className="relative">
           {/* 2xl 이상 화면에서 보이는 검색바와 정렬 버튼 */}

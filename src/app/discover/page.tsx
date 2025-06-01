@@ -13,7 +13,7 @@ import {
   discoverSubcategoryFilterAtom,
   discoverTimeRangeAtom,
 } from '@/atoms/discover';
-import { useQueryParams } from '@/hooks';
+import { useFilterScrollVisibility, useQueryParams } from '@/hooks';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
 import { useSetAtom } from 'jotai';
 import { useSearchParams } from 'next/navigation';
@@ -101,6 +101,9 @@ export default function DiscoverPage() {
   const searchParams = useSearchParams();
   const { updateQueryParams, clearQueryParams } = useQueryParams();
 
+  // 필터 스크롤 가시성 훅 추가
+  const [showFilter] = useFilterScrollVisibility();
+
   // Atom setters
   const setCategoryFilter = useSetAtom(discoverCategoryFilterAtom);
   const setSubcategoryFilter = useSetAtom(discoverSubcategoryFilterAtom);
@@ -143,8 +146,12 @@ export default function DiscoverPage() {
 
   return (
     <div className="w-full bg-white pb-1">
-      {/* 필터 영역 및 브레드크럼 - 모바일에선 상단 고정 해제, 데스크탑만 sticky */}
-      <div className="w-full bg-white md:sticky md:top-[56px] md:z-30">
+      {/* 필터 영역 및 브레드크럼 - 모바일에서 스크롤에 따라 보임/숨김 */}
+      <div
+        className={`w-full bg-white transition-transform duration-300 sm:translate-y-0 md:sticky md:top-[56px] md:z-30 ${
+          showFilter ? 'translate-y-0' : '-translate-y-[150%]'
+        } fixed top-[56px] right-0 left-0 z-30 sm:relative sm:top-0`}
+      >
         {/* 브레드크럼 */}
         <div className="mx-auto w-full px-3 py-2 sm:px-4 sm:py-2 sm:pt-4">
           <Suspense fallback={<div className="h-5 md:h-6" />}>
@@ -179,8 +186,8 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      {/* 도서 목록 - 프로필 페이지와 동일한 Suspense 구조 */}
-      <div className="mx-auto w-full px-2 pt-1 sm:px-4">
+      {/* 도서 목록 - 모바일에서 필터 높이만큼 상단 여백 추가 */}
+      <div className="mx-auto w-full px-2 pt-[130px] sm:px-4 sm:pt-1">
         <Suspense fallback={<BooksGridSkeleton />}>
           <BooksContent />
         </Suspense>
