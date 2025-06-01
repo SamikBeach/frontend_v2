@@ -97,10 +97,14 @@ function CommunityContent() {
   // 필터 변경 핸들러
   const handleTypeFilterChange = (type: ReviewType | 'all') => {
     setTypeFilter(type);
+    // 스크롤 위치를 맨 위로 이동
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSortOptionChange = (sort: 'popular' | 'latest' | 'following') => {
     setSortOption(sort);
+    // 스크롤 위치를 맨 위로 이동
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

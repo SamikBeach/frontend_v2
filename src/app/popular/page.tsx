@@ -14,9 +14,13 @@ import {
   timeRangeAtom,
 } from '@/atoms/popular';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useFilterScrollVisibility, useQueryParams } from '@/hooks';
+import {
+  useCategories,
+  useFilterScrollVisibility,
+  useQueryParams,
+} from '@/hooks';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
-import { useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
@@ -128,6 +132,37 @@ export default function PopularPage() {
   const setTimeRange = useSetAtom(timeRangeAtom);
   const setSelectedBookId = useSetAtom(selectedBookIdAtom);
 
+  // 현재 선택된 카테고리와 서브카테고리 상태 추가
+  const [categoryFilter] = useAtom(categoryFilterAtom);
+
+  // 카테고리 데이터 가져오기
+  const categories = useCategories();
+
+  // 서브카테고리가 활성화되었는지 확인하는 함수
+  const hasActiveSubcategories = () => {
+    // 카테고리가 'all'이면 서브카테고리 없음
+    if (categoryFilter === 'all') return false;
+
+    // 선택된 카테고리 찾기 (문자열 ID로 비교)
+    const selectedCategory = categories.find(
+      category => category.id === categoryFilter
+    );
+
+    // 선택된 카테고리에 활성화된 서브카테고리가 있는지 확인
+    return (
+      selectedCategory?.subcategories &&
+      selectedCategory.subcategories.length > 0
+    );
+  };
+
+  // 동적 패딩 계산
+  const getContentPadding = () => {
+    if (hasActiveSubcategories()) {
+      return 'pt-[170px]'; // 기본 높이 + 서브카테고리 높이
+    }
+    return 'pt-[130px]'; // 기본 높이
+  };
+
   // URL 파라미터에서 필터 상태 초기화
   useEffect(() => {
     const category = searchParams.get('category') || DEFAULT_CATEGORY;
@@ -150,6 +185,13 @@ export default function PopularPage() {
     setSortOption(sort);
     setTimeRange(timeRange);
     if (bookId) setSelectedBookId(bookId);
+
+    // 필터나 정렬이 변경되었을 때 스크롤 위치를 맨 위로 이동
+    // 초기 로드가 아닌 경우에만 스크롤 이동
+    const isInitialLoad = !searchParams.toString();
+    if (!isInitialLoad) {
+      window.scrollTo({ top: 0 });
+    }
   }, [
     searchParams,
     updateQueryParams,
@@ -198,8 +240,10 @@ export default function PopularPage() {
         </div>
       </div>
 
-      {/* 도서 목록 - 모바일에서 필터 높이만큼 상단 여백 추가 */}
-      <div className="mx-auto w-full px-2 pt-[130px] sm:px-4 sm:pt-1">
+      {/* 도서 목록 - 모바일에서 필터 높이만큼 상단 여백 추가 (서브카테고리 고려) */}
+      <div
+        className={`mx-auto w-full px-2 ${getContentPadding()} sm:px-4 sm:pt-1`}
+      >
         <Suspense fallback={<BooksGridSkeleton />}>
           <BooksContent />
         </Suspense>
