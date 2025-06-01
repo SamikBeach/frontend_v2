@@ -14,6 +14,8 @@ export interface Book {
   isbn13?: string;
   description: string;
   coverImage: string;
+  coverImageWidth?: number;
+  coverImageHeight?: number;
   rating: number;
   reviews: number;
   publisher: string;
@@ -48,6 +50,8 @@ export interface CreateBookDto {
   isbn13?: string;
   description: string;
   coverImage: string;
+  coverImageWidth?: number;
+  coverImageHeight?: number;
   publisher: string;
   publishDate: Date;
   categoryId: number;
@@ -60,6 +64,8 @@ export interface UpdateBookDto {
   author?: string;
   description?: string;
   coverImage?: string;
+  coverImageWidth?: number;
+  coverImageHeight?: number;
   rating?: number;
   reviews?: number;
   categoryId?: number;
@@ -127,6 +133,8 @@ export interface HomeBookPreview {
   title: string;
   author: string;
   coverImage: string;
+  coverImageWidth?: number;
+  coverImageHeight?: number;
   rating: number;
   isbn: string;
   isbn13?: string;
@@ -155,6 +163,8 @@ export interface BookResponse {
   isbn13?: string;
   description: string;
   coverImage: string;
+  coverImageWidth?: number;
+  coverImageHeight?: number;
   rating: number;
   reviews: number;
   publisher: string;
