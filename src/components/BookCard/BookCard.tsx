@@ -56,7 +56,7 @@ export const BookCard = React.memo(
         >
           <div
             className={cn(
-              'relative flex flex-col items-center overflow-hidden rounded-md bg-white',
+              'relative flex flex-col items-center overflow-hidden rounded-md border border-gray-200 bg-white',
               horizontal
                 ? 'w-32 flex-shrink-0 justify-start'
                 : 'aspect-[3/4.5] w-full justify-end'
@@ -68,7 +68,7 @@ export const BookCard = React.memo(
               width={240}
               height={360}
               className={cn(
-                'rounded-md border border-gray-200 object-cover transition-transform group-hover:scale-[1.02]',
+                'rounded-md object-cover transition-transform group-hover:scale-[1.02]',
                 horizontal ? 'h-auto w-full' : 'h-full w-full object-center'
               )}
               priority={priority}
