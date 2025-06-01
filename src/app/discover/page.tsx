@@ -13,7 +13,6 @@ import {
   discoverSubcategoryFilterAtom,
   discoverTimeRangeAtom,
 } from '@/atoms/discover';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useQueryParams } from '@/hooks';
 import { isValidSortOption, isValidTimeRange } from '@/utils/type-guards';
 import { useSetAtom } from 'jotai';
@@ -29,12 +28,66 @@ import {
   DiscoverSortDropdown,
 } from './components';
 
-// 도서 목록 로딩 컴포넌트
-function BooksContentLoading() {
+// 도서 목록 스켈레톤 컴포넌트 (실제 컨텐츠 크기에 맞춤)
+function BooksGridSkeleton() {
   return (
-    <div className="flex h-[calc(100vh-200px)] w-full items-center justify-center">
-      <LoadingSpinner size="lg" />
-    </div>
+    <>
+      {/* 모바일: horizontal 카드 스켈레톤 */}
+      <div className="flex flex-col gap-4 px-0.5 py-1 md:hidden">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div key={index} className="flex w-full">
+            <div className="h-auto w-32 flex-shrink-0">
+              <div className="relative aspect-[3/4.5] w-full overflow-hidden rounded-md bg-gray-50">
+                <div className="h-full w-full animate-pulse bg-gray-200" />
+              </div>
+            </div>
+            <div className="flex h-full flex-1 flex-col justify-between px-2 py-0.5">
+              <div>
+                <div className="h-5 w-full animate-pulse rounded bg-gray-200" />
+                <div className="mt-1 h-4 w-[70%] animate-pulse rounded bg-gray-200" />
+              </div>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="flex items-center gap-1">
+                  <div className="h-[18px] w-[18px] animate-pulse rounded-full bg-gray-200" />
+                  <div className="h-4 w-12 animate-pulse rounded bg-gray-200" />
+                </div>
+                <div className="flex items-center gap-1">
+                  <div className="h-[18px] w-[18px] animate-pulse rounded-full bg-gray-200" />
+                  <div className="h-4 w-8 animate-pulse rounded bg-gray-200" />
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 데스크톱: 그리드 카드 스켈레톤 */}
+      <div className="hidden grid-cols-2 gap-3 sm:grid-cols-2 md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {Array.from({ length: 20 }).map((_, index) => (
+          <div key={index} className="flex h-full w-full flex-col">
+            <div className="h-full w-full">
+              <div className="relative aspect-[3/4.5] w-full overflow-hidden rounded-md border border-gray-100 bg-gray-50">
+                <div className="h-full w-full animate-pulse bg-gray-200" />
+              </div>
+              <div className="px-2.5 pt-2.5 pb-2.5">
+                <div className="h-5 w-full animate-pulse rounded bg-gray-200" />
+                <div className="mt-1 h-4 w-[70%] animate-pulse rounded bg-gray-200" />
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <div className="h-3.5 w-3.5 animate-pulse rounded-full bg-gray-200" />
+                    <div className="h-3 w-12 animate-pulse rounded bg-gray-200" />
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <div className="h-3.5 w-3.5 animate-pulse rounded-full bg-gray-200" />
+                    <div className="h-3 w-8 animate-pulse rounded bg-gray-200" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -126,9 +179,9 @@ export default function DiscoverPage() {
         </div>
       </div>
 
-      {/* 도서 목록 - Suspense로 감싸서 스크롤 복원 개선 */}
+      {/* 도서 목록 - 프로필 페이지와 동일한 Suspense 구조 */}
       <div className="mx-auto w-full px-2 pt-1 sm:px-4">
-        <Suspense fallback={<BooksContentLoading />}>
+        <Suspense fallback={<BooksGridSkeleton />}>
           <BooksContent />
         </Suspense>
       </div>
