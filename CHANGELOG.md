@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.20.0](https://github.com/SamikBeach/frontend_v2/compare/1.19.0...1.20.0) (2025-06-01)
+
+
+### Features
+
+* 발견하기/분야별 인기 페이지 스크롤 위치 복원 개선 ([bba35bd](https://github.com/SamikBeach/frontend_v2/commit/bba35bd3020820d0230f972bfb20a9e121a75d8f))
+
 # [1.19.0](https://github.com/SamikBeach/frontend_v2/compare/1.18.0...1.19.0) (2025-06-01)
 
 
