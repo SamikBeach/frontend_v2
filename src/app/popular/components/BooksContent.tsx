@@ -81,12 +81,22 @@ export function BooksContent() {
       {/* 모바일: flex-col (horizontal 카드), 데스크톱: grid */}
       <div className="flex flex-col gap-4 px-0.5 py-1 md:grid md:grid-cols-3 md:gap-3 md:px-0 md:py-0 lg:grid-cols-4 xl:grid-cols-5">
         {books.map(book => (
-          <BookCard
-            key={book.id}
-            book={book}
-            onClick={handleBookSelect}
-            horizontal={true}
-          />
+          <div key={book.id} className="md:hidden">
+            <BookCard
+              book={book}
+              onClick={handleBookSelect}
+              horizontal={true}
+            />
+          </div>
+        ))}
+        {books.map(book => (
+          <div key={`desktop-${book.id}`} className="hidden md:block">
+            <BookCard
+              book={book}
+              onClick={handleBookSelect}
+              horizontal={false}
+            />
+          </div>
         ))}
       </div>
     </InfiniteScroll>
