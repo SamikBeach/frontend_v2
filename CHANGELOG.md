@@ -1,5 +1,19 @@
 # 🚦 CHANGELOG
 
+# [1.28.0](https://github.com/SamikBeach/frontend_v2/compare/1.27.0...1.28.0) (2025-06-02)
+
+
+### Bug Fixes
+
+* 모바일 BookDialog에서 중복된 close 버튼 제거 ([b6f7cab](https://github.com/SamikBeach/frontend_v2/commit/b6f7caba6fb4109b6bbfd810bd1ace5bc3f3a2b8))
+* 중간 크기 화면에서 bottom navigation 표시 문제 해결 ([b8d1033](https://github.com/SamikBeach/frontend_v2/commit/b8d103382d6c35af326ba7d54ba0cb11d59812dd))
+
+
+### Features
+
+* BookDialog와 책 상세페이지 이탈 시 정렬 상태 초기화 ([5316824](https://github.com/SamikBeach/frontend_v2/commit/5316824c55d049b15572be60b65e2fc253642162))
+* 커뮤니티 페이지에 쿼리 파라미터 연동 및 메뉴 구조 개선 ([8a2f6ea](https://github.com/SamikBeach/frontend_v2/commit/8a2f6ea3a1e02115aeb3d394a4e6f77f26057fc0))
+
 # [1.27.0](https://github.com/SamikBeach/frontend_v2/compare/1.26.0...1.27.0) (2025-06-01)
 
 
