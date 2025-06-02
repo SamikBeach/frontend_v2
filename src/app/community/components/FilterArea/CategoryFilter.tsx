@@ -51,7 +51,6 @@ export function CategoryFilter({
             </button>
           ))}
         </div>
-        {/* 데스크탑용: md:flex md:flex-wrap ... 필요시 추가 */}
       </div>
     </div>
   );
