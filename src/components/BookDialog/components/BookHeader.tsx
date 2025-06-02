@@ -5,6 +5,7 @@ import {
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useBookDetails } from '../hooks';
 
 // 헤더 스켈레톤 컴포넌트
@@ -23,6 +24,7 @@ interface BookHeaderProps {
 
 export function BookHeader({ isDialog = false }: BookHeaderProps) {
   const { book } = useBookDetails();
+  const isMobile = useIsMobile();
   const bookTitle = book ? book.title : '도서 상세 정보';
 
   return (
@@ -39,7 +41,7 @@ export function BookHeader({ isDialog = false }: BookHeaderProps) {
           {bookTitle}
         </h1>
       )}
-      {isDialog && (
+      {isDialog && !isMobile && (
         <ResponsiveDialogClose className="rounded-full">
           <X className="h-4 w-4" />
         </ResponsiveDialogClose>

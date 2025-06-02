@@ -180,10 +180,7 @@ export function BookDialog() {
                   >
                     도서 상세 정보
                   </ResponsiveDialogTitle>
-                  <ResponsiveDialogHeader
-                    className="flex-shrink-0 p-0"
-                    onClose={handleClose}
-                  >
+                  <ResponsiveDialogHeader className="flex-shrink-0 p-0">
                     <BookHeader isDialog />
                   </ResponsiveDialogHeader>
                   <div className="pb-safe flex-1 overflow-y-auto">
