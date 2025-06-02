@@ -28,12 +28,10 @@ export function RecentSearchList({
           type: 'book',
           title: search.title || search.term,
           author: search.author,
-          image: search.coverImage
-            ? search.coverImage.replace(/^https?:\/\//, '//')
-            : undefined,
-          coverImage: search.coverImage
-            ? search.coverImage.replace(/^https?:\/\//, '//')
-            : undefined,
+          image: search.coverImage,
+          coverImage: search.coverImage,
+          coverImageWidth: search.coverImageWidth,
+          coverImageHeight: search.coverImageHeight,
           subtitle: search.author,
           isbn: search.isbn || '',
           isbn13: search.isbn13 || '',

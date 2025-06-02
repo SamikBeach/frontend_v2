@@ -9,6 +9,7 @@ import {
   Star,
   X,
 } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 
 interface SearchItemProps {
@@ -20,6 +21,8 @@ interface SearchItemProps {
     subtitle?: string;
     image?: string;
     coverImage?: string;
+    coverImageWidth?: number;
+    coverImageHeight?: number;
     author?: string;
     highlight?: string;
     rating?: number;
@@ -43,7 +46,7 @@ interface SearchItemProps {
 }
 
 export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
-  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   // 하이라이트 텍스트 처리
   const highlightText = (text: string, highlight?: string) => {
@@ -231,6 +234,10 @@ export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
   // 이미지 URL 선택 로직
   const imageUrl = item.coverImage || item.image || '/images/no-image.png';
 
+  // 이미지 크기 정보 (레이아웃 시프트 방지용)
+  const imageWidth = item.coverImageWidth || 240;
+  const imageHeight = item.coverImageHeight || 360;
+
   // 평점과 리뷰 정보 렌더링
   const renderRatingAndReviews = () => {
     const hasRating = item.rating !== undefined;
@@ -279,19 +286,29 @@ export function SearchItem({ item, onClick, onDelete }: SearchItemProps) {
     >
       {/* 이미지 섬네일 */}
       <div className="relative w-[110px] flex-shrink-0 overflow-hidden rounded-md border border-gray-200 bg-white md:w-[160px]">
-        {!imageError ? (
-          <img
-            src={imageUrl}
-            alt={item.title}
-            className="h-auto w-full object-contain"
-            onError={() => setImageError(true)}
-            loading="lazy"
-          />
-        ) : (
-          <div className="flex h-[130px] w-full items-center justify-center bg-gray-50 md:h-[190px]">
-            <span className="text-2xl md:text-3xl">📚</span>
-          </div>
+        {/* 로딩 스켈레톤 */}
+        {!imageLoaded && (
+          <div className="absolute inset-0 animate-pulse bg-gray-200" />
         )}
+        <Image
+          src={imageUrl}
+          alt={item.title}
+          width={imageWidth}
+          height={imageHeight}
+          className={`h-auto w-full object-cover transition-all duration-300 ${
+            imageLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          placeholder="blur"
+          blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
+          sizes="(max-width: 768px) 110px, 160px"
+          onLoad={() => setImageLoaded(true)}
+          onError={e => {
+            // 이미지 로드 실패 시 기본 이미지로 대체
+            const target = e.currentTarget as HTMLImageElement;
+            target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(item.title.slice(0, 10))}`;
+            setImageLoaded(true);
+          }}
+        />
       </div>
 
       {/* 도서 정보 */}
