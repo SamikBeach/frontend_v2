@@ -30,6 +30,8 @@ export interface SearchResult {
   author?: string;
   image?: string;
   coverImage?: string;
+  coverImageWidth?: number;
+  coverImageHeight?: number;
   highlight?: string;
   totalRatings?: number;
   rating?: number;
@@ -82,6 +84,8 @@ export interface RecentSearch {
   title?: string;
   author?: string;
   coverImage?: string;
+  coverImageWidth?: number;
+  coverImageHeight?: number;
   publisher?: string;
   description?: string;
   isbn?: string;

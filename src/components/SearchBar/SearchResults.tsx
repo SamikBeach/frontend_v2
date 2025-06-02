@@ -74,7 +74,7 @@ function RecentSearches({
             }}
           />
         ) : (
-          <div className="flex h-32 flex-col items-center justify-center px-4 py-6 text-center">
+          <div className="flex flex-col items-center justify-center px-4 py-6 text-center">
             <p className="text-sm text-gray-500">최근 검색 기록이 없습니다.</p>
           </div>
         )}
@@ -101,7 +101,7 @@ function PopularSearchesSkeleton() {
           인기 검색어 로딩 중...
         </h3>
       </div>
-      <div className="flex h-32 items-center justify-center">
+      <div className="flex items-center justify-center py-8">
         <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
       </div>
     </CommandGroup>
@@ -201,19 +201,9 @@ export function SearchResults({
   // 검색 결과 로딩 중 (첫 로딩만 전체 화면 로딩 표시)
   if (isLoading && searchResults.length === 0) {
     return (
-      <CommandPrimitive.List
-        ref={listRef}
-        className={cn(
-          'h-full !max-h-none overflow-y-auto',
-          'md:[&::-webkit-scrollbar]:w-2 md:[&::-webkit-scrollbar-thumb]:rounded-full md:[&::-webkit-scrollbar-thumb]:bg-gray-200 md:[&::-webkit-scrollbar-track]:bg-transparent'
-        )}
-      >
-        <div className="flex h-full min-h-[400px] w-full items-center justify-center">
-          <div className="flex flex-col items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
-          </div>
-        </div>
-      </CommandPrimitive.List>
+      <div className="flex h-full w-full flex-1 items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-gray-500" />
+      </div>
     );
   }
 
@@ -223,8 +213,8 @@ export function SearchResults({
   // 검색 결과 없음
   if (hasNoResults) {
     return (
-      <CommandEmpty className="py-6 text-center">
-        <div className="flex h-full min-h-[400px] w-full items-center justify-center">
+      <CommandEmpty className="flex h-full min-h-0 flex-col">
+        <div className="flex w-full flex-1 items-center justify-center">
           <div className="flex flex-col items-center justify-center py-6 text-center">
             <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
               <span className="text-4xl">📚</span>
@@ -269,12 +259,10 @@ export function SearchResults({
                 type: 'book',
                 title: book.title,
                 author: book.author,
-                image: book.coverImage
-                  ? book.coverImage.replace(/^https?:\/\//, '//')
-                  : undefined,
-                coverImage: book.coverImage
-                  ? book.coverImage.replace(/^https?:\/\//, '//')
-                  : undefined,
+                image: book.coverImage,
+                coverImage: book.coverImage,
+                coverImageWidth: book.coverImageWidth,
+                coverImageHeight: book.coverImageHeight,
                 highlight: query,
                 rating: book.rating,
                 reviews: book.reviews,
