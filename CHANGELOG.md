@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.28.1](https://github.com/SamikBeach/frontend_v2/compare/1.28.0...1.28.1) (2025-06-02)
+
+
+### Bug Fixes
+
+* 검색 다이얼로그 로딩 스피너 수직 중앙정렬 완전 수정 ([7b1d4b0](https://github.com/SamikBeach/frontend_v2/commit/7b1d4b0de2b275f8d4d47a315e7cf9787f1aef61))
+
 # [1.28.0](https://github.com/SamikBeach/frontend_v2/compare/1.27.0...1.28.0) (2025-06-02)
 
 
