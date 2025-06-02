@@ -7,10 +7,11 @@ import {
 } from '@/atoms/community';
 import { ReviewCard } from '@/components/ReviewCard';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useFilterScrollVisibility } from '@/hooks';
+import { useFilterScrollVisibility, useQueryParams } from '@/hooks';
 import { cn } from '@/lib/utils';
 import { useAtom } from 'jotai';
-import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { CreateReviewCard, FilterArea } from './components';
 import { useCommunityReviews } from './hooks';
@@ -85,8 +86,15 @@ function ReviewsList() {
   );
 }
 
+// 기본값 상수 정의
+const DEFAULT_CATEGORY = 'all';
+const DEFAULT_SORT = 'latest';
+
 // 커뮤니티 메인 컨텐츠 컴포넌트
 function CommunityContent() {
+  const searchParams = useSearchParams();
+  const { updateQueryParams } = useQueryParams();
+
   // 필터 상태 atom 직접 사용
   const [typeFilter, setTypeFilter] = useAtom(communityTypeFilterAtom);
   const [sortOption, setSortOption] = useAtom(communitySortOptionAtom);
@@ -94,17 +102,32 @@ function CommunityContent() {
   // 필터 스크롤 가시성 훅 추가
   const [showFilter] = useFilterScrollVisibility();
 
+  // URL 파라미터에서 필터 상태 초기화
+  useEffect(() => {
+    const category = searchParams.get('category') || DEFAULT_CATEGORY;
+    const sort = searchParams.get('sort') || DEFAULT_SORT;
+
+    // Atoms 업데이트
+    setTypeFilter(category as ReviewType | 'all');
+    setSortOption(sort as 'popular' | 'latest' | 'following');
+
+    // 필터나 정렬이 변경되었을 때 스크롤 위치를 맨 위로 이동
+    // 초기 로드가 아닌 경우에만 스크롤 이동
+    const isInitialLoad = !searchParams.toString();
+    if (!isInitialLoad) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [searchParams, setTypeFilter, setSortOption]);
+
   // 필터 변경 핸들러
   const handleTypeFilterChange = (type: ReviewType | 'all') => {
     setTypeFilter(type);
-    // 스크롤 위치를 맨 위로 이동
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateQueryParams({ category: type === 'all' ? undefined : type });
   };
 
   const handleSortOptionChange = (sort: 'popular' | 'latest' | 'following') => {
     setSortOption(sort);
-    // 스크롤 위치를 맨 위로 이동
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateQueryParams({ sort: sort === DEFAULT_SORT ? undefined : sort });
   };
 
   return (

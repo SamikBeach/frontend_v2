@@ -19,6 +19,7 @@ import {
 import { BookInfo, BookInfoSkeleton } from './components/BookInfo';
 import { BookFullSkeleton, ErrorFallback } from './components/common';
 
+import { bookReviewSortAtom } from '@/atoms/book';
 import { hasOpenDropdownAtom } from '@/atoms/book-dialog';
 import {
   ResponsiveDialog,
@@ -27,7 +28,7 @@ import {
   ResponsiveDialogPortal,
   ResponsiveDialogTitle,
 } from '@/components/ui/responsive-dialog';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 
 // 모바일용 BookDialogContent 컴포넌트
 function MobileBookDialogContent() {
@@ -148,13 +149,23 @@ export function BookDialog() {
   // 현재 열려있는 드롭다운이 있는지 확인
   const hasOpenDropdown = useAtomValue(hasOpenDropdownAtom);
 
+  // 정렬 상태 초기화를 위한 setter
+  const setBookReviewSort = useSetAtom(bookReviewSortAtom);
+
+  // 다이얼로그 닫기 핸들러
+  const handleClose = () => {
+    // 정렬 상태 초기화 (기본값으로 리셋)
+    setBookReviewSort('likes');
+    close();
+  };
+
   // 모바일 환경에서는 ResponsiveDialog 사용, 데스크톱에서는 직접 Dialog 컴포넌트 스타일링
   if (isMobile) {
     return (
       <ResponsiveDialog
         open={isOpen}
         onOpenChange={open => {
-          if (!open) close();
+          if (!open) handleClose();
         }}
         shouldScaleBackground={false}
       >
@@ -169,10 +180,7 @@ export function BookDialog() {
                   >
                     도서 상세 정보
                   </ResponsiveDialogTitle>
-                  <ResponsiveDialogHeader
-                    className="flex-shrink-0 p-0"
-                    onClose={close}
-                  >
+                  <ResponsiveDialogHeader className="flex-shrink-0 p-0">
                     <BookHeader isDialog />
                   </ResponsiveDialogHeader>
                   <div className="pb-safe flex-1 overflow-y-auto">
@@ -192,7 +200,7 @@ export function BookDialog() {
     <DialogPrimitive.Root
       open={isOpen}
       onOpenChange={open => {
-        if (!open) close();
+        if (!open) handleClose();
       }}
     >
       <DialogPrimitive.Portal>

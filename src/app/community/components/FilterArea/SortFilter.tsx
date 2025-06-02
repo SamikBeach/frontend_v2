@@ -15,8 +15,8 @@ export function SortFilter({
 }: SortFilterProps) {
   // 정렬 옵션
   const sortOptions = [
-    { id: 'popular', name: '인기' },
     { id: 'following', name: '팔로잉' },
+    { id: 'popular', name: '인기' },
     { id: 'latest', name: '최신' },
   ];
 

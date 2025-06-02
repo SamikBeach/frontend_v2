@@ -1,4 +1,5 @@
 import { LibrarySortOption } from '@/apis/library/types';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
@@ -27,10 +28,12 @@ export function TabNavigation({
   librarySortValue = LibrarySortOption.RECENT,
   className,
 }: TabNavigationProps) {
+  const isMobile = useIsMobile();
+
   return (
     <div className={cn('space-y-2 md:space-y-0', className)}>
       {/* 탭 영역 */}
-      <div className="relative flex border-b border-gray-200">
+      <div className="flex items-center justify-between border-b border-gray-200">
         <div className="no-scrollbar flex w-full overflow-x-auto pb-1 md:pb-2">
           <button
             className={cn(
@@ -68,9 +71,35 @@ export function TabNavigation({
           </button>
         </div>
 
-        {/* 데스크톱 정렬 필터 - 절대 위치 */}
-        {activeTab === 'reviews' && (
-          <div className="absolute -top-1 right-0 hidden md:block">
+        {/* 데스크톱에서만 정렬 필터 표시 */}
+        {!isMobile && (
+          <div className="ml-4 flex flex-shrink-0">
+            {activeTab === 'reviews' && (
+              <ErrorBoundary FallbackComponent={() => null}>
+                <Suspense
+                  fallback={
+                    <div className="h-8 w-24 animate-pulse rounded-full bg-gray-200"></div>
+                  }
+                >
+                  <ReviewSortDropdown />
+                </Suspense>
+              </ErrorBoundary>
+            )}
+
+            {activeTab === 'libraries' && onLibrarySortChange && (
+              <LibrarySortDropdown
+                onChange={onLibrarySortChange}
+                value={librarySortValue}
+              />
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* 모바일에서만 정렬 필터 표시 */}
+      {isMobile && (
+        <div className="flex justify-end">
+          {activeTab === 'reviews' && (
             <ErrorBoundary FallbackComponent={() => null}>
               <Suspense
                 fallback={
@@ -80,40 +109,14 @@ export function TabNavigation({
                 <ReviewSortDropdown />
               </Suspense>
             </ErrorBoundary>
-          </div>
-        )}
+          )}
 
-        {activeTab === 'libraries' && onLibrarySortChange && (
-          <div className="absolute -top-1 right-0 hidden md:block">
+          {activeTab === 'libraries' && onLibrarySortChange && (
             <LibrarySortDropdown
               onChange={onLibrarySortChange}
               value={librarySortValue}
             />
-          </div>
-        )}
-      </div>
-
-      {/* 모바일 정렬 필터 영역 */}
-      {activeTab === 'reviews' && (
-        <div className="flex justify-end md:hidden">
-          <ErrorBoundary FallbackComponent={() => null}>
-            <Suspense
-              fallback={
-                <div className="h-8 w-24 animate-pulse rounded-full bg-gray-200"></div>
-              }
-            >
-              <ReviewSortDropdown />
-            </Suspense>
-          </ErrorBoundary>
-        </div>
-      )}
-
-      {activeTab === 'libraries' && onLibrarySortChange && (
-        <div className="flex justify-end md:hidden">
-          <LibrarySortDropdown
-            onChange={onLibrarySortChange}
-            value={librarySortValue}
-          />
+          )}
         </div>
       )}
     </div>

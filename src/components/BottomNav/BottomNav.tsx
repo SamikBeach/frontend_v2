@@ -54,7 +54,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className={`fixed right-0 bottom-0 left-0 z-50 flex h-16 w-full items-center justify-between border-t border-gray-100 bg-white px-1 transition-transform duration-300 md:hidden ${
+      className={`fixed right-0 bottom-0 left-0 z-50 flex h-16 w-full items-center justify-between border-t border-gray-100 bg-white px-1 transition-transform duration-300 lg:hidden ${
         showBottomNav ? 'translate-y-0' : 'translate-y-full'
       }`}
       role="navigation"
