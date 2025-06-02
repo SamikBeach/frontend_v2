@@ -92,7 +92,7 @@ export default async function RootLayout({
                 <SidebarProvider>
                   <Header />
                   <AppSidebar />
-                  <main className="w-full pb-14 md:pb-0">{children}</main>
+                  <main className="w-full pb-14 lg:pb-0">{children}</main>
                   <BottomNav />
                 </SidebarProvider>
                 <Toaster />
