@@ -1,5 +1,6 @@
 'use client';
 
+import { bookReviewSortAtom } from '@/atoms/book';
 import {
   BookActionButtons,
   BookCoverSection,
@@ -12,7 +13,8 @@ import {
   BookInfoSkeleton,
 } from '@/components/BookDialog/components/BookInfo';
 import { ErrorFallback } from '@/components/BookDialog/components/common';
-import { Suspense } from 'react';
+import { useSetAtom } from 'jotai';
+import { Suspense, useEffect } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 // 통합 스켈레톤 컴포넌트 (모바일/데스크톱 공통)
@@ -164,6 +166,17 @@ function BookPageContent() {
 }
 
 export default function BookPage() {
+  // 정렬 상태 초기화를 위한 setter
+  const setBookReviewSort = useSetAtom(bookReviewSortAtom);
+
+  // 페이지 이탈 시 정렬 상태 초기화
+  useEffect(() => {
+    return () => {
+      // cleanup 함수에서 정렬 상태 초기화
+      setBookReviewSort('likes');
+    };
+  }, [setBookReviewSort]);
+
   return (
     <main className="min-h-screen w-full bg-white">
       <ErrorBoundary FallbackComponent={ErrorFallback}>

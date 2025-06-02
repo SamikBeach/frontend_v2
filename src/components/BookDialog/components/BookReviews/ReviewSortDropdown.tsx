@@ -38,6 +38,9 @@ export function ReviewSortDropdown() {
   const selectedOption =
     sortOptions.find(option => option.value === sort) || sortOptions[0];
 
+  // 활성 상태 확인 (기본값이 아닌 경우)
+  const isActive = sort !== 'likes';
+
   const handleSortChange = (newSort: ReviewSortType) => {
     setSort(newSort);
     setOpen(false);
@@ -49,7 +52,12 @@ export function ReviewSortDropdown() {
         <Button
           variant="ghost"
           size="sm"
-          className="flex h-7 cursor-pointer items-center gap-1.5 rounded-full bg-gray-50 px-3 text-xs text-gray-600 hover:bg-gray-100"
+          className={
+            `flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs ` +
+            (isActive
+              ? 'border border-blue-200 bg-blue-50 text-blue-700'
+              : 'bg-gray-50 text-gray-600 hover:bg-gray-100')
+          }
         >
           <span className="mr-1 flex h-3 w-3 items-center justify-center">
             {selectedOption.icon}
@@ -59,23 +67,28 @@ export function ReviewSortDropdown() {
       </ResponsiveDropdownMenuTrigger>
       <ResponsiveDropdownMenuContent
         align="end"
-        className="w-36"
+        className="w-[140px]"
         sideOffset={8}
       >
-        {sortOptions.map(option => (
-          <ResponsiveDropdownMenuItem
-            key={option.value}
-            className={`cursor-pointer text-sm ${
-              sort === option.value ? 'text-primary font-medium' : ''
-            }`}
-            onSelect={() => handleSortChange(option.value)}
-          >
-            <span className="mr-2 inline-flex h-3.5 w-3.5 items-center justify-center">
-              {option.icon}
-            </span>
-            {option.label}
-          </ResponsiveDropdownMenuItem>
-        ))}
+        {sortOptions.map(option => {
+          const isOptionActive = sort === option.value;
+          return (
+            <ResponsiveDropdownMenuItem
+              key={option.value}
+              className={`flex cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-sm transition-colors ${
+                isOptionActive
+                  ? 'text-primary bg-blue-50 font-medium'
+                  : 'text-gray-700'
+              }`}
+              onSelect={() => handleSortChange(option.value)}
+            >
+              <span className="mr-2 inline-flex h-3.5 w-3.5 items-center justify-center">
+                {option.icon}
+              </span>
+              {option.label}
+            </ResponsiveDropdownMenuItem>
+          );
+        })}
       </ResponsiveDropdownMenuContent>
     </ResponsiveDropdownMenu>
   );
