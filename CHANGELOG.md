@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.28.2](https://github.com/SamikBeach/frontend_v2/compare/1.28.1...1.28.2) (2025-06-02)
+
+
+### Bug Fixes
+
+* scroll behavior 수정 ([f4ddb38](https://github.com/SamikBeach/frontend_v2/commit/f4ddb38907f621e8fccb7fad1b140752918c4e93))
+
 ## [1.28.1](https://github.com/SamikBeach/frontend_v2/compare/1.28.0...1.28.1) (2025-06-02)
 
 
