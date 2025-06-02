@@ -170,7 +170,7 @@ export default function DiscoverPage() {
     // 초기 로드가 아닌 경우에만 스크롤 이동
     const isInitialLoad = !searchParams.toString();
     if (!isInitialLoad) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [
     searchParams,
