@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.29.0](https://github.com/SamikBeach/frontend_v2/compare/1.28.3...1.29.0) (2025-06-03)
+
+
+### Features
+
+* 프로필 이미지 업로드 파일 크기 제한을 20MB로 증가 ([04814db](https://github.com/SamikBeach/frontend_v2/commit/04814db24dafdb3480fd664a579c6f88f97a4c2a))
+
 ## [1.28.3](https://github.com/SamikBeach/frontend_v2/compare/1.28.2...1.28.3) (2025-06-03)
 
 
