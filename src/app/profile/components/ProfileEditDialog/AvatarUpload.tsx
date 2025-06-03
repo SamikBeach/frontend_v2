@@ -30,9 +30,9 @@ export function AvatarUpload({
       return;
     }
 
-    // 파일 크기 검증 (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('5MB 이하의 이미지만 업로드할 수 있습니다.');
+    // 파일 크기 검증 (20MB)
+    if (file.size > 20 * 1024 * 1024) {
+      alert('20MB 이하의 이미지만 업로드할 수 있습니다.');
       return;
     }
 
@@ -106,7 +106,7 @@ export function AvatarUpload({
       </Button>
 
       <p className="mt-2 text-center text-xs text-gray-500">
-        5MB 이하의 이미지 파일만 업로드 가능합니다
+        20MB 이하의 이미지 파일만 업로드 가능합니다
       </p>
     </div>
   );
