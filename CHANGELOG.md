@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.28.3](https://github.com/SamikBeach/frontend_v2/compare/1.28.2...1.28.3) (2025-06-03)
+
+
+### Bug Fixes
+
+* .heic 이미지 업로드 허용 ([ce84f43](https://github.com/SamikBeach/frontend_v2/commit/ce84f43901603811bd78bc86d15d009e3f7f6ad0))
+
 ## [1.28.2](https://github.com/SamikBeach/frontend_v2/compare/1.28.1...1.28.2) (2025-06-02)
 
 
