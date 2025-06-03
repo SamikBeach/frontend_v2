@@ -66,7 +66,7 @@ export function AvatarUpload({
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
-        accept="image/*"
+        accept="image/*, .heic"
         className="hidden"
       />
 
