@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.30.1](https://github.com/SamikBeach/frontend_v2/compare/1.30.0...1.30.1) (2025-06-09)
+
+
+### Bug Fixes
+
+* 3일 이후 절대시간 표시에 시간 정보 추가 ([382180b](https://github.com/SamikBeach/frontend_v2/commit/382180b8d5bc0751e8bfa5feccd3cbe82a08a813))
+
 # [1.30.0](https://github.com/SamikBeach/frontend_v2/compare/1.29.0...1.30.0) (2025-06-09)
 
 
