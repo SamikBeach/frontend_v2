@@ -26,8 +26,8 @@ export const LibrarySidebarUpdates: FC<LibrarySidebarUpdatesProps> = ({
       });
     }
 
-    // 3일 이후는 절대시간 표시 (시간 제외)
-    return format(new Date(date), 'PPP', { locale: ko });
+    // 3일 이후는 절대시간 표시 (날짜 + 시간)
+    return format(new Date(date), 'PPP p', { locale: ko });
   };
 
   // 가장 최근 업데이트
