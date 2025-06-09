@@ -1,5 +1,5 @@
 import { UpdateHistoryItem } from '@/apis/library/types';
-import { formatDistanceToNow } from 'date-fns';
+import { differenceInDays, format, formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { Clock } from 'lucide-react';
 import { FC, ReactNode } from 'react';
@@ -13,9 +13,21 @@ export const LibrarySidebarUpdates: FC<LibrarySidebarUpdatesProps> = ({
   updates,
   renderActivityMessage,
 }) => {
-  // 상대적 시간 포맷팅 (예: "2일 전")
-  const formatRelativeTime = (date: Date): string => {
-    return formatDistanceToNow(new Date(date), { addSuffix: true, locale: ko });
+  // 스마트 시간 포맷팅 (3일 이내는 상대시간, 이후는 절대시간)
+  const formatSmartTime = (date: Date): string => {
+    const now = new Date();
+    const daysDiff = differenceInDays(now, new Date(date));
+
+    // 3일 이내는 상대시간 표시
+    if (daysDiff <= 3) {
+      return formatDistanceToNow(new Date(date), {
+        addSuffix: true,
+        locale: ko,
+      });
+    }
+
+    // 3일 이후는 절대시간 표시 (시간 제외)
+    return format(new Date(date), 'PPP', { locale: ko });
   };
 
   // 가장 최근 업데이트
@@ -47,7 +59,7 @@ export const LibrarySidebarUpdates: FC<LibrarySidebarUpdatesProps> = ({
               )}
             </div>
             <span className="mt-0.5 text-xs text-gray-500">
-              {formatRelativeTime(update.date)}
+              {formatSmartTime(update.date)}
             </span>
           </div>
         </div>

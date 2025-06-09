@@ -28,7 +28,7 @@ import {
   useReviewState,
 } from './hooks';
 import { ExtendedReviewResponseDto, ReviewCardProps } from './types';
-import { formatDate } from './utils';
+import { formatRelativeDate } from './utils';
 
 export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
   // Cast to our extended type
@@ -470,7 +470,7 @@ export function ReviewCard({ review, isDetailed }: ReviewCardProps) {
                 <div ref={commentSectionRef} className="w-full min-w-0">
                   <CommentSection
                     comments={comments}
-                    formatDate={formatDate}
+                    formatDate={formatRelativeDate}
                     currentUser={getUserForComments()}
                     commentText={commentText}
                     setCommentText={setCommentText}

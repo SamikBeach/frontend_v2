@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { differenceInDays, format, formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { Star } from 'lucide-react';
 import { ReactNode } from 'react';
@@ -56,10 +56,25 @@ export const getNameInitial = (name?: string): string => {
   return name.charAt(0);
 };
 
-// 날짜 포맷팅 함수
+// 날짜/시간 포맷팅 함수 (절대시간)
 export const formatDate = (dateStr: string | Date): string => {
   const date = new Date(dateStr);
   return format(date, 'PPP p', { locale: ko });
+};
+
+// 스마트 날짜 포맷팅 함수 (3일 이내는 상대시간, 이후는 절대시간)
+export const formatRelativeDate = (dateStr: string | Date): string => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const daysDiff = differenceInDays(now, date);
+
+  // 3일 이내는 상대시간 표시
+  if (daysDiff <= 3) {
+    return formatDistanceToNow(date, { addSuffix: true, locale: ko });
+  }
+
+  // 3일 이후는 절대시간 표시 (시간 제외)
+  return format(date, 'PPP', { locale: ko });
 };
 
 // 리뷰 타입 이름 가져오기

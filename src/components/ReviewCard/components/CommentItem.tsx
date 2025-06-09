@@ -191,7 +191,7 @@ export function CommentItem({
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                   setEditedContent(e.target.value)
                 }
-                className="min-h-[50px] w-full resize-none rounded-lg border-gray-200 bg-white text-base placeholder:text-xs sm:min-h-[60px] sm:text-xs sm:placeholder:text-xs"
+                className="min-h-[50px] w-full resize-none rounded-lg border-gray-200 bg-white text-base placeholder:text-sm sm:min-h-[60px] sm:text-sm sm:placeholder:text-sm"
                 ref={textareaRef}
               />
               <div className="mt-2 flex justify-end gap-1.5 sm:gap-2">

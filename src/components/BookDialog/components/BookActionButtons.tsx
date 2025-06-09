@@ -124,6 +124,7 @@ export function BookActionButtons() {
         <ResponsiveDropdownMenu
           open={readingStatusOpen}
           onOpenChange={setReadingStatusOpen}
+          shouldScaleBackground={false}
         >
           <ResponsiveDropdownMenuTrigger asChild>
             <Button
@@ -198,6 +199,7 @@ export function BookActionButtons() {
         <ResponsiveDropdownMenu
           open={libraryAddOpen}
           onOpenChange={setLibraryAddOpen}
+          shouldScaleBackground={false}
         >
           <ResponsiveDropdownMenuTrigger asChild>
             <Button

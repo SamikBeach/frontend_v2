@@ -12,6 +12,7 @@ export function useHeaderScrollVisibility(): [
   const [showHeader, setShowHeader] = useState(true);
   const lastScrollY = useRef(0);
   const lastHeaderState = useRef(true);
+  const isDrawerOpen = useRef(false);
 
   useEffect(() => {
     const isMobile = window.matchMedia('(max-width: 639px)').matches;
@@ -21,7 +22,7 @@ export function useHeaderScrollVisibility(): [
 
     const handleScroll = () => {
       // Drawer가 열려 있으면 Header 상태를 변경하지 않음
-      if (document.body.style.position === 'fixed') {
+      if (isDrawerOpen.current) {
         return;
       }
 
@@ -44,16 +45,26 @@ export function useHeaderScrollVisibility(): [
     // Drawer 열림/닫힘 감지
     const observer = new MutationObserver(() => {
       const now = document.body.style.position;
-      // Drawer가 열릴 때 Header 상태를 기억
+
+      // Drawer가 열릴 때
       if (now === 'fixed' && prevBodyPosition !== 'fixed') {
+        isDrawerOpen.current = true;
         lastHeaderState.current = showHeader;
+        // Drawer가 열릴 때 Header 상태를 즉시 변경하지 않음
       }
-      // Drawer가 닫힐 때 Header 상태를 복원
+
+      // Drawer가 닫힐 때
       if (now !== 'fixed' && prevBodyPosition === 'fixed') {
-        setShowHeader(lastHeaderState.current);
+        isDrawerOpen.current = false;
+        // 잠시 후에 상태를 복원 (애니메이션이 완료된 후)
+        setTimeout(() => {
+          setShowHeader(lastHeaderState.current);
+        }, 150);
       }
+
       prevBodyPosition = now;
     });
+
     observer.observe(document.body, {
       attributes: true,
       attributeFilter: ['style'],

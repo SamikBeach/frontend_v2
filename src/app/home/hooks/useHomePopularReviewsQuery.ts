@@ -14,7 +14,7 @@ export function useHomePopularReviewsQuery(limit: number = 4) {
     staleTime: 1000 * 60 * 5, // 5분 동안 캐시
   });
 
-  // 서버 응답에서 reviews를 HomeReviewPreview 형식으로 변환
+  // 서버 응답에서 reviews를 HomeReviewPreview 형식으로 변 환
   const reviews = useMemo<HomeReviewPreview[]>(() => {
     if (!data?.reviews) return [];
 

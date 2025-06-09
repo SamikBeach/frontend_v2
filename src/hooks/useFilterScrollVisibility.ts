@@ -14,6 +14,7 @@ export function useFilterScrollVisibility(): [
   const [showFilter, setShowFilter] = useState(true);
   const lastScrollY = useRef(0);
   const lastFilterState = useRef(true);
+  const isDrawerOpen = useRef(false);
 
   useEffect(() => {
     const isMobile = window.matchMedia('(max-width: 639px)').matches;
@@ -23,7 +24,7 @@ export function useFilterScrollVisibility(): [
 
     const handleScroll = () => {
       // Drawer가 열려 있으면 Filter 상태를 변경하지 않음
-      if (document.body.style.position === 'fixed') {
+      if (isDrawerOpen.current) {
         return;
       }
 
@@ -46,16 +47,26 @@ export function useFilterScrollVisibility(): [
     // Drawer 열림/닫힘 감지
     const observer = new MutationObserver(() => {
       const now = document.body.style.position;
-      // Drawer가 열릴 때 Filter 상태를 기억
+
+      // Drawer가 열릴 때
       if (now === 'fixed' && prevBodyPosition !== 'fixed') {
+        isDrawerOpen.current = true;
         lastFilterState.current = showFilter;
+        // Drawer가 열릴 때 Filter 상태를 즉시 변경하지 않음
       }
-      // Drawer가 닫힐 때 Filter 상태를 복원
+
+      // Drawer가 닫힐 때
       if (now !== 'fixed' && prevBodyPosition === 'fixed') {
-        setShowFilter(lastFilterState.current);
+        isDrawerOpen.current = false;
+        // 잠시 후에 상태를 복원 (애니메이션이 완료된 후)
+        setTimeout(() => {
+          setShowFilter(lastFilterState.current);
+        }, 150);
       }
+
       prevBodyPosition = now;
     });
+
     observer.observe(document.body, {
       attributes: true,
       attributeFilter: ['style'],

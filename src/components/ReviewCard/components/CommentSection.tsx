@@ -62,7 +62,7 @@ export function CommentSection({
                 placeholder="댓글을 입력하세요..."
                 value={commentText}
                 onChange={e => setCommentText(e.target.value)}
-                className="h-9 w-full flex-1 rounded-lg border-gray-200 bg-gray-50 text-sm shadow-none sm:h-10 sm:rounded-xl sm:text-sm"
+                className="h-9 w-full flex-1 rounded-lg border-gray-200 bg-gray-50 text-base shadow-none placeholder:text-sm sm:h-10 sm:rounded-xl sm:text-sm sm:placeholder:text-sm"
                 disabled={isCommentLoading}
                 onKeyDown={e => {
                   // Cmd+Enter(Mac) 또는 Ctrl+Enter(Windows)로 댓글 제출
