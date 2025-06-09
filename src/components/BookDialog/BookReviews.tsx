@@ -186,7 +186,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
           <div className="flex gap-2">
             <Textarea
               placeholder="댓글을 입력하세요..."
-              className="max-h-[150px] min-h-[36px] flex-1 resize-none rounded-lg border-gray-200 bg-white py-2 shadow-none"
+              className="max-h-[150px] min-h-[36px] flex-1 resize-none rounded-lg border-gray-200 bg-white py-2 text-base shadow-none placeholder:text-sm sm:text-sm sm:placeholder:text-sm"
               value={commentText}
               onChange={e => handleCommentTextChange(e.target.value)}
               onKeyDown={e => {
@@ -243,7 +243,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                     <Textarea
                       value={editCommentText}
                       onChange={e => setEditCommentText(e.target.value)}
-                      className="max-h-[150px] min-h-[36px] w-full resize-none rounded-lg border-gray-200 bg-white py-2 text-base shadow-none md:text-sm"
+                      className="max-h-[150px] min-h-[36px] w-full resize-none rounded-lg border-gray-200 bg-white py-2 text-base shadow-none placeholder:text-sm sm:text-sm sm:placeholder:text-sm"
                       placeholder="댓글을 수정하세요..."
                       rows={1}
                       style={{ overflow: 'hidden', height: 'auto' }}
