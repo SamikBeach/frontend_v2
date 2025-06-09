@@ -1,10 +1,8 @@
 import { ReviewUser } from '@/apis/review/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { formatDistanceToNow } from 'date-fns';
-import { ko } from 'date-fns/locale';
 import Link from 'next/link';
 import { ExtendedReviewResponseDto } from '../types';
-import { getNameInitial, renderStarRating } from '../utils';
+import { formatRelativeDate, getNameInitial, renderStarRating } from '../utils';
 import { ReviewHeaderDropdown } from './ReviewHeaderDropdown';
 import { TagName } from './TagName';
 
@@ -83,12 +81,9 @@ export function ReviewHeader({
             )}
           </div>
 
-          {/* 날짜 표시는 별도의 라인에 배치 */}
+          {/* 스마트 시간 표시 */}
           <span className="text-xs text-gray-500">
-            {formatDistanceToNow(new Date(review.createdAt), {
-              addSuffix: true,
-              locale: ko,
-            })}
+            {formatRelativeDate(review.createdAt)}
           </span>
         </div>
       </div>

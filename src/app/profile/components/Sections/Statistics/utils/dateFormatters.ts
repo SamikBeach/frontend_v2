@@ -15,6 +15,26 @@ export const formatDate = (dateStr: string): string => {
   }
 };
 
+// 날짜/시간 포맷터 (댓글용)
+export const formatDateTime = (dateStr: string): string => {
+  try {
+    const date = new Date(dateStr);
+    return format(date, 'PPP p', { locale: ko });
+  } catch {
+    return dateStr;
+  }
+};
+
+// 시간만 포맷터
+export const formatTimeOnly = (dateStr: string): string => {
+  try {
+    const date = new Date(dateStr);
+    return format(date, 'p', { locale: ko });
+  } catch {
+    return dateStr;
+  }
+};
+
 // 기간별 날짜 포맷팅 타입
 export type PeriodType =
   | 'all'

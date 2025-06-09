@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { differenceInDays, format, formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import {
   MessageSquare,
@@ -50,10 +50,29 @@ import { BookReviewsSkeleton } from './components/common/Skeletons';
 import { useBookDetails, useBookReviews, useReviewDialog } from './hooks';
 import { useReviewComments } from './hooks/useReviewComments';
 
-// 날짜 포맷팅 함수
+// 날짜 포맷팅 함수 (댓글용)
 export const formatDate = (dateStr: string) => {
   try {
     const date = new Date(dateStr);
+    return format(date, 'PPP p', { locale: ko });
+  } catch {
+    return dateStr;
+  }
+};
+
+// 스마트 날짜 포맷팅 함수 (3일 이내는 상대시간, 이후는 절대시간)
+export const formatSmartDate = (dateStr: string) => {
+  try {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const daysDiff = differenceInDays(now, date);
+
+    // 3일 이내는 상대시간 표시
+    if (daysDiff <= 3) {
+      return formatDistanceToNow(date, { addSuffix: true, locale: ko });
+    }
+
+    // 3일 이후는 절대시간 표시 (시간 제외)
     return format(date, 'PPP', { locale: ko });
   } catch {
     return dateStr;
@@ -301,7 +320,7 @@ function ReviewComments({ reviewId }: { reviewId: number }) {
                           {comment.author.username}
                         </Link>
                         <span className="text-xs text-gray-500">
-                          {formatDate(comment.createdAt)}
+                          {formatSmartDate(comment.createdAt)}
                         </span>
                       </div>
                       {isMyComment(comment) && (
@@ -707,7 +726,7 @@ function ReviewsList({
                           {review.author.username}
                         </Link>
                         <span className="text-xs text-gray-500">
-                          {formatDate(review.createdAt)}
+                          {formatSmartDate(review.createdAt)}
                         </span>
                       </div>
 
