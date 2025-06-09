@@ -73,8 +73,8 @@ export const formatRelativeDate = (dateStr: string | Date): string => {
     return formatDistanceToNow(date, { addSuffix: true, locale: ko });
   }
 
-  // 3일 이후는 절대시간 표시 (시간 제외)
-  return format(date, 'PPP', { locale: ko });
+  // 3일 이후는 절대시간 표시 (날짜 + 시간)
+  return format(date, 'PPP p', { locale: ko });
 };
 
 // 리뷰 타입 이름 가져오기
