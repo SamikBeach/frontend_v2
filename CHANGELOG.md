@@ -1,5 +1,17 @@
 # 🚦 CHANGELOG
 
+# [1.30.0](https://github.com/SamikBeach/frontend_v2/compare/1.29.0...1.30.0) (2025-06-09)
+
+
+### Bug Fixes
+
+* 모바일에서 댓글 입력 시 화면 확대 방지 ([31621b4](https://github.com/SamikBeach/frontend_v2/commit/31621b46e3330b7f0b1cb20bcf9fc7d6f876d2b1))
+
+
+### Features
+
+* 시간 표시를 스마트 포맷으로 개선 (3일 기준) ([e913ef8](https://github.com/SamikBeach/frontend_v2/commit/e913ef8795af5c452d35c7cc405d834031ba0526))
+
 # [1.29.0](https://github.com/SamikBeach/frontend_v2/compare/1.28.3...1.29.0) (2025-06-03)
 
 
