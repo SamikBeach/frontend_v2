@@ -12,6 +12,7 @@ export function useBottomNavScrollVisibility(): [
   const [showBottomNav, setShowBottomNav] = useState(true);
   const lastScrollY = useRef(0);
   const lastBottomNavState = useRef(true);
+  const isDrawerOpen = useRef(false);
 
   useEffect(() => {
     // 1024px 미만에서 BottomNav가 표시되므로 해당 조건으로 변경
@@ -22,7 +23,7 @@ export function useBottomNavScrollVisibility(): [
 
     const handleScroll = () => {
       // Drawer가 열려 있으면 BottomNav 상태를 변경하지 않음
-      if (document.body.style.position === 'fixed') {
+      if (isDrawerOpen.current) {
         return;
       }
 
@@ -47,16 +48,26 @@ export function useBottomNavScrollVisibility(): [
     // Drawer 열림/닫힘 감지
     const observer = new MutationObserver(() => {
       const now = document.body.style.position;
-      // Drawer가 열릴 때 BottomNav 상태를 기억
+
+      // Drawer가 열릴 때
       if (now === 'fixed' && prevBodyPosition !== 'fixed') {
+        isDrawerOpen.current = true;
         lastBottomNavState.current = showBottomNav;
+        // Drawer가 열릴 때 BottomNav 상태를 즉시 변경하지 않음
       }
-      // Drawer가 닫힐 때 BottomNav 상태를 복원
+
+      // Drawer가 닫힐 때
       if (now !== 'fixed' && prevBodyPosition === 'fixed') {
-        setShowBottomNav(lastBottomNavState.current);
+        isDrawerOpen.current = false;
+        // 잠시 후에 상태를 복원 (애니메이션이 완료된 후)
+        setTimeout(() => {
+          setShowBottomNav(lastBottomNavState.current);
+        }, 150);
       }
+
       prevBodyPosition = now;
     });
+
     observer.observe(document.body, {
       attributes: true,
       attributeFilter: ['style'],

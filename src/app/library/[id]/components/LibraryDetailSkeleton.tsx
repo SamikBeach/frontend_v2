@@ -33,10 +33,11 @@ export function LibraryDetailSkeleton() {
       </div>
 
       <div className="mt-3 grid grid-cols-1 gap-6 lg:grid-cols-[1fr_400px]">
-        <div>
+        {/* 모바일에서는 사이드바가 위에, 데스크톱에서는 컨텐츠가 먼저 */}
+        <div className="order-2 lg:order-1">
           <LibraryContentSkeleton />
         </div>
-        <div className="w-full lg:min-w-[400px]">
+        <div className="order-1 w-full lg:order-2 lg:min-w-[400px]">
           <div className="rounded-xl bg-white p-5">
             <div className="h-12 w-12 animate-pulse rounded-full bg-gray-200"></div>
             <div className="mt-3 h-5 w-32 animate-pulse rounded-lg bg-gray-200"></div>

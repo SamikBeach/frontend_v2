@@ -497,7 +497,7 @@ export function AddBookDialog({
                                       <div className="inline-flex items-center rounded-full bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-600 md:px-2.5 md:py-1">
                                         <span className="flex items-center">
                                           <Clock className="h-3 w-3 text-purple-500 md:h-3.5 md:w-3.5" />
-                                          <span className="ml-1">
+                                        <span className="ml-1">
                                             읽고 싶어요
                                             {(book.readingStats
                                               ?.readingStatusCounts?.[

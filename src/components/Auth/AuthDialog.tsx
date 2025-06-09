@@ -125,7 +125,14 @@ export function AuthDialog({
         <ResponsiveDialogHeader
           className="relative flex h-14 items-center border-b border-gray-100 px-6"
           drawerClassName="relative flex h-14 items-center border-b border-gray-100 px-6"
-          onClose={() => props.onOpenChange?.(false)}
+          onClose={() => {
+            // 비밀번호 재설정 모드에서는 로그인 모드로 돌아가고, 다른 경우에는 다이얼로그 닫기
+            if (mode === 'resetPassword') {
+              changeMode('login');
+            } else {
+              props.onOpenChange?.(false);
+            }
+          }}
         >
           <ResponsiveDialogTitle className="sr-only" drawerClassName="sr-only">
             로그인 / 회원가입
