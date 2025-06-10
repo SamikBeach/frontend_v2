@@ -1,8 +1,13 @@
 import { UpdateHistoryItem } from '@/apis/library/types';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import { differenceInDays, format, formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { Clock } from 'lucide-react';
-import { FC, ReactNode } from 'react';
+import { ChevronDown, Clock } from 'lucide-react';
+import { FC, ReactNode, useState } from 'react';
 
 interface LibrarySidebarUpdatesProps {
   updates: UpdateHistoryItem[];
@@ -13,6 +18,8 @@ export const LibrarySidebarUpdates: FC<LibrarySidebarUpdatesProps> = ({
   updates,
   renderActivityMessage,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   // 스마트 시간 포맷팅 (3일 이내는 상대시간, 이후는 절대시간)
   const formatSmartTime = (date: Date): string => {
     const now = new Date();
@@ -69,11 +76,28 @@ export const LibrarySidebarUpdates: FC<LibrarySidebarUpdatesProps> = ({
 
   return (
     <div className="rounded-xl bg-gray-50 p-4">
-      <div className="mb-3 flex items-center">
-        <Clock className="mr-1.5 h-4 w-4 text-gray-500" />
-        <h3 className="text-sm font-medium text-gray-900">최근 활동</h3>
-      </div>
-      <div className="space-y-2">{renderRecentUpdates()}</div>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <CollapsibleTrigger className="-m-2 flex w-full items-center justify-between rounded-lg p-2 hover:bg-gray-100 lg:m-0 lg:cursor-default lg:p-0 lg:hover:bg-transparent">
+          <div className="flex items-center">
+            <Clock className="mr-1.5 h-4 w-4 text-gray-500" />
+            <h3 className="text-sm font-medium text-gray-900">최근 활동</h3>
+          </div>
+          <ChevronDown
+            className={`h-4 w-4 text-gray-500 lg:hidden ${
+              isOpen ? 'rotate-180 text-gray-700' : 'text-gray-400'
+            }`}
+          />
+        </CollapsibleTrigger>
+
+        {/* 데스크톱에서는 항상 표시, 모바일에서는 Collapsible */}
+        <div className="hidden lg:block">
+          <div className="mt-2 space-y-2">{renderRecentUpdates()}</div>
+        </div>
+
+        <CollapsibleContent className="lg:hidden">
+          <div className="mt-3 space-y-2">{renderRecentUpdates()}</div>
+        </CollapsibleContent>
+      </Collapsible>
     </div>
   );
 };

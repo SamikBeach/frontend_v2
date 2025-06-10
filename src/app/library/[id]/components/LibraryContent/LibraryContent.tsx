@@ -3,7 +3,6 @@ import { LibraryListItem } from '@/apis/library/types';
 import { Separator } from '@/components/ui/separator';
 import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { decodeHtmlEntities } from '@/lib/utils';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { useLibraryDetail } from '../../hooks';
@@ -88,13 +87,6 @@ export function LibraryContent() {
 
   return (
     <div className="space-y-3">
-      {/* 서재 설명 */}
-      <div className="rounded-xl bg-white py-2">
-        <p className="text-gray-700">
-          {decodeHtmlEntities(library.description || '설명이 없습니다.')}
-        </p>
-      </div>
-
       <Separator className="border-gray-100" />
 
       {/* 책 목록 */}
