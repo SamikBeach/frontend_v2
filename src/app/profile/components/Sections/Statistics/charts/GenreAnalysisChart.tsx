@@ -1,5 +1,4 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import {
   Cell,
   Legend,
@@ -12,13 +11,11 @@ import {
 import { GenreAnalysisResponse } from '@/apis/user/types';
 import { getGenreAnalysis } from '@/apis/user/user';
 import { useCurrentUser } from '@/hooks/useCurrentUser';
-import { cn } from '@/lib/utils';
 
 import { ChartContainer, PrivateDataMessage } from '../components';
 import { PrivacyToggle } from '../components/PrivacyToggle';
 import { PASTEL_COLORS } from '../constants';
 import { useStatisticsSettings } from '../hooks/useStatisticsSettings';
-import { PeriodType, getAllPeriodOptions } from '../utils';
 import {
   CustomLegendProps,
   CustomTooltipProps,
@@ -92,7 +89,6 @@ const CustomLegend = ({ payload }: CustomLegendProps) => {
 };
 
 const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
-  const [activePeriod, setActivePeriod] = useState<PeriodType>('all');
   const CHART_TITLE = '장르';
 
   const currentUser = useCurrentUser();
@@ -102,7 +98,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
 
   const { data, isLoading } = useSuspenseQuery<GenreAnalysisResponse>({
-    queryKey: ['genreAnalysis', userId, activePeriod],
+    queryKey: ['genreAnalysis', userId],
     queryFn: () => getGenreAnalysis(userId),
   });
 
@@ -124,70 +120,9 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
   // 설정 로딩 중 또는 설정 업데이트 중인지 확인
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
-  // 활성 기간에 따른 데이터 가져오기
-  const getCategoryDataForPeriod = (): {
-    categoryData: CategoryData[];
-    subCategoryData: SubCategoryData[];
-  } => {
-    if (activePeriod === 'all') {
-      // 전체 데이터 (기존 API 응답 구조)
-      return {
-        categoryData: data.categoryCounts || [],
-        subCategoryData: data.subCategoryCounts || [],
-      };
-    }
-
-    // 기간별 데이터 (새 API 응답 구조)
-    const periodData =
-      data[
-        activePeriod as keyof Omit<
-          GenreAnalysisResponse,
-          | 'categoryCounts'
-          | 'subCategoryCounts'
-          | 'mostReadCategory'
-          | 'isPublic'
-        >
-      ];
-
-    if (!periodData || !Array.isArray(periodData) || periodData.length === 0) {
-      return { categoryData: [], subCategoryData: [] };
-    }
-
-    // 선택된 기간의 모든 데이터를 합산
-    const categoryMap = new Map<string, number>();
-    const subCategoryMap = new Map<string, number>();
-
-    periodData.forEach(periodItem => {
-      // 카테고리 데이터 합산
-      if (periodItem.categories) {
-        periodItem.categories.forEach(cat => {
-          const currentCount = categoryMap.get(cat.category) || 0;
-          categoryMap.set(cat.category, currentCount + cat.count);
-        });
-      }
-
-      // 서브카테고리 데이터 합산
-      if (periodItem.subCategories) {
-        periodItem.subCategories.forEach(subCat => {
-          const currentCount = subCategoryMap.get(subCat.subCategory) || 0;
-          subCategoryMap.set(subCat.subCategory, currentCount + subCat.count);
-        });
-      }
-    });
-
-    // Map을 배열로 변환
-    const categoryData: CategoryData[] = Array.from(categoryMap.entries()).map(
-      ([category, count]) => ({ category, count })
-    );
-
-    const subCategoryData: SubCategoryData[] = Array.from(
-      subCategoryMap.entries()
-    ).map(([subCategory, count]) => ({ subCategory, count }));
-
-    return { categoryData, subCategoryData };
-  };
-
-  const { categoryData, subCategoryData } = getCategoryDataForPeriod();
+  // 전체 기간 데이터 사용
+  const categoryData = data.categoryCounts || [];
+  const subCategoryData = data.subCategoryCounts || [];
 
   // 항상 기본적인 데이터 준비 (데이터가 없는 경우도 차트 표시용)
   const defaultCategories: CategoryData[] = [
@@ -223,7 +158,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     0
   );
 
-  // 상위 5개 카테고리 데이터 추출 및 가공 (두 차트를 보여주기 위해 개수를 줄임)
+  // 상위 5개 카테고리 데이터 추출 및 가공
   let topCategories = [...finalCategoryData]
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
@@ -263,7 +198,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     0
   );
 
-  // 상위 5개 서브카테고리 데이터 추출 및 가공 (두 차트를 보여주기 위해 개수를 줄임)
+  // 상위 5개 서브카테고리 데이터 추출 및 가공
   let topSubCategories = [...finalSubCategoryData]
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
@@ -351,23 +286,6 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex flex-nowrap overflow-x-auto pb-1">
-            {getAllPeriodOptions().map(option => (
-              <button
-                key={option.id}
-                onClick={() => setActivePeriod(option.id)}
-                className={cn(
-                  'flex h-7 cursor-pointer items-center rounded-full border px-2 text-xs font-medium whitespace-nowrap transition-colors',
-                  'mr-1.5 last:mr-0',
-                  activePeriod === option.id
-                    ? 'border-blue-200 bg-blue-50 text-blue-600'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                )}
-              >
-                {option.name}
-              </button>
-            ))}
-          </div>
           {isMyProfile && (
             <div className="hidden sm:block">
               <PrivacyToggle
@@ -393,9 +311,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
             {totalCategoryCount === 0 && (
               <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
                 <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
-                  {activePeriod === 'all'
-                    ? '데이터가 없습니다'
-                    : '해당 기간의 데이터가 없습니다'}
+                  데이터가 없습니다
                 </p>
               </div>
             )}
@@ -450,9 +366,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
             {totalSubCategoryCount === 0 && (
               <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
                 <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
-                  {activePeriod === 'all'
-                    ? '데이터가 없습니다'
-                    : '해당 기간의 데이터가 없습니다'}
+                  데이터가 없습니다
                 </p>
               </div>
             )}
@@ -499,9 +413,9 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
         </div>
       </div>
 
-      {/* 주요 카테고리 정보 - 독서 상태별 도서수 차트의 완독률과 같은 스타일로 하단에 배치 */}
+      {/* 주요 카테고리 정보 */}
       {(() => {
-        // 현재 기간의 가장 많이 읽은 카테고리 계산
+        // 가장 많이 읽은 카테고리 계산
         const mostReadCategory =
           finalCategoryData.length > 0
             ? finalCategoryData.reduce((prev, current) =>
