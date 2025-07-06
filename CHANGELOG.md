@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+# [1.31.0](https://github.com/SamikBeach/frontend_v2/compare/1.30.2...1.31.0) (2025-07-06)
+
+
+### Features
+
+* 프로필 장르분석 차트 기간 필터 기능 개선 ([5bb5236](https://github.com/SamikBeach/frontend_v2/commit/5bb523612d70d8eab604f737bb14e255f9de740a))
+
 ## [1.30.2](https://github.com/SamikBeach/frontend_v2/compare/1.30.1...1.30.2) (2025-06-10)
 
 ## [1.30.1](https://github.com/SamikBeach/frontend_v2/compare/1.30.0...1.30.1) (2025-06-09)
