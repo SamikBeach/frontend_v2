@@ -102,7 +102,7 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
     : { settings: null, handleUpdateSetting: () => {}, isUpdating: false };
 
   const { data, isLoading } = useSuspenseQuery<GenreAnalysisResponse>({
-    queryKey: ['genreAnalysis', userId],
+    queryKey: ['genreAnalysis', userId, activePeriod],
     queryFn: () => getGenreAnalysis(userId),
   });
 
@@ -125,14 +125,18 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
   const showLoading = isLoading || isUpdating || (isMyProfile && !settings);
 
   // 활성 기간에 따른 데이터 가져오기
-  let categoryData: CategoryData[] = [];
-  let subCategoryData: SubCategoryData[] = [];
+  const getCategoryDataForPeriod = (): {
+    categoryData: CategoryData[];
+    subCategoryData: SubCategoryData[];
+  } => {
+    if (activePeriod === 'all') {
+      // 전체 데이터 (기존 API 응답 구조)
+      return {
+        categoryData: data.categoryCounts || [],
+        subCategoryData: data.subCategoryCounts || [],
+      };
+    }
 
-  if (activePeriod === 'all') {
-    // 전체 데이터 (기존 API 응답 구조)
-    categoryData = data.categoryCounts || [];
-    subCategoryData = data.subCategoryCounts || [];
-  } else {
     // 기간별 데이터 (새 API 응답 구조)
     const periodData =
       data[
@@ -145,16 +149,45 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
         >
       ];
 
-    if (periodData && Array.isArray(periodData) && periodData.length > 0) {
-      // 가장 최근 기간의 데이터 사용 (배열의 마지막 항목)
-      const latestPeriodData = periodData[periodData.length - 1];
-
-      if (latestPeriodData) {
-        categoryData = latestPeriodData.categories || [];
-        subCategoryData = latestPeriodData.subCategories || [];
-      }
+    if (!periodData || !Array.isArray(periodData) || periodData.length === 0) {
+      return { categoryData: [], subCategoryData: [] };
     }
-  }
+
+    // 선택된 기간의 모든 데이터를 합산
+    const categoryMap = new Map<string, number>();
+    const subCategoryMap = new Map<string, number>();
+
+    periodData.forEach(periodItem => {
+      // 카테고리 데이터 합산
+      if (periodItem.categories) {
+        periodItem.categories.forEach(cat => {
+          const currentCount = categoryMap.get(cat.category) || 0;
+          categoryMap.set(cat.category, currentCount + cat.count);
+        });
+      }
+
+      // 서브카테고리 데이터 합산
+      if (periodItem.subCategories) {
+        periodItem.subCategories.forEach(subCat => {
+          const currentCount = subCategoryMap.get(subCat.subCategory) || 0;
+          subCategoryMap.set(subCat.subCategory, currentCount + subCat.count);
+        });
+      }
+    });
+
+    // Map을 배열로 변환
+    const categoryData: CategoryData[] = Array.from(categoryMap.entries()).map(
+      ([category, count]) => ({ category, count })
+    );
+
+    const subCategoryData: SubCategoryData[] = Array.from(
+      subCategoryMap.entries()
+    ).map(([subCategory, count]) => ({ subCategory, count }));
+
+    return { categoryData, subCategoryData };
+  };
+
+  const { categoryData, subCategoryData } = getCategoryDataForPeriod();
 
   // 항상 기본적인 데이터 준비 (데이터가 없는 경우도 차트 표시용)
   const defaultCategories: CategoryData[] = [
@@ -174,22 +207,24 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
   ];
 
   // 데이터가 없거나 빈 배열인 경우 기본 데이터로 대체
-  if (!categoryData || categoryData.length === 0) {
-    categoryData = [...defaultCategories];
-  }
+  const finalCategoryData =
+    !categoryData || categoryData.length === 0
+      ? [...defaultCategories]
+      : categoryData;
 
-  if (!subCategoryData || subCategoryData.length === 0) {
-    subCategoryData = [...defaultSubCategories];
-  }
+  const finalSubCategoryData =
+    !subCategoryData || subCategoryData.length === 0
+      ? [...defaultSubCategories]
+      : subCategoryData;
 
   // 카테고리 데이터 가공 (총 합계 계산)
-  const totalCategoryCount = categoryData.reduce(
+  const totalCategoryCount = finalCategoryData.reduce(
     (sum: number, item: CategoryData) => sum + item.count,
     0
   );
 
   // 상위 5개 카테고리 데이터 추출 및 가공 (두 차트를 보여주기 위해 개수를 줄임)
-  let topCategories = [...categoryData]
+  let topCategories = [...finalCategoryData]
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
     .map((item, index) => ({
@@ -223,13 +258,13 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
   }
 
   // 서브카테고리 데이터 가공 (총 합계 계산)
-  const totalSubCategoryCount = subCategoryData.reduce(
+  const totalSubCategoryCount = finalSubCategoryData.reduce(
     (sum: number, item: SubCategoryData) => sum + item.count,
     0
   );
 
   // 상위 5개 서브카테고리 데이터 추출 및 가공 (두 차트를 보여주기 위해 개수를 줄임)
-  let topSubCategories = [...subCategoryData]
+  let topSubCategories = [...finalSubCategoryData]
     .sort((a, b) => b.count - a.count)
     .slice(0, 5)
     .map((item, index) => ({
@@ -358,7 +393,9 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
             {totalCategoryCount === 0 && (
               <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
                 <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
-                  데이터가 없습니다
+                  {activePeriod === 'all'
+                    ? '데이터가 없습니다'
+                    : '해당 기간의 데이터가 없습니다'}
                 </p>
               </div>
             )}
@@ -413,7 +450,9 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
             {totalSubCategoryCount === 0 && (
               <div className="pointer-events-none absolute inset-0 top-10 z-10 flex items-center justify-center">
                 <p className="rounded bg-white/80 px-2 py-1 text-xs text-gray-400">
-                  데이터가 없습니다
+                  {activePeriod === 'all'
+                    ? '데이터가 없습니다'
+                    : '해당 기간의 데이터가 없습니다'}
                 </p>
               </div>
             )}
@@ -461,16 +500,26 @@ const GenreAnalysisChart = ({ userId }: GenreAnalysisChartProps) => {
       </div>
 
       {/* 주요 카테고리 정보 - 독서 상태별 도서수 차트의 완독률과 같은 스타일로 하단에 배치 */}
-      {data.mostReadCategory && (
-        <div className="mt-16 md:mt-[-50px]">
-          <div className="mx-auto max-w-[200px] rounded-md bg-gray-50 px-3 py-1.5">
-            <p className="text-center text-sm font-medium text-gray-600">
-              주요 카테고리:{' '}
-              <span className="text-blue-600">{data.mostReadCategory}</span>
-            </p>
+      {(() => {
+        // 현재 기간의 가장 많이 읽은 카테고리 계산
+        const mostReadCategory =
+          finalCategoryData.length > 0
+            ? finalCategoryData.reduce((prev, current) =>
+                prev.count > current.count ? prev : current
+              )?.category
+            : null;
+
+        return mostReadCategory && totalCategoryCount > 0 ? (
+          <div className="mt-16 md:mt-[-50px]">
+            <div className="mx-auto max-w-[200px] rounded-md bg-gray-50 px-3 py-1.5">
+              <p className="text-center text-sm font-medium text-gray-600">
+                주요 카테고리:{' '}
+                <span className="text-blue-600">{mostReadCategory}</span>
+              </p>
+            </div>
           </div>
-        </div>
-      )}
+        ) : null;
+      })()}
     </ChartContainer>
   );
 };
