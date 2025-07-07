@@ -1,5 +1,260 @@
 # 🚦 CHANGELOG
 
+# [1.31.0](https://github.com/SamikBeach/frontend_v2/compare/1.30.2...1.31.0) (2025-07-06)
+
+### Features
+
+- 프로필 장르분석 차트 기간 필터 기능 개선 ([5bb5236](https://github.com/SamikBeach/frontend_v2/commit/5bb523612d70d8eab604f737bb14e255f9de740a))
+
+## [1.30.2](https://github.com/SamikBeach/frontend_v2/compare/1.30.1...1.30.2) (2025-06-10)
+
+## [1.30.1](https://github.com/SamikBeach/frontend_v2/compare/1.30.0...1.30.1) (2025-06-09)
+
+### Bug Fixes
+
+- 3일 이후 절대시간 표시에 시간 정보 추가 ([382180b](https://github.com/SamikBeach/frontend_v2/commit/382180b8d5bc0751e8bfa5feccd3cbe82a08a813))
+
+# [1.30.0](https://github.com/SamikBeach/frontend_v2/compare/1.29.0...1.30.0) (2025-06-09)
+
+### Bug Fixes
+
+- 모바일에서 댓글 입력 시 화면 확대 방지 ([31621b4](https://github.com/SamikBeach/frontend_v2/commit/31621b46e3330b7f0b1cb20bcf9fc7d6f876d2b1))
+
+### Features
+
+- 시간 표시를 스마트 포맷으로 개선 (3일 기준) ([e913ef8](https://github.com/SamikBeach/frontend_v2/commit/e913ef8795af5c452d35c7cc405d834031ba0526))
+
+# [1.29.0](https://github.com/SamikBeach/frontend_v2/compare/1.28.3...1.29.0) (2025-06-03)
+
+### Features
+
+- 프로필 이미지 업로드 파일 크기 제한을 20MB로 증가 ([04814db](https://github.com/SamikBeach/frontend_v2/commit/04814db24dafdb3480fd664a579c6f88f97a4c2a))
+
+## [1.28.3](https://github.com/SamikBeach/frontend_v2/compare/1.28.2...1.28.3) (2025-06-03)
+
+### Bug Fixes
+
+- .heic 이미지 업로드 허용 ([ce84f43](https://github.com/SamikBeach/frontend_v2/commit/ce84f43901603811bd78bc86d15d009e3f7f6ad0))
+
+## [1.28.2](https://github.com/SamikBeach/frontend_v2/compare/1.28.1...1.28.2) (2025-06-02)
+
+### Bug Fixes
+
+- scroll behavior 수정 ([f4ddb38](https://github.com/SamikBeach/frontend_v2/commit/f4ddb38907f621e8fccb7fad1b140752918c4e93))
+
+## [1.28.1](https://github.com/SamikBeach/frontend_v2/compare/1.28.0...1.28.1) (2025-06-02)
+
+### Bug Fixes
+
+- 검색 다이얼로그 로딩 스피너 수직 중앙정렬 완전 수정 ([7b1d4b0](https://github.com/SamikBeach/frontend_v2/commit/7b1d4b0de2b275f8d4d47a315e7cf9787f1aef61))
+
+# [1.28.0](https://github.com/SamikBeach/frontend_v2/compare/1.27.0...1.28.0) (2025-06-02)
+
+### Bug Fixes
+
+- 모바일 BookDialog에서 중복된 close 버튼 제거 ([b6f7cab](https://github.com/SamikBeach/frontend_v2/commit/b6f7caba6fb4109b6bbfd810bd1ace5bc3f3a2b8))
+- 중간 크기 화면에서 bottom navigation 표시 문제 해결 ([b8d1033](https://github.com/SamikBeach/frontend_v2/commit/b8d103382d6c35af326ba7d54ba0cb11d59812dd))
+
+### Features
+
+- BookDialog와 책 상세페이지 이탈 시 정렬 상태 초기화 ([5316824](https://github.com/SamikBeach/frontend_v2/commit/5316824c55d049b15572be60b65e2fc253642162))
+- 커뮤니티 페이지에 쿼리 파라미터 연동 및 메뉴 구조 개선 ([8a2f6ea](https://github.com/SamikBeach/frontend_v2/commit/8a2f6ea3a1e02115aeb3d394a4e6f77f26057fc0))
+
+# [1.27.0](https://github.com/SamikBeach/frontend_v2/compare/1.26.0...1.27.0) (2025-06-01)
+
+### Features
+
+- 필터/정렬 변경 시 스크롤 위치를 useEffect에서 처리하도록 변경 ([7c95f38](https://github.com/SamikBeach/frontend_v2/commit/7c95f385647b75238cf68766ee66287d78751895))
+
+# [1.26.0](https://github.com/SamikBeach/frontend_v2/compare/1.25.7...1.26.0) (2025-06-01)
+
+### Bug Fixes
+
+- 분야별 인기 페이지 서브카테고리 동적 패딩 수정 ([6f2eb06](https://github.com/SamikBeach/frontend_v2/commit/6f2eb06509a3b063a8b4b72f7f5a5940870dfa0d))
+
+### Features
+
+- 필터/정렬 변경 시 스크롤 처리 개선 ([c3ad4fc](https://github.com/SamikBeach/frontend_v2/commit/c3ad4fc482ea59e2077ac55dd64e471c3568ae69))
+
+## [1.25.7](https://github.com/SamikBeach/frontend_v2/compare/1.25.6...1.25.7) (2025-06-01)
+
+## [1.25.6](https://github.com/SamikBeach/frontend_v2/compare/1.25.5...1.25.6) (2025-06-01)
+
+### Bug Fixes
+
+- horizontal BookCard 레이아웃 시프트 완전 방지 ([f7a97ae](https://github.com/SamikBeach/frontend_v2/commit/f7a97aeea4f2f1cbd12a3168af332286cdf969c9))
+
+## [1.25.5](https://github.com/SamikBeach/frontend_v2/compare/1.25.4...1.25.5) (2025-06-01)
+
+### Bug Fixes
+
+- BookCard horizontal 모드에서 이미지 비율 가변 높이 적용 ([f02479d](https://github.com/SamikBeach/frontend_v2/commit/f02479d5d0048cfeec9d536dcc38b6e34a057500))
+
+## [1.25.4](https://github.com/SamikBeach/frontend_v2/compare/1.25.3...1.25.4) (2025-06-01)
+
+### Bug Fixes
+
+- BookCard 스켈레톤과 실제 카드 높이 불일치 문제 해결 ([7bb5bac](https://github.com/SamikBeach/frontend_v2/commit/7bb5bac00c7b8dd411b08dec703f16b586a899f4))
+- BookCard 스켈레톤과 실제 카드 높이 불일치 문제 해결 ([e585cf0](https://github.com/SamikBeach/frontend_v2/commit/e585cf0635cb4fee68864bc907772d6a689b8183))
+- 일반 모드에서 이미지 바닥 정렬 복원 ([e2470ce](https://github.com/SamikBeach/frontend_v2/commit/e2470ce5e6923538c6f617fafb23e1f5e09a8086))
+
+## [1.25.3](https://github.com/SamikBeach/frontend_v2/compare/1.25.2...1.25.3) (2025-06-01)
+
+### Bug Fixes
+
+- BookCard 일반 모드에서 이미지 실제 비율 유지하도록 수정 ([8464190](https://github.com/SamikBeach/frontend_v2/commit/84641908c3781df9940b23581d3e1912f29d69f1))
+
+## [1.25.2](https://github.com/SamikBeach/frontend_v2/compare/1.25.1...1.25.2) (2025-06-01)
+
+### Bug Fixes
+
+- fix next.config.mjs ([57ae5f9](https://github.com/SamikBeach/frontend_v2/commit/57ae5f99aed37a6e154d63a99582abc97190bb4a))
+
+## [1.25.1](https://github.com/SamikBeach/frontend_v2/compare/1.25.0...1.25.1) (2025-06-01)
+
+### Bug Fixes
+
+- 모바일 기기에서 Next.js Image 표시 문제 해결 ([2cc6d2e](https://github.com/SamikBeach/frontend_v2/commit/2cc6d2ef0fff3bd12deeb09ef491976d2ae5e05f))
+
+# [1.25.0](https://github.com/SamikBeach/frontend_v2/compare/1.24.3...1.25.0) (2025-06-01)
+
+### Bug Fixes
+
+- fix lint ([666419d](https://github.com/SamikBeach/frontend_v2/commit/666419dd6575521e1962374e4fef05a82698a770))
+
+### Features
+
+- BookCard img 태그를 Next.js Image 컴포넌트로 교체 ([92ec0e8](https://github.com/SamikBeach/frontend_v2/commit/92ec0e861b5c54efcbc3f55eae50e6b6f4dbb0ca))
+
+## [1.24.3](https://github.com/SamikBeach/frontend_v2/compare/1.24.2...1.24.3) (2025-06-01)
+
+### Bug Fixes
+
+- BookCard 스케일 변환 시 보더 유지 문제 해결 ([f287c55](https://github.com/SamikBeach/frontend_v2/commit/f287c5521142837560d589c27471fa0e9c9a64e2))
+- BookCard 호버 시 왼쪽 보더 사라짐 문제 해결 ([386b3a6](https://github.com/SamikBeach/frontend_v2/commit/386b3a6b7636999a13fcb04753748911d4669506))
+- fix lint ([e45bc95](https://github.com/SamikBeach/frontend_v2/commit/e45bc9561efc18003c7724b56921b4f23bf43f47))
+- Next.js Image 컴포넌트 로딩 시 검정색 배경 문제 해결 ([f73fece](https://github.com/SamikBeach/frontend_v2/commit/f73fece11caa7414e241fec0788e60b088eefb3f))
+
+## [1.24.2](https://github.com/SamikBeach/frontend_v2/compare/1.24.1...1.24.2) (2025-06-01)
+
+### Bug Fixes
+
+- BookCard 이미지 비율을 실제 이미지에 맞게 가변적으로 조정 ([1d8047e](https://github.com/SamikBeach/frontend_v2/commit/1d8047ebb6e24ea5a66c169467f37ddceefcf45f))
+- NextJS Image 컴포넌트 레이아웃 시프트 방지 및 캐시 최적화 ([9df9b47](https://github.com/SamikBeach/frontend_v2/commit/9df9b47a559cce06baa0165cc8bb9c75428b4736))
+
+## [1.24.1](https://github.com/SamikBeach/frontend_v2/compare/1.24.0...1.24.1) (2025-06-01)
+
+### Bug Fixes
+
+- BookCard 이미지 레이아웃 시프트 방지를 위한 명시적 크기 설정 ([a9920af](https://github.com/SamikBeach/frontend_v2/commit/a9920af1b4f1174137a0624649cd4ca36ad1f186))
+
+# [1.24.0](https://github.com/SamikBeach/frontend_v2/compare/1.23.0...1.24.0) (2025-06-01)
+
+### Bug Fixes
+
+- BookCard 이미지 로딩 중 검정색 배경 문제 해결 ([880b188](https://github.com/SamikBeach/frontend_v2/commit/880b188019fb40677a4d4fe13a44ee4956197c52))
+- BookCard에서 Next.js Image 로딩 시 검정색 배경 문제 해결 ([560424c](https://github.com/SamikBeach/frontend_v2/commit/560424cd5d7aeb6f77e1ccdc458b75c8788a1c8e)), closes [#f9](https://github.com/SamikBeach/frontend_v2/issues/f9) [#f3f4f6](https://github.com/SamikBeach/frontend_v2/issues/f3f4f6)
+- horizontal BookCard에서 별점 영역 justify-between 레이아웃 개선 ([b1c4f0a](https://github.com/SamikBeach/frontend_v2/commit/b1c4f0a9536d7624941f2272ee176ac873a65cb6))
+
+### Features
+
+- md 이상 화면에서 BookCard horizontal 모드 비활성화 ([77c05e2](https://github.com/SamikBeach/frontend_v2/commit/77c05e2121cf572731411f00c112efab336791d4))
+- 책 이미지에 좌우와 하단으로 퍼지는 그림자 효과 추가 ([a19f977](https://github.com/SamikBeach/frontend_v2/commit/a19f977432af44b83eadb759d13d0399399406d1))
+
+# [1.23.0](https://github.com/SamikBeach/frontend_v2/compare/1.22.0...1.23.0) (2025-06-01)
+
+### Features
+
+- Next.js Image 컴포넌트로 이미지 최적화 및 캐싱 개선 ([755ffdd](https://github.com/SamikBeach/frontend_v2/commit/755ffdd05ecd582f3933c637adf1056d8b09f2ad))
+- 책카드 이미지에 연한 회색 테두리 추가 ([cba2c14](https://github.com/SamikBeach/frontend_v2/commit/cba2c14fdf214f6f4090b9cb5212b2b5c6b28a27))
+
+# [1.22.0](https://github.com/SamikBeach/frontend_v2/compare/1.21.0...1.22.0) (2025-06-01)
+
+### Features
+
+- BookCard horizontal 레이아웃에서 컨텐츠 영역 높이 최적화 ([200e6c7](https://github.com/SamikBeach/frontend_v2/commit/200e6c7f84f1f425491b209353818da1f104cb0d))
+
+# [1.21.0](https://github.com/SamikBeach/frontend_v2/compare/1.20.1...1.21.0) (2025-06-01)
+
+### Features
+
+- BookCard horizontal 레이아웃 이미지 스타일 개선 ([1af1a61](https://github.com/SamikBeach/frontend_v2/commit/1af1a61eef573dbf59a39d551ade5d40717d1170))
+
+## [1.20.1](https://github.com/SamikBeach/frontend_v2/compare/1.20.0...1.20.1) (2025-06-01)
+
+### Bug Fixes
+
+- 하이드레이션 불일치로 인한 스크롤 위치 복원 문제 해결 ([7467aab](https://github.com/SamikBeach/frontend_v2/commit/7467aab95cf9669b37759b208725885fd915b56f))
+
+# [1.20.0](https://github.com/SamikBeach/frontend_v2/compare/1.19.0...1.20.0) (2025-06-01)
+
+### Features
+
+- 발견하기/분야별 인기 페이지 스크롤 위치 복원 개선 ([bba35bd](https://github.com/SamikBeach/frontend_v2/commit/bba35bd3020820d0230f972bfb20a9e121a75d8f))
+
+# [1.19.0](https://github.com/SamikBeach/frontend_v2/compare/1.18.0...1.19.0) (2025-06-01)
+
+### Features
+
+- 발견하기/분야별 인기 페이지 스켈레톤을 실제 컨텐츠 크기에 맞게 개선 ([2ac23b4](https://github.com/SamikBeach/frontend_v2/commit/2ac23b4559595025558d4051475310d5803d6cd0))
+
+# [1.18.0](https://github.com/SamikBeach/frontend_v2/compare/1.17.0...1.18.0) (2025-06-01)
+
+### Features
+
+- 발견하기/분야별 인기 페이지 로딩 UI를 공통 스피너로 개선 ([a423948](https://github.com/SamikBeach/frontend_v2/commit/a423948f24e19ca13732a6a2ea49a6544ebcb4f3))
+
+# [1.17.0](https://github.com/SamikBeach/frontend_v2/compare/1.16.0...1.17.0) (2025-06-01)
+
+### Bug Fixes
+
+- AuthDialog 헤더에서 뒤로가기 버튼과 로고 겹침 문제 해결 ([38510ce](https://github.com/SamikBeach/frontend_v2/commit/38510ceb326861db8ca6b26c78ea362fe16d810a))
+- 모바일 다이얼로그에서 키보드 등장 시 스크롤 문제 해결 ([157672c](https://github.com/SamikBeach/frontend_v2/commit/157672cdc5563543259a33af1e8aa4f7c0c54161))
+- 발견하기와 분야별 인기 페이지의 스크롤 위치 복원 문제 해결 ([746d8b4](https://github.com/SamikBeach/frontend_v2/commit/746d8b4beb6e1ca31b906d7fb437f22b5e3dcf5f))
+- 프로필 리뷰 섹션에서 댓글 개수 실시간 업데이트 기능 추가 ([838a5f6](https://github.com/SamikBeach/frontend_v2/commit/838a5f6838a891acf3c8bd23f731ce9cdc0ee548))
+- 프로필 스켈레톤에서 shadow 제거 ([19cc43f](https://github.com/SamikBeach/frontend_v2/commit/19cc43f74a0be19a713713b144879c19fe90e459))
+- 프로필 편집 다이얼로그 이미지 삭제 버튼에 cursor pointer 추가 ([baf646e](https://github.com/SamikBeach/frontend_v2/commit/baf646efafd111c0c5663e5dd89089fe64d84abf))
+
+### Features
+
+- HTML 엔티티 디코딩 기능 추가 ([18b6e20](https://github.com/SamikBeach/frontend_v2/commit/18b6e205d42bdd9957863d910942be6fd44777b4)), closes [#39](https://github.com/SamikBeach/frontend_v2/issues/39)
+- 서재 목록페이지 정렬버튼 반응형 브레이크포인트 조정 (xl→2xl) ([90a1f71](https://github.com/SamikBeach/frontend_v2/commit/90a1f71f880593b67e97ecc9999cf388504236a4))
+
+# [1.16.0](https://github.com/SamikBeach/frontend_v2/compare/1.15.1...1.16.0) (2025-05-31)
+
+### Bug Fixes
+
+- BookDialog 로딩 중 skeleton에서 Dialog radius 누락 문제 수정 ([16b0a4e](https://github.com/SamikBeach/frontend_v2/commit/16b0a4ec5c6a8b9b2df366ade3a7c0772a3ea2d2))
+- fix lint ([0c84336](https://github.com/SamikBeach/frontend_v2/commit/0c84336a7ac3092cfb121319417e009c90031723))
+- 리뷰 수정 시 React 훅 조건부 호출 에러 수정 ([a4c1a55](https://github.com/SamikBeach/frontend_v2/commit/a4c1a5528136f9caf8e34f8d866ee8530219d937))
+- 모바일 BookDialog 높이가 100dvh를 초과하는 문제 해결 ([7861b3c](https://github.com/SamikBeach/frontend_v2/commit/7861b3c585415f6011bc7ccfaeab7e00592e019a))
+- 별점 x버튼 호버 시 별점 호버 효과 충돌 문제 해결 ([fd34d33](https://github.com/SamikBeach/frontend_v2/commit/fd34d33abf38109eaeabbe64e590db09cccebf04))
+- 서재 삭제 후 이전 페이지 서재 목록 갱신 문제 해결 ([069001b](https://github.com/SamikBeach/frontend_v2/commit/069001bba83e97c01881eb7ed6db7d58a0316358))
+
+### Features
+
+- BookDialog 리뷰에 더보기 기능 추가 ([950ae50](https://github.com/SamikBeach/frontend_v2/commit/950ae506f33f4bcf1124c8ea4ed5db00f2b8adcf))
+
+## [1.15.1](https://github.com/SamikBeach/frontend_v2/compare/1.15.0...1.15.1) (2025-05-31)
+
+### Bug Fixes
+
+- 프로필 서재 섹션 ErrorBoundary 문제 해결 및 react-error-boundary 적용 ([1d698c6](https://github.com/SamikBeach/frontend_v2/commit/1d698c601d41295c6c31a384540b2c59de56b316))
+
+# [1.15.0](https://github.com/SamikBeach/frontend_v2/compare/1.14.4...1.15.0) (2025-05-31)
+
+### Bug Fixes
+
+- ClientSideScrollRestorer 제거 ([d587be9](https://github.com/SamikBeach/frontend_v2/commit/d587be9fb2fbb5a718d4d000f750cdc6fa52bedf))
+- ClientSideScrollRestorer 제거 ([cb94ba4](https://github.com/SamikBeach/frontend_v2/commit/cb94ba4c3a43ce3cf9fa55bc145b8d1fb3f35864))
+- fix type errors ([64fc010](https://github.com/SamikBeach/frontend_v2/commit/64fc0105d3e9cad83f9dad877fcdb25885416240))
+
+### Features
+
+- 프로필 읽기 섹션에 정렬 및 기간 필터 기능 추가 ([edcdd0d](https://github.com/SamikBeach/frontend_v2/commit/edcdd0dffbd61b7ae82fbb2b727958bdd6ed61a3))
+
+## [1.14.4](https://github.com/SamikBeach/frontend_v2/compare/1.14.3...1.14.4) (2025-05-29)
+
 ## [1.14.3](https://github.com/SamikBeach/frontend_v2/compare/1.14.2...1.14.3) (2025-05-29)
 
 ## [1.14.2](https://github.com/SamikBeach/frontend_v2/compare/1.14.1...1.14.2) (2025-05-27)
