@@ -60,12 +60,10 @@ export function LibraryDialog({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
 
-  // 태그 상태 추가 (tagId 기반으로 변경)
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
     mode === 'edit' && library?.tags ? library.tags.map(tag => tag.tagId) : []
   );
 
-  // 태그 이름을 저장하기 위한 맵 (UI 표시용)
   const [_, setSelectedTagNames] = useState<Map<number, string>>(
     new Map(
       mode === 'edit' && library?.tags
@@ -74,7 +72,6 @@ export function LibraryDialog({
     )
   );
 
-  // 태그 추가 핸들러
   const handleTagSelect = (tagId: number, tagName: string) => {
     if (selectedTagIds.length >= 5) {
       toast.warning('태그는 최대 5개까지 선택할 수 있습니다.');
@@ -84,7 +81,6 @@ export function LibraryDialog({
     setSelectedTagNames(prev => new Map(prev).set(tagId, tagName));
   };
 
-  // 태그 제거 핸들러
   const handleTagRemove = (tagId: number) => {
     setSelectedTagIds(prev => prev.filter(id => id !== tagId));
     setSelectedTagNames(prev => {
@@ -94,7 +90,6 @@ export function LibraryDialog({
     });
   };
 
-  // 서재 생성/수정 핸들러
   const handleSubmit = async () => {
     if (mode === 'create' && !currentUser) {
       setAuthDialogOpen(true);
@@ -130,7 +125,6 @@ export function LibraryDialog({
         toast.success('서재 정보가 수정되었습니다.');
       }
 
-      // 다이얼로그 닫기 및 상태 초기화
       resetForm();
     } catch (error) {
       console.error(`서재 ${mode === 'create' ? '생성' : '수정'} 오류:`, error);
@@ -153,7 +147,6 @@ export function LibraryDialog({
     }
   };
 
-  // 태그 토글 핸들러
   const toggleTag = (tagId: number, tagName: string) => {
     if (selectedTagIds.includes(tagId)) {
       handleTagRemove(tagId);

@@ -15,7 +15,6 @@ import {
 } from '../ui/responsive-dialog';
 import { Textarea } from '../ui/textarea';
 
-// 폼 데이터 타입
 interface FeedbackFormValues {
   content: string;
 }
@@ -26,14 +25,12 @@ interface FeedbackDialogProps {
 }
 
 export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
-  // 폼 초기값 설정
   const { register, handleSubmit, reset } = useForm<FeedbackFormValues>({
     defaultValues: {
       content: '',
     },
   });
 
-  // 피드백 제출 mutation
   const { mutate, isPending } = useMutation({
     mutationFn: (values: FeedbackFormValues) => {
       const feedbackData: FeedbackDto = {
@@ -42,7 +39,6 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
       return submitFeedback(feedbackData);
     },
     onSuccess: data => {
-      // 성공 시 다이얼로그 닫기 및 폼 초기화
       toast.success(
         data.message || '피드백이 제출되었습니다. 소중한 의견 감사합니다!'
       );
@@ -55,9 +51,7 @@ export function FeedbackDialog({ isOpen, onOpenChange }: FeedbackDialogProps) {
     },
   });
 
-  // 폼 제출 핸들러
   const onSubmit = (values: FeedbackFormValues) => {
-    // 내용이 비어있는지 확인
     if (!values.content.trim()) {
       toast.error('피드백 내용을 입력해주세요.');
       return;

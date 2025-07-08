@@ -77,23 +77,19 @@ export function ReviewDialog({
     open,
   });
 
-  // 별점 호버 상태 관리
   const [isHovering, setIsHovering] = useState(false);
   const [hoveredRating, setHoveredRating] = useState(0);
 
-  // 별점 호버 핸들러
   const handleStarHover = (star: number) => {
     setIsHovering(true);
     setHoveredRating(star);
   };
 
-  // 별점 호버 해제 핸들러
   const handleStarLeave = () => {
     setIsHovering(false);
     setHoveredRating(0);
   };
 
-  // x버튼 호버 시 별점 호버 상태 해제
   const handleXButtonHover = () => {
     setIsHovering(false);
     setHoveredRating(0);
@@ -107,24 +103,19 @@ export function ReviewDialog({
   };
 
   const handleSubmit = () => {
-    // 별점이 입력되지 않은 경우 경고 표시
     if (rating === 0) {
       setAlertMessage('리뷰를 등록하기 위해서는 별점을 입력해주세요.');
       setAlertDialogOpen(true);
       return;
     }
 
-    // 유효성 검사 통과 시 제출
     if (isCreateMode) {
-      // 생성 모드에서는 읽기 상태도 함께 전달 (null 포함)
       onSubmit(rating, content, readingStatus);
     } else {
-      // 수정 모드에서는 읽기 상태를 전달하지 않음
       onSubmit(rating, content);
     }
   };
 
-  // 버튼 텍스트 결정
   const getButtonText = () => {
     if (isSubmitting) {
       return '처리 중...';
@@ -139,7 +130,6 @@ export function ReviewDialog({
     }
   };
 
-  // 읽기 상태별 스타일 반환
   const getReadingStatusStyle = (status: ReadingStatusType | null) => {
     if (!status) {
       return 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100';
