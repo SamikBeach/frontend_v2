@@ -20,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: '%s',
     },
     description: '미역서점 - 책과 함께 유유자적',
-    keywords: ['고전', '독서', '도서', '서재', '문학', '독서 커뮤니티'],
+    keywords: ['독서', '도서', '서재', '문학', '독서 커뮤니티'],
     authors: [{ name: '미역서점' }],
     creator: '미역서점',
     publisher: '미역서점',
