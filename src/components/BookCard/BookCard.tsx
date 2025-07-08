@@ -9,26 +9,21 @@ interface BookCardProps {
   onClick?: (book: Book) => void;
   horizontal?: boolean;
 }
-// React.memo를 사용하여 props가 변경되지 않으면 리렌더링 방지
 export const BookCard = React.memo(
   ({ book, onClick, horizontal = false }: BookCardProps) => {
     const [imageLoaded, setImageLoaded] = useState(false);
-    // 책 표지 이미지 - 없으면 기본 이미지 제공
     const coverImage =
       book.coverImage || `https://picsum.photos/seed/${book.id}/240/360`;
 
-    // 이미지 크기 정보 (레이아웃 시프트 방지용)
     const imageWidth = book.coverImageWidth || 240;
     const imageHeight = book.coverImageHeight || 360;
 
-    // horizontal과 normal 모드에 따른 이미지 크기 계산
     const horizontalSize = {
       width: 128,
       height: Math.round((128 * imageHeight) / imageWidth),
     };
     const normalSize = { width: imageWidth, height: imageHeight };
 
-    // 평점과 리뷰 수가 문자열인 경우를 처리
     const rating =
       typeof book.rating === 'string'
         ? parseFloat(book.rating)
@@ -37,11 +32,9 @@ export const BookCard = React.memo(
       typeof book.reviews === 'string'
         ? parseInt(book.reviews)
         : book.reviews || 0;
-    // totalRatings 값 가져오기 (대체값 사용 안함)
     const totalRatings = (book as any).totalRatings;
-    // 책 카드 클릭 핸들러
+
     const handleBookClick = () => {
-      // 기존 onClick prop을 호출
       if (onClick) onClick(book);
     };
     return (
@@ -69,7 +62,6 @@ export const BookCard = React.memo(
                 className="relative w-32 flex-shrink-0 overflow-hidden rounded-md border border-gray-200"
                 style={{ height: `${horizontalSize.height}px` }}
               >
-                {/* 로딩 스켈레톤 */}
                 {!imageLoaded && (
                   <div className="absolute inset-0 animate-pulse bg-gray-200" />
                 )}
@@ -87,7 +79,6 @@ export const BookCard = React.memo(
                   sizes="128px"
                   onLoad={() => setImageLoaded(true)}
                   onError={e => {
-                    // 이미지 로드 실패 시 기본 이미지로 대체
                     const target = e.currentTarget as HTMLImageElement;
                     target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
                     setImageLoaded(true);
@@ -108,7 +99,6 @@ export const BookCard = React.memo(
                   blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMjQwIiBoZWlnaHQ9IjM2MCIgZmlsbD0iI2Y5ZmFmYiIvPgo8L3N2Zz4="
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
                   onError={e => {
-                    // 이미지 로드 실패 시 기본 이미지로 대체
                     const target = e.currentTarget as HTMLImageElement;
                     target.src = `https://placehold.co/240x360/f3f4f6/9ca3af?text=${encodeURIComponent(book.title.slice(0, 10))}`;
                   }}

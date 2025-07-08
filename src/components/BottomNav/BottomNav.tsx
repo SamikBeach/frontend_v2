@@ -45,7 +45,6 @@ export function BottomNav() {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
   const [showBottomNav] = useBottomNavScrollVisibility();
 
-  // activeColor는 green-800, inactiveColor는 gray-500으로 조금 더 진하게
   const activeColor = 'text-green-800';
   const inactiveColor = 'text-gray-500';
   const iconSize = 22;

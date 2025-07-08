@@ -20,10 +20,8 @@ import {
   ResponsiveDropdownMenuTrigger,
 } from '@/components/ui/responsive-dropdown-menu';
 
-// API와 일치하는 타입 사용
 import { TimeRange as ApiTimeRange, TimeRangeOptions } from '@/apis/book/types';
 
-// UI에서 사용하는 확장된 TimeRange
 export type TimeRange = ApiTimeRange;
 
 export type SortOption<T = Book> = {
@@ -98,7 +96,6 @@ export const defaultSortOptions: SortOption<Book>[] = [
   },
 ];
 
-// 기간 필터 옵션
 export const timeRangeOptions: TimeRangeOption[] = [
   {
     id: TimeRangeOptions.ALL,
@@ -153,12 +150,10 @@ interface SortDropdownProps<T = Book> {
   sortOptions?: SortOption<T>[];
   className?: string;
   align?: 'start' | 'center' | 'end';
-  // 기간 필터 관련 props 추가
   selectedTimeRange?: TimeRange;
   onTimeRangeChange?: (range: TimeRange) => void;
 }
 
-// 정렬 기준별 텍스트
 const SORT_LABELS: Record<string, string> = {
   popular: '인기순',
   books: '담긴 책 많은 순',
@@ -177,22 +172,17 @@ export function SortDropdown<T = Book>({
   selectedTimeRange = TimeRangeOptions.ALL,
   onTimeRangeChange,
 }: SortDropdownProps<T>) {
-  // 현재 선택된 정렬 옵션 가져오기
   const currentSortOption =
     sortOptions.find(option => option.id === selectedSort) || sortOptions[0];
 
-  // 현재 선택된 기간 필터 가져오기
   const currentTimeRange =
     timeRangeOptions.find(option => option.id === selectedTimeRange) ||
     timeRangeOptions[0];
 
-  // 기간 필터 표시 여부 - onTimeRangeChange가 존재할 때만 표시
   const showTimeRangeFilter = !!onTimeRangeChange;
 
-  // 버튼에 표시할 정렬 텍스트
   const sortButtonText = SORT_LABELS[selectedSort] || currentSortOption.label;
 
-  // active 스타일 조건
   const isTimeRangeActive = selectedTimeRange !== TimeRangeOptions.ALL;
   const isSortActive = selectedSort !== (sortOptions[0]?.id ?? '');
 
