@@ -27,9 +27,6 @@ export interface Tag {
   color: string;
 }
 
-/**
- * 기본 태그 생성 ("전체" 태그)
- */
 export function createDefaultTag(): Tag {
   return {
     id: 'all',
