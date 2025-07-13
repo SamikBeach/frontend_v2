@@ -1,4 +1,3 @@
-// 태그 색상 배열 - 파스텔톤
 export const TAG_COLORS = [
   '#FFF8E2', // 파스텔 옐로우
   '#F2E2FF', // 파스텔 퍼플
@@ -28,9 +27,6 @@ export interface Tag {
   color: string;
 }
 
-/**
- * 기본 태그 생성 ("전체" 태그)
- */
 export function createDefaultTag(): Tag {
   return {
     id: 'all',

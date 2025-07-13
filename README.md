@@ -1,5 +1,15 @@
 # 🚦 CHANGELOG
 
+# [1.32.0](https://github.com/SamikBeach/frontend_v2/compare/1.31.0...1.32.0) (2025-07-08)
+
+### Bug Fixes
+
+- meta keywords 수정 ([00c3ab7](https://github.com/SamikBeach/frontend_v2/commit/00c3ab75618cecc3c0d2f69baa2e13e5a423b787))
+
+### Features
+
+- 장르분석 차트 기간 필터 제거 및 전체 기간 데이터로 단순화 ([4a66ac9](https://github.com/SamikBeach/frontend_v2/commit/4a66ac980aea0e09eeac05aed15bdb98f15c4abb))
+
 # [1.31.0](https://github.com/SamikBeach/frontend_v2/compare/1.30.2...1.31.0) (2025-07-06)
 
 ### Features
