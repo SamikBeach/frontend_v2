@@ -19,6 +19,21 @@ export function ManageDiscoverBooksDialog({
 }: ManageDiscoverBooksDialogProps) {
   const { activeTab, setActiveTab } = useTabState();
 
+  const TAB_CONFIG = [
+    {
+      value: 'books',
+      icon: BookOpen,
+      fullLabel: '도서 관리',
+      shortLabel: '도서',
+    },
+    {
+      value: 'categories',
+      icon: Settings,
+      fullLabel: '카테고리 관리',
+      shortLabel: '카테고리',
+    },
+  ] as const;
+
   return (
     <DndProvider backend={HTML5Backend}>
       <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
@@ -36,22 +51,17 @@ export function ManageDiscoverBooksDialog({
               className="flex h-[94vh] flex-col md:h-[85vh]"
             >
               <TabsList className="mx-2 mt-1 grid w-fit grid-cols-2 md:mx-3 md:mt-2">
-                <TabsTrigger
-                  value="books"
-                  className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
-                >
-                  <BookOpen className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">도서 관리</span>
-                  <span className="sm:hidden">도서</span>
-                </TabsTrigger>
-                <TabsTrigger
-                  value="categories"
-                  className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
-                >
-                  <Settings className="h-3 w-3 md:h-4 md:w-4" />
-                  <span className="hidden sm:inline">카테고리 관리</span>
-                  <span className="sm:hidden">카테고리</span>
-                </TabsTrigger>
+                {TAB_CONFIG.map(({ value, icon: Icon, fullLabel, shortLabel }) => (
+                  <TabsTrigger
+                    key={value}
+                    value={value}
+                    className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
+                  >
+                    <Icon className="h-3 w-3 md:h-4 md:w-4" />
+                    <span className="hidden sm:inline">{fullLabel}</span>
+                    <span className="sm:hidden">{shortLabel}</span>
+                  </TabsTrigger>
+                ))}
               </TabsList>
 
               <TabsContent value="books" className="flex-1 overflow-hidden">
