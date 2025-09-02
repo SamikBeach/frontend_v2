@@ -19,14 +19,27 @@ import {
   renderStarRating,
 } from '../utils';
 
+// 상수 정의
+const DEBOUNCE_DELAY = 300;
+const FOCUS_DELAY = 200;
+const SCROLL_THRESHOLD = 0.9;
+const BOOKS_PER_PAGE = 10;
+const DEFAULT_RATING = '0.0';
+const THOUSAND_THRESHOLD = 999;
+
 export function BookSearchSection({ open }: CategoryBooksListProps) {
   const queryClient = useQueryClient();
   const { selectedCategoryId, selectedSubcategoryId } = useCategorySelection();
   const { searchQuery, setSearchQuery } = useSearchState();
   const { categories } = useDiscoverCategories({ includeInactive: true });
 
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const debouncedSearchQuery = useDebounce(searchQuery, DEBOUNCE_DELAY);
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // 유효한 서브카테고리 ID인지 확인
+  const isValidSubcategoryId = useCallback((id: string | null): boolean => {
+    return id !== null && id !== '' && id !== 'none' && !isNaN(parseInt(id));
+  }, []);
 
   // 선택이 완료되었는지 확인하는 함수
   const isSelectionComplete = useCallback(() => {
@@ -37,20 +50,16 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
     );
     if (!category) return false;
 
-    // 서브카테고리가 있는 경우
-    if (category.subCategories && category.subCategories.length > 0) {
-      // 서브카테고리가 선택되어야 함 (빈 문자열이나 'none'이 아닌 유효한 값)
-      return (
-        selectedSubcategoryId &&
-        selectedSubcategoryId !== '' &&
-        selectedSubcategoryId !== 'none' &&
-        !isNaN(parseInt(selectedSubcategoryId))
-      );
-    }
-
-    // 서브카테고리가 없는 경우는 카테고리만 선택되면 됨
-    return true;
-  }, [selectedCategoryId, selectedSubcategoryId, categories]);
+    // 서브카테고리가 있는 경우 서브카테고리도 선택되어야 함
+    return category.subCategories?.length > 0
+      ? isValidSubcategoryId(selectedSubcategoryId)
+      : true;
+  }, [
+    selectedCategoryId,
+    selectedSubcategoryId,
+    categories,
+    isValidSubcategoryId,
+  ]);
 
   // 도서 검색 기능
   const {
@@ -62,7 +71,7 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
   } = useInfiniteQuery({
     queryKey: ['available-books-for-discover', debouncedSearchQuery],
     queryFn: ({ pageParam = 1 }) => {
-      return searchBooks(debouncedSearchQuery, pageParam, 10);
+      return searchBooks(debouncedSearchQuery, pageParam, BOOKS_PER_PAGE);
     },
     initialPageParam: 1,
     getNextPageParam: lastPage => {
@@ -86,7 +95,7 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
     if (open) {
       setTimeout(() => {
         searchInputRef.current?.focus();
-      }, 200);
+      }, FOCUS_DELAY);
     } else {
       setSearchQuery('');
     }
@@ -100,66 +109,88 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
       const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
       const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
 
-      // 스크롤이 90% 이상 내려갔을 때 다음 페이지 로드
-      if (scrollPercentage >= 0.9) {
+      // 스크롤이 임계점 이상 내려갔을 때 다음 페이지 로드
+      if (scrollPercentage >= SCROLL_THRESHOLD) {
         fetchNextSearchPage();
       }
     },
     [hasNextSearchPage, isFetchingNextSearchPage, fetchNextSearchPage]
   );
 
-  // 검색 결과에서 도서를 카테고리에 즉시 추가하는 함수
-  const addBookToCategory = (book: SearchResult): void => {
-    if (!open) return;
-
-    const bookId = book.bookId !== undefined ? book.bookId : book.id;
-    const isbn = book.isbn13 || book.isbn || '';
-
-    if (!selectedCategoryId || !isSelectionComplete()) {
-      if (!selectedCategoryId) {
-        toast.error('카테고리를 선택해주세요.');
-      } else if (!isSelectionComplete()) {
-        toast.error('서브카테고리를 선택해주세요.');
-      }
-      return;
+  // 선택 검증 및 에러 메시지 표시
+  const validateSelection = useCallback((): boolean => {
+    if (!selectedCategoryId) {
+      toast.error('카테고리를 선택해주세요.');
+      return false;
     }
+    if (!isSelectionComplete()) {
+      toast.error('서브카테고리를 선택해주세요.');
+      return false;
+    }
+    return true;
+  }, [selectedCategoryId, isSelectionComplete]);
+
+  // 도서 정보 검증
+  const validateBookData = useCallback((book: SearchResult): boolean => {
+    const bookId = book.bookId ?? book.id;
+    const isbn = book.isbn13 || book.isbn || '';
 
     if ((bookId === undefined || bookId === null) && !isbn) {
       toast.error('도서 ID 또는 ISBN 정보가 없어 추가할 수 없습니다.');
-      return;
+      return false;
     }
+    return true;
+  }, []);
 
-    if (selectedCategory && !selectedCategory.isActive) {
-      toast.warning(
-        `비활성 카테고리 "${selectedCategory.name}"에 도서를 추가합니다.`
-      );
-    }
+  // 검색 결과에서 도서를 카테고리에 즉시 추가하는 함수
+  const addBookToCategory = useCallback(
+    (book: SearchResult): void => {
+      if (!open || !validateSelection() || !validateBookData(book)) return;
 
-    addBookToDiscoverCategory(
-      bookId as number,
-      parseInt(selectedCategoryId),
-      selectedSubcategoryId &&
-        selectedSubcategoryId !== 'none' &&
-        selectedSubcategoryId !== 'all' &&
-        !isNaN(parseInt(selectedSubcategoryId))
-        ? parseInt(selectedSubcategoryId)
-        : undefined,
-      isbn
-    )
-      .then(() => {
-        const statusText = selectedCategory?.isActive ? '' : ' (비활성)';
-        toast.success(
-          `도서가 ${selectedCategory?.name}${statusText} 카테고리에 추가되었습니다.`
+      const bookId = book.bookId ?? book.id;
+      const isbn = book.isbn13 || book.isbn || '';
+
+      if (selectedCategory && !selectedCategory.isActive) {
+        toast.warning(
+          `비활성 카테고리 "${selectedCategory.name}"에 도서를 추가합니다.`
         );
-        queryClient.invalidateQueries({
-          queryKey: ['admin-discover-category-books'],
+      }
+
+      const subcategoryId = isValidSubcategoryId(selectedSubcategoryId)
+        ? parseInt(selectedSubcategoryId!)
+        : undefined;
+
+      addBookToDiscoverCategory(
+        bookId as number,
+        parseInt(selectedCategoryId!),
+        subcategoryId,
+        isbn
+      )
+        .then(() => {
+          const statusText = selectedCategory?.isActive ? '' : ' (비활성)';
+          toast.success(
+            `도서가 ${selectedCategory?.name}${statusText} 카테고리에 추가되었습니다.`
+          );
+          queryClient.invalidateQueries({
+            queryKey: ['admin-discover-category-books'],
+          });
+        })
+        .catch(error => {
+          console.error('도서 추가 오류:', error);
+          toast.error('도서 추가 중 오류가 발생했습니다.');
         });
-      })
-      .catch(error => {
-        console.error('도서 추가 오류:', error);
-        toast.error('도서 추가 중 오류가 발생했습니다.');
-      });
-  };
+    },
+    [
+      open,
+      validateSelection,
+      validateBookData,
+      selectedCategory,
+      selectedCategoryId,
+      isValidSubcategoryId,
+      selectedSubcategoryId,
+      queryClient,
+    ]
+  );
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-white p-2 md:p-3">
@@ -277,7 +308,7 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
                             <span className="mx-1 text-xs font-medium text-gray-800 md:mx-1.5 md:text-sm">
                               {typeof book.rating === 'number'
                                 ? book.rating.toFixed(1)
-                                : book.rating || '0.0'}
+                                : book.rating || DEFAULT_RATING}
                             </span>
                             <span className="text-xs text-gray-500 md:text-sm">
                               ({book.totalRatings || 0})
@@ -287,7 +318,7 @@ export function BookSearchSection({ open }: CategoryBooksListProps) {
                           <div className="flex items-center md:border-l md:border-gray-200 md:pl-3">
                             <span className="text-xs text-gray-500 md:ml-1.5 md:text-sm">
                               리뷰{' '}
-                              {book.reviews && book.reviews > 999
+                              {book.reviews && book.reviews > THOUSAND_THRESHOLD
                                 ? `${Math.floor(book.reviews / 1000)}k`
                                 : book.reviews || 0}
                             </span>
