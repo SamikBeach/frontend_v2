@@ -3,6 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Loader2 } from 'lucide-react';
+import { useCallback } from 'react';
 import { CategoryFormProps } from '../types';
 
 export function CategoryForm({
@@ -13,10 +14,30 @@ export function CategoryForm({
   isLoading,
   mode,
 }: CategoryFormProps) {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit();
-  };
+  const handleSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      onSubmit();
+    },
+    [onSubmit]
+  );
+
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setCategoryForm(prev => ({ ...prev, name: e.target.value }));
+    },
+    [setCategoryForm]
+  );
+
+  const handleActiveChange = useCallback(
+    (checked: boolean) => {
+      setCategoryForm(prev => ({ ...prev, isActive: checked }));
+    },
+    [setCategoryForm]
+  );
+
+  const isSubmitDisabled = !categoryForm.name.trim() || isLoading;
+  const buttonText = mode === 'create' ? '생성' : '수정';
 
   return (
     <div className="mb-2 rounded-lg border border-gray-200 bg-gray-50 p-4">
@@ -29,9 +50,7 @@ export function CategoryForm({
             id="categoryName"
             type="text"
             value={categoryForm.name}
-            onChange={e =>
-              setCategoryForm(prev => ({ ...prev, name: e.target.value }))
-            }
+            onChange={handleNameChange}
             placeholder="카테고리명을 입력하세요"
             className="h-9"
             autoFocus
@@ -42,9 +61,7 @@ export function CategoryForm({
           <Switch
             id="categoryActive"
             checked={categoryForm.isActive}
-            onCheckedChange={checked =>
-              setCategoryForm(prev => ({ ...prev, isActive: checked }))
-            }
+            onCheckedChange={handleActiveChange}
           />
           <Label htmlFor="categoryActive" className="text-sm">
             활성화
@@ -55,11 +72,11 @@ export function CategoryForm({
           <Button
             type="submit"
             size="sm"
-            disabled={!categoryForm.name.trim() || isLoading}
+            disabled={isSubmitDisabled}
             className="flex items-center gap-2"
           >
             {isLoading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {mode === 'create' ? '생성' : '수정'}
+            {buttonText}
           </Button>
           <Button
             type="button"
