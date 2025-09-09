@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/responsive-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BookOpen, Settings } from 'lucide-react';
+import { useMemo } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { BooksManagementTab } from './components/BooksManagementTab';
@@ -13,26 +14,43 @@ import { CategoriesManagementTab } from './components/CategoriesManagementTab';
 import { useTabState } from './hooks';
 import { ManageDiscoverBooksDialogProps } from './types';
 
+// 탭 설정 상수
+const TAB_CONFIG = [
+  {
+    value: 'books',
+    icon: BookOpen,
+    fullLabel: '도서 관리',
+    shortLabel: '도서',
+  },
+  {
+    value: 'categories',
+    icon: Settings,
+    fullLabel: '카테고리 관리',
+    shortLabel: '카테고리',
+  },
+] as const;
+
 export function ManageDiscoverBooksDialog({
   open,
   onOpenChange,
 }: ManageDiscoverBooksDialogProps) {
   const { activeTab, setActiveTab } = useTabState();
 
-  const TAB_CONFIG = [
-    {
-      value: 'books',
-      icon: BookOpen,
-      fullLabel: '도서 관리',
-      shortLabel: '도서',
-    },
-    {
-      value: 'categories',
-      icon: Settings,
-      fullLabel: '카테고리 관리',
-      shortLabel: '카테고리',
-    },
-  ] as const;
+  const tabTriggers = useMemo(
+    () =>
+      TAB_CONFIG.map(({ value, icon: Icon, fullLabel, shortLabel }) => (
+        <TabsTrigger
+          key={value}
+          value={value}
+          className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
+        >
+          <Icon className="h-3 w-3 md:h-4 md:w-4" />
+          <span className="hidden sm:inline">{fullLabel}</span>
+          <span className="sm:hidden">{shortLabel}</span>
+        </TabsTrigger>
+      )),
+    []
+  );
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -51,17 +69,7 @@ export function ManageDiscoverBooksDialog({
               className="flex h-[94vh] flex-col md:h-[85vh]"
             >
               <TabsList className="mx-2 mt-1 grid w-fit grid-cols-2 md:mx-3 md:mt-2">
-                {TAB_CONFIG.map(({ value, icon: Icon, fullLabel, shortLabel }) => (
-                  <TabsTrigger
-                    key={value}
-                    value={value}
-                    className="flex items-center gap-1 text-xs md:gap-2 md:text-sm"
-                  >
-                    <Icon className="h-3 w-3 md:h-4 md:w-4" />
-                    <span className="hidden sm:inline">{fullLabel}</span>
-                    <span className="sm:hidden">{shortLabel}</span>
-                  </TabsTrigger>
-                ))}
+                {tabTriggers}
               </TabsList>
 
               <TabsContent value="books" className="flex-1 overflow-hidden">
