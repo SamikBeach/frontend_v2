@@ -30,12 +30,7 @@ export function DraggableSubCategory({
 
   const handleHover = useCallback(
     (item: { index: number }, monitor: any) => {
-      if (!ref.current) return;
-
-      const dragIndex = item.index;
-      const hoverIndex = index;
-
-      if (dragIndex === hoverIndex) return;
+      if (!ref.current || item.index === index) return;
 
       const hoverBoundingRect = ref.current.getBoundingClientRect();
       const hoverMiddleY =
@@ -43,11 +38,15 @@ export function DraggableSubCategory({
       const clientOffset = monitor.getClientOffset();
       const hoverClientY = clientOffset!.y - hoverBoundingRect.top;
 
-      if (dragIndex < hoverIndex && hoverClientY < hoverMiddleY) return;
-      if (dragIndex > hoverIndex && hoverClientY > hoverMiddleY) return;
+      const dragIndex = item.index;
+      const shouldSkip =
+        (dragIndex < index && hoverClientY < hoverMiddleY) ||
+        (dragIndex > index && hoverClientY > hoverMiddleY);
 
-      onMove(dragIndex, hoverIndex);
-      item.index = hoverIndex;
+      if (shouldSkip) return;
+
+      onMove(dragIndex, index);
+      item.index = index;
     },
     [index, onMove]
   );
@@ -114,7 +113,7 @@ export function DraggableSubCategory({
       ? 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
       : 'border-gray-300 bg-gray-50 opacity-75 hover:border-gray-400 hover:bg-gray-100';
     const draggingStyle = isDragging ? 'opacity-50' : '';
-    return `${baseStyle} ${activeStyle} ${draggingStyle}`;
+    return [baseStyle, activeStyle, draggingStyle].filter(Boolean).join(' ');
   }, [subCategory.isActive, isDragging]);
 
   const titleClassName = useMemo(
