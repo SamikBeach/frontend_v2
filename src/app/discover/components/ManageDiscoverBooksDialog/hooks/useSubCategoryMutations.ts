@@ -10,6 +10,7 @@ import {
   UpdateDiscoverSubCategoryDto,
 } from '@/apis/discover-category/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { toast } from 'sonner';
 
 interface UseSubCategoryMutationsProps {
@@ -19,6 +20,19 @@ interface UseSubCategoryMutationsProps {
   onSubCategoriesReordered?: () => void;
 }
 
+// 상수 정의
+const QUERY_KEY = 'discover-categories';
+const MESSAGES = {
+  CREATE_SUCCESS: '서브카테고리가 생성되었습니다.',
+  CREATE_ERROR: '서브카테고리 생성 중 오류가 발생했습니다.',
+  UPDATE_SUCCESS: '서브카테고리가 수정되었습니다.',
+  UPDATE_ERROR: '서브카테고리 수정 중 오류가 발생했습니다.',
+  DELETE_SUCCESS: '서브카테고리가 삭제되었습니다.',
+  DELETE_ERROR: '서브카테고리 삭제 중 오류가 발생했습니다.',
+  REORDER_SUCCESS: '서브카테고리 순서가 변경되었습니다.',
+  REORDER_ERROR: '서브카테고리 순서 변경 중 오류가 발생했습니다.',
+} as const;
+
 export const useSubCategoryMutations = ({
   onSubCategoryCreated,
   onSubCategoryUpdated,
@@ -27,18 +41,20 @@ export const useSubCategoryMutations = ({
 }: UseSubCategoryMutationsProps = {}) => {
   const queryClient = useQueryClient();
 
+  const invalidateQueries = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEY] });
+  }, [queryClient]);
+
   const createSubCategoryMutation = useMutation({
     mutationFn: (data: CreateDiscoverSubCategoryDto) =>
       createDiscoverSubCategory(data),
     onSuccess: newSubCategory => {
-      toast.success('서브카테고리가 생성되었습니다.');
-      queryClient.invalidateQueries({
-        queryKey: ['discover-categories'],
-      });
+      toast.success(MESSAGES.CREATE_SUCCESS);
+      invalidateQueries();
       onSubCategoryCreated?.(newSubCategory);
     },
     onError: () => {
-      toast.error('서브카테고리 생성 중 오류가 발생했습니다.');
+      toast.error(MESSAGES.CREATE_ERROR);
     },
   });
 
@@ -51,46 +67,36 @@ export const useSubCategoryMutations = ({
       data: UpdateDiscoverSubCategoryDto;
     }) => updateDiscoverSubCategory(id, data),
     onSuccess: updatedSubCategory => {
-      toast.success('서브카테고리가 수정되었습니다.');
-      queryClient.invalidateQueries({
-        queryKey: ['discover-categories'],
-      });
+      toast.success(MESSAGES.UPDATE_SUCCESS);
+      invalidateQueries();
       onSubCategoryUpdated?.(updatedSubCategory);
     },
     onError: () => {
-      toast.error('서브카테고리 수정 중 오류가 발생했습니다.');
+      toast.error(MESSAGES.UPDATE_ERROR);
     },
   });
 
   const deleteSubCategoryMutation = useMutation({
-    mutationFn: (subCategoryId: number) =>
-      deleteDiscoverSubCategory(subCategoryId),
+    mutationFn: deleteDiscoverSubCategory,
     onSuccess: (_, subCategoryId) => {
-      toast.success('서브카테고리가 삭제되었습니다.');
-      queryClient.invalidateQueries({
-        queryKey: ['discover-categories'],
-      });
+      toast.success(MESSAGES.DELETE_SUCCESS);
+      invalidateQueries();
       onSubCategoryDeleted?.(subCategoryId);
     },
     onError: () => {
-      toast.error('서브카테고리 삭제 중 오류가 발생했습니다.');
+      toast.error(MESSAGES.DELETE_ERROR);
     },
   });
 
   const reorderSubCategoriesMutation = useMutation({
-    mutationFn: (data: {
-      categoryId: number;
-      subCategories: { id: number; displayOrder: number }[];
-    }) => reorderDiscoverSubCategories(data),
+    mutationFn: reorderDiscoverSubCategories,
     onSuccess: () => {
-      toast.success('서브카테고리 순서가 변경되었습니다.');
-      queryClient.invalidateQueries({
-        queryKey: ['discover-categories'],
-      });
+      toast.success(MESSAGES.REORDER_SUCCESS);
+      invalidateQueries();
       onSubCategoriesReordered?.();
     },
     onError: () => {
-      toast.error('서브카테고리 순서 변경 중 오류가 발생했습니다.');
+      toast.error(MESSAGES.REORDER_ERROR);
     },
   });
 
