@@ -1,5 +1,12 @@
 # 🚦 CHANGELOG
 
+## [1.32.9](https://github.com/SamikBeach/frontend_v2/compare/1.32.8...1.32.9) (2025-09-11)
+
+
+### Bug Fixes
+
+* DEFAULT_FORM_STATE 타입 호환성 문제 해결 ([255f585](https://github.com/SamikBeach/frontend_v2/commit/255f585841a9084774ab58bcc16b0a563893e937))
+
 ## [1.32.8](https://github.com/SamikBeach/frontend_v2/compare/1.32.7...1.32.8) (2025-09-10)
 
 ## [1.32.7](https://github.com/SamikBeach/frontend_v2/compare/1.32.6...1.32.7) (2025-09-09)
