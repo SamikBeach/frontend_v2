@@ -12,7 +12,7 @@ import {
 const DEFAULT_FORM_STATE = {
   name: '',
   isActive: true,
-} as const;
+};
 
 // 탭 상태 관리
 export const useTabState = () => {
