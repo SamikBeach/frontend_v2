@@ -1,5 +1,5 @@
 import { useAtom } from 'jotai';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   activeTabAtom,
   searchQueryAtom,
@@ -8,10 +8,19 @@ import {
   selectedSubcategoryIdAtom,
 } from '../atoms';
 
+// 기본 폼 상태
+const DEFAULT_FORM_STATE = {
+  name: '',
+  isActive: true,
+} as const;
+
 // 탭 상태 관리
 export const useTabState = () => {
   const [activeTab, setActiveTab] = useAtom(activeTabAtom);
-  return { activeTab, setActiveTab };
+  return useMemo(
+    () => ({ activeTab, setActiveTab }),
+    [activeTab, setActiveTab]
+  );
 };
 
 // 카테고리 선택 상태 관리 (도서 관리용)
@@ -23,18 +32,29 @@ export const useCategorySelection = () => {
     selectedSubcategoryIdAtom
   );
 
-  return {
-    selectedCategoryId,
-    setSelectedCategoryId,
-    selectedSubcategoryId,
-    setSelectedSubcategoryId,
-  };
+  return useMemo(
+    () => ({
+      selectedCategoryId,
+      setSelectedCategoryId,
+      selectedSubcategoryId,
+      setSelectedSubcategoryId,
+    }),
+    [
+      selectedCategoryId,
+      setSelectedCategoryId,
+      selectedSubcategoryId,
+      setSelectedSubcategoryId,
+    ]
+  );
 };
 
 // 검색 상태 관리
 export const useSearchState = () => {
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
-  return { searchQuery, setSearchQuery };
+  return useMemo(
+    () => ({ searchQuery, setSearchQuery }),
+    [searchQuery, setSearchQuery]
+  );
 };
 
 // 카테고리 관리용 선택 상태
@@ -42,10 +62,13 @@ export const useCategoryManagement = () => {
   const [selectedCategoryForManagement, setSelectedCategoryForManagement] =
     useAtom(selectedCategoryForManagementAtom);
 
-  return {
-    selectedCategoryForManagement,
-    setSelectedCategoryForManagement,
-  };
+  return useMemo(
+    () => ({
+      selectedCategoryForManagement,
+      setSelectedCategoryForManagement,
+    }),
+    [selectedCategoryForManagement, setSelectedCategoryForManagement]
+  );
 };
 
 // 카테고리 폼 상태 (로컬 상태로 충분)
@@ -54,19 +77,19 @@ export const useCategoryFormState = () => {
   const [isEditingCategory, setIsEditingCategory] = useState<number | null>(
     null
   );
-  const [categoryForm, setCategoryForm] = useState({
-    name: '',
-    isActive: true,
-  });
+  const [categoryForm, setCategoryForm] = useState(DEFAULT_FORM_STATE);
 
-  return {
-    isCreatingCategory,
-    setIsCreatingCategory,
-    isEditingCategory,
-    setIsEditingCategory,
-    categoryForm,
-    setCategoryForm,
-  };
+  return useMemo(
+    () => ({
+      isCreatingCategory,
+      setIsCreatingCategory,
+      isEditingCategory,
+      setIsEditingCategory,
+      categoryForm,
+      setCategoryForm,
+    }),
+    [isCreatingCategory, isEditingCategory, categoryForm]
+  );
 };
 
 // 서브카테고리 폼 상태 (로컬 상태로 충분)
@@ -75,17 +98,17 @@ export const useSubCategoryFormState = () => {
   const [isEditingSubCategory, setIsEditingSubCategory] = useState<
     number | null
   >(null);
-  const [subCategoryForm, setSubCategoryForm] = useState({
-    name: '',
-    isActive: true,
-  });
+  const [subCategoryForm, setSubCategoryForm] = useState(DEFAULT_FORM_STATE);
 
-  return {
-    isCreatingSubCategory,
-    setIsCreatingSubCategory,
-    isEditingSubCategory,
-    setIsEditingSubCategory,
-    subCategoryForm,
-    setSubCategoryForm,
-  };
+  return useMemo(
+    () => ({
+      isCreatingSubCategory,
+      setIsCreatingSubCategory,
+      isEditingSubCategory,
+      setIsEditingSubCategory,
+      subCategoryForm,
+      setSubCategoryForm,
+    }),
+    [isCreatingSubCategory, isEditingSubCategory, subCategoryForm]
+  );
 };
