@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useMemo } from 'react';
 import { UserProfile } from '../CreateReviewCard';
 
 interface UserAvatarProps {
@@ -6,11 +7,9 @@ interface UserAvatarProps {
 }
 
 export function UserAvatar({ user }: UserAvatarProps) {
-  // Safely get first letter of name for avatar fallback
-  const getNameInitial = () => {
-    if (!user?.username) return '?';
-    return user.username.charAt(0);
-  };
+  const nameInitial = useMemo(() => {
+    return user?.username?.charAt(0) ?? '?';
+  }, [user?.username]);
 
   return (
     <Avatar className="h-8 w-8 sm:h-10 sm:w-10">
@@ -20,7 +19,7 @@ export function UserAvatar({ user }: UserAvatarProps) {
         className="object-cover"
       />
       <AvatarFallback className="text-xs sm:text-sm">
-        {getNameInitial()}
+        {nameInitial}
       </AvatarFallback>
     </Avatar>
   );
