@@ -12,6 +12,10 @@ import { useBookMutations, useCategorySelection } from '../hooks';
 import { CategoryBooksListProps } from '../types';
 import { CategorySelector } from './CategorySelector';
 
+// 상수 정의
+const DEBOUNCE_DELAY = 300;
+const BOOKS_LIMIT = 100;
+
 export function CategoryBooksSection({ open }: CategoryBooksListProps) {
   const { selectedCategoryId, selectedSubcategoryId } = useCategorySelection();
   const { categories } = useDiscoverCategories({ includeInactive: true });
@@ -19,7 +23,7 @@ export function CategoryBooksSection({ open }: CategoryBooksListProps) {
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const { removeBookMutation } = useBookMutations();
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const debouncedSearchQuery = useDebounce(searchQuery, DEBOUNCE_DELAY);
 
   // 선택이 완료되었는지 확인하는 함수
   const isSelectionComplete = useCallback(() => {
@@ -65,7 +69,7 @@ export function CategoryBooksSection({ open }: CategoryBooksListProps) {
         return getDiscoverBooks({
           discoverCategoryId: categoryId,
           discoverSubCategoryId: subcategoryId,
-          limit: 100,
+          limit: BOOKS_LIMIT,
         });
       },
       enabled: Boolean(open && isSelectionComplete()),
@@ -129,14 +133,18 @@ export function CategoryBooksSection({ open }: CategoryBooksListProps) {
             type="text"
             placeholder="도서 제목, 저자, 출판사, ISBN으로 검색"
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={useCallback(
+              (e: React.ChangeEvent<HTMLInputElement>) =>
+                setSearchQuery(e.target.value),
+              []
+            )}
             className="focus:ring-opacity-50 h-9 rounded-full border-gray-200 pr-10 pl-10 text-sm transition-all hover:border-gray-300 focus:border-blue-300 focus:ring focus:ring-blue-200 md:h-10 md:text-base"
           />
           <Search className="absolute top-1/2 left-3 h-3 w-3 -translate-y-1/2 transform text-gray-400 md:left-3.5 md:h-4 md:w-4" />
           {searchQuery && (
             <button
               className="absolute top-1/2 right-3 -translate-y-1/2 transform cursor-pointer text-gray-400 hover:text-gray-600 md:right-3.5"
-              onClick={() => setSearchQuery('')}
+              onClick={useCallback(() => setSearchQuery(''), [])}
             >
               <X className="h-3 w-3 md:h-4 md:w-4" />
             </button>
