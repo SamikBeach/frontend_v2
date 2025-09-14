@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/responsive-dropdown-menu';
 import { cn } from '@/lib/utils';
 import { ChevronDown, Star, X } from 'lucide-react';
+import { useCallback, useMemo } from 'react';
 
 // 읽기 상태 텍스트 및 아이콘 정의
 const statusTexts = {
@@ -44,22 +45,38 @@ export function SelectedBook({
   setReadingStatus,
 }: SelectedBookProps) {
   // 읽기 상태별 스타일 반환
-  const getReadingStatusStyle = (status: ReadingStatusType | null) => {
-    if (!status) {
-      return 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100';
-    }
+  const getReadingStatusStyle = useCallback(
+    (status: ReadingStatusType | null) => {
+      if (!status) {
+        return 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100';
+      }
 
-    switch (status) {
-      case ReadingStatusType.WANT_TO_READ:
-        return 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100';
-      case ReadingStatusType.READING:
-        return 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100';
-      case ReadingStatusType.READ:
-        return 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100';
-      default:
-        return 'bg-gray-50 text-gray-700';
-    }
-  };
+      switch (status) {
+        case ReadingStatusType.WANT_TO_READ:
+          return 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100';
+        case ReadingStatusType.READING:
+          return 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100';
+        case ReadingStatusType.READ:
+          return 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100';
+        default:
+          return 'bg-gray-50 text-gray-700';
+      }
+    },
+    []
+  );
+
+  const ratingText = useMemo(() => {
+    if (rating === 0) return '';
+    const texts = [
+      '',
+      '별로예요',
+      '아쉬워요',
+      '보통이에요',
+      '좋아요',
+      '최고예요',
+    ];
+    return texts[rating];
+  }, [rating]);
 
   return (
     <div className="mt-2 mb-2 space-y-2 sm:mt-3 sm:mb-3 sm:space-y-3">
@@ -109,15 +126,7 @@ export function SelectedBook({
           </div>
           {rating > 0 && (
             <span className="ml-1.5 text-[10px] text-gray-500 sm:ml-2 sm:text-sm">
-              {rating === 1
-                ? '별로예요'
-                : rating === 2
-                  ? '아쉬워요'
-                  : rating === 3
-                    ? '보통이에요'
-                    : rating === 4
-                      ? '좋아요'
-                      : '최고예요'}
+              {ratingText}
             </span>
           )}
         </div>
