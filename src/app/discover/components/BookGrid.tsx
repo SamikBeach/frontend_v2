@@ -1,5 +1,6 @@
 import { Book } from '@/apis/book/types';
 import { BookCard } from '@/components/BookCard';
+import { useMemo } from 'react';
 
 interface BookGridProps {
   books: Book[];
@@ -7,6 +8,8 @@ interface BookGridProps {
 }
 
 export function BookGrid({ books, onSelectBook }: BookGridProps) {
+  const isEmpty = useMemo(() => books.length === 0, [books.length]);
+
   return (
     <div>
       {/* 도서 그리드 */}
@@ -17,7 +20,7 @@ export function BookGrid({ books, onSelectBook }: BookGridProps) {
       </div>
 
       {/* 결과가 없을 때 */}
-      {books.length === 0 && (
+      {isEmpty && (
         <div className="mt-8 flex flex-col items-center justify-center rounded-lg bg-gray-50 py-16 text-center">
           <div className="text-3xl">📚</div>
           <h3 className="mt-4 text-lg font-medium text-gray-900">
