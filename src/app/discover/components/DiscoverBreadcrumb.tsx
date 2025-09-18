@@ -7,6 +7,7 @@ import { useQueryParams } from '@/hooks';
 import { useAtom } from 'jotai';
 import { ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useCallback, useMemo } from 'react';
 
 export function DiscoverBreadcrumb() {
   const { clearQueryParams, updateQueryParams } = useQueryParams();
@@ -21,26 +22,38 @@ export function DiscoverBreadcrumb() {
   const { categories } = useDiscoverCategories({ includeInactive: false });
 
   // 선택된 카테고리 정보
-  const currentCategory = categories?.find(
-    cat => cat.id.toString() === selectedCategory
+  const currentCategory = useMemo(
+    () => categories?.find(cat => cat.id.toString() === selectedCategory),
+    [categories, selectedCategory]
   );
 
-  const handleClearFilters = () => {
+  const currentSubcategory = useMemo(
+    () =>
+      currentCategory?.subCategories.find(
+        sub => sub.id.toString() === selectedSubcategory
+      ),
+    [currentCategory, selectedSubcategory]
+  );
+
+  const handleClearFilters = useCallback(() => {
     setSelectedCategory('all');
     setSelectedSubcategory('all');
     clearQueryParams();
-  };
+  }, [setSelectedCategory, setSelectedSubcategory, clearQueryParams]);
 
-  const handleCategoryClick = (categoryId: string) => {
-    setSelectedCategory(categoryId);
-    setSelectedSubcategory('all');
+  const handleCategoryClick = useCallback(
+    (categoryId: string) => {
+      setSelectedCategory(categoryId);
+      setSelectedSubcategory('all');
 
-    // URL 쿼리 파라미터 업데이트
-    updateQueryParams({
-      category: categoryId,
-      subcategory: 'all',
-    });
-  };
+      // URL 쿼리 파라미터 업데이트
+      updateQueryParams({
+        category: categoryId,
+        subcategory: 'all',
+      });
+    },
+    [setSelectedCategory, setSelectedSubcategory, updateQueryParams]
+  );
 
   return (
     <div className="flex items-center text-[14px] text-gray-500 md:text-[14px]">
@@ -81,11 +94,7 @@ export function DiscoverBreadcrumb() {
         <>
           <ChevronRight className="mx-1 h-3 w-3 md:h-4 md:w-4" />
           <span className="font-medium text-gray-900">
-            {
-              currentCategory?.subCategories.find(
-                sub => sub.id.toString() === selectedSubcategory
-              )?.name
-            }
+            {currentSubcategory?.name}
           </span>
         </>
       )}

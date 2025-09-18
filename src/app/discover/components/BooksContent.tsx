@@ -6,9 +6,12 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useQueryParams } from '@/hooks';
 import { useBookDetailOpen } from '@/hooks/useBookDetailOpen';
 import { useAtom } from 'jotai';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useDiscoverBooksQuery } from '../hooks';
+
+// 상수 정의
+const SCROLL_THRESHOLD = 0.9;
 
 export function BooksContent() {
   const { clearQueryParams } = useQueryParams();
@@ -31,7 +34,18 @@ export function BooksContent() {
     clearQueryParams();
   }, [clearQueryParams]);
 
-  if (books.length === 0) {
+  const isEmpty = useMemo(() => books.length === 0, [books.length]);
+
+  const loadingSpinner = useMemo(
+    () => (
+      <div className="my-8 flex justify-center">
+        <LoadingSpinner size="md" />
+      </div>
+    ),
+    []
+  );
+
+  if (isEmpty) {
     return (
       <div className="flex h-[calc(100vh-200px)] w-full flex-col items-center justify-center space-y-4">
         <div className="text-center">
@@ -54,12 +68,8 @@ export function BooksContent() {
       dataLength={books.length}
       next={fetchNextPage}
       hasMore={hasNextPage}
-      loader={
-        <div className="my-8 flex justify-center">
-          <LoadingSpinner size="md" />
-        </div>
-      }
-      scrollThreshold={0.9}
+      loader={loadingSpinner}
+      scrollThreshold={SCROLL_THRESHOLD}
       className="flex w-full flex-col pb-4"
       style={{ overflow: 'visible' }}
     >
