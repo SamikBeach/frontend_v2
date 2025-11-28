@@ -26,5 +26,8 @@
   "prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
   "typescript.tsdk": ".yarn/sdks/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "i18n-ally.localesPaths": ["messages", "src/i18n"]
+  "i18n-ally.localesPaths": [
+    "messages",
+    "src/i18n"
+  ]
 }
