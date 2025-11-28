@@ -2,11 +2,14 @@ name: Add release tag
 
 on:
   push:
-    branches: ['main']
+    branches:
+      - main
+      - dev
+      - develop
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch to release'
+        description: 'Branch to release (실제로 릴리즈할 브랜치 선택)'
         required: true
         type: string
         default: 'main'
